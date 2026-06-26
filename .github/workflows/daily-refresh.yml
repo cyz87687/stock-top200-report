@@ -25,7 +25,7 @@ jobs:
           cache: 'pip'
 
       - name: Install dependencies
-        run: pip install --quiet requests beautifulsoup4 lxml html5lib
+        run: pip install --quiet -r requirements.txt
 
       - name: Fetch & Score & Generate Report
         run: |
