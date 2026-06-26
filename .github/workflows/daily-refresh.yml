@@ -103,7 +103,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html top200_report_*.html top200_scored_*.json top200_all_a.json refresh_log.txt
+          git add index.html top200_report_*.html refresh_log.txt
+          git add -f top200_scored_*.json top200_all_a.json
           git diff --cached --quiet && echo "No changes to commit" && exit 0
           git commit -m "auto: daily report refresh $(date -u '+%Y-%m-%d')"
           git push
