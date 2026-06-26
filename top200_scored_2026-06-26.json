@@ -3187,105 +3187,6 @@
       "cagr3": 21.0
     },
     {
-      "name": "泰晶科技",
-      "code": "sh603738",
-      "sector": "电子元件",
-      "price": 64.3,
-      "pct_chg": -0.71,
-      "pe": 372.67,
-      "turnover": 3499752529.0,
-      "score_news": 5,
-      "score_tech": 2.1,
-      "score_fund": 1.5,
-      "score_theme": 5,
-      "total": 13.5,
-      "rating": "B",
-      "advice": "波段操作，轻仓参与",
-      "tech": {
-        "ma5": 63.1,
-        "ma10": 59.7,
-        "ma20": 52.1,
-        "ma60": 43.1,
-        "wma5": 52.6,
-        "wma10": 49.4,
-        "wma20": 36.2,
-        "trend": "双线多头",
-        "bull_level": 3,
-        "position": 99.0,
-        "vol_ratio": 1.1,
-        "amount_ratio": 1.3,
-        "amount_today_yi": 33.9,
-        "boll_upper": 68.52,
-        "boll_mid": 52.05,
-        "boll_lower": 35.58,
-        "boll_pos": 87.2,
-        "boll_label": "上轨附近",
-        "reason": "双线多头+极值高位(99%)+BOLL触碰上轨(超买); BOLL:上轨附近(87%)",
-        "overall": "震荡",
-        "explanations": [
-          "日线和周线均线均多头排列，中长趋势向上",
-          "接近BOLL上轨压力位，上涨空间有限",
-          "价格处于120日99%分位，接近区间高点"
-        ],
-        "support_levels": [
-          [
-            "MA20均线",
-            52.05
-          ],
-          [
-            "MA60均线",
-            43.06
-          ],
-          [
-            "BOLL下轨",
-            35.58
-          ]
-        ],
-        "resistance_levels": [
-          [
-            "120日高点",
-            64.76
-          ],
-          [
-            "BOLL上轨",
-            68.52
-          ]
-        ],
-        "vol_price_analysis": "量价基本平衡",
-        "industry_prospect": "行业前景加分+1.0(顶级赛道+绝对龙头)"
-      },
-      "fund_reasons": [
-        "高估值(FwdPE=372.7)",
-        "PEG=0.31(严重低估,增速远超估值)"
-      ],
-      "theme_reasons": [
-        "细分题材:光模块晶振",
-        "板块涨跌-0.4%",
-        "题材处于震荡期",
-        "板块有一定关注度(6只上榜)"
-      ],
-      "news_reasons": [
-        "石英光刻晶振国内唯一+312.5M/625M超高频晶振国产替代+AI光模块时钟核心+日本出口管制断供+车规晶振市占60%",
-        "⚠️高端产能爬坡+消费电子基本盘下行",
-        "横盘(-0.7%)"
-      ],
-      "news_items": [
-        {
-          "source": "券商研报",
-          "time": "",
-          "sentiment": "重大利好",
-          "content": "石英光刻晶振国内唯一+312.5M/625M超高频晶振国产替代+AI光模块时钟核心+日本出口管制断供+车规晶振市占60%",
-          "url": ""
-        }
-      ],
-      "sub_theme": "光模块晶振",
-      "lifecycle": "震荡期",
-      "fwd_pe": 372.7,
-      "growth": 1200,
-      "pe_ladder": null,
-      "cagr3": null
-    },
-    {
       "name": "源杰科技",
       "code": "sh688498",
       "sector": "AI/半导体",
@@ -7096,6 +6997,104 @@
       "cagr3": -10.2
     },
     {
+      "name": "泰晶科技",
+      "code": "sh603738",
+      "sector": "电子元件",
+      "price": 64.3,
+      "pct_chg": -0.71,
+      "pe": 372.67,
+      "turnover": 3499752529.0,
+      "score_news": 5,
+      "score_tech": 2.1,
+      "score_fund": 0,
+      "score_theme": 5,
+      "total": 11.7,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 63.1,
+        "ma10": 59.7,
+        "ma20": 52.1,
+        "ma60": 43.1,
+        "wma5": 52.6,
+        "wma10": 49.4,
+        "wma20": 36.2,
+        "trend": "双线多头",
+        "bull_level": 3,
+        "position": 99.0,
+        "vol_ratio": 1.1,
+        "amount_ratio": 1.3,
+        "amount_today_yi": 33.9,
+        "boll_upper": 68.52,
+        "boll_mid": 52.05,
+        "boll_lower": 35.58,
+        "boll_pos": 87.2,
+        "boll_label": "上轨附近",
+        "reason": "双线多头+极值高位(99%)+BOLL触碰上轨(超买); BOLL:上轨附近(87%)",
+        "overall": "震荡",
+        "explanations": [
+          "日线和周线均线均多头排列，中长趋势向上",
+          "接近BOLL上轨压力位，上涨空间有限",
+          "价格处于120日99%分位，接近区间高点"
+        ],
+        "support_levels": [
+          [
+            "MA20均线",
+            52.05
+          ],
+          [
+            "MA60均线",
+            43.06
+          ],
+          [
+            "BOLL下轨",
+            35.58
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "120日高点",
+            64.76
+          ],
+          [
+            "BOLL上轨",
+            68.52
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡",
+        "industry_prospect": "行业前景加分+1.0(顶级赛道+绝对龙头)"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=372.7)+负增长(-39%)"
+      ],
+      "theme_reasons": [
+        "细分题材:光模块晶振",
+        "板块涨跌-0.4%",
+        "题材处于震荡期",
+        "板块有一定关注度(6只上榜)"
+      ],
+      "news_reasons": [
+        "石英光刻晶振国内唯一+312.5M/625M超高频晶振国产替代+AI光模块时钟核心+日本出口管制断供+车规晶振市占60%",
+        "⚠️高端产能爬坡+消费电子基本盘下行",
+        "横盘(-0.7%)"
+      ],
+      "news_items": [
+        {
+          "source": "券商研报",
+          "time": "",
+          "sentiment": "重大利好",
+          "content": "石英光刻晶振国内唯一+312.5M/625M超高频晶振国产替代+AI光模块时钟核心+日本出口管制断供+车规晶振市占60%",
+          "url": ""
+        }
+      ],
+      "sub_theme": "光模块晶振",
+      "lifecycle": "震荡期",
+      "fwd_pe": 372.7,
+      "growth": -38.9,
+      "pe_ladder": null,
+      "cagr3": -40.3
+    },
+    {
       "name": "领益智造",
       "code": "sz002600",
       "sector": "电子制造",
@@ -8120,109 +8119,6 @@
         "2028": 64.8
       },
       "cagr3": 18.2
-    },
-    {
-      "name": "中化国际",
-      "code": "sh600500",
-      "sector": "化工",
-      "price": 8.92,
-      "pct_chg": 3.24,
-      "pe": 0,
-      "turnover": 3635296670.0,
-      "score_news": 2,
-      "score_tech": 1.6,
-      "score_fund": 4,
-      "score_theme": 3.0,
-      "total": 11.3,
-      "rating": "B",
-      "advice": "波段操作，轻仓参与",
-      "tech": {
-        "ma5": 8.4,
-        "ma10": 8.5,
-        "ma20": 7.3,
-        "ma60": 5.7,
-        "wma5": 7.4,
-        "wma10": 6.3,
-        "wma20": 5.4,
-        "trend": "周线多头",
-        "bull_level": 2,
-        "position": 95.0,
-        "vol_ratio": 1.34,
-        "amount_ratio": 1.42,
-        "amount_today_yi": 35.9,
-        "boll_upper": 10.02,
-        "boll_mid": 7.27,
-        "boll_lower": 4.51,
-        "boll_pos": 80.1,
-        "boll_label": "上轨附近",
-        "reason": "周线多头+高位(95%)+BOLL触碰上轨; BOLL:上轨附近(80%)",
-        "overall": "偏强",
-        "explanations": [
-          "周线多头排列但日线未确认，中线偏强",
-          "接近BOLL上轨压力位，上涨空间有限",
-          "价格处于120日95%分位，接近区间高点"
-        ],
-        "support_levels": [
-          [
-            "MA20均线",
-            7.27
-          ],
-          [
-            "MA60均线",
-            5.68
-          ],
-          [
-            "BOLL下轨",
-            4.51
-          ]
-        ],
-        "resistance_levels": [
-          [
-            "120日高点",
-            9.2
-          ],
-          [
-            "BOLL上轨",
-            10.02
-          ]
-        ],
-        "vol_price_analysis": "量价基本平衡"
-      },
-      "fund_reasons": [
-        "估值偏高(FwdPE=53.0)+适度增长(+43%)",
-        "估值阶梯明显收缩(53.0→35.7),3年收缩33%,高PE起始,阶梯加分受限",
-        "PEG=1.23(合理估值)"
-      ],
-      "theme_reasons": [
-        "细分题材:化工/橡胶",
-        "板块涨跌-0.3%",
-        "上涨占比80%,普涨格局",
-        "题材处于震荡期",
-        "板块有一定关注度(5只上榜)"
-      ],
-      "news_reasons": [
-        "化工新材料+农药中间体+橡胶化学品",
-        "⚠️化工周期波动+环保政策",
-        "上涨+3.2%"
-      ],
-      "news_items": [
-        {
-          "source": "券商研报",
-          "time": "",
-          "sentiment": "小幅利空",
-          "content": "化工新材料+农药中间体+橡胶化学品",
-          "url": ""
-        }
-      ],
-      "sub_theme": "化工/橡胶",
-      "lifecycle": "震荡期",
-      "fwd_pe": 53.0,
-      "growth": 43.1,
-      "pe_ladder": {
-        "2027": 53.0,
-        "2028": 35.7
-      },
-      "cagr3": null
     },
     {
       "name": "锡业股份",
@@ -14103,6 +13999,109 @@
       "cagr3": 6.7
     },
     {
+      "name": "中化国际",
+      "code": "sh600500",
+      "sector": "化工",
+      "price": 8.92,
+      "pct_chg": 3.24,
+      "pe": 0,
+      "turnover": 3635296670.0,
+      "score_news": 2,
+      "score_tech": 1.6,
+      "score_fund": 2,
+      "score_theme": 3.0,
+      "total": 8.9,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 8.4,
+        "ma10": 8.5,
+        "ma20": 7.3,
+        "ma60": 5.7,
+        "wma5": 7.4,
+        "wma10": 6.3,
+        "wma20": 5.4,
+        "trend": "周线多头",
+        "bull_level": 2,
+        "position": 95.0,
+        "vol_ratio": 1.34,
+        "amount_ratio": 1.42,
+        "amount_today_yi": 35.9,
+        "boll_upper": 10.02,
+        "boll_mid": 7.27,
+        "boll_lower": 4.51,
+        "boll_pos": 80.1,
+        "boll_label": "上轨附近",
+        "reason": "周线多头+高位(95%)+BOLL触碰上轨; BOLL:上轨附近(80%)",
+        "overall": "偏强",
+        "explanations": [
+          "周线多头排列但日线未确认，中线偏强",
+          "接近BOLL上轨压力位，上涨空间有限",
+          "价格处于120日95%分位，接近区间高点"
+        ],
+        "support_levels": [
+          [
+            "MA20均线",
+            7.27
+          ],
+          [
+            "MA60均线",
+            5.68
+          ],
+          [
+            "BOLL下轨",
+            4.51
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "120日高点",
+            9.2
+          ],
+          [
+            "BOLL上轨",
+            10.02
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "估值中等(FwdPE=37.8)+增速(+43%)",
+        "估值阶梯收缩不足(37.8→35.7),3年仅收缩6%",
+        "PEG=0.88(低估,增速覆盖估值)"
+      ],
+      "theme_reasons": [
+        "细分题材:化工/橡胶",
+        "板块涨跌-0.3%",
+        "上涨占比80%,普涨格局",
+        "题材处于震荡期",
+        "板块有一定关注度(5只上榜)"
+      ],
+      "news_reasons": [
+        "化工新材料+农药中间体+橡胶化学品",
+        "⚠️化工周期波动+环保政策",
+        "上涨+3.2%"
+      ],
+      "news_items": [
+        {
+          "source": "券商研报",
+          "time": "",
+          "sentiment": "小幅利空",
+          "content": "化工新材料+农药中间体+橡胶化学品",
+          "url": ""
+        }
+      ],
+      "sub_theme": "化工/橡胶",
+      "lifecycle": "震荡期",
+      "fwd_pe": 37.8,
+      "growth": 43.1,
+      "pe_ladder": {
+        "2027": 37.8,
+        "2028": 35.7
+      },
+      "cagr3": null
+    },
+    {
       "name": "麦格米特",
       "code": "sz002851",
       "sector": "高端制造",
@@ -14378,9 +14377,9 @@
         "vol_price_analysis": "放量下跌，抛压较大，空头量价配合"
       },
       "fund_reasons": [
-        "估值偏高(FwdPE=8.9)+增长一般(+4%)",
-        "估值阶梯合理收缩(8.9→8.2→7.5),3年收缩16%",
-        "PEG=2.21(偏高估值)"
+        "估值偏高(FwdPE=9.1)+增长一般(+4%)",
+        "估值阶梯合理收缩(9.1→8.3→7.5),3年收缩18%",
+        "PEG=2.26(偏高估值)"
       ],
       "theme_reasons": [
         "板块:综合/其他",
@@ -14396,11 +14395,11 @@
       "news_items": [],
       "sub_theme": "综合/其他",
       "lifecycle": "震荡期",
-      "fwd_pe": 8.9,
+      "fwd_pe": 9.1,
       "growth": 4.0,
       "pe_ladder": {
-        "2026": 8.9,
-        "2027": 8.2,
+        "2026": 9.1,
+        "2027": 8.3,
         "2028": 7.5
       },
       "cagr3": 27.4
@@ -14792,6 +14791,104 @@
       "growth": 21.4,
       "pe_ladder": null,
       "cagr3": null
+    },
+    {
+      "name": "牧原股份",
+      "code": "sz002714",
+      "sector": "综合",
+      "price": 33.56,
+      "pct_chg": 3.71,
+      "pe": 19.81,
+      "turnover": 3521695469.0,
+      "score_news": 0,
+      "score_tech": 1.0,
+      "score_fund": 3,
+      "score_theme": 3.5,
+      "total": 8.6,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 33.1,
+        "ma10": 33.9,
+        "ma20": 34.7,
+        "ma60": 39.8,
+        "wma5": 35.0,
+        "wma10": 38.6,
+        "wma20": 42.3,
+        "trend": "双线空头",
+        "bull_level": 0,
+        "position": 6.0,
+        "vol_ratio": 1.23,
+        "amount_ratio": 1.17,
+        "amount_today_yi": 35.2,
+        "boll_upper": 37.75,
+        "boll_mid": 34.75,
+        "boll_lower": 31.74,
+        "boll_pos": 30.3,
+        "boll_label": "中轨下方",
+        "reason": "趋势走弱+低位(6%)可能反弹; BOLL:中轨下方(30%)",
+        "overall": "弱势",
+        "explanations": [
+          "日线和周线均空头排列，中长趋势向下",
+          "BOLL中轨下方运行，空头占优",
+          "价格处于120日6%分位，接近区间低点"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            39.83
+          ],
+          [
+            "MA20均线",
+            34.75
+          ],
+          [
+            "120日低点",
+            32.36
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            37.75
+          ],
+          [
+            "MA60均线",
+            39.83
+          ],
+          [
+            "120日高点",
+            50.96
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "估值偏高(FwdPE=27.5)+增长一般(+-15%)",
+        "估值阶梯强收缩(27.5→6.9→7.4),3年收缩73%,中PE起始,阶梯加分适度"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他",
+        "板块涨跌-0.1%",
+        "板块5只涨停,做多情绪强",
+        "题材处于震荡期",
+        "板块高度集中(25只上榜)"
+      ],
+      "news_reasons": [
+        "无真实新闻/催化剂",
+        "上涨+3.7%"
+      ],
+      "news_items": [],
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "fwd_pe": 27.5,
+      "growth": -14.7,
+      "pe_ladder": {
+        "2026": 27.5,
+        "2027": 6.9,
+        "2028": 7.4
+      },
+      "cagr3": 7.1
     },
     {
       "name": "信维通信",
@@ -17046,99 +17143,6 @@
       "cagr3": null
     },
     {
-      "name": "牧原股份",
-      "code": "sz002714",
-      "sector": "综合",
-      "price": 33.56,
-      "pct_chg": 3.71,
-      "pe": 19.81,
-      "turnover": 3521695469.0,
-      "score_news": 0,
-      "score_tech": 1.0,
-      "score_fund": 2,
-      "score_theme": 3.5,
-      "total": 7.4,
-      "rating": "C",
-      "advice": "观望，不新开仓",
-      "tech": {
-        "ma5": 33.1,
-        "ma10": 33.9,
-        "ma20": 34.7,
-        "ma60": 39.8,
-        "wma5": 35.0,
-        "wma10": 38.6,
-        "wma20": 42.3,
-        "trend": "双线空头",
-        "bull_level": 0,
-        "position": 6.0,
-        "vol_ratio": 1.23,
-        "amount_ratio": 1.17,
-        "amount_today_yi": 35.2,
-        "boll_upper": 37.75,
-        "boll_mid": 34.75,
-        "boll_lower": 31.74,
-        "boll_pos": 30.3,
-        "boll_label": "中轨下方",
-        "reason": "趋势走弱+低位(6%)可能反弹; BOLL:中轨下方(30%)",
-        "overall": "弱势",
-        "explanations": [
-          "日线和周线均空头排列，中长趋势向下",
-          "BOLL中轨下方运行，空头占优",
-          "价格处于120日6%分位，接近区间低点"
-        ],
-        "support_levels": [
-          [
-            "MA60均线",
-            39.83
-          ],
-          [
-            "MA20均线",
-            34.75
-          ],
-          [
-            "120日低点",
-            32.36
-          ]
-        ],
-        "resistance_levels": [
-          [
-            "BOLL上轨",
-            37.75
-          ],
-          [
-            "MA60均线",
-            39.83
-          ],
-          [
-            "120日高点",
-            50.96
-          ]
-        ],
-        "vol_price_analysis": "量价基本平衡"
-      },
-      "fund_reasons": [
-        "估值偏高(FwdPE=19.8)+增长一般(+-15%)"
-      ],
-      "theme_reasons": [
-        "板块:综合/其他",
-        "板块涨跌-0.1%",
-        "板块5只涨停,做多情绪强",
-        "题材处于震荡期",
-        "板块高度集中(25只上榜)"
-      ],
-      "news_reasons": [
-        "无真实新闻/催化剂",
-        "上涨+3.7%"
-      ],
-      "news_items": [],
-      "sub_theme": "综合/其他",
-      "lifecycle": "震荡期",
-      "fwd_pe": 19.8,
-      "growth": -14.7,
-      "pe_ladder": null,
-      "cagr3": 7.1
-    },
-    {
       "name": "新莱应材",
       "code": "sz300260",
       "sector": "综合",
@@ -19299,8 +19303,8 @@
     "rating_dist": {
       "S": 1,
       "A": 20,
-      "B": 93,
-      "C": 79,
+      "B": 92,
+      "C": 80,
       "D": 0
     },
     "sector_avg": {
@@ -19324,10 +19328,6 @@
         "count": 5,
         "avg": 11.7
       },
-      "化工": {
-        "count": 5,
-        "avg": 11.4
-      },
       "特种材料": {
         "count": 2,
         "avg": 11.3
@@ -19339,6 +19339,10 @@
       "AI/半导体": {
         "count": 80,
         "avg": 11.0
+      },
+      "化工": {
+        "count": 5,
+        "avg": 10.9
       },
       "电子材料": {
         "count": 10,
@@ -19362,7 +19366,7 @@
       },
       "电子元件": {
         "count": 6,
-        "avg": 9.6
+        "avg": 9.3
       },
       "家电制造": {
         "count": 1,
@@ -19378,7 +19382,7 @@
       },
       "综合": {
         "count": 25,
-        "avg": 8.2
+        "avg": 8.3
       },
       "电力": {
         "count": 2,
