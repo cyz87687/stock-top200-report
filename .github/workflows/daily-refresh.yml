@@ -8,8 +8,6 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 jobs:
   refresh:
@@ -28,6 +26,7 @@ jobs:
         run: pip install --quiet -r requirements.txt
 
       - name: Fetch & Score & Generate Report
+        id: build
         run: |
           LOG="refresh_log.txt"
           echo "=== Refresh started at $(date -u '+%Y-%m-%d %H:%M:%S UTC') ===" > $LOG
@@ -92,26 +91,22 @@ jobs:
 
           if [ $SUCCESS -eq 1 ]; then
             echo "[$(date -u '+%H:%M:%S')] ✅ All steps completed successfully" >> $LOG
+            echo "result=success" >> $GITHUB_OUTPUT
           else
             echo "[$(date -u '+%H:%M:%S')] ❌ Failed after $MAX_RETRIES attempts" >> $LOG
             cat $LOG
             exit 1
           fi
 
-      - name: Deploy to GitHub Pages
-        if: success()
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
-          publish_branch: gh-pages
-          include: |
-            index.html
-            top200_report_*.html
-            top200_scored_*.json
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_message: 'auto: daily report refresh'
+      - name: Commit & Push updated report
+        if: steps.build.outputs.result == 'success'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html top200_report_*.html top200_scored_*.json top200_all_a.json refresh_log.txt
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "auto: daily report refresh $(date -u '+%Y-%m-%d')"
+          git push
 
       - name: Upload refresh log
         if: always()
