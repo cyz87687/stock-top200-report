@@ -1,0 +1,122 @@
+name: Daily Stock Report Refresh
+
+on:
+  schedule:
+    # 每天15:30北京时间 (UTC+8 = 07:30 UTC), 仅工作日
+    - cron: '30 7 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install --quiet requests beautifulsoup4 lxml html5lib
+
+      - name: Fetch & Score & Generate Report
+        run: |
+          LOG="refresh_log.txt"
+          echo "=== Refresh started at $(date -u '+%Y-%m-%d %H:%M:%S UTC') ===" > $LOG
+          MAX_RETRIES=3
+          RETRY_DELAY=30
+          SUCCESS=0
+
+          for ATTEMPT in $(seq 1 $MAX_RETRIES); do
+            echo "--- Attempt $ATTEMPT/$MAX_RETRIES ---" >> $LOG
+
+            # Step 1: Fetch top200 data
+            echo "[$(date -u '+%H:%M:%S')] Running fetch_top200_sina.py ..." >> $LOG
+            if python3 fetch_top200_sina.py >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Fetch succeeded" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ❌ Fetch failed" >> $LOG
+              [ $ATTEMPT -lt $MAX_RETRIES ] && sleep $RETRY_DELAY && continue
+              break
+            fi
+
+            # Step 2: Score and analyze
+            INPUT_JSON="top200_all_a.json"
+            if [ ! -f "$INPUT_JSON" ]; then
+              echo "[$(date -u '+%H:%M:%S')] ❌ $INPUT_JSON not found" >> $LOG
+              [ $ATTEMPT -lt $MAX_RETRIES ] && sleep $RETRY_DELAY && continue
+              break
+            fi
+
+            echo "[$(date -u '+%H:%M:%S')] Running step2_stockscorer_v2.py ..." >> $LOG
+            if python3 step2_stockscorer_v2.py "$INPUT_JSON" >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Scoring succeeded" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ❌ Scoring failed" >> $LOG
+              [ $ATTEMPT -lt $MAX_RETRIES ] && sleep $RETRY_DELAY && continue
+              break
+            fi
+
+            # Step 3: Generate HTML report
+            SCORED_JSON=$(ls -t top200_scored_*.json 2>/dev/null | head -1)
+            if [ -z "$SCORED_JSON" ]; then
+              echo "[$(date -u '+%H:%M:%S')] ❌ No scored JSON found" >> $LOG
+              [ $ATTEMPT -lt $MAX_RETRIES ] && sleep $RETRY_DELAY && continue
+              break
+            fi
+
+            echo "[$(date -u '+%H:%M:%S')] Running gen_report_top200.py ..." >> $LOG
+            if python3 gen_report_top200.py "$SCORED_JSON" >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Report generation succeeded" >> $LOG
+              # Copy latest report as index.html for GitHub Pages
+              LATEST_HTML=$(ls -t top200_report_*.html 2>/dev/null | head -1)
+              if [ -n "$LATEST_HTML" ]; then
+                cp "$LATEST_HTML" index.html
+                echo "[$(date -u '+%H:%M:%S')] ✅ Copied $LATEST_HTML → index.html" >> $LOG
+              fi
+              SUCCESS=1
+              break
+            else
+              echo "[$(date -u '+%H:%M:%S')] ❌ Report generation failed" >> $LOG
+              [ $ATTEMPT -lt $MAX_RETRIES ] && sleep $RETRY_DELAY && continue
+            fi
+          done
+
+          if [ $SUCCESS -eq 1 ]; then
+            echo "[$(date -u '+%H:%M:%S')] ✅ All steps completed successfully" >> $LOG
+          else
+            echo "[$(date -u '+%H:%M:%S')] ❌ Failed after $MAX_RETRIES attempts" >> $LOG
+            cat $LOG
+            exit 1
+          fi
+
+      - name: Deploy to GitHub Pages
+        if: success()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+          publish_branch: gh-pages
+          include: |
+            index.html
+            top200_report_*.html
+            top200_scored_*.json
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'auto: daily report refresh'
+
+      - name: Upload refresh log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: refresh-log-${{ github.run_number }}
+          path: refresh_log.txt
+          retention-days: 30

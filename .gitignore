@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.trae/
+.workbuddy/
+*.json
+!package.json
+update_rating.py
