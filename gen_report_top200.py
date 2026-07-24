@@ -26,6 +26,7 @@ with open(inp, "r", encoding="utf-8") as f:
 
 results = data["results"]
 stats = data.get("stats", {})
+market_breadth = stats.get("market_breadth")  # 大盘赚钱效应 (v2.7 新增)
 
 # 加载历史报告用于评级变化追踪
 prev_ratings = {}
@@ -45,9 +46,9 @@ date_str = data.get("date", datetime.now().strftime("%Y-%m-%d"))
 total_stocks = len(results)
 
 # 颜色配置
-RATING_COLORS = {"S": "#22c55e", "A": "#3b82f6", "B": "#f59e0b", "C": "#f97316"}
-RATING_BG = {"S": "#dcfce7", "A": "#dbeafe", "B": "#fef3c7", "C": "#ffedd5"}
-RATING_FULL = {"S": "强烈推荐 · 可重仓", "A": "重点关注 · 逢低加仓", "B": "波段操作 · 轻仓参与", "C": "观望为主 · 不新开仓"}
+RATING_COLORS = {"S": "#22c55e", "A": "#3b82f6", "B": "#f59e0b", "C": "#f97316", "D": "#dc2626"}
+RATING_BG = {"S": "#dcfce7", "A": "#dbeafe", "B": "#fef3c7", "C": "#ffedd5", "D": "#fee2e2"}
+RATING_FULL = {"S": "强烈推荐 · 可重仓", "A": "重点关注 · 逢低加仓", "B": "波段操作 · 轻仓参与", "C": "观望为主 · 不新开仓", "D": "坚决回避 · 不持有"}
 
 top20 = [r for r in results if r["rating"] in ("S", "A")]
 top20.sort(key=lambda x: -x["total"])
@@ -398,15 +399,15 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
 <div class="container">
     <div class="header">
         <h1>📊 A股成交额TOP''' + str(total_stocks) + ''' 极简公司评分</h1>
-        <div class="sub">Stock-Scorer v4.1 | 题材热度30% · 基本面30%(含行业前景) · 消息面20% · 技术面20%</div>
-        <div class="meta">''' + date_str + ''' | 数据源：东方财富 + 腾讯K线 + iFinD</div>
+        <div class="sub">Stock-Scorer v2.7 | 题材动量 · 大盘赚钱效应 · 基本面含行业前景 · 四维加权</div>
+        <div class="meta">''' + date_str + ''' | 数据源：东方财富 + 腾讯K线 + 同花顺 + 新浪/乐股</div>
     </div>
 
     <!-- 统计卡片 -->
     <div class="summary">''')
 
 # 添加统计卡片
-for r in ["S", "A", "B", "C"]:
+for r in ["S", "A", "B", "C", "D"]:
     count = stats.get("rating_dist", {}).get(r, 0)
     html_parts.append(f'''
         <div class="card">
@@ -418,9 +419,10 @@ html_parts.append('''
     </div>
     <div style="font-size:11px;color:#94a3b8;margin:8px 0 16px;padding:8px 12px;background:#1e293b;border-radius:8px;">
         📐 评分等级标准：<span style="color:#22c55e;font-weight:700;">S级 ≥17分</span> ·
-        <span style="color:#3b82f6;font-weight:700;">A级 14~17分</span> ·
-        <span style="color:#f59e0b;font-weight:700;">B级 10~14分</span> ·
-        <span style="color:#f97316;font-weight:700;">C级 &lt;10分</span>
+        <span style="color:#3b82f6;font-weight:700;">A级 13~17分</span> ·
+        <span style="color:#f59e0b;font-weight:700;">B级 9~13分</span> ·
+        <span style="color:#f97316;font-weight:700;">C级 5~9分</span> ·
+        <span style="color:#dc2626;font-weight:700;">D级 &lt;5分</span>
     </div>''')
 
 # 核心结论卡片
@@ -429,6 +431,13 @@ s_count = stats.get("rating_dist", {}).get("S", 0)
 a_count = stats.get("rating_dist", {}).get("A", 0)
 top_sector = sorted_secs[0] if sorted_secs else ("-", {"avg": 0, "count": 0})
 main_line = f"今日S级{s_count}只、A级{a_count}只，主线板块：{top_sector[0]}(均分{top_sector[1].get('avg',0):.1f})"
+
+# 大盘赚钱效应 → 入场时机一句话摘要
+if market_breadth and market_breadth.get("available"):
+    mb_sc = market_breadth["score"]
+    mb_phase = market_breadth["phase"]
+    mb_pos = market_breadth["position"]
+    main_line += f" · 大盘赚钱效应{mb_sc}分 {mb_phase}, {mb_pos}"
 
 # 评级变化统计
 rating_changes = {"up": [], "down": [], "new": []}
@@ -483,6 +492,69 @@ html_parts.append('''
         </div>
     </div>
 
+    <!-- 大盘赚钱效应 -->
+''')
+
+# 大盘赚钱效应 banner (v2.7 新增)
+if market_breadth and market_breadth.get("available"):
+    sc = market_breadth["score"]
+    phase = market_breadth["phase"]
+    advice = market_breadth["advice"]
+    position = market_breadth["position"]
+    raw = market_breadth.get("raw", {}) or {}
+    # 颜色语义: 高分(可入场)=红, 中性=橙, 低分(亏钱效应/回避)=绿 (A股惯例 红涨绿跌)
+    if sc >= 55:
+        bar_color = "#ef4444"
+    elif sc >= 40:
+        bar_color = "#f59e0b"
+    else:
+        bar_color = "#22c55e"
+    up = raw.get("up"); down = raw.get("down"); zt = raw.get("zt"); dt = raw.get("dt")
+    flat = raw.get("flat")
+    idx = raw.get("index", {}) or {}
+    idx_str = " · ".join(f"{k}{v:+.2f}%" for k, v in idx.items()) if idx else "—"
+    amt = raw.get("amount_yi")
+    amt_str = (f"{amt/10000:.2f}万亿" if (amt and amt >= 10000) else (f"{amt:.0f}亿" if amt else "—"))
+    comp = market_breadth.get("components", {}) or {}
+    comp_rows = "".join(
+        f"<div style='display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid #1e293b;'>"
+        f"<span style='color:#94a3b8;'>{k}</span><span style='font-weight:700;color:#e2e8f0;'>{v:+.1f}</span></div>"
+        for k, v in comp.items())
+    html_parts.append(f'''
+    <div class="market-gauge" style="background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #334155;border-radius:12px;padding:18px;margin:16px 0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <h2 style="font-size:15px;margin:0;">🌊 大盘赚钱效应 · 入场时机评估</h2>
+            <span style="font-size:11px;color:#64748b;">数据源:{raw.get('source','-')}</span>
+        </div>
+        <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
+            <div style="text-align:center;min-width:140px;">
+                <div style="font-size:48px;font-weight:900;color:{bar_color};line-height:1;">{sc}</div>
+                <div style="font-size:11px;color:#94a3b8;margin-top:4px;">赚钱效应评分 / 100</div>
+                <div style="font-size:13px;font-weight:800;color:{bar_color};margin-top:6px;">{phase}</div>
+            </div>
+            <div style="flex:1;min-width:220px;">
+                <div style="font-size:12px;color:#e2e8f0;margin-bottom:8px;">📈 涨跌家数：<b style="color:#ef4444;">上涨{up}</b> / <b style="color:#22c55e;">下跌{down}</b>{f" / 平{flat}" if flat else ""}　涨停{zt} · 跌停{dt}</div>
+                <div style="font-size:12px;color:#e2e8f0;margin-bottom:8px;">📊 三大指数：{idx_str}</div>
+                <div style="font-size:12px;color:#e2e8f0;margin-bottom:8px;">💰 全市场成交额：{amt_str}</div>
+                <div style="background:#020617;border-radius:8px;padding:10px;">
+                    <div style="font-size:12px;font-weight:800;color:{bar_color};margin-bottom:4px;">💡 {advice}</div>
+                    <div style="font-size:14px;font-weight:900;color:{bar_color};">{position}</div>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top:12px;">
+            <div style="font-size:11px;color:#64748b;margin-bottom:4px;">评分分项贡献（满分100）</div>
+            {comp_rows}
+        </div>
+        <div style="font-size:10px;color:#475569;margin-top:10px;">⚠️ 本模块为纯量化情绪模型（涨跌广度 + 涨停净额 + 指数强度 + 中位涨幅），仅供仓位参考，不构成投资建议。</div>
+    </div>''')
+else:
+    html_parts.append('''
+    <div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px;margin:16px 0;font-size:12px;color:#94a3b8;">
+        🌊 大盘赚钱效应：数据获取失败（接口暂不可用），本次跳过该评估，不影响个股评分。
+    </div>''')
+
+html_parts.append('''
     <!-- 快捷筛选按钮 -->
     <div class="quick-filters">
         <button class="quick-btn active" data-quick="all">全部</button>
@@ -2005,7 +2077,7 @@ print(f"✅ HTML报告已生成: {out}")
 print(f"📊 包含 {total_stocks} 只个股")
 
 sd = stats.get("rating_dist", {})
-print(f"⭐ 评级分布: S:{sd.get('S',0)} A:{sd.get('A',0)} B:{sd.get('B',0)} C:{sd.get('C',0)}")
+print(f"⭐ 评级分布: S:{sd.get('S',0)} A:{sd.get('A',0)} B:{sd.get('B',0)} C:{sd.get('C',0)} D:{sd.get('D',0)}")
 
 fwd_ok = sum(1 for r in results if r.get("fwd_pe"))
 growth_ok = sum(1 for r in results if r.get("growth"))
