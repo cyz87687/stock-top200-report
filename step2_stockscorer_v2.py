@@ -360,6 +360,38 @@ def run_ifind_news(name, code):
         return ""
 
 
+def fetch_announcements_map(days=7):
+    """
+    拉取近 days 日全市场公告(akshare stock_notice_report)，按6位代码聚合标题文本。
+    作为消息面评分的通用覆盖源，弥补 iFinD 仅抓重点标的/被限流(429)的缺口。
+    返回 {code6: 'title1 | title2 | ...'}
+    """
+    try:
+        import akshare as ak
+    except Exception:
+        print("   ⚠️ akshare 不可用，跳过公告覆盖")
+        return {}
+    from datetime import datetime as _dt, timedelta as _td
+    ann = {}
+    d = _dt.now()
+    for _ in range(days):
+        ds = d.strftime("%Y%m%d")
+        d -= _td(days=1)
+        try:
+            df = ak.stock_notice_report(symbol="全部", date=ds)
+        except Exception:
+            continue
+        if df is None or len(df) == 0:
+            continue
+        for _, row in df.iterrows():
+            c = str(row.get("代码", "")).strip()
+            title = str(row.get("公告标题", "")).strip()
+            if not c or not title:
+                continue
+            ann.setdefault(c, []).append(title)
+    return {c: " | ".join(v) for c, v in ann.items()}
+
+
 # ============================================================
 # 1. 技术面 (0-5) × 25%
 # ============================================================
@@ -1984,11 +2016,13 @@ KNOWN_CATALYSTS = {
     "sh601958": {"level": 3, "reason": "钼矿龙头+钼价上行+军工高温合金需求增长", "risk": "钼价波动+资源枯竭风险"},
 }
 
-def score_news(news_text, pct, name="", code="", growth=None):
+def score_news(news_text, pct, name="", code="", growth=None, ann_text=""):
     """
-    消息面评分 (v2.8):
-    仅依据真实新闻/已验证催化剂评分，业绩数据不作为消息面依据
-    增强来源标注、时间、情感标签、原文链接
+    消息面评分 (v2.9):
+    仅依据真实新闻/已验证催化剂/交易所公告评分，业绩数据不作为消息面依据
+    新增 akshare 全市场公告作为通用覆盖源(弥补 iFinD 仅抓重点标的/限流缺口)
+    已验证催化剂(KNOWN_CATALYSTS 非负面)不被 iFinD/公告利空词覆盖;
+    有真实内容(level>=1)的标的股价反应最多压到1分, 避免与"无消息"混淆
     返回: (score, reasons, news_items)
     news_items: [{source, time, sentiment, content, url}]
     """
@@ -2058,7 +2092,7 @@ def score_news(news_text, pct, name="", code="", growth=None):
                 "content": f"iFinD新闻偏利好({bull_total}个关键词)",
                 "url": "",
             })
-        elif bear_total >= 6 and content_score > 0:
+        elif bear_total >= 6 and content_score > 0 and not (code in KNOWN_CATALYSTS and "negative" not in KNOWN_CATALYSTS[code]):
             content_score = max(0, content_score - 2)
             reasons.append("iFinD确认:多重利空")
             content_label = {5:"重大利好",4:"一般利好",3:"中性",2:"小幅利空",1:"一般利空",0:"重大利空"}.get(content_score,"中性")
@@ -2070,7 +2104,7 @@ def score_news(news_text, pct, name="", code="", growth=None):
                 "content": f"iFinD新闻检测到{bear_total}个利空关键词",
                 "url": "",
             })
-        elif bear_total >= 2 and content_score > 0:
+        elif bear_total >= 2 and content_score > 0 and not (code in KNOWN_CATALYSTS and "negative" not in KNOWN_CATALYSTS[code]):
             content_score = max(1, content_score - 1)
             reasons.append("iFinD确认:偏利空")
             content_label = "一般利空"
@@ -2082,6 +2116,41 @@ def score_news(news_text, pct, name="", code="", growth=None):
                 "content": f"iFinD新闻偏利空({bear_total}个关键词)",
                 "url": "",
             })
+
+    # 1b2. 公告关键词分析（akshare 全市场公告，官方披露，覆盖全部标的）
+    if ann_text and len(ann_text) > 2:
+        al = ann_text.lower()
+        a_bull = sum(1 for k in ["回购", "增持", "中标", "业绩预增", "预增", "高送转",
+                                 "分红", "资产注入", "重组", "战略合作", "项目中标",
+                                 "签订协议", "定增获批", "股权激励", "扭亏", "扩产",
+                                 "首次公开发行", "IPO", "科创板上市", "获批", "签约",
+                                 "大单", "供货", "定点", "订单", "增资", "扭亏为盈",
+                                 "业绩扭亏", "并购", "中标通知书", "控股权"] if k in al)
+        a_bear = sum(1 for k in ["减持", "立案", "处罚", "诉讼", "业绩预减", "预减",
+                                 "亏损", "退市风险", "问询函", "监管函", "商誉减值",
+                                 "计提减值", "终止重组", "风险警示"] if k in al)
+        ann_verified = code in KNOWN_CATALYSTS and "negative" not in KNOWN_CATALYSTS[code]
+        if a_bull >= 1 and content_score < 5:
+            content_score = min(5, content_score + 1)
+            reasons.append("公告确认:利好事件")
+            content_label = {5: "重大利好", 4: "一般利好", 3: "中性", 2: "小幅利空", 1: "一般利空"}.get(content_score, "中性")
+            has_content = True
+            news_items.append({"source": "交易所公告(akshare)", "time": "", "sentiment": "利好",
+                               "content": f"公告检测到利好关键词×{a_bull}", "url": ""})
+        elif a_bear >= 1 and (not ann_verified) and content_score > 0:
+            content_score = max(1, content_score - 1)
+            reasons.append("公告确认:偏利空事件")
+            content_label = "一般利空"
+            has_content = True
+            news_items.append({"source": "交易所公告(akshare)", "time": "", "sentiment": "利空",
+                               "content": f"公告检测到利空关键词×{a_bear}", "url": ""})
+        elif a_bear >= 1 and content_score == 0:
+            content_score = 1
+            reasons.append("公告确认:偏利空事件")
+            content_label = "一般利空"
+            has_content = True
+            news_items.append({"source": "交易所公告(akshare)", "time": "", "sentiment": "利空",
+                               "content": f"公告检测到利空关键词×{a_bear}", "url": ""})
 
     # ========== Step 1c: 已知利空（已验证的负面事件）==========
     if code in KNOWN_CATALYSTS and "negative" in KNOWN_CATALYSTS[code]:
@@ -2145,6 +2214,10 @@ def score_news(news_text, pct, name="", code="", growth=None):
         price_mod = 0
 
     final_score = max(0, min(5, content_score + price_mod))
+    # 有真实内容(已验证催化剂/新闻/公告)且content>=1的标的, 股价反应最多压到1分,
+    # 避免与"完全无消息"混淆(修复利通电子类被跌停清零的bug)
+    if has_content and content_score >= 1 and final_score < 1:
+        final_score = 1
 
     return final_score, reasons, news_items
 
@@ -2591,6 +2664,11 @@ def main():
             a = sub_mom[lab].get(20, {})
             print(f"   题材[{lab}] 近20日中位{a.get('median', 0):+.1f}% 上涨占比{a.get('up_ratio', 0):.0%} ({a.get('n', 0)}只)")
 
+    # --- Step 4.8: 全市场公告覆盖 (近7日, akshare) ---
+    print(f"\n📢 Step 4.8: 全市场公告覆盖 (近7日)")
+    ann_map = fetch_announcements_map(days=7)
+    print(f"   公告覆盖 {len(ann_map)} 只标的")
+
     # --- Step 5: Score all ---
     print(f"\n🎯 Step 5: 四维评分(题材30%+基本面30%(含行业前景)+消息20%+技术面20%)")
     results = []
@@ -2634,9 +2712,10 @@ def main():
             sector_data=sector_data, sector_zt_counts=sector_zt_counts,
             mom_map=mom_map, theme_mom=theme_mom, sub_mom=sub_mom, code=code)
         
-        # News (传入增速用于动态评估)
+        # News (传入增速用于动态评估; ann_text 为近7日公告覆盖)
         ntext = news_map.get(code, "")
-        ns, nr, news_items = score_news(ntext, pct, name, code, growth=growth_resolved)
+        ann_text = ann_map.get(code[2:], "")
+        ns, nr, news_items = score_news(ntext, pct, name, code, growth=growth_resolved, ann_text=ann_text)
         
         # Weighted total: 题材30% + 基本面30% + 消息20% + 技术面20%
         # 行业前景加分叠加到技术面,上限5分
