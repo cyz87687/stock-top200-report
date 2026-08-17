@@ -27,6 +27,7 @@ with open(inp, "r", encoding="utf-8") as f:
 results = data["results"]
 stats = data.get("stats", {})
 market_breadth = stats.get("market_breadth")  # 大盘赚钱效应 (v2.7 新增)
+market_review = data.get("market_review") or {}  # v2.11 盘面复盘点评(数据驱动)
 
 # 加载历史报告用于评级变化追踪
 prev_ratings = {}
@@ -459,13 +460,32 @@ if rating_changes["up"]:
     change_text += f" · 评级上调: {', '.join(rating_changes['up'][:5])}"
 if rating_changes["down"]:
     change_text += f" · 评级下调: {', '.join(rating_changes['down'][:5])}"
-if rating_changes["new"] and len(rating_changes["new"]) < 50:
-    change_text += f" · 新晋上榜: {', '.join(rating_changes['new'][:5])}"
+    if rating_changes["new"] and len(rating_changes["new"]) < 50:
+        change_text += f" · 新晋上榜: {', '.join(rating_changes['new'][:5])}"
+
+# ===== v2.11 盘面复盘点评(数据驱动, 无幻觉) — 合并原"今日核心结论"+"大盘赚钱效应" =====
+mr_text = market_review.get("text", "")
+mr_idx = market_review.get("indices", {}) or {}
+mr_amt = market_review.get("amount_yi")
+mr_up = market_review.get("up"); mr_down = market_review.get("down")
+mr_zt = market_review.get("zt"); mr_dt = market_review.get("dt")
+mr_score = market_review.get("money_score"); mr_phase = market_review.get("money_phase", "")
+idx_chips = " · ".join(f"{k}{v:+.2f}%" for k, v in mr_idx.items()) if mr_idx else "—"
+amt_disp = (f"{mr_amt/10000:.2f}万亿" if (mr_amt and mr_amt >= 10000) else (f"{mr_amt:.0f}亿" if mr_amt else "—"))
+breadth_disp = (f"涨{mr_up}/跌{mr_down} · 涨停{mr_zt}/跌停{mr_dt}" if (mr_up is not None and mr_down is not None) else "—")
+me_disp = (f"{mr_score}分 {mr_phase}" if mr_score is not None else "—")
 
 html_parts.append(f'''
-    <!-- 核心结论 -->
-    <div class="core-conclusion">
-        <h2>🎯 今日核心结论</h2>
+    <!-- 复盘点评 (v2.11) -->
+    <div class="core-conclusion review-card">
+        <h2>📝 盘面复盘点评</h2>
+        <div class="review-text" style="font-size:13px;line-height:1.9;color:#e2e8f0;background:#0f172a;border-left:3px solid #3b82f6;padding:12px 14px;border-radius:8px;margin:10px 0;">{mr_text}</div>
+        <div class="review-metrics" style="display:flex;flex-wrap:wrap;gap:10px;margin:12px 0;font-size:12px;color:#cbd5e1;">
+            <span style="background:#1e293b;padding:6px 10px;border-radius:6px;"><b style="color:#94a3b8;">指数</b> {idx_chips}</span>
+            <span style="background:#1e293b;padding:6px 10px;border-radius:6px;"><b style="color:#94a3b8;">成交</b> {amt_disp}</span>
+            <span style="background:#1e293b;padding:6px 10px;border-radius:6px;"><b style="color:#94a3b8;">涨跌</b> {breadth_disp}</span>
+            <span style="background:#1e293b;padding:6px 10px;border-radius:6px;"><b style="color:#94a3b8;">赚钱效应</b> {me_disp}</span>
+        </div>
         <div class="main-line">{main_line}{change_text}</div>
         <div class="top3">''')
 
@@ -495,64 +515,7 @@ html_parts.append('''
     <!-- 大盘赚钱效应 -->
 ''')
 
-# 大盘赚钱效应 banner (v2.7 新增)
-if market_breadth and market_breadth.get("available"):
-    sc = market_breadth["score"]
-    phase = market_breadth["phase"]
-    advice = market_breadth["advice"]
-    position = market_breadth["position"]
-    raw = market_breadth.get("raw", {}) or {}
-    # 颜色语义: 高分(可入场)=红, 中性=橙, 低分(亏钱效应/回避)=绿 (A股惯例 红涨绿跌)
-    if sc >= 55:
-        bar_color = "#ef4444"
-    elif sc >= 40:
-        bar_color = "#f59e0b"
-    else:
-        bar_color = "#22c55e"
-    up = raw.get("up"); down = raw.get("down"); zt = raw.get("zt"); dt = raw.get("dt")
-    flat = raw.get("flat")
-    idx = raw.get("index", {}) or {}
-    idx_str = " · ".join(f"{k}{v:+.2f}%" for k, v in idx.items()) if idx else "—"
-    amt = raw.get("amount_yi")
-    amt_str = (f"{amt/10000:.2f}万亿" if (amt and amt >= 10000) else (f"{amt:.0f}亿" if amt else "—"))
-    comp = market_breadth.get("components", {}) or {}
-    comp_rows = "".join(
-        f"<div style='display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid #1e293b;'>"
-        f"<span style='color:#94a3b8;'>{k}</span><span style='font-weight:700;color:#e2e8f0;'>{v:+.1f}</span></div>"
-        for k, v in comp.items())
-    html_parts.append(f'''
-    <div class="market-gauge" style="background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #334155;border-radius:12px;padding:18px;margin:16px 0;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-            <h2 style="font-size:15px;margin:0;">🌊 大盘赚钱效应 · 入场时机评估</h2>
-            <span style="font-size:11px;color:#64748b;">数据源:{raw.get('source','-')}</span>
-        </div>
-        <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
-            <div style="text-align:center;min-width:140px;">
-                <div style="font-size:48px;font-weight:900;color:{bar_color};line-height:1;">{sc}</div>
-                <div style="font-size:11px;color:#94a3b8;margin-top:4px;">赚钱效应评分 / 100</div>
-                <div style="font-size:13px;font-weight:800;color:{bar_color};margin-top:6px;">{phase}</div>
-            </div>
-            <div style="flex:1;min-width:220px;">
-                <div style="font-size:12px;color:#e2e8f0;margin-bottom:8px;">📈 涨跌家数：<b style="color:#ef4444;">上涨{up}</b> / <b style="color:#22c55e;">下跌{down}</b>{f" / 平{flat}" if flat else ""}　涨停{zt} · 跌停{dt}</div>
-                <div style="font-size:12px;color:#e2e8f0;margin-bottom:8px;">📊 三大指数：{idx_str}</div>
-                <div style="font-size:12px;color:#e2e8f0;margin-bottom:8px;">💰 全市场成交额：{amt_str}</div>
-                <div style="background:#020617;border-radius:8px;padding:10px;">
-                    <div style="font-size:12px;font-weight:800;color:{bar_color};margin-bottom:4px;">💡 {advice}</div>
-                    <div style="font-size:14px;font-weight:900;color:{bar_color};">{position}</div>
-                </div>
-            </div>
-        </div>
-        <div style="margin-top:12px;">
-            <div style="font-size:11px;color:#64748b;margin-bottom:4px;">评分分项贡献（满分100）</div>
-            {comp_rows}
-        </div>
-        <div style="font-size:10px;color:#475569;margin-top:10px;">⚠️ 本模块为纯量化情绪模型（涨跌广度 + 涨停净额 + 指数强度 + 中位涨幅），仅供仓位参考，不构成投资建议。</div>
-    </div>''')
-else:
-    html_parts.append('''
-    <div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px;margin:16px 0;font-size:12px;color:#94a3b8;">
-        🌊 大盘赚钱效应：数据获取失败（接口暂不可用），本次跳过该评估，不影响个股评分。
-    </div>''')
+# v2.11: 原"大盘赚钱效应"独立卡片已并入上方"📝 盘面复盘点评"卡片(指数/成交/涨跌/赚钱效应速览)
 
 html_parts.append('''
     <!-- 快捷筛选按钮 -->
@@ -690,11 +653,30 @@ for idx, r in enumerate(top20):
     boll_pos = tech.get("boll_pos")
     boll_info = f"BOLL:{boll_label}({boll_pos:.0f}%)" if boll_label and boll_pos is not None else ""
 
+    # v2.10: RSI 超买/超卖
+    rsi_val = tech.get("rsi")
+    rsi_state = tech.get("rsi_state")
+    rsi_info = f" · RSI:{rsi_val:.0f}({rsi_state})" if rsi_val is not None else ""
+
+    # v2.10: 公司持续性/低PE可持续性
+    score_sustain = r.get("score_sustain")
+    sustain_note = r.get("sustain_note", "")
+    cyclic_tag = "周期股" if r.get("is_cyclic") else ("存储模组" if r.get("is_storage_mod") else "")
+    sustain_str = (f"持续性:{score_sustain}/5 {sustain_note}" if score_sustain is not None else (sustain_note or "")) + (f" [{cyclic_tag}]" if cyclic_tag else "")
+    fund_detail = (', '.join(fund_reasons[:2]) if fund_reasons else '数据不足') + (f" · {sustain_str}" if sustain_str else "")
+
+    # v2.10: 消息面7日时效
+    news_recency = r.get("news_recency", "")
+    news_recency_color = "#f97316" if "无消息" in news_recency else "#22c55e"
+    news_detail = news_html + (f' · <span style="color:{news_recency_color};font-weight:600;">{news_recency}</span>' if news_recency else "")
+
     justification = []
     if r['score_news'] >= 4: justification.append("消息面强劲")
     elif r['score_news'] <= 1: justification.append("消息面疲弱")
     if r['score_tech'] >= 4: justification.append("技术面看多")
     elif r['score_tech'] <= 1: justification.append("技术面承压")
+    if rsi_state == "超买": justification.append("RSI超买注意回调")
+    elif rsi_state == "超卖": justification.append("RSI超卖存反弹")
     if r['score_fund'] >= 4: justification.append("估值吸引力强")
     elif r['score_fund'] <= 1: justification.append("估值偏高")
     if r.get('score_theme', 0) >= 4: justification.append("主线题材热度高")
@@ -735,17 +717,17 @@ for idx, r in enumerate(top20):
                 <div class="dim-card">
                     <div class="dim-title">📰 消息面 ({r['score_news']}/5)</div>
                     <div class="dim-score">{r['score_news']}</div>
-                    <div class="dim-detail">{news_html}</div>
+                    <div class="dim-detail">{news_detail}</div>
                 </div>
                 <div class="dim-card">
                     <div class="dim-title">📈 技术面 ({r['score_tech']}/5)</div>
                     <div class="dim-score">{r['score_tech']}</div>
-                    <div class="dim-detail">趋势: {tech.get('trend','N/A')} · 分位: {tech.get('position','N/A')}%{f' · {boll_info}' if boll_info else ''} · {tech.get('reason','')}</div>
+                    <div class="dim-detail">趋势: {tech.get('trend','N/A')} · 分位: {tech.get('position','N/A')}%{f' · {boll_info}' if boll_info else ''} · {tech.get('reason','')}{rsi_info}</div>
                 </div>
                 <div class="dim-card">
                     <div class="dim-title">📊 基本面 ({r['score_fund']}/5)</div>
                     <div class="dim-score">{r['score_fund']}</div>
-                    <div class="dim-detail">{', '.join(fund_reasons[:3]) if fund_reasons else '数据不足'}</div>
+                    <div class="dim-detail">{fund_detail}</div>
                 </div>
                 <div class="dim-card">
                     <div class="dim-title">🔥 题材热度 ({r.get('score_theme',0)}/5){f' · {sub_theme}' if sub_theme else ''}</div>

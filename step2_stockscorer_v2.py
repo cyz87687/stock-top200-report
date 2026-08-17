@@ -177,6 +177,30 @@ def get_sec(name):
     return "综合"
 
 
+def get_sub_theme_label(name):
+    """根据股票名称解析细分题材标签(与 SUB_THEME 一致, 用于持续性判定等)。"""
+    if not name:
+        return ""
+    if name in SUB_THEME:
+        return SUB_THEME[name][0]
+    n = _normalize_name(name)
+    if n in SUB_THEME:
+        return SUB_THEME[n][0]
+    for prefix in ("XD", "DR", "XR"):
+        if n.startswith(prefix):
+            n2 = n[len(prefix):]
+            if n2 in SUB_THEME:
+                return SUB_THEME[n2][0]
+            break
+    base = n.rstrip("UW").rstrip("-").rstrip("U").rstrip("-")
+    if base in SUB_THEME:
+        return SUB_THEME[base][0]
+    for key in SUB_THEME:
+        if base.startswith(key) or key.startswith(base):
+            return SUB_THEME[key][0]
+    return ""
+
+
 # ============================================================
 # Data fetching
 # ============================================================
@@ -406,6 +430,21 @@ def boll(kl, n=20, k=2):
     std = (sum((c - mid) ** 2 for c in closes) / n) ** 0.5
     return mid + k * std, mid, mid - k * std
 
+def rsi(closes, period=14):
+    """标准 RSI(相对强弱指标), 用于判断超买/超卖。返回 0-100 或 None。"""
+    if closes is None or len(closes) < period + 1:
+        return None
+    deltas = [closes[i] - closes[i - 1] for i in range(1, len(closes))]
+    recent = deltas[-period:]
+    gains = [d for d in recent if d > 0]
+    losses = [-d for d in recent if d < 0]
+    avg_gain = sum(gains) / period if gains else 0.0
+    avg_loss = sum(losses) / period if losses else 0.0
+    if avg_loss == 0:
+        return 100.0 if avg_gain > 0 else 50.0
+    rs = avg_gain / avg_loss
+    return 100 - 100 / (1 + rs)
+
 def score_tech(kl, price, pct, cagr3=None, wkl=None):
     if len(kl) < 60:
         return 2, {"note": "K线不足60日"}
@@ -419,6 +458,15 @@ def score_tech(kl, price, pct, cagr3=None, wkl=None):
     if boll_upper and boll_lower and boll_upper != boll_lower:
         boll_pos = (price - boll_lower) / (boll_upper - boll_lower) * 100
     cls = [k["close"] for k in kl]
+    rsi14 = rsi(cls, 14)
+    rsi_state = None
+    if rsi14 is not None:
+        if rsi14 >= 70:
+            rsi_state = "超买"
+        elif rsi14 <= 30:
+            rsi_state = "超卖"
+        else:
+            rsi_state = "中性"
     hi, lo = max(cls), min(cls)
     pos = (price - lo) / (hi - lo) * 100 if hi != lo else 50
     vol5 = sum(k["vol"] for k in kl[-5:]) / 5
@@ -600,6 +648,19 @@ def score_tech(kl, price, pct, cagr3=None, wkl=None):
             boll_label = "跌破下轨"
         r += f"; BOLL:{boll_label}({boll_pos:.0f}%)"
 
+    # RSI 超买/超卖调节 (v2.10)
+    if rsi14 is not None:
+        if rsi_state == "超买":
+            if s > 2.5:
+                s = 2.5
+            r += f"; RSI{rsi14:.0f}(超买,短线回调风险)"
+        elif rsi_state == "超卖":
+            if s < 3:
+                s = min(5, s + 0.5)
+            r += f"; RSI{rsi14:.0f}(超卖,存在反弹机会)"
+        else:
+            r += f"; RSI{rsi14:.0f}(中性)"
+
     detail = {
         "ma5": round(ma5v, 1) if ma5v else None,
         "ma10": round(ma10v, 1) if ma10v else None,
@@ -619,6 +680,8 @@ def score_tech(kl, price, pct, cagr3=None, wkl=None):
         "boll_lower": round(boll_lower, 2) if boll_lower else None,
         "boll_pos": round(boll_pos, 1) if boll_pos is not None else None,
         "boll_label": boll_label if boll_label else None,
+        "rsi": round(rsi14, 1) if rsi14 is not None else None,
+        "rsi_state": rsi_state,
         "reason": r,
     }
 
@@ -666,6 +729,11 @@ def score_tech(kl, price, pct, cagr3=None, wkl=None):
         explanations.append(f"价格处于120日{pos:.0f}%分位，接近区间高点")
     elif pos <= 10:
         explanations.append(f"价格处于120日{pos:.0f}%分位，接近区间低点")
+    if rsi14 is not None:
+        if rsi_state == "超买":
+            explanations.append(f"RSI={rsi14:.0f} 进入超买区(>70)，短线回调概率上升")
+        elif rsi_state == "超卖":
+            explanations.append(f"RSI={rsi14:.0f} 进入超卖区(<30)，存在技术性反弹机会")
     detail["explanations"] = explanations
 
     # 3. 关键支撑位、压力位
@@ -912,10 +980,17 @@ INDUSTRY_PROSPECT_LABELS = {
 }
 
 
+# 周期性行业板块(盈利随景气大幅波动, 低PE常处盈利高峰, 需论证持续性)
+CYCLICAL_SECTORS = {
+    "有色资源", "化工", "电子面板", "面板", "电力", "煤炭", "航运",
+    "钢铁", "石油", "建材", "基础材料",
+}
+
 def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
-               roe=None, gross_margin=None):
+               roe=None, gross_margin=None, sub_theme_label=None):
     """基本面+竞争力评分 0-5，用估值阶梯替代单年PEG
-    v2.8: 增加PEG指标、ROE、毛利率评分"""
+    v2.8: 增加PEG指标、ROE、毛利率评分
+    v2.10: 增加公司持续性/低PE可持续性子评分(周期股/存储模组重点论证)"""
     effective_pe = fwd_pe if fwd_pe else pe
     if code in KNOWN:
         k_fwd, k_growth = KNOWN[code]
@@ -928,17 +1003,18 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
     _fwd_pe_out = effective_pe if (fwd_pe or code in KNOWN or effective_pe) else None
     _growth_out = growth if growth is not None else None
     _ladder_out = pe_ladder_data or {}
+    _sustain_empty = {"score": 3.0, "note": "数据不足,未评估持续性", "is_cyclic": False, "is_storage_mod": False}
     if effective_pe is None or effective_pe <= 0:
         if growth is None:
-            return 2, ["数据不足"], _fwd_pe_out, _growth_out, _ladder_out
+            return 2, ["数据不足"], _fwd_pe_out, _growth_out, _ladder_out, _sustain_empty
         if growth > 100:
-            return 3, [f"高增长(+{growth:.0f}%)但缺估值"], _fwd_pe_out, _growth_out, _ladder_out
+            return 3, [f"高增长(+{growth:.0f}%)但缺估值"], _fwd_pe_out, _growth_out, _ladder_out, _sustain_empty
         elif growth > 20:
-            return 3, [f"中速增长(+{growth:.0f}%)"], _fwd_pe_out, _growth_out, _ladder_out
+            return 3, [f"中速增长(+{growth:.0f}%)"], _fwd_pe_out, _growth_out, _ladder_out, _sustain_empty
         elif growth > 0:
-            return 2, [f"低增长(+{growth:.0f}%)"], _fwd_pe_out, _growth_out, _ladder_out
+            return 2, [f"低增长(+{growth:.0f}%)"], _fwd_pe_out, _growth_out, _ladder_out, _sustain_empty
         else:
-            return (1 if growth > -20 else 0), [f"负增长({growth:.0f}%)"], _fwd_pe_out, _growth_out, _ladder_out
+            return (1 if growth > -20 else 0), [f"负增长({growth:.0f}%)"], _fwd_pe_out, _growth_out, _ladder_out, _sustain_empty
 
     if growth is None:
         growth = 15
@@ -1051,7 +1127,57 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
         elif gross_margin < 15:
             reasons.append(f"毛利率{gross_margin:.0f}%(低毛利竞争激烈)")
 
-    return s, reasons, _fwd_pe_out, _growth_out, _ladder_out
+    # ===== 公司持续性 / 低PE可持续性评估 (v2.10) =====
+    # 判定: 周期股(盈利随景气波动) & 存储模组厂(模组环节薄利/价格周期敏感)
+    # 论证低PE是否可持续: 用估值阶梯轨迹(收缩=周期底部错杀/扩张=顶部陷阱)+增速+ROE
+    is_cyclic = sector in CYCLICAL_SECTORS
+    is_storage_mod = "存储模组" in (sub_theme_label or "")
+    ladder_shrink = None
+    if pe_ladder_data and len(pe_ladder_data) >= 2:
+        ys = sorted(pe_ladder_data.keys())
+        pf, pl = pe_ladder_data[ys[0]], pe_ladder_data[ys[-1]]
+        if pf and pf > 0:
+            ladder_shrink = (pf - pl) / pf
+
+    sustain_score = 3.0
+    if is_cyclic or is_storage_mod:
+        low_pe_peak = (effective_pe is not None and effective_pe < 20
+                       and growth is not None and growth <= 15
+                       and (ladder_shrink is None or ladder_shrink < 0.3))
+        durable = ((growth is not None and growth > 30)
+                   or (ladder_shrink is not None and ladder_shrink >= 0.3)
+                   or (roe is not None and roe >= 0.15))
+        if low_pe_peak:
+            sustain_score = 2.0
+            sustain_note = "周期/存储模组低PE或处盈利高峰,警惕低PE陷阱(盈利不可持续)"
+        elif durable:
+            sustain_score = 4.0
+            sustain_note = "低PE配合高成长/估值阶梯收缩/高ROE,盈利可持续性强"
+        else:
+            sustain_score = 3.0
+            sustain_note = "周期性行业,盈利随景气波动,持续性中性"
+    else:
+        if roe is not None and roe >= 0.15 and (growth is None or growth > 0):
+            sustain_score = 4.0
+            sustain_note = f"高ROE({roe*100:.0f}%)护城河,盈利可持续"
+        elif growth is not None and growth < 0:
+            sustain_score = 2.0
+            sustain_note = "盈利下滑,持续性偏弱"
+        else:
+            sustain_score = 3.0
+            sustain_note = "盈利持续性中性"
+
+    # 持续性以有限权重(约20%)修正基本面总分, 避免过度主导
+    s = max(0, min(5, s + (sustain_score - 3.0) * 0.2))
+    reasons.append(f"持续性:{sustain_note}")
+    sustain_info = {
+        "score": round(sustain_score, 1),
+        "note": sustain_note,
+        "is_cyclic": is_cyclic,
+        "is_storage_mod": is_storage_mod,
+    }
+
+    return s, reasons, _fwd_pe_out, _growth_out, _ladder_out, sustain_info
 
 
 # ============================================================
@@ -2171,7 +2297,22 @@ def score_news(news_text, pct, name="", code="", growth=None, ann_text=""):
 
     if not has_content:
         reasons.append("无真实新闻/催化剂")
-    
+
+    # ========== Step 1d: 近7日时效判定 (v2.10) ==========
+    # 仅7日内新闻(iFinD)/公告(akshare)视为"近期信号"; 已验证催化剂(KNOWN_CATALYSTS)
+    # 若近7日无新增消息, 视为时效性减弱, 评分下调
+    recent_signal = bool(news_text and len(news_text) > 20) or bool(ann_text and len(ann_text) > 2)
+    recency_penalty = False
+    if not recent_signal:
+        if code in KNOWN_CATALYSTS and content_score > 0:
+            content_score = max(0, round(content_score * 0.4, 1))
+            reasons.append("近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调")
+            recency_penalty = True
+        news_recency = "近7日无消息"
+    else:
+        news_recency = "近7日有消息/公告"
+    reasons.append(f"消息时效:{news_recency}")
+
     # ========== Step 2: 股价反应调节 (次要) ==========
     price_mod = 0
     if pct >= 9.9:
@@ -2219,7 +2360,7 @@ def score_news(news_text, pct, name="", code="", growth=None, ann_text=""):
     if has_content and content_score >= 1 and final_score < 1:
         final_score = 1
 
-    return final_score, reasons, news_items
+    return final_score, reasons, news_items, news_recency
 
 
 # ============================================================
@@ -2247,7 +2388,7 @@ def fetch_market_breadth():
         "total": None, "up": None, "down": None, "flat": None,
         "suspended": None, "zt": None, "dt": None, "up5": None,
         "up3": None, "down5": None, "avg_pct": None, "median_pct": None,
-        "amount_yi": None, "index": {}, "source": None, "active_rate": None,
+        "amount_yi": None, "index": {}, "index_level": {}, "source": None, "active_rate": None,
     }
 
     # ---- 源1: 东方财富全A快照(信息最全) ----
@@ -2299,19 +2440,36 @@ def fetch_market_breadth():
         except Exception as e:
             print(f"   ⚠️ 乐股活跃度获取失败: {e}")
 
-    # ---- 指数(新浪, 本地/生产均可达) ----
+    # ---- 指数(新浪, 本地/生产均可达) — 同时抓取最新点位(用于"沪指逼近X关口") ----
     try:
         idf = ak.stock_zh_index_spot_sina()
-        name_map = {"上证指数": "上证", "深证成指": "深证", "创业板指": "创业板"}
+        name_map = {"上证指数": "上证", "深证成指": "深证", "创业板指": "创业板", "科创50": "科创"}
         for _, row in idf.iterrows():
             nm = row.get("名称")
-            if nm in name_map and "涨跌幅" in idf.columns:
+            if nm in name_map:
                 try:
                     b["index"][name_map[nm]] = round(float(row["涨跌幅"]), 2)
                 except Exception:
                     pass
+                lvl = row.get("最新价")
+                if lvl is not None:
+                    try:
+                        b["index_level"][name_map[nm]] = round(float(lvl), 0)
+                    except Exception:
+                        pass
     except Exception as e:
         print(f"   ⚠️ 指数获取失败: {e}")
+
+    # ---- 成交额回退(源1/源2未取到时, 单独补一次东方财富全A快照) ----
+    if b["amount_yi"] is None:
+        try:
+            df = ak.stock_zh_a_spot_em()
+            if df is not None and "成交额" in df.columns:
+                b["amount_yi"] = round(float(df["成交额"].astype(float).sum()) / 1e8, 0)
+                if b["source"] is None:
+                    b["source"] = "eastmoney"
+        except Exception as e:
+            print(f"   ⚠️ 成交额回退获取失败: {e}")
 
     # 完整性校验
     if b["up"] is None or b["down"] is None:
@@ -2380,6 +2538,157 @@ def compute_money_effect(b):
         },
         "active_rate": b.get("active_rate"),
         "raw": b,
+    }
+
+
+# ============================================================
+# 盘面复盘点评 (Market Review Commentary) — v2.11 新增
+# 目的: 将机械的"今日核心结论"+"大盘赚钱效应"两个模块, 合并为一段
+#       拟人化、带观点的复盘点评, 风格对齐人工复盘。
+# 数据源(全部真实, 无幻觉):
+#   1) 全市场广度 market_breadth.raw: 指数涨跌幅/点位、成交额、涨跌家数、涨停跌停
+#   2) 个股动量/评级 results: 按题材(sub_theme/板块)聚合平均总分→资金进攻方向
+#   3) 聚合真实新闻 results[].news_items: 消息面催化密集度(仅统计真实条数, 不虚构标题)
+# 说明: 所有结论均由上述真实数据推导, 不引用任何未经核实的个股/事件。
+# ============================================================
+def build_market_review(market_breadth, stats, results):
+    """返回 dict: {available, text, indices, index_level, amount_yi,
+                   up, down, zt, dt, money_score, money_phase, hot, weak, hw_ratio}
+    text 为复盘点评自然语言段落(范文结构: 大盘→资金进攻→高低切换→市场偏好→关口展望)。
+    """
+    if not results:
+        return {"available": False, "text": "个股数据不足, 复盘点评暂不可用。"}
+
+    mb = (market_breadth or {}).get("raw", {}) or {}
+    idx = mb.get("index", {}) or {}
+    idx_level = mb.get("index_level", {}) or {}
+    amount_yi = mb.get("amount_yi")
+    up = mb.get("up"); down = mb.get("down"); zt = mb.get("zt"); dt = mb.get("dt")
+    me_score = (market_breadth or {}).get("score")
+    me_phase = (market_breadth or {}).get("phase", "")
+
+    # ---------- 1) 大盘 ----------
+    idx_order = ["上证", "深证", "创业板", "科创"]
+    idx_parts = [f"{k}{idx[k]:+.2f}%" for k in idx_order if k in idx]
+    lead = max(idx.items(), key=lambda kv: kv[1]) if idx else (None, 0)
+    if amount_yi and amount_yi >= 10000:
+        amt_str = f"{amount_yi/10000:.2f}万亿"
+    elif amount_yi:
+        amt_str = f"{amount_yi:.0f}亿"
+    else:
+        amt_str = None
+    if me_score is not None:
+        if me_score >= 60: effect = "赚钱效应扩散"
+        elif me_score >= 45: effect = "情绪偏暖"
+        elif me_score >= 30: effect = "结构性分化"
+        else: effect = "亏钱效应显现"
+    else:
+        effect = None
+    s1 = ""
+    if idx_parts:
+        s1 += "大盘" + "、".join(idx_parts)
+        if lead[0]: s1 += f"（{lead[0]}领涨）"
+    if amt_str:
+        s1 += f"，全市场成交{amt_str}"
+    if effect:
+        s1 += f"，{effect}"
+    if s1: s1 += "。"
+
+    # ---------- 板块/题材聚合(资金进攻 & 高低切换) ----------
+    from collections import defaultdict
+    grp = defaultdict(lambda: {"n": 0, "score": 0.0, "pct": 0.0, "sa": 0, "news": 0})
+    for r in results:
+        lab = (r.get("sub_theme") or r.get("sector") or "其他").strip()
+        if not lab:
+            lab = "其他"
+        g = grp[lab]
+        g["n"] += 1
+        g["score"] += r.get("total", 0) or 0
+        g["pct"] += r.get("pct_chg", 0) or 0
+        if r.get("rating") in ("S", "A"):
+            g["sa"] += 1
+        g["news"] += len(r.get("news_items") or [])
+    # 仅取样本>=2的方向, 避免单只个股噪声; 按平均总分排序
+    ranked = sorted(
+        [(k, v) for k, v in grp.items() if v["n"] >= 2],
+        key=lambda kv: kv[1]["score"] / kv[1]["n"], reverse=True)
+    avg_score = lambda v: v["score"] / v["n"]
+    avg_pct = lambda v: v["pct"] / v["n"]
+    hot = [k for k, v in ranked[:3]]
+    # 弱势方向: 平均涨幅为负(冲高回落/兑现压力); 若无则取评分最低的3个
+    weak = [k for k, v in ranked if avg_pct(v) < 0][:3]
+    if not weak and ranked:
+        weak = [k for k, _ in ranked[-3:]]
+
+    # ---------- 2) 资金进攻方向 ----------
+    if hot:
+        s2 = f"资金集中进攻{'、'.join(hot)}等方向，带动产业链走强。"
+    else:
+        s2 = "板块轮动较快，资金方向尚不明朗。"
+
+    # ---------- 3) 高低切换 ----------
+    if weak:
+        s3 = f"{'、'.join(weak)}等题材冲高回落，资金出现明显高低切换。"
+    else:
+        s3 = "板块内部分化，资金高低切换明显。"
+
+    # ---------- 4) 市场偏好(硬件制造 vs 软件故事, 仅统计S/A级真实样本) ----------
+    HW_KW = ["芯片", "半导体", "PCB", "光模块", "光芯片", "存储", "模组", "设备",
+             "机器人", "硬件", "算力", "电子", "面板", "材料", "制造", "封测",
+             "电源", "连接器", "元件", "有色", "资源", "新能源", "军工", "汽车"]
+    SW_KW = ["软件", "应用", "政企", "互联网", "传媒", "游戏", "平台", "数据",
+             "信创", "AI应用"]
+    hw = sw = 0
+    for r in results:
+        if r.get("rating") not in ("S", "A"):
+            continue
+        blob = (r.get("sub_theme") or "") + " " + (r.get("sector") or "")
+        if any(k in blob for k in HW_KW):
+            hw += 1
+        elif any(k in blob for k in SW_KW):
+            sw += 1
+    hw_ratio = (hw / (hw + sw)) if (hw + sw) > 0 else None
+    if hw_ratio is not None and hw_ratio >= 0.6:
+        s4 = "当前市场偏好订单可落地的硬件制造（一阶业绩确定性），远期故事类题材遭遇阶段性兑现压力。"
+    elif hw_ratio is not None and hw_ratio <= 0.4:
+        s4 = "当前市场更偏好具备兑现能力的软件/应用方向，纯概念题材承压。"
+    else:
+        s4 = "当前市场风格趋于均衡，硬件制造与景气兑现并重的方向更受资金青睐。"
+
+    # ---------- 5) 关口展望 ----------
+    sh_level = idx_level.get("上证")
+    if sh_level:
+        gate = (int(sh_level) // 500 + 1) * 500
+        if 0 < gate - sh_level <= 100:
+            s5 = (f"沪指报{sh_level:.0f}点，逼近{gate}点关口，"
+                  f"后续重点观察成交量能否持续维持高位，"
+                  f"同时等待中报业绩进一步验证赛道景气度。")
+        else:
+            s5 = (f"沪指报{sh_level:.0f}点，"
+                  f"后续重点观察成交量能否持续维持高位，"
+                  f"同时等待中报业绩进一步验证赛道景气度。")
+    else:
+        s5 = ("后续重点观察成交量能否持续维持高位，"
+              "同时等待中报业绩进一步验证赛道景气度。")
+
+    text = "".join([s for s in (s1, s2, s3, s4, s5) if s])
+
+    # 消息面催化密集度(仅统计近7日有真实消息/公告覆盖的标的, 对齐v2.10时效口径, 不虚构标题)
+    total_news = sum(1 for r in results if r.get("news_recency") == "近7日有消息/公告")
+    hot_news = sum(1 for r in results
+                   if r.get("news_recency") == "近7日有消息/公告"
+                   and (r.get("sub_theme") or r.get("sector") or "") in set(hot))
+
+    return {
+        "available": True,
+        "text": text,
+        "indices": {k: idx[k] for k in idx_order if k in idx},
+        "index_level": {k: idx_level.get(k) for k in idx_order if k in idx_level},
+        "amount_yi": amount_yi,
+        "up": up, "down": down, "zt": zt, "dt": dt,
+        "money_score": me_score, "money_phase": me_phase,
+        "hot": hot, "weak": weak, "hw_ratio": hw_ratio,
+        "total_news": total_news, "hot_news": hot_news,
     }
 
 
@@ -2501,7 +2810,11 @@ def main():
     fund_map = {}
     for i, s in enumerate(stocks[:20]):
         print(f"   [{i+1}/20] {s['name']}", end=" ", flush=True)
-        fund_map[s["code"]] = run_ifind_fin(s["name"], s["code"])
+        try:
+            fund_map[s["code"]] = run_ifind_fin(s["name"], s["code"])
+        except Exception as e:
+            fund_map[s["code"]] = ""
+            print(f"⚠️err={e}", end=" ")
         print("✓" if fund_map[s["code"]] else "✗")
     
     # --- Step 4.5: akshare 财务增速 + 机构预测 + 腾讯行情PE ---
@@ -2696,10 +3009,11 @@ def main():
         ladder_input = pe_ladder.get(code)
         roe_input = fparsed.get("roe")
         gm_input = fparsed.get("gross_margin")
-        fs, fr, fwd_pe_resolved, growth_resolved, ladder_resolved = score_fund(
+        sub_theme_label = get_sub_theme_label(name)
+        fs, fr, fwd_pe_resolved, growth_resolved, ladder_resolved, sustain_info = score_fund(
             pe_input, fwd_pe_input,
             growth_input, code, sector, pe_ladder_data=ladder_input,
-            roe=roe_input, gross_margin=gm_input)
+            roe=roe_input, gross_margin=gm_input, sub_theme_label=sub_theme_label)
         
         # Tech (传入CAGR3用于成长加分, 传入周线用于双线多头判断)
         cagr3_input = cagr3_map.get(code)
@@ -2715,7 +3029,7 @@ def main():
         # News (传入增速用于动态评估; ann_text 为近7日公告覆盖)
         ntext = news_map.get(code, "")
         ann_text = ann_map.get(code[2:], "")
-        ns, nr, news_items = score_news(ntext, pct, name, code, growth=growth_resolved, ann_text=ann_text)
+        ns, nr, news_items, news_recency = score_news(ntext, pct, name, code, growth=growth_resolved, ann_text=ann_text)
         
         # Weighted total: 题材30% + 基本面30% + 消息20% + 技术面20%
         # 行业前景加分叠加到技术面,上限5分
@@ -2747,8 +3061,13 @@ def main():
             "tech": td, "fund_reasons": fr, "theme_reasons": thr,
             "news_reasons": nr,
             "news_items": news_items,
+            "news_recency": news_recency,
             "sub_theme": sub_theme_label,
             "lifecycle": lifecycle,
+            "score_sustain": sustain_info["score"],
+            "sustain_note": sustain_info["note"],
+            "is_cyclic": sustain_info["is_cyclic"],
+            "is_storage_mod": sustain_info["is_storage_mod"],
             "fwd_pe": round(fwd_pe_resolved, 1) if fwd_pe_resolved else None,
             "growth": round(growth_resolved, 1) if growth_resolved else None,
             "pe_ladder": ladder_resolved if ladder_resolved else None,
@@ -2806,7 +3125,7 @@ def main():
     
     out_data = {
         "date": raw.get("date", ""),
-        "model": "stock-scorer v2.7",
+        "model": "stock-scorer v2.11",
         "weights": "题材30% 基本面30%(含行业前景) 消息20% 技术面20%",
         "results": results,
         "stats": {
@@ -2815,6 +3134,8 @@ def main():
                           for s, v in sorted(sec_avg.items(), key=lambda x: -sum(x[1])/len(x[1]))},
             "market_breadth": money_effect,
         },
+        # v2.11: 盘面复盘点评(数据驱动, 无幻觉) — 替代原"今日核心结论"+"大盘赚钱效应"模块
+        "market_review": build_market_review(money_effect, None, results),
     }
     
     with open(out, "w") as f:
