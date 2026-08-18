@@ -995,7 +995,9 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
     v2.12: 存储链识别扩至芯片/控制器/分销; 周期股持续性采用封顶策略(陷阱3.5/中性4.5)
     v2.14: 方案C——模组/分销环节一律周期中性(封顶4.5); 芯片/控制器需穿越周期
            校验(近4年扣非净利全为正) + 预测增速不衰减(fwd_np后两年增速≥25%)才判可持续
-    v2.15: 模组/分销业务模式不可持续 → 基本面封顶3分(标签+名单双识别)"""
+    v2.15: 模组/分销业务模式不可持续 → 基本面封顶3分(标签+名单双识别)
+    v2.16: 名单改以【财报主营构成】为依据(德明利收入100%存储/毛利14.8%=模组厂,
+           非"存储控制器"标签; 名单含主营构成证据注释)"""
     effective_pe = fwd_pe if fwd_pe else pe
     if code in KNOWN:
         k_fwd, k_growth = KNOWN[code]
@@ -1164,16 +1166,19 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
                     gs.append((vb - va) / va)
             if gs:
                 decay = sum(gs) / len(gs)
-        # v2.15: 模组/分销环节业务模式不可持续(依赖存储价格周期、无定价权)
-        # 识别: 题材标签命中 或 已知模组/分销厂名单(含标签未覆盖的佰维/深科技等)
-        STORAGE_NON_DURABLE = {
-            "sh688525": "佰维存储(存储模组+封测)",
-            "sz301308": "江波龙(存储模组)",
-            "sz300475": "香农芯创(存储分销)",
-            "sz000021": "深科技(存储模组/代工)",
+        # v2.16: 模组/分销业务识别以【财报主营构成】为准(非题材标签)。
+        # 标签可能与实际收入组成不符——德明利题材标"存储控制器",但2025年报
+        # 收入100%来自存储(存储产品42%+嵌入式34%+移动存储14%+内存条10%),
+        # 毛利率仅14.8%,本质是模组厂而非控制器厂。以下名单均基于主营构成核验:
+        STORAGE_BUSINESS_MIX = {
+            "sh688525": "存储产品96%+经销56%(2025年报),模组厂",
+            "sz301308": "存储产品100%(2026中报),模组厂",
+            "sz300475": "电子元器件分销94%(2025年报),分销商",
+            "sz001309": "存储100%、毛利率14.8%(2025年报),模组厂(收入无控制器)",
+            "sz000021": "高端制造代工54%+存储26%(2025年报),代工/模组",
         }
         is_pure_price = (any(k in (sub_theme_label or "") for k in ("存储模组", "存储分销"))
-                         or code in STORAGE_NON_DURABLE)
+                         or code in STORAGE_BUSINESS_MIX)
         if is_pure_price:
             sustain_score = 1.0
             sustain_note = "模组/分销业务模式不可持续(盈利依赖存储价格周期、无定价权),基本面封顶3分"
@@ -3222,7 +3227,7 @@ def main():
     
     out_data = {
         "date": raw.get("date", ""),
-        "model": "stock-scorer v2.15",
+        "model": "stock-scorer v2.16",
         "weights": "题材30% 基本面30%(含行业前景) 消息20% 技术面20%",
         "results": results,
         "stats": {
