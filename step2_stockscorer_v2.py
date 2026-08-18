@@ -994,7 +994,8 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
     v2.10: 增加公司持续性/低PE可持续性子评分(周期股/存储链重点论证)
     v2.12: 存储链识别扩至芯片/控制器/分销; 周期股持续性采用封顶策略(陷阱3.5/中性4.5)
     v2.14: 方案C——模组/分销环节一律周期中性(封顶4.5); 芯片/控制器需穿越周期
-           校验(近4年扣非净利全为正) + 预测增速不衰减(fwd_np后两年增速≥25%)才判可持续"""
+           校验(近4年扣非净利全为正) + 预测增速不衰减(fwd_np后两年增速≥25%)才判可持续
+    v2.15: 模组/分销业务模式不可持续 → 基本面封顶3分(标签+名单双识别)"""
     effective_pe = fwd_pe if fwd_pe else pe
     if code in KNOWN:
         k_fwd, k_growth = KNOWN[code]
@@ -1163,11 +1164,19 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
                     gs.append((vb - va) / va)
             if gs:
                 decay = sum(gs) / len(gs)
-        # v2.14 方案B: 模组/分销环节(纯价格弹性、低毛利)一律周期中性, 不给可持续
-        is_pure_price = any(k in (sub_theme_label or "") for k in ("存储模组", "存储分销"))
+        # v2.15: 模组/分销环节业务模式不可持续(依赖存储价格周期、无定价权)
+        # 识别: 题材标签命中 或 已知模组/分销厂名单(含标签未覆盖的佰维/深科技等)
+        STORAGE_NON_DURABLE = {
+            "sh688525": "佰维存储(存储模组+封测)",
+            "sz301308": "江波龙(存储模组)",
+            "sz300475": "香农芯创(存储分销)",
+            "sz000021": "深科技(存储模组/代工)",
+        }
+        is_pure_price = (any(k in (sub_theme_label or "") for k in ("存储模组", "存储分销"))
+                         or code in STORAGE_NON_DURABLE)
         if is_pure_price:
-            sustain_score = 3.0
-            sustain_note = "模组/分销环节毛利率低、盈利依赖存储价格周期,持续性中性"
+            sustain_score = 1.0
+            sustain_note = "模组/分销业务模式不可持续(盈利依赖存储价格周期、无定价权),基本面封顶3分"
         elif low_pe_peak:
             sustain_score = 2.0
             sustain_note = "周期/存储链低PE或处盈利高峰,警惕低PE陷阱(盈利不可持续)"
@@ -1203,10 +1212,14 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
 
     # v2.12 持续性修正: 非周期股用有限权重(±0.2)微调;
     # 周期/存储链采用"封顶"策略——只有"可持续"(durable)才允许满分:
-    #   低PE陷阱(2.0) → 基本面封顶3.5; 中性(3.0) → 封顶4.5; 可持续(4.0) → 不封顶
+    #   模组/分销业务不可持续(1.0) → 基本面封顶3.0; 低PE陷阱(2.0) → 封顶3.5;
+    #   中性(3.0) → 封顶4.5; 可持续(4.0) → 不封顶
     # 防止周期股在盈利高峰以低PE虚高拿满分
     if is_cyclic or is_storage_mod:
-        if sustain_score <= 2.0:
+        if is_pure_price:
+            s = min(s, 3.0)
+            reasons.append("模组/分销业务模式不可持续,基本面分封顶3分")
+        elif sustain_score <= 2.0:
             s = min(s, 3.5)
             reasons.append("周期股低PE陷阱,基本面分封顶3.5")
         elif sustain_score == 3.0:
@@ -3209,7 +3222,7 @@ def main():
     
     out_data = {
         "date": raw.get("date", ""),
-        "model": "stock-scorer v2.14",
+        "model": "stock-scorer v2.15",
         "weights": "题材30% 基本面30%(含行业前景) 消息20% 技术面20%",
         "results": results,
         "stats": {
