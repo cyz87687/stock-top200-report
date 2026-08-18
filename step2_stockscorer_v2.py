@@ -987,11 +987,14 @@ CYCLICAL_SECTORS = {
 }
 
 def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
-               roe=None, gross_margin=None, sub_theme_label=None):
+               roe=None, gross_margin=None, sub_theme_label=None,
+               hist_loss_free=False, fwd_np=None):
     """基本面+竞争力评分 0-5，用估值阶梯替代单年PEG
     v2.8: 增加PEG指标、ROE、毛利率评分
     v2.10: 增加公司持续性/低PE可持续性子评分(周期股/存储链重点论证)
-    v2.12: 存储链识别扩至芯片/控制器/分销; 周期股持续性采用封顶策略(陷阱3.5/中性4.5)"""
+    v2.12: 存储链识别扩至芯片/控制器/分销; 周期股持续性采用封顶策略(陷阱3.5/中性4.5)
+    v2.14: 方案C——模组/分销环节一律周期中性(封顶4.5); 芯片/控制器需穿越周期
+           校验(近4年扣非净利全为正) + 预测增速不衰减(fwd_np后两年增速≥25%)才判可持续"""
     effective_pe = fwd_pe if fwd_pe else pe
     if code in KNOWN:
         k_fwd, k_growth = KNOWN[code]
@@ -1149,17 +1152,44 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
         # 不能单独作为"可持续"证据; 需"高增长+估值阶梯收缩"双重确认才算可持续
         low_pe_peak = (effective_pe is not None and effective_pe < 20
                        and growth is not None and growth <= 15)
-        durable = (growth is not None and growth > 30
-                   and (ladder_shrink is None or ladder_shrink >= 0.15))
-        if low_pe_peak:
+        # v2.14 方案C: 预测后两年增速衰减校验(机构预测本身判断高增长能否延续)
+        decay = None
+        if fwd_np and isinstance(fwd_np, dict) and len(fwd_np) >= 3:
+            ys = sorted(int(k) for k in fwd_np.keys())
+            gs = []
+            for a, b in zip(ys[:-1], ys[1:]):
+                va, vb = fwd_np.get(str(a), fwd_np.get(a)), fwd_np.get(str(b), fwd_np.get(b))
+                if va and vb and va > 0:
+                    gs.append((vb - va) / va)
+            if gs:
+                decay = sum(gs) / len(gs)
+        # v2.14 方案B: 模组/分销环节(纯价格弹性、低毛利)一律周期中性, 不给可持续
+        is_pure_price = any(k in (sub_theme_label or "") for k in ("存储模组", "存储分销"))
+        if is_pure_price:
+            sustain_score = 3.0
+            sustain_note = "模组/分销环节毛利率低、盈利依赖存储价格周期,持续性中性"
+        elif low_pe_peak:
             sustain_score = 2.0
             sustain_note = "周期/存储链低PE或处盈利高峰,警惕低PE陷阱(盈利不可持续)"
-        elif durable:
-            sustain_score = 4.0
-            sustain_note = "高增长配合估值阶梯收缩,盈利可持续性强"
         else:
-            sustain_score = 3.0
-            sustain_note = "周期性行业,盈利随景气波动,持续性中性"
+            # v2.14 方案A: 穿越周期校验——近4年扣非净利全为正(历史盈利未在
+            # 下行期亏损) + 预测增速不衰减(后两年预测净利增速均值>=25%)
+            durable = (growth is not None and growth > 30
+                       and (ladder_shrink is None or ladder_shrink >= 0.15)
+                       and hist_loss_free
+                       and (decay is None or decay >= 0.25))
+            if durable:
+                sustain_score = 4.0
+                sustain_note = "高增长+估值阶梯收缩+穿越周期盈利稳定+预测增长延续,可持续性强"
+            else:
+                sustain_score = 3.0
+                reason_parts = []
+                if not hist_loss_free:
+                    reason_parts.append("历史盈利未穿越周期(近4年有亏损/负净利)")
+                if decay is not None and decay < 0.25:
+                    reason_parts.append(f"预测后两年增速衰减至{decay*100:.0f}%")
+                sustain_note = "周期性行业,盈利随景气波动,持续性中性" + (
+                    ";" + ";".join(reason_parts) if reason_parts else "")
     else:
         if roe is not None and roe >= 0.15 and (growth is None or growth > 0):
             sustain_score = 4.0
@@ -2870,6 +2900,7 @@ def main():
     growth_map = {}
     fwd_pe_map = {}
     cagr3_map = {}
+    hist_loss_free_map = {}  # v2.14: 近4年扣非净利全为正(穿越周期盈利稳定)
     for i, s in enumerate(stocks):
         code = s["code"]
         sym = code[2:]
@@ -2904,6 +2935,10 @@ def main():
                             n_years = len(vals) - 1
                             cagr = (vals[-1] / vals[0]) ** (1.0 / n_years) - 1
                             cagr3_map[code] = round(cagr * 100, 1)
+                        # v2.14: 穿越周期校验——近4年扣非净利是否全为正(含2023存储下行期)
+                        if len(vals) >= 4:
+                            hist_loss_free_map[code] = all(
+                                v is not None and v > 0 for v in vals[-4:])
                     except:
                         pass
         except:
@@ -3060,7 +3095,9 @@ def main():
         fs, fr, fwd_pe_resolved, growth_resolved, ladder_resolved, sustain_info = score_fund(
             pe_input, fwd_pe_input,
             growth_input, code, sector, pe_ladder_data=ladder_input,
-            roe=roe_input, gross_margin=gm_input, sub_theme_label=sub_theme_label)
+            roe=roe_input, gross_margin=gm_input, sub_theme_label=sub_theme_label,
+            hist_loss_free=hist_loss_free_map.get(code, False),
+            fwd_np=fwd_pe_map.get(code))
         
         # Tech (传入CAGR3用于成长加分, 传入周线用于双线多头判断)
         cagr3_input = cagr3_map.get(code)
@@ -3172,7 +3209,7 @@ def main():
     
     out_data = {
         "date": raw.get("date", ""),
-        "model": "stock-scorer v2.12",
+        "model": "stock-scorer v2.14",
         "weights": "题材30% 基本面30%(含行业前景) 消息20% 技术面20%",
         "results": results,
         "stats": {
