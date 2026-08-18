@@ -7,10 +7,10 @@
       "name": "紫金矿业",
       "code": "sh601899",
       "sector": "有色资源",
-      "price": 33.52,
-      "pct_chg": 0.48,
+      "price": 33.56,
+      "pct_chg": 0.6,
       "pe": 14.47,
-      "turnover": 6045653378.0,
+      "turnover": 6128479458.0,
       "score_news": 5,
       "score_tech": 4.0,
       "score_fund": 4.5,
@@ -35,11 +35,11 @@
         "boll_upper": 35.19,
         "boll_mid": 33.02,
         "boll_lower": 30.84,
-        "boll_pos": 61.6,
+        "boll_pos": 62.5,
         "boll_label": "中轨上方",
         "rsi": 56.8,
         "rsi_state": "中性",
-        "reason": "偏多+中位(55%)+BOLL通道内; 高成长(CAGR3=38%)+0.5; BOLL:中轨上方(62%); RSI57(中性)",
+        "reason": "偏多+中位(55%)+BOLL通道内; 高成长(CAGR3=38%)+0.5; BOLL:中轨上方(63%); RSI57(中性)",
         "overall": "震荡",
         "explanations": [
           "BOLL中轨上方运行，多头占优"
@@ -89,7 +89,7 @@
         "铜价新高+金价强势+并购扩张+海外矿山增产",
         "⚠️大宗商品波动+短期涨幅较大",
         "消息时效:近7日有消息/公告",
-        "横盘(+0.5%)"
+        "横盘(+0.6%)"
       ],
       "news_items": [
         {
@@ -120,10 +120,10 @@
       "name": "宁德时代",
       "code": "sz300750",
       "sector": "新能源",
-      "price": 396.27,
+      "price": 396.26,
       "pct_chg": -0.93,
       "pe": 21.57,
-      "turnover": 6640649918.0,
+      "turnover": 6731677180.0,
       "score_news": 4,
       "score_tech": 3.5,
       "score_fund": 5,
@@ -148,7 +148,7 @@
         "boll_upper": 406.74,
         "boll_mid": 392.17,
         "boll_lower": 377.6,
-        "boll_pos": 64.1,
+        "boll_pos": 64.0,
         "boll_label": "中轨上方",
         "rsi": 50.6,
         "rsi_state": "中性",
@@ -234,10 +234,10 @@
       "name": "沪电股份",
       "code": "sz002463",
       "sector": "AI/半导体",
-      "price": 123.6,
-      "pct_chg": -1.19,
+      "price": 123.59,
+      "pct_chg": -1.2,
       "pe": 55.29,
-      "turnover": 4495861721.0,
+      "turnover": 4525869373.0,
       "score_news": 4,
       "score_tech": 3.5,
       "score_fund": 4.0,
@@ -352,10 +352,10 @@
       "name": "胜宏科技",
       "code": "sz300476",
       "sector": "AI/半导体",
-      "price": 269.43,
-      "pct_chg": -2.38,
+      "price": 269.4,
+      "pct_chg": -2.39,
       "pe": 56.58,
-      "turnover": 8441054781.0,
+      "turnover": 8510667741.0,
       "score_news": 3,
       "score_tech": 3.5,
       "score_fund": 4.5,
@@ -470,10 +470,10 @@
       "name": "澜起科技",
       "code": "sh688008",
       "sector": "AI/半导体",
-      "price": 217.98,
-      "pct_chg": -2.85,
+      "price": 218.0,
+      "pct_chg": -2.84,
       "pe": 104.03,
-      "turnover": 9719263557.0,
+      "turnover": 9788243117.0,
       "score_news": 4,
       "score_tech": 4.5,
       "score_fund": 3.0,
@@ -498,7 +498,7 @@
         "boll_upper": 233.02,
         "boll_mid": 212.28,
         "boll_lower": 191.53,
-        "boll_pos": 63.7,
+        "boll_pos": 63.8,
         "boll_label": "中轨上方",
         "rsi": 54.8,
         "rsi_state": "中性",
@@ -548,14 +548,14 @@
       "theme_reasons": [
         "细分题材:内存接口(内禀5)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "板块高度集中(82只上榜)"
       ],
       "news_reasons": [
         "内存接口芯片全球龙头+DDR5渗透+AI算力需求增长",
         "⚠️技术迭代快+行业周期性强",
         "消息时效:近7日有消息/公告",
-        "小跌-2.9%"
+        "小跌-2.8%"
       ],
       "news_items": [
         {
@@ -589,7 +589,7 @@
       "price": 66.2,
       "pct_chg": -2.98,
       "pe": 28.0,
-      "turnover": 8681203632.0,
+      "turnover": 8747299765.0,
       "score_news": 4,
       "score_tech": 1.5,
       "score_fund": 5,
@@ -702,10 +702,10 @@
       "name": "阳光电源",
       "code": "sz300274",
       "sector": "新能源",
-      "price": 118.05,
-      "pct_chg": -0.63,
+      "price": 118.04,
+      "pct_chg": -0.64,
       "pe": 20.52,
-      "turnover": 5201813973.0,
+      "turnover": 5234086109.0,
       "score_news": 1.6,
       "score_tech": 5,
       "score_fund": 4.0,
@@ -820,10 +820,10 @@
       "name": "生益科技",
       "code": "sh600183",
       "sector": "电子材料",
-      "price": 139.43,
-      "pct_chg": -3.5,
+      "price": 139.41,
+      "pct_chg": -3.52,
       "pe": 65.19,
-      "turnover": 10273468259.0,
+      "turnover": 10341890687.0,
       "score_news": 3,
       "score_tech": 3.5,
       "score_fund": 4.0,
@@ -848,7 +848,7 @@
         "boll_upper": 154.63,
         "boll_mid": 125.67,
         "boll_lower": 96.71,
-        "boll_pos": 73.8,
+        "boll_pos": 73.7,
         "boll_label": "中轨上方",
         "rsi": 70.2,
         "rsi_state": "超买",
@@ -943,7 +943,7 @@
       "price": 253.18,
       "pct_chg": -1.4,
       "pe": 30.23,
-      "turnover": 7515303516.0,
+      "turnover": 7588443168.0,
       "score_news": 4.5,
       "score_tech": 5,
       "score_fund": 3.0,
@@ -1066,10 +1066,10 @@
       "name": "厦门钨业",
       "code": "sh600549",
       "sector": "有色资源",
-      "price": 58.1,
-      "pct_chg": -0.51,
+      "price": 58.11,
+      "pct_chg": -0.5,
       "pe": 30.41,
-      "turnover": 3956313028.0,
+      "turnover": 3977806465.0,
       "score_news": 3,
       "score_tech": 3.5,
       "score_fund": 4.5,
@@ -1094,7 +1094,7 @@
         "boll_upper": 62.04,
         "boll_mid": 52.51,
         "boll_lower": 42.98,
-        "boll_pos": 79.3,
+        "boll_pos": 79.4,
         "boll_label": "中轨上方",
         "rsi": 69.3,
         "rsi_state": "中性",
@@ -1185,7 +1185,7 @@
       "price": 37.48,
       "pct_chg": -4.36,
       "pe": 66.27,
-      "turnover": 7072402271.0,
+      "turnover": 7179520711.0,
       "score_news": 2,
       "score_tech": 3.5,
       "score_fund": 4.5,
@@ -1298,10 +1298,10 @@
       "name": "华友钴业",
       "code": "sh603799",
       "sector": "有色资源",
-      "price": 41.86,
-      "pct_chg": -2.79,
+      "price": 41.87,
+      "pct_chg": -2.76,
       "pe": 10.78,
-      "turnover": 2591577794.0,
+      "turnover": 2610035346.0,
       "score_news": 4,
       "score_tech": 1.5,
       "score_fund": 4.5,
@@ -1319,18 +1319,18 @@
         "wma20": 51.3,
         "trend": "周线空头",
         "bull_level": 0,
-        "position": 13.0,
+        "position": 14.0,
         "vol_ratio": 0.82,
         "amount_ratio": 0.83,
         "amount_today_yi": 26.0,
         "boll_upper": 45.12,
         "boll_mid": 41.52,
         "boll_lower": 37.93,
-        "boll_pos": 54.7,
+        "boll_pos": 54.8,
         "boll_label": "中轨上方",
         "rsi": 55.4,
         "rsi_state": "中性",
-        "reason": "趋势走弱+低位(13%)可能反弹; BOLL:中轨上方(55%); RSI55(中性)",
+        "reason": "趋势走弱+低位(14%)可能反弹; BOLL:中轨上方(55%); RSI55(中性)",
         "overall": "弱势",
         "explanations": [
           "BOLL中轨上方运行，多头占优"
@@ -1418,7 +1418,7 @@
       "price": 291.44,
       "pct_chg": 1.7,
       "pe": 146.38,
-      "turnover": 15570492348.0,
+      "turnover": 15715979196.0,
       "score_news": 4,
       "score_tech": 3.5,
       "score_fund": 3.0,
@@ -1439,7 +1439,7 @@
         "position": 67.0,
         "vol_ratio": 1.11,
         "amount_ratio": 1.35,
-        "amount_today_yi": 158.2,
+        "amount_today_yi": 159.6,
         "boll_upper": 289.89,
         "boll_mid": 219.54,
         "boll_lower": 149.19,
@@ -1490,7 +1490,7 @@
       "theme_reasons": [
         "细分题材:光模块/CPO(内禀5)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日+26.2%强于题材,超额明显",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
@@ -1533,7 +1533,7 @@
       "price": 22.01,
       "pct_chg": 1.15,
       "pe": 29.86,
-      "turnover": 3129696796.0,
+      "turnover": 3179261115.0,
       "score_news": 2,
       "score_tech": 2.5,
       "score_fund": 5,
@@ -1647,7 +1647,7 @@
       "price": 44.91,
       "pct_chg": -3.04,
       "pe": 47.04,
-      "turnover": 10811216281.0,
+      "turnover": 10886659781.0,
       "score_news": 3,
       "score_tech": 3.5,
       "score_fund": 4.5,
@@ -1668,7 +1668,7 @@
         "position": 43.0,
         "vol_ratio": 0.92,
         "amount_ratio": 1.0,
-        "amount_today_yi": 106.9,
+        "amount_today_yi": 107.6,
         "boll_upper": 47.01,
         "boll_mid": 40.37,
         "boll_lower": 33.73,
@@ -1768,7 +1768,7 @@
       "price": 80.97,
       "pct_chg": 0.36,
       "pe": 46.54,
-      "turnover": 7089021748.0,
+      "turnover": 7155845398.0,
       "score_news": 4,
       "score_tech": 2.5,
       "score_fund": 3.5,
@@ -1878,10 +1878,10 @@
       "name": "华工科技",
       "code": "sz000988",
       "sector": "AI/半导体",
-      "price": 111.94,
-      "pct_chg": -1.51,
+      "price": 111.95,
+      "pct_chg": -1.5,
       "pe": 66.24,
-      "turnover": 5629440706.0,
+      "turnover": 5662086781.0,
       "score_news": 1.2,
       "score_tech": 4.5,
       "score_fund": 4.0,
@@ -1906,7 +1906,7 @@
         "boll_upper": 117.62,
         "boll_mid": 104.64,
         "boll_lower": 91.65,
-        "boll_pos": 78.1,
+        "boll_pos": 78.2,
         "boll_label": "中轨上方",
         "rsi": 63.3,
         "rsi_state": "中性",
@@ -1956,7 +1956,7 @@
       "theme_reasons": [
         "细分题材:激光/光模块(内禀5)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "板块高度集中(82只上榜)"
       ],
       "news_reasons": [
@@ -1995,10 +1995,10 @@
       "name": "洛阳钼业",
       "code": "sh603993",
       "sector": "有色资源",
-      "price": 18.83,
-      "pct_chg": -1.57,
+      "price": 18.82,
+      "pct_chg": -1.62,
       "pe": 16.67,
-      "turnover": 3516159655.0,
+      "turnover": 3545592253.0,
       "score_news": 2,
       "score_tech": 2.5,
       "score_fund": 4.5,
@@ -2016,18 +2016,18 @@
         "wma20": 18.8,
         "trend": "偏空",
         "bull_level": 0,
-        "position": 32.0,
+        "position": 31.0,
         "vol_ratio": 0.87,
         "amount_ratio": 0.83,
         "amount_today_yi": 35.5,
         "boll_upper": 20.8,
         "boll_mid": 19.42,
         "boll_lower": 18.03,
-        "boll_pos": 28.9,
+        "boll_pos": 28.5,
         "boll_label": "中轨下方",
         "rsi": 47.9,
         "rsi_state": "中性",
-        "reason": "趋势走弱+中位(32%); 高成长(CAGR3=50%)+0.5; BOLL:中轨下方(29%); RSI48(中性)",
+        "reason": "趋势走弱+中位(31%); 高成长(CAGR3=50%)+0.5; BOLL:中轨下方(29%); RSI48(中性)",
         "overall": "震荡",
         "explanations": [
           "BOLL中轨下方运行，空头占优"
@@ -2118,10 +2118,10 @@
       "name": "兆易创新",
       "code": "sh603986",
       "sector": "AI/半导体",
-      "price": 436.51,
-      "pct_chg": -1.69,
+      "price": 436.74,
+      "pct_chg": -1.64,
       "pe": 106.62,
-      "turnover": 26580345462.0,
+      "turnover": 26794872150.0,
       "score_news": 4.5,
       "score_tech": 3.5,
       "score_fund": 3,
@@ -2130,8 +2130,8 @@
       "rating": "A",
       "advice": "逢低加仓，重点关注",
       "tech": {
-        "ma5": 423.1,
-        "ma10": 410.8,
+        "ma5": 423.2,
+        "ma10": 410.9,
         "ma20": 406.1,
         "ma60": 523.0,
         "wma5": 421.4,
@@ -2140,15 +2140,15 @@
         "trend": "日线多头",
         "bull_level": 1,
         "position": 33.0,
-        "vol_ratio": 0.84,
+        "vol_ratio": 0.85,
         "amount_ratio": 0.89,
-        "amount_today_yi": 263.1,
-        "boll_upper": 475.25,
-        "boll_mid": 406.13,
-        "boll_lower": 337.01,
-        "boll_pos": 72.0,
+        "amount_today_yi": 265.4,
+        "boll_upper": 475.28,
+        "boll_mid": 406.14,
+        "boll_lower": 337.0,
+        "boll_pos": 72.1,
         "boll_label": "中轨上方",
-        "rsi": 67.2,
+        "rsi": 67.3,
         "rsi_state": "中性",
         "reason": "日线多头+中位(33%)+BOLL通道内; BOLL:中轨上方(72%); RSI67(中性)",
         "overall": "偏强",
@@ -2163,17 +2163,17 @@
           ],
           [
             "MA20均线",
-            406.13
+            406.14
           ],
           [
             "BOLL下轨",
-            337.01
+            337.0
           ]
         ],
         "resistance_levels": [
           [
             "BOLL上轨",
-            475.25
+            475.28
           ],
           [
             "MA60均线",
@@ -2206,7 +2206,7 @@
         "⚠️存储芯片价格周期波动",
         "公告确认:利好事件",
         "消息时效:近7日有消息/公告",
-        "小跌-1.7%"
+        "小跌-1.6%"
       ],
       "news_items": [
         {
@@ -2247,7 +2247,7 @@
       "price": 412.18,
       "pct_chg": -1.69,
       "pe": 14.78,
-      "turnover": 7397314914.0,
+      "turnover": 7439567486.0,
       "score_news": 3.5,
       "score_tech": 3.0,
       "score_fund": 3.0,
@@ -2324,7 +2324,7 @@
       "theme_reasons": [
         "细分题材:存储模组(内禀5)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "板块高度集中(82只上榜)"
       ],
       "news_reasons": [
@@ -2370,10 +2370,10 @@
       "name": "长飞光纤",
       "code": "sh601869",
       "sector": "AI/半导体",
-      "price": 383.5,
-      "pct_chg": 1.85,
+      "price": 383.6,
+      "pct_chg": 1.88,
       "pe": 274.45,
-      "turnover": 5892520903.0,
+      "turnover": 5940701063.0,
       "score_news": 4,
       "score_tech": 2.5,
       "score_fund": 4.0,
@@ -2398,7 +2398,7 @@
         "boll_upper": 397.6,
         "boll_mid": 325.56,
         "boll_lower": 253.51,
-        "boll_pos": 90.2,
+        "boll_pos": 90.3,
         "boll_label": "上轨附近",
         "rsi": 76.9,
         "rsi_state": "超买",
@@ -2448,7 +2448,7 @@
       "theme_reasons": [
         "细分题材:光通信/光纤(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日-5.6%弱于题材",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
@@ -2488,10 +2488,10 @@
       "name": "深南电路",
       "code": "sz002916",
       "sector": "电子制造",
-      "price": 381.84,
+      "price": 381.85,
       "pct_chg": -2.81,
       "pe": 71.56,
-      "turnover": 3070405730.0,
+      "turnover": 3088047200.0,
       "score_news": 4,
       "score_tech": 2.5,
       "score_fund": 4.0,
@@ -2604,10 +2604,10 @@
       "name": "北方华创",
       "code": "sz002371",
       "sector": "AI/半导体",
-      "price": 778.45,
-      "pct_chg": 1.63,
+      "price": 777.0,
+      "pct_chg": 1.44,
       "pe": 101.12,
-      "turnover": 6240726638.0,
+      "turnover": 6312195098.0,
       "score_news": 4,
       "score_tech": 2.5,
       "score_fund": 2.8,
@@ -2632,11 +2632,11 @@
         "boll_upper": 804.66,
         "boll_mid": 732.54,
         "boll_lower": 660.42,
-        "boll_pos": 81.8,
+        "boll_pos": 80.8,
         "boll_label": "上轨附近",
         "rsi": 61.4,
         "rsi_state": "中性",
-        "reason": "日线多头+相对高位(69%)+BOLL通道内; 缩量(0.7x); 高成长(CAGR3=36%)+0.5; BOLL:上轨附近(82%); RSI61(中性)",
+        "reason": "日线多头+相对高位(69%)+BOLL通道内; 缩量(0.7x); 高成长(CAGR3=36%)+0.5; BOLL:上轨附近(81%); RSI61(中性)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -2685,7 +2685,7 @@
         "半导体设备平台龙头+多品类布局+国产替代加速",
         "⚠️研发投入大+技术迭代快",
         "消息时效:近7日有消息/公告",
-        "横盘(+1.6%)"
+        "横盘(+1.4%)"
       ],
       "news_items": [
         {
@@ -2716,10 +2716,10 @@
       "name": "方正科技",
       "code": "sh600601",
       "sector": "电子制造",
-      "price": 13.11,
-      "pct_chg": 0.92,
+      "price": 13.14,
+      "pct_chg": 1.16,
       "pe": 89.8,
-      "turnover": 2796784387.0,
+      "turnover": 2810926969.0,
       "score_news": 2,
       "score_tech": 2.0,
       "score_fund": 4.5,
@@ -2744,11 +2744,11 @@
         "boll_upper": 14.26,
         "boll_mid": 11.17,
         "boll_lower": 8.08,
-        "boll_pos": 81.4,
+        "boll_pos": 81.9,
         "boll_label": "上轨附近",
         "rsi": 74.1,
         "rsi_state": "超买",
-        "reason": "日线多头+相对高位(69%)+BOLL通道内; BOLL:上轨附近(81%); RSI74(超买,短线回调风险)",
+        "reason": "日线多头+相对高位(69%)+BOLL通道内; BOLL:上轨附近(82%); RSI74(超买,短线回调风险)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -2799,7 +2799,7 @@
         "PCB制造+宽带接入+智慧城市",
         "⚠️PCB行业竞争+业务转型慢",
         "消息时效:近7日有消息/公告",
-        "横盘(+0.9%)"
+        "横盘(+1.2%)"
       ],
       "news_items": [
         {
@@ -2830,10 +2830,10 @@
       "name": "亚翔集成",
       "code": "sh603929",
       "sector": "综合",
-      "price": 182.88,
-      "pct_chg": 2.19,
+      "price": 182.95,
+      "pct_chg": 2.22,
       "pe": 31.95,
-      "turnover": 2174461919.0,
+      "turnover": 2188402709.0,
       "score_news": 0,
       "score_tech": 4.0,
       "score_fund": 5,
@@ -2858,7 +2858,7 @@
         "boll_upper": 183.88,
         "boll_mid": 162.02,
         "boll_lower": 140.16,
-        "boll_pos": 97.7,
+        "boll_pos": 97.9,
         "boll_label": "上轨附近",
         "rsi": 61.9,
         "rsi_state": "中性",
@@ -2938,10 +2938,10 @@
       "name": "华正新材",
       "code": "sh603186",
       "sector": "电子材料",
-      "price": 184.15,
-      "pct_chg": -0.09,
+      "price": 184.2,
+      "pct_chg": -0.06,
       "pe": 99.85,
-      "turnover": 5797596500.0,
+      "turnover": 5858612566.0,
       "score_news": 1.2,
       "score_tech": 2.5,
       "score_fund": 4.5,
@@ -2966,7 +2966,7 @@
         "boll_upper": 185.12,
         "boll_mid": 135.96,
         "boll_lower": 86.8,
-        "boll_pos": 99.0,
+        "boll_pos": 99.1,
         "boll_label": "上轨附近",
         "rsi": 78.4,
         "rsi_state": "超买",
@@ -3053,10 +3053,10 @@
       "name": "中材科技",
       "code": "sz002080",
       "sector": "新材料",
-      "price": 60.09,
-      "pct_chg": -3.08,
+      "price": 60.1,
+      "pct_chg": -3.06,
       "pe": 49.76,
-      "turnover": 3306573192.0,
+      "turnover": 3328076972.0,
       "score_news": 2,
       "score_tech": 2.5,
       "score_fund": 4.5,
@@ -3170,10 +3170,10 @@
       "name": "德福科技",
       "code": "sz301511",
       "sector": "电子材料",
-      "price": 98.5,
-      "pct_chg": -2.48,
+      "price": 98.61,
+      "pct_chg": -2.37,
       "pe": 257.32,
-      "turnover": 3160176772.0,
+      "turnover": 3178173097.0,
       "score_news": 3.5,
       "score_tech": 2.5,
       "score_fund": 3.0,
@@ -3198,7 +3198,7 @@
         "boll_upper": 103.0,
         "boll_mid": 80.79,
         "boll_lower": 58.59,
-        "boll_pos": 89.9,
+        "boll_pos": 90.1,
         "boll_label": "上轨附近",
         "rsi": 72.9,
         "rsi_state": "超买",
@@ -3257,7 +3257,7 @@
         "⚠️铜箔加工费下行+产能过剩",
         "公告确认:利好事件",
         "消息时效:近7日有消息/公告",
-        "小跌-2.5%"
+        "小跌-2.4%"
       ],
       "news_items": [
         {
@@ -3298,7 +3298,7 @@
       "price": 17.1,
       "pct_chg": -0.41,
       "pe": 346.36,
-      "turnover": 2718938519.0,
+      "turnover": 2735107817.0,
       "score_news": 1.2,
       "score_tech": 2.5,
       "score_fund": 4.5,
@@ -3416,7 +3416,7 @@
       "price": 18.7,
       "pct_chg": -1.58,
       "pe": 76.18,
-      "turnover": 5956582703.0,
+      "turnover": 5999751653.0,
       "score_news": 3.5,
       "score_tech": 3.0,
       "score_fund": 4.5,
@@ -3536,10 +3536,10 @@
       "name": "源杰科技",
       "code": "sh688498",
       "sector": "AI/半导体",
-      "price": 1614.04,
-      "pct_chg": 1.19,
+      "price": 1613.5,
+      "pct_chg": 1.16,
       "pe": 564.2,
-      "turnover": 5811919033.0,
+      "turnover": 5873688653.0,
       "score_news": 4,
       "score_tech": 2.5,
       "score_fund": 2.5,
@@ -3564,7 +3564,7 @@
         "boll_upper": 1665.52,
         "boll_mid": 1357.89,
         "boll_lower": 1050.25,
-        "boll_pos": 91.6,
+        "boll_pos": 91.5,
         "boll_label": "上轨附近",
         "rsi": 69.9,
         "rsi_state": "中性",
@@ -3610,7 +3610,7 @@
       "theme_reasons": [
         "细分题材:光芯片/激光器(内禀5)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
       ],
@@ -3649,10 +3649,10 @@
       "name": "天华新能",
       "code": "sz300390",
       "sector": "新能源",
-      "price": 63.81,
-      "pct_chg": -5.61,
+      "price": 63.82,
+      "pct_chg": -5.59,
       "pe": 19.03,
-      "turnover": 3112890847.0,
+      "turnover": 3135329959.0,
       "score_news": 2,
       "score_tech": 4.0,
       "score_fund": 2.8,
@@ -3765,10 +3765,10 @@
       "name": "迈为股份",
       "code": "sz300751",
       "sector": "新能源",
-      "price": 212.23,
-      "pct_chg": 13.46,
+      "price": 212.5,
+      "pct_chg": 13.6,
       "pe": 87.47,
-      "turnover": 2826412960.0,
+      "turnover": 2847599210.0,
       "score_news": 4,
       "score_tech": 2,
       "score_fund": 2.8,
@@ -3793,7 +3793,7 @@
         "boll_upper": 203.43,
         "boll_mid": 171.88,
         "boll_lower": 140.32,
-        "boll_pos": 113.9,
+        "boll_pos": 114.4,
         "boll_label": "突破上轨",
         "rsi": 73.3,
         "rsi_state": "超买",
@@ -3852,7 +3852,7 @@
         "光伏电池设备龙头+HJT整线方案",
         "⚠️光伏行业周期+技术路线不确定",
         "消息时效:近7日有消息/公告",
-        "涨停+13.5%(股价确认利好)"
+        "涨停+13.6%(股价确认利好)"
       ],
       "news_items": [
         {
@@ -3883,10 +3883,10 @@
       "name": "京东方Ａ",
       "code": "sz000725",
       "sector": "电子面板",
-      "price": 6.46,
-      "pct_chg": 6.25,
+      "price": 6.47,
+      "pct_chg": 6.41,
       "pe": 40.28,
-      "turnover": 20190038272.0,
+      "turnover": 20484397392.0,
       "score_news": 3,
       "score_tech": 2.5,
       "score_fund": 3.5,
@@ -3907,15 +3907,15 @@
         "position": 50.0,
         "vol_ratio": 1.01,
         "amount_ratio": 1.05,
-        "amount_today_yi": 206.5,
+        "amount_today_yi": 209.8,
         "boll_upper": 6.36,
         "boll_mid": 5.85,
         "boll_lower": 5.34,
-        "boll_pos": 109.9,
+        "boll_pos": 110.6,
         "boll_label": "突破上轨",
-        "rsi": 66.7,
+        "rsi": 66.8,
         "rsi_state": "中性",
-        "reason": "趋势日线多头+分位(50%); BOLL:突破上轨(110%); RSI67(中性)",
+        "reason": "趋势日线多头+分位(50%); BOLL:突破上轨(111%); RSI67(中性)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -3958,8 +3958,8 @@
       "theme_reasons": [
         "细分题材:玻璃基板/TGV(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.4%,上涨占比67%(3只样本)",
-        "大涨+6.2%验证",
+        "题材近20日中位+2.5%,上涨占比67%(3只样本)",
+        "大涨+6.4%验证",
         "板块1只涨停",
         "上涨占比100%,普涨",
         "题材启动期,可关注"
@@ -3968,7 +3968,7 @@
         "面板龙头+产能整合优化+VR/AR/车载显示增长",
         "⚠️面板价格周期波动+行业竞争激烈",
         "消息时效:近7日有消息/公告",
-        "上涨+6.2%"
+        "上涨+6.4%"
       ],
       "news_items": [
         {
@@ -3999,10 +3999,10 @@
       "name": "协创数据",
       "code": "sz300857",
       "sector": "AI/半导体",
-      "price": 267.02,
-      "pct_chg": -0.79,
+      "price": 267.16,
+      "pct_chg": -0.74,
       "pe": 50.38,
-      "turnover": 5586376042.0,
+      "turnover": 5660833534.0,
       "score_news": 3,
       "score_tech": 2.5,
       "score_fund": 4.0,
@@ -4020,18 +4020,18 @@
         "wma20": 252.8,
         "trend": "日线多头",
         "bull_level": 1,
-        "position": 61.0,
+        "position": 62.0,
         "vol_ratio": 0.95,
         "amount_ratio": 1.04,
         "amount_today_yi": 56.9,
         "boll_upper": 284.32,
         "boll_mid": 239.68,
         "boll_lower": 195.05,
-        "boll_pos": 80.6,
+        "boll_pos": 80.8,
         "boll_label": "上轨附近",
         "rsi": 71.6,
         "rsi_state": "超买",
-        "reason": "日线多头+相对高位(61%)+BOLL通道内; 超高成长(CAGR3=113%)+1; BOLL:上轨附近(81%); RSI72(超买,短线回调风险)",
+        "reason": "日线多头+相对高位(62%)+BOLL通道内; 超高成长(CAGR3=113%)+1; BOLL:上轨附近(81%); RSI72(超买,短线回调风险)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -4073,14 +4073,14 @@
       "theme_reasons": [
         "细分题材:存储/云服务(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "板块高度集中(82只上榜)"
       ],
       "news_reasons": [
         "数据存储+AI服务器+算力租赁",
         "⚠️行业竞争+盈利模式待验证",
         "消息时效:近7日有消息/公告",
-        "横盘(-0.8%)"
+        "横盘(-0.7%)"
       ],
       "news_items": [
         {
@@ -4111,10 +4111,10 @@
       "name": "剑桥科技",
       "code": "sh603083",
       "sector": "AI/半导体",
-      "price": 186.0,
-      "pct_chg": -2.21,
+      "price": 186.05,
+      "pct_chg": -2.19,
       "pe": 195.54,
-      "turnover": 4338066737.0,
+      "turnover": 4377509337.0,
       "score_news": 3,
       "score_tech": 2.5,
       "score_fund": 4.0,
@@ -4232,7 +4232,7 @@
       "price": 52.37,
       "pct_chg": -0.95,
       "pe": 42.81,
-      "turnover": 3107922769.0,
+      "turnover": 3137378747.0,
       "score_news": 3,
       "score_tech": 4.0,
       "score_fund": 3.0,
@@ -4341,10 +4341,10 @@
       "name": "长川科技",
       "code": "sz300604",
       "sector": "AI/半导体",
-      "price": 301.4,
-      "pct_chg": -0.39,
+      "price": 301.03,
+      "pct_chg": -0.51,
       "pe": 123.55,
-      "turnover": 5404241736.0,
+      "turnover": 5454995394.0,
       "score_news": 1.6,
       "score_tech": 3.0,
       "score_fund": 3.5,
@@ -4369,11 +4369,11 @@
         "boll_upper": 321.86,
         "boll_mid": 279.63,
         "boll_lower": 237.39,
-        "boll_pos": 75.8,
+        "boll_pos": 75.3,
         "boll_label": "中轨上方",
         "rsi": 58.7,
         "rsi_state": "中性",
-        "reason": "日线多头+相对高位(72%)+BOLL通道内; 高成长(CAGR3=47%)+0.5; BOLL:中轨上方(76%); RSI59(中性)",
+        "reason": "日线多头+相对高位(72%)+BOLL通道内; 高成长(CAGR3=47%)+0.5; BOLL:中轨上方(75%); RSI59(中性)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -4415,7 +4415,7 @@
       "theme_reasons": [
         "细分题材:半导体测试(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+13.4%,上涨占比50%(2只样本)",
+        "题材近20日中位+6.8%,上涨占比50%(2只样本)",
         "个股近20日-5.3%弱于题材",
         "题材加速期,趋势延续",
         "板块高度集中(82只上榜)"
@@ -4425,7 +4425,7 @@
         "⚠️设备验证周期+技术迭代快",
         "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
         "消息时效:近7日无消息",
-        "横盘(-0.4%)"
+        "横盘(-0.5%)"
       ],
       "news_items": [
         {
@@ -4459,7 +4459,7 @@
       "price": 12.9,
       "pct_chg": -1.75,
       "pe": 65.78,
-      "turnover": 4580589046.0,
+      "turnover": 4620917091.0,
       "score_news": 1.2,
       "score_tech": 2.5,
       "score_fund": 4.0,
@@ -4573,7 +4573,7 @@
       "price": 5.24,
       "pct_chg": 0.96,
       "pe": 21.54,
-      "turnover": 2914742694.0,
+      "turnover": 2950874171.0,
       "score_news": 3,
       "score_tech": 3.0,
       "score_fund": 4.5,
@@ -4644,7 +4644,7 @@
       "theme_reasons": [
         "细分题材:面板/半导体(内禀3)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.4%,上涨占比67%(3只样本)",
+        "题材近20日中位+2.5%,上涨占比67%(3只样本)",
         "板块1只涨停",
         "上涨占比100%,普涨",
         "题材启动期,可关注"
@@ -4684,10 +4684,10 @@
       "name": "泰晶科技",
       "code": "sh603738",
       "sector": "电子元件",
-      "price": 39.85,
-      "pct_chg": -2.06,
+      "price": 39.89,
+      "pct_chg": -1.97,
       "pe": 231.2,
-      "turnover": 2214677238.0,
+      "turnover": 2227186742.0,
       "score_news": 5,
       "score_tech": 3.5,
       "score_fund": 0.8,
@@ -4712,7 +4712,7 @@
         "boll_upper": 41.4,
         "boll_mid": 33.91,
         "boll_lower": 26.42,
-        "boll_pos": 89.6,
+        "boll_pos": 89.9,
         "boll_label": "上轨附近",
         "rsi": 73.7,
         "rsi_state": "超买",
@@ -4771,7 +4771,7 @@
         "石英光刻晶振国内唯一+312.5M/625M超高频晶振国产替代+AI光模块时钟核心+日本出口管制断供+车规晶振市占60%",
         "⚠️高端产能爬坡+消费电子基本盘下行",
         "消息时效:近7日有消息/公告",
-        "小跌-2.1%"
+        "小跌-2.0%"
       ],
       "news_items": [
         {
@@ -4802,10 +4802,10 @@
       "name": "安集科技",
       "code": "sh688019",
       "sector": "AI/半导体",
-      "price": 272.88,
-      "pct_chg": 4.18,
+      "price": 272.98,
+      "pct_chg": 4.22,
       "pe": 75.79,
-      "turnover": 2460755625.0,
+      "turnover": 2484272579.0,
       "score_news": 1.6,
       "score_tech": 3.5,
       "score_fund": 4.0,
@@ -4830,7 +4830,7 @@
         "boll_upper": 273.03,
         "boll_mid": 247.5,
         "boll_lower": 221.97,
-        "boll_pos": 99.7,
+        "boll_pos": 99.9,
         "boll_label": "上轨附近",
         "rsi": 56.5,
         "rsi_state": "中性",
@@ -4875,7 +4875,7 @@
       "theme_reasons": [
         "细分题材:CMP抛光液(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
       ],
@@ -4915,10 +4915,10 @@
       "name": "君正股份",
       "code": "sz300223",
       "sector": "综合",
-      "price": 152.78,
-      "pct_chg": -1.68,
+      "price": 152.75,
+      "pct_chg": -1.7,
       "pe": 118.91,
-      "turnover": 6639382886.0,
+      "turnover": 6694038974.0,
       "score_news": 3.5,
       "score_tech": 2.5,
       "score_fund": 2.8,
@@ -4943,7 +4943,7 @@
         "boll_upper": 160.37,
         "boll_mid": 138.48,
         "boll_lower": 116.58,
-        "boll_pos": 82.7,
+        "boll_pos": 82.6,
         "boll_label": "上轨附近",
         "rsi": 70.3,
         "rsi_state": "超买",
@@ -5040,10 +5040,10 @@
       "name": "大族激光",
       "code": "sz002008",
       "sector": "AI/半导体",
-      "price": 98.14,
-      "pct_chg": -2.61,
+      "price": 98.0,
+      "pct_chg": -2.75,
       "pe": 50.76,
-      "turnover": 4575141737.0,
+      "turnover": 4606197937.0,
       "score_news": 1.2,
       "score_tech": 3.0,
       "score_fund": 4.5,
@@ -5068,11 +5068,11 @@
         "boll_upper": 108.89,
         "boll_mid": 95.21,
         "boll_lower": 81.53,
-        "boll_pos": 60.7,
+        "boll_pos": 60.2,
         "boll_label": "中轨上方",
         "rsi": 57.3,
         "rsi_state": "中性",
-        "reason": "日线多头+中位(42%)+BOLL通道内; BOLL:中轨上方(61%); RSI57(中性)",
+        "reason": "日线多头+中位(42%)+BOLL通道内; BOLL:中轨上方(60%); RSI57(中性)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -5117,7 +5117,7 @@
       "theme_reasons": [
         "细分题材:激光设备(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "板块高度集中(82只上榜)"
       ],
       "news_reasons": [
@@ -5125,7 +5125,7 @@
         "⚠️激光行业竞争+下游需求波动",
         "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
         "消息时效:近7日无消息",
-        "小跌-2.6%"
+        "小跌-2.8%"
       ],
       "news_items": [
         {
@@ -5159,7 +5159,7 @@
       "price": 40.04,
       "pct_chg": 10.0,
       "pe": 297.67,
-      "turnover": 4447587547.0,
+      "turnover": 4528055935.0,
       "score_news": 4.5,
       "score_tech": 2,
       "score_fund": 2.0,
@@ -5282,7 +5282,7 @@
       "price": 157.22,
       "pct_chg": -2.31,
       "pe": 287.88,
-      "turnover": 3080933261.0,
+      "turnover": 3102503845.0,
       "score_news": 2.5,
       "score_tech": 4.0,
       "score_fund": 2.5,
@@ -5404,10 +5404,10 @@
       "name": "新易盛",
       "code": "sz300502",
       "sector": "AI/半导体",
-      "price": 452.2,
+      "price": 452.21,
       "pct_chg": -3.1,
       "pe": 58.71,
-      "turnover": 17531868005.0,
+      "turnover": 17684710915.0,
       "score_news": 1,
       "score_tech": 4.5,
       "score_fund": 4.5,
@@ -5428,9 +5428,9 @@
         "position": 55.0,
         "vol_ratio": 0.79,
         "amount_ratio": 0.82,
-        "amount_today_yi": 174.5,
+        "amount_today_yi": 176.0,
         "boll_upper": 508.3,
-        "boll_mid": 435.87,
+        "boll_mid": 435.88,
         "boll_lower": 363.45,
         "boll_pos": 61.3,
         "boll_label": "中轨上方",
@@ -5449,7 +5449,7 @@
           ],
           [
             "MA20均线",
-            435.87
+            435.88
           ],
           [
             "BOLL下轨",
@@ -5526,7 +5526,7 @@
       "price": 57.74,
       "pct_chg": -1.87,
       "pe": 25.95,
-      "turnover": 5388791899.0,
+      "turnover": 5436167569.0,
       "score_news": 1.6,
       "score_tech": 1.5,
       "score_fund": 5,
@@ -5600,7 +5600,7 @@
       "theme_reasons": [
         "细分题材:消费电子/代工(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "板块高度集中(82只上榜)"
       ],
       "news_reasons": [
@@ -5639,10 +5639,10 @@
       "name": "中际旭创",
       "code": "sz300308",
       "sector": "AI/半导体",
-      "price": 988.01,
-      "pct_chg": -1.3,
+      "price": 988.1,
+      "pct_chg": -1.29,
       "pe": 77.32,
-      "turnover": 21638906028.0,
+      "turnover": 21830696238.0,
       "score_news": 2,
       "score_tech": 2.5,
       "score_fund": 4.5,
@@ -5662,9 +5662,9 @@
         "bull_level": 0,
         "position": 54.0,
         "vol_ratio": 0.68,
-        "amount_ratio": 0.68,
-        "amount_today_yi": 216.2,
-        "boll_upper": 1090.7,
+        "amount_ratio": 0.69,
+        "amount_today_yi": 218.1,
+        "boll_upper": 1090.71,
         "boll_mid": 957.73,
         "boll_lower": 824.75,
         "boll_pos": 61.4,
@@ -5693,7 +5693,7 @@
         "resistance_levels": [
           [
             "BOLL上轨",
-            1090.7
+            1090.71
           ],
           [
             "MA60均线",
@@ -5768,7 +5768,7 @@
       "price": 167.18,
       "pct_chg": 0.17,
       "pe": 23.02,
-      "turnover": 8289302544.0,
+      "turnover": 8366780276.0,
       "score_news": 1.2,
       "score_tech": 1.1,
       "score_fund": 5,
@@ -5880,10 +5880,10 @@
       "name": "香农芯创",
       "code": "sz300475",
       "sector": "AI/半导体",
-      "price": 173.55,
-      "pct_chg": 0.91,
+      "price": 173.58,
+      "pct_chg": 0.92,
       "pe": 43.93,
-      "turnover": 6092505682.0,
+      "turnover": 6136665822.0,
       "score_news": 3,
       "score_tech": 4.5,
       "score_fund": 3.0,
@@ -5908,7 +5908,7 @@
         "boll_upper": 176.78,
         "boll_mid": 155.89,
         "boll_lower": 135.0,
-        "boll_pos": 92.3,
+        "boll_pos": 92.4,
         "boll_label": "上轨附近",
         "rsi": 68.1,
         "rsi_state": "中性",
@@ -5958,7 +5958,7 @@
       "theme_reasons": [
         "细分题材:存储分销(内禀3)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
       ],
@@ -5997,10 +5997,10 @@
       "name": "瑞芯微",
       "code": "sh603893",
       "sector": "AI/半导体",
-      "price": 198.08,
-      "pct_chg": -6.35,
+      "price": 198.05,
+      "pct_chg": -6.36,
       "pe": 61.27,
-      "turnover": 4230174984.0,
+      "turnover": 4261486689.0,
       "score_news": 0,
       "score_tech": 3.0,
       "score_fund": 4.0,
@@ -6025,7 +6025,7 @@
         "boll_upper": 227.56,
         "boll_mid": 203.51,
         "boll_lower": 179.47,
-        "boll_pos": 38.7,
+        "boll_pos": 38.6,
         "boll_label": "中轨下方",
         "rsi": 47.8,
         "rsi_state": "中性",
@@ -6070,14 +6070,14 @@
       "theme_reasons": [
         "板块:AI算力/半导体(内禀5)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
-        "下跌-6.3%",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
+        "下跌-6.4%",
         "板块高度集中(82只上榜)"
       ],
       "news_reasons": [
         "公告确认:利好事件",
         "消息时效:近7日有消息/公告",
-        "下跌-6.3%"
+        "下跌-6.4%"
       ],
       "news_items": [
         {
@@ -6111,7 +6111,7 @@
       "price": 213.51,
       "pct_chg": -6.14,
       "pe": 1309.08,
-      "turnover": 4039573222.0,
+      "turnover": 4082622389.0,
       "score_news": 1.5,
       "score_tech": 3.0,
       "score_fund": 3.0,
@@ -6229,10 +6229,10 @@
       "name": "仕佳光子",
       "code": "sh688313",
       "sector": "AI/半导体",
-      "price": 162.38,
-      "pct_chg": 1.49,
+      "price": 162.3,
+      "pct_chg": 1.44,
       "pe": 155.96,
-      "turnover": 3594398133.0,
+      "turnover": 3633897409.0,
       "score_news": 1.2,
       "score_tech": 2.5,
       "score_fund": 3.5,
@@ -6257,7 +6257,7 @@
         "boll_upper": 162.3,
         "boll_mid": 120.24,
         "boll_lower": 78.18,
-        "boll_pos": 100.1,
+        "boll_pos": 100.0,
         "boll_label": "突破上轨",
         "rsi": 83.2,
         "rsi_state": "超买",
@@ -6303,7 +6303,7 @@
       "theme_reasons": [
         "细分题材:光芯片/PLC(内禀5)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日+33.1%强于题材,超额明显",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
@@ -6313,7 +6313,7 @@
         "⚠️光芯片竞争+技术迭代",
         "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
         "消息时效:近7日无消息",
-        "横盘(+1.5%)"
+        "横盘(+1.4%)"
       ],
       "news_items": [
         {
@@ -6344,10 +6344,10 @@
       "name": "长鑫科技",
       "code": "sh688825",
       "sector": "综合",
-      "price": 59.2,
-      "pct_chg": -4.21,
+      "price": 59.19,
+      "pct_chg": -4.22,
       "pe": 140.4,
-      "turnover": 25158562809.0,
+      "turnover": 25460048436.0,
       "score_news": 0,
       "score_tech": 2,
       "score_fund": 5,
@@ -6401,7 +6401,7 @@
       "price": 65.41,
       "pct_chg": 0.54,
       "pe": 49.96,
-      "turnover": 16953913313.0,
+      "turnover": 17095703551.0,
       "score_news": 1.6,
       "score_tech": 3.0,
       "score_fund": 2.8,
@@ -6422,7 +6422,7 @@
         "position": 31.0,
         "vol_ratio": 1.13,
         "amount_ratio": 1.25,
-        "amount_today_yi": 168.4,
+        "amount_today_yi": 169.8,
         "boll_upper": 66.37,
         "boll_mid": 55.41,
         "boll_lower": 44.46,
@@ -6516,10 +6516,10 @@
       "name": "寒武纪",
       "code": "sh688256",
       "sector": "AI/半导体",
-      "price": 1162.05,
-      "pct_chg": 0.52,
+      "price": 1162.5,
+      "pct_chg": 0.56,
       "pe": 219.2,
-      "turnover": 12425579004.0,
+      "turnover": 12569910354.0,
       "score_news": 3,
       "score_tech": 2.0,
       "score_fund": 2.5,
@@ -6528,7 +6528,7 @@
       "rating": "A",
       "advice": "逢低加仓，重点关注",
       "tech": {
-        "ma5": 1124.4,
+        "ma5": 1124.5,
         "ma10": 1134.2,
         "ma20": 1144.8,
         "ma60": 1291.0,
@@ -6538,13 +6538,13 @@
         "trend": "日线空头",
         "bull_level": 0,
         "position": 54.0,
-        "vol_ratio": 0.84,
+        "vol_ratio": 0.85,
         "amount_ratio": 0.84,
-        "amount_today_yi": 12502.6,
-        "boll_upper": 1284.38,
-        "boll_mid": 1144.81,
-        "boll_lower": 1005.23,
-        "boll_pos": 56.2,
+        "amount_today_yi": 12651.8,
+        "boll_upper": 1284.41,
+        "boll_mid": 1144.83,
+        "boll_lower": 1005.24,
+        "boll_pos": 56.3,
         "boll_label": "中轨上方",
         "rsi": 51.2,
         "rsi_state": "中性",
@@ -6556,25 +6556,25 @@
         "support_levels": [
           [
             "MA60均线",
-            1291.01
+            1291.02
           ],
           [
             "MA20均线",
-            1144.81
+            1144.83
           ],
           [
             "BOLL下轨",
-            1005.23
+            1005.24
           ]
         ],
         "resistance_levels": [
           [
             "BOLL上轨",
-            1284.38
+            1284.41
           ],
           [
             "MA60均线",
-            1291.01
+            1291.02
           ],
           [
             "120日高点",
@@ -6593,7 +6593,7 @@
       "theme_reasons": [
         "细分题材:AI芯片/GPU(内禀5)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日-13.9%弱于题材",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
@@ -6602,7 +6602,7 @@
         "AI芯片龙头+云端训练+国产算力",
         "⚠️技术差距+生态建设周期",
         "消息时效:近7日有消息/公告",
-        "横盘(+0.5%)"
+        "横盘(+0.6%)"
       ],
       "news_items": [
         {
@@ -6633,10 +6633,10 @@
       "name": "蓝思科技",
       "code": "sz300433",
       "sector": "电子制造",
-      "price": 39.13,
-      "pct_chg": 5.79,
+      "price": 39.12,
+      "pct_chg": 5.76,
       "pe": 60.04,
-      "turnover": 6977983557.0,
+      "turnover": 7037312949.0,
       "score_news": 1.2,
       "score_tech": 3.0,
       "score_fund": 3.5,
@@ -6661,7 +6661,7 @@
         "boll_upper": 39.06,
         "boll_mid": 34.93,
         "boll_lower": 30.8,
-        "boll_pos": 100.9,
+        "boll_pos": 100.7,
         "boll_label": "突破上轨",
         "rsi": 68.8,
         "rsi_state": "中性",
@@ -6755,7 +6755,7 @@
       "price": 35.11,
       "pct_chg": -2.53,
       "pe": 37.53,
-      "turnover": 4589571378.0,
+      "turnover": 4625710593.0,
       "score_news": 4,
       "score_tech": 3.5,
       "score_fund": 1.8,
@@ -6829,7 +6829,7 @@
       "theme_reasons": [
         "细分题材:5G/算力设备(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "板块高度集中(82只上榜)"
       ],
       "news_reasons": [
@@ -6867,10 +6867,10 @@
       "name": "杰瑞股份",
       "code": "sz002353",
       "sector": "高端制造",
-      "price": 162.33,
-      "pct_chg": -2.26,
+      "price": 162.55,
+      "pct_chg": -2.13,
       "pe": 63.16,
-      "turnover": 4300775011.0,
+      "turnover": 4327911433.0,
       "score_news": 3,
       "score_tech": 1.3,
       "score_fund": 3.0,
@@ -6895,7 +6895,7 @@
         "boll_upper": 163.31,
         "boll_mid": 142.44,
         "boll_lower": 121.57,
-        "boll_pos": 97.6,
+        "boll_pos": 98.2,
         "boll_label": "上轨附近",
         "rsi": 63.5,
         "rsi_state": "中性",
@@ -6950,7 +6950,7 @@
         "油服装备龙头+压裂设备+海外拓展",
         "⚠️油气资本开支波动+地缘风险",
         "消息时效:近7日有消息/公告",
-        "小跌-2.3%"
+        "小跌-2.1%"
       ],
       "news_items": [
         {
@@ -6981,10 +6981,10 @@
       "name": "睿创微纳",
       "code": "sh688002",
       "sector": "综合",
-      "price": 175.2,
-      "pct_chg": 3.8,
+      "price": 174.84,
+      "pct_chg": 3.59,
       "pe": 40.04,
-      "turnover": 3126520359.0,
+      "turnover": 3151276479.0,
       "score_news": 0.5,
       "score_tech": 2.1,
       "score_fund": 4.5,
@@ -7009,11 +7009,11 @@
         "boll_upper": 179.52,
         "boll_mid": 155.43,
         "boll_lower": 131.34,
-        "boll_pos": 91.0,
+        "boll_pos": 90.3,
         "boll_label": "上轨附近",
         "rsi": 71.4,
         "rsi_state": "超买",
-        "reason": "双线多头+极值高位(100%)+BOLL触碰上轨(超买); 超高成长(CAGR3=62%)+1; BOLL:上轨附近(91%); RSI71(超买,短线回调风险)",
+        "reason": "双线多头+极值高位(100%)+BOLL触碰上轨(超买); 超高成长(CAGR3=62%)+1; BOLL:上轨附近(90%); RSI71(超买,短线回调风险)",
         "overall": "震荡",
         "explanations": [
           "日线和周线均线均多头排列，中长趋势向上",
@@ -7064,7 +7064,7 @@
       "news_reasons": [
         "公告确认:利好事件",
         "消息时效:近7日有消息/公告",
-        "上涨+3.8%"
+        "上涨+3.6%"
       ],
       "news_items": [
         {
@@ -7098,7 +7098,7 @@
       "price": 437.33,
       "pct_chg": 0.44,
       "pe": 24.18,
-      "turnover": 8779507542.0,
+      "turnover": 8860982121.0,
       "score_news": 3,
       "score_tech": 2.5,
       "score_fund": 3.0,
@@ -7174,7 +7174,7 @@
       "theme_reasons": [
         "细分题材:存储控制器(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日-13.9%弱于题材",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
@@ -7214,10 +7214,10 @@
       "name": "思源电气",
       "code": "sz002028",
       "sector": "电力设备",
-      "price": 182.35,
-      "pct_chg": -0.44,
+      "price": 182.44,
+      "pct_chg": -0.39,
       "pe": 42.99,
-      "turnover": 2715417448.0,
+      "turnover": 2735650044.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 4.0,
@@ -7242,7 +7242,7 @@
         "boll_upper": 179.07,
         "boll_mid": 163.84,
         "boll_lower": 148.61,
-        "boll_pos": 110.8,
+        "boll_pos": 111.1,
         "boll_label": "突破上轨",
         "rsi": 66.0,
         "rsi_state": "中性",
@@ -7318,10 +7318,10 @@
       "name": "中钨高新",
       "code": "sz000657",
       "sector": "有色资源",
-      "price": 72.93,
-      "pct_chg": 3.46,
+      "price": 72.94,
+      "pct_chg": 3.48,
       "pe": 85.27,
-      "turnover": 8620133510.0,
+      "turnover": 8689346276.0,
       "score_news": 1.2,
       "score_tech": 2.5,
       "score_fund": 3.5,
@@ -7350,7 +7350,7 @@
         "boll_label": "上轨附近",
         "rsi": 71.0,
         "rsi_state": "超买",
-        "reason": "日线多头+中位(43%)+BOLL通道内; 高成长(CAGR3=32%)+0.5; BOLL:上轨附近(87%); RSI71(超买,短线回调风险)",
+        "reason": "日线多头+中位(43%)+BOLL通道内; 高成长(CAGR3=32%)+0.5; BOLL:上轨附近(88%); RSI71(超买,短线回调风险)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -7437,10 +7437,10 @@
       "name": "拓荆科技",
       "code": "sh688072",
       "sector": "AI/半导体",
-      "price": 754.05,
-      "pct_chg": 4.87,
+      "price": 755.46,
+      "pct_chg": 5.07,
       "pe": 133.55,
-      "turnover": 5147470207.0,
+      "turnover": 5193483009.0,
       "score_news": 1.6,
       "score_tech": 3.6,
       "score_fund": 2.0,
@@ -7465,7 +7465,7 @@
         "boll_upper": 810.44,
         "boll_mid": 703.03,
         "boll_lower": 595.62,
-        "boll_pos": 73.8,
+        "boll_pos": 74.4,
         "boll_label": "中轨上方",
         "rsi": 56.7,
         "rsi_state": "中性",
@@ -7511,7 +7511,8 @@
       "theme_reasons": [
         "细分题材:半导体设备/CVD(内禀5)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
+        "大涨+5.1%验证",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
       ],
@@ -7520,7 +7521,7 @@
         "⚠️技术迭代快+研发投入高",
         "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
         "消息时效:近7日无消息",
-        "上涨+4.9%"
+        "上涨+5.1%"
       ],
       "news_items": [
         {
@@ -7551,10 +7552,10 @@
       "name": "沃格光电",
       "code": "sh603773",
       "sector": "电子材料",
-      "price": 112.07,
-      "pct_chg": 7.25,
+      "price": 112.0,
+      "pct_chg": 7.19,
       "pe": 0,
-      "turnover": 4414647763.0,
+      "turnover": 4453903763.0,
       "score_news": 5,
       "score_tech": 2,
       "score_fund": 0.8,
@@ -7579,11 +7580,11 @@
         "boll_upper": 110.8,
         "boll_mid": 85.57,
         "boll_lower": 60.34,
-        "boll_pos": 102.5,
+        "boll_pos": 102.4,
         "boll_label": "突破上轨",
         "rsi": 77.2,
         "rsi_state": "超买",
-        "reason": "趋势日线多头+分位(55%); BOLL:突破上轨(103%); RSI77(超买,短线回调风险)",
+        "reason": "趋势日线多头+分位(55%); BOLL:突破上轨(102%); RSI77(超买,短线回调风险)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -7677,10 +7678,10 @@
       "name": "东材科技",
       "code": "sh601208",
       "sector": "基础材料",
-      "price": 49.47,
-      "pct_chg": -0.26,
+      "price": 49.48,
+      "pct_chg": -0.24,
       "pe": 131.4,
-      "turnover": 3195288961.0,
+      "turnover": 3219168009.0,
       "score_news": 1.2,
       "score_tech": 2.5,
       "score_fund": 3,
@@ -7765,7 +7766,7 @@
         "⚠️材料行业竞争+原材料波动",
         "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
         "消息时效:近7日无消息",
-        "横盘(-0.3%)"
+        "横盘(-0.2%)"
       ],
       "news_items": [
         {
@@ -7799,7 +7800,7 @@
       "price": 46.6,
       "pct_chg": -2.35,
       "pe": 20.18,
-      "turnover": 2611811830.0,
+      "turnover": 2627818930.0,
       "score_news": 3.5,
       "score_tech": 2.5,
       "score_fund": 2,
@@ -7919,7 +7920,7 @@
       "price": 35.29,
       "pct_chg": -1.7,
       "pe": 37.71,
-      "turnover": 10002477560.0,
+      "turnover": 10077793407.0,
       "score_news": 1.6,
       "score_tech": 3.5,
       "score_fund": 2.0,
@@ -8035,10 +8036,10 @@
       "name": "雅克科技",
       "code": "sz002409",
       "sector": "特种材料",
-      "price": 158.84,
-      "pct_chg": -0.11,
+      "price": 158.86,
+      "pct_chg": -0.09,
       "pe": 75.1,
-      "turnover": 4295660553.0,
+      "turnover": 4328941723.0,
       "score_news": 1.6,
       "score_tech": 3.5,
       "score_fund": 2.0,
@@ -8147,129 +8148,13 @@
       "cagr3": 19.9
     },
     {
-      "name": "海光信息",
-      "code": "sh688041",
-      "sector": "AI/半导体",
-      "price": 280.18,
-      "pct_chg": -2.98,
-      "pe": 207.2,
-      "turnover": 7477512011.0,
-      "score_news": 4,
-      "score_tech": 2.5,
-      "score_fund": 1.0,
-      "score_theme": 5.0,
-      "total": 12.4,
-      "rating": "B",
-      "advice": "波段操作，轻仓参与",
-      "tech": {
-        "ma5": 284.7,
-        "ma10": 287.7,
-        "ma20": 290.9,
-        "ma60": 309.1,
-        "wma5": 289.6,
-        "wma10": 310.4,
-        "wma20": 298.1,
-        "trend": "日线空头",
-        "bull_level": 0,
-        "position": 45.0,
-        "vol_ratio": 0.9,
-        "amount_ratio": 0.87,
-        "amount_today_yi": 7540.3,
-        "boll_upper": 323.1,
-        "boll_mid": 290.86,
-        "boll_lower": 258.62,
-        "boll_pos": 33.4,
-        "boll_label": "中轨下方",
-        "rsi": 48.0,
-        "rsi_state": "中性",
-        "reason": "趋势走弱+中位(45%); 高成长(CAGR3=46%)+0.5; BOLL:中轨下方(33%); RSI48(中性)",
-        "overall": "偏弱",
-        "explanations": [
-          "BOLL中轨下方运行，空头占优"
-        ],
-        "support_levels": [
-          [
-            "MA60均线",
-            309.13
-          ],
-          [
-            "MA20均线",
-            290.86
-          ],
-          [
-            "BOLL下轨",
-            258.62
-          ]
-        ],
-        "resistance_levels": [
-          [
-            "MA5均线",
-            284.71
-          ],
-          [
-            "MA60均线",
-            309.13
-          ],
-          [
-            "BOLL上轨",
-            323.1
-          ]
-        ],
-        "vol_price_analysis": "量价基本平衡",
-        "industry_prospect": "行业前景加分+1.0(顶级赛道+绝对龙头)"
-      },
-      "fund_reasons": [
-        "高估值(FwdPE=145.2)",
-        "估值阶梯强收缩(145.2→95.9→67.2),3年收缩54%,高PE起始,阶梯加分受限",
-        "PEG=5.39(严重高估)",
-        "持续性:盈利持续性中性"
-      ],
-      "theme_reasons": [
-        "细分题材:AI芯片/CPU(内禀5)",
-        "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
-        "个股近20日-18.7%弱于题材",
-        "板块高度集中(82只上榜)"
-      ],
-      "news_reasons": [
-        "国产CPU龙头+服务器芯片+AI算力",
-        "⚠️技术迭代+生态建设周期",
-        "消息时效:近7日有消息/公告",
-        "小跌-3.0%"
-      ],
-      "news_items": [
-        {
-          "source": "券商研报",
-          "time": "",
-          "sentiment": "一般利好",
-          "content": "国产CPU龙头+服务器芯片+AI算力",
-          "url": ""
-        }
-      ],
-      "news_recency": "近7日有消息/公告",
-      "sub_theme": "AI芯片/CPU",
-      "lifecycle": "震荡期",
-      "score_sustain": 3.0,
-      "sustain_note": "盈利持续性中性",
-      "is_cyclic": false,
-      "is_storage_mod": false,
-      "fwd_pe": 145.2,
-      "growth": 26.9,
-      "pe_ladder": {
-        "2026": 145.2,
-        "2027": 95.9,
-        "2028": 67.2
-      },
-      "cagr3": 45.5
-    },
-    {
       "name": "卧龙电驱",
       "code": "sh600580",
       "sector": "综合",
-      "price": 37.86,
-      "pct_chg": 7.37,
+      "price": 37.87,
+      "pct_chg": 7.4,
       "pe": 52.17,
-      "turnover": 4220704558.0,
+      "turnover": 4295459938.0,
       "score_news": 1,
       "score_tech": 2.5,
       "score_fund": 3.0,
@@ -8370,10 +8255,10 @@
       "name": "鹏鼎控股",
       "code": "sz002938",
       "sector": "电子制造",
-      "price": 94.76,
-      "pct_chg": -3.8,
+      "price": 94.77,
+      "pct_chg": -3.79,
       "pe": 57.97,
-      "turnover": 2760440914.0,
+      "turnover": 2770846660.0,
       "score_news": 3,
       "score_tech": 2.0,
       "score_fund": 2.0,
@@ -8487,10 +8372,10 @@
       "name": "昊华科技",
       "code": "sh600378",
       "sector": "化工",
-      "price": 49.33,
-      "pct_chg": -1.89,
+      "price": 49.36,
+      "pct_chg": -1.83,
       "pe": 40.62,
-      "turnover": 2661352442.0,
+      "turnover": 2673569042.0,
       "score_news": 1.2,
       "score_tech": 3.0,
       "score_fund": 3.5,
@@ -8515,7 +8400,7 @@
         "boll_upper": 52.52,
         "boll_mid": 45.3,
         "boll_lower": 38.09,
-        "boll_pos": 77.9,
+        "boll_pos": 78.1,
         "boll_label": "中轨上方",
         "rsi": 64.1,
         "rsi_state": "中性",
@@ -8573,7 +8458,7 @@
         "⚠️氟化工周期+环保政策",
         "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
         "消息时效:近7日无消息",
-        "小跌-1.9%"
+        "小跌-1.8%"
       ],
       "news_items": [
         {
@@ -8607,7 +8492,7 @@
       "price": 6.23,
       "pct_chg": 20.04,
       "pe": 56.31,
-      "turnover": 2288156704.0,
+      "turnover": 2291043063.0,
       "score_news": 1,
       "score_tech": 2.5,
       "score_fund": 3.0,
@@ -8705,10 +8590,10 @@
       "name": "共进股份",
       "code": "sh603118",
       "sector": "综合",
-      "price": 19.2,
-      "pct_chg": -0.62,
+      "price": 19.01,
+      "pct_chg": -1.6,
       "pe": 187.23,
-      "turnover": 4340968138.0,
+      "turnover": 4393371028.0,
       "score_news": 0,
       "score_tech": 1.1,
       "score_fund": 4.5,
@@ -8726,23 +8611,23 @@
         "wma20": 14.5,
         "trend": "双线多头",
         "bull_level": 3,
-        "position": 99.0,
+        "position": 96.0,
         "vol_ratio": 0.93,
         "amount_ratio": 1.03,
         "amount_today_yi": 43.5,
         "boll_upper": 18.97,
         "boll_mid": 15.74,
         "boll_lower": 12.51,
-        "boll_pos": 103.5,
+        "boll_pos": 100.6,
         "boll_label": "突破上轨",
         "rsi": 61.3,
         "rsi_state": "中性",
-        "reason": "双线多头+极值高位(99%)+BOLL突破上轨(严重超买); BOLL:突破上轨(104%); RSI61(中性)",
+        "reason": "双线多头+极值高位(96%)+BOLL突破上轨(严重超买); BOLL:突破上轨(101%); RSI61(中性)",
         "overall": "震荡",
         "explanations": [
           "日线和周线均线均多头排列，中长趋势向上",
           "价格突破BOLL上轨，短期超买注意回调",
-          "价格处于120日99%分位，接近区间高点"
+          "价格处于120日96%分位，接近区间高点"
         ],
         "support_levels": [
           [
@@ -8786,7 +8671,7 @@
       "news_reasons": [
         "无真实新闻/催化剂",
         "消息时效:近7日有消息/公告",
-        "横盘(-0.6%)"
+        "小跌-1.6%"
       ],
       "news_items": [],
       "news_recency": "近7日有消息/公告",
@@ -8812,7 +8697,7 @@
       "price": 85.42,
       "pct_chg": -0.5,
       "pe": 92.52,
-      "turnover": 12812911833.0,
+      "turnover": 12923176753.0,
       "score_news": 4,
       "score_tech": 2.5,
       "score_fund": 2.8,
@@ -8833,7 +8718,7 @@
         "position": 69.0,
         "vol_ratio": 0.87,
         "amount_ratio": 0.93,
-        "amount_today_yi": 127.7,
+        "amount_today_yi": 128.8,
         "boll_upper": 90.67,
         "boll_mid": 76.09,
         "boll_lower": 61.5,
@@ -8920,10 +8805,10 @@
       "name": "国际复材",
       "code": "sz301526",
       "sector": "基础材料",
-      "price": 37.34,
-      "pct_chg": -2.89,
+      "price": 37.33,
+      "pct_chg": -2.91,
       "pe": 287.29,
-      "turnover": 5627284007.0,
+      "turnover": 5672774345.0,
       "score_news": 1.2,
       "score_tech": 2.0,
       "score_fund": 3,
@@ -8941,18 +8826,18 @@
         "wma20": 28.4,
         "trend": "日线多头",
         "bull_level": 1,
-        "position": 65.0,
+        "position": 64.0,
         "vol_ratio": 0.76,
         "amount_ratio": 0.85,
         "amount_today_yi": 56.3,
         "boll_upper": 42.26,
         "boll_mid": 33.29,
         "boll_lower": 24.32,
-        "boll_pos": 72.6,
+        "boll_pos": 72.5,
         "boll_label": "中轨上方",
         "rsi": 63.8,
         "rsi_state": "中性",
-        "reason": "日线多头+相对高位(65%)+BOLL通道内; BOLL:中轨上方(73%); RSI64(中性)",
+        "reason": "日线多头+相对高位(64%)+BOLL通道内; BOLL:中轨上方(73%); RSI64(中性)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -9036,10 +8921,10 @@
       "name": "华丰科技",
       "code": "sh688629",
       "sector": "AI/半导体",
-      "price": 156.2,
-      "pct_chg": 0.76,
+      "price": 156.22,
+      "pct_chg": 0.77,
       "pe": 169.38,
-      "turnover": 2898214129.0,
+      "turnover": 2920624356.0,
       "score_news": 0,
       "score_tech": 4.0,
       "score_fund": 3.5,
@@ -9064,7 +8949,7 @@
         "boll_upper": 167.65,
         "boll_mid": 146.04,
         "boll_lower": 124.43,
-        "boll_pos": 73.5,
+        "boll_pos": 73.6,
         "boll_label": "中轨上方",
         "rsi": 63.7,
         "rsi_state": "中性",
@@ -9109,7 +8994,7 @@
       "theme_reasons": [
         "细分题材:光连接器/射频(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
       ],
@@ -9142,7 +9027,7 @@
       "price": 55.35,
       "pct_chg": 8.17,
       "pe": 100.71,
-      "turnover": 2742718001.0,
+      "turnover": 2772833936.0,
       "score_news": 1,
       "score_tech": 2.5,
       "score_fund": 2.8,
@@ -9243,10 +9128,10 @@
       "name": "鼎龙股份",
       "code": "sz300054",
       "sector": "电子材料",
-      "price": 81.47,
-      "pct_chg": 0.21,
+      "price": 81.48,
+      "pct_chg": 0.22,
       "pe": 93.68,
-      "turnover": 2501716704.0,
+      "turnover": 2523422976.0,
       "score_news": 1.2,
       "score_tech": 2.0,
       "score_fund": 3.0,
@@ -9271,7 +9156,7 @@
         "boll_upper": 83.42,
         "boll_mid": 73.96,
         "boll_lower": 64.5,
-        "boll_pos": 89.7,
+        "boll_pos": 89.8,
         "boll_label": "上轨附近",
         "rsi": 64.4,
         "rsi_state": "中性",
@@ -9360,7 +9245,7 @@
       "price": 97.0,
       "pct_chg": 20.0,
       "pe": 85.04,
-      "turnover": 4836064768.0,
+      "turnover": 4847927868.0,
       "score_news": 1,
       "score_tech": 2.1,
       "score_fund": 3.0,
@@ -9461,13 +9346,131 @@
       "cagr3": 23.1
     },
     {
+      "name": "中芯国际",
+      "code": "sh688981",
+      "sector": "AI/半导体",
+      "price": 134.98,
+      "pct_chg": -1.3,
+      "pe": 229.03,
+      "turnover": 7748492525.0,
+      "score_news": 4,
+      "score_tech": 3.5,
+      "score_fund": 1.0,
+      "score_theme": 4.0,
+      "total": 12.0,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 132.4,
+        "ma10": 129.2,
+        "ma20": 131.6,
+        "ma60": 139.8,
+        "wma5": 132.8,
+        "wma10": 139.7,
+        "wma20": 129.8,
+        "trend": "金叉",
+        "bull_level": 0,
+        "position": 53.0,
+        "vol_ratio": 1.0,
+        "amount_ratio": 1.01,
+        "amount_today_yi": 77.5,
+        "boll_upper": 150.46,
+        "boll_mid": 131.61,
+        "boll_lower": 112.75,
+        "boll_pos": 58.9,
+        "boll_label": "中轨上方",
+        "rsi": 54.3,
+        "rsi_state": "中性",
+        "reason": "金叉+中位(53%)+BOLL通道内; BOLL:中轨上方(59%); RSI54(中性)",
+        "overall": "震荡",
+        "explanations": [
+          "MA5上穿MA20，短线买点信号",
+          "BOLL中轨上方运行，多头占优"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            139.83
+          ],
+          [
+            "MA20均线",
+            131.61
+          ],
+          [
+            "BOLL下轨",
+            112.75
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "MA60均线",
+            139.83
+          ],
+          [
+            "BOLL上轨",
+            150.46
+          ],
+          [
+            "120日高点",
+            173.0
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡",
+        "industry_prospect": "行业前景加分+1.0(顶级赛道+绝对龙头)"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=168.6)",
+        "估值阶梯明显收缩(168.6→137.9→117.0),3年收缩31%,高PE起始,阶梯加分受限",
+        "PEG=3.02(严重高估)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "细分题材:晶圆代工(内禀5)",
+        "短期(10日)加速强于中期(20日)",
+        "题材近20日中位-24.6%,上涨占比0%(2只样本)",
+        "个股近20日-15.6%强于题材,超额明显",
+        "题材退潮期,短期回避",
+        "板块高度集中(82只上榜)"
+      ],
+      "news_reasons": [
+        "晶圆代工龙头+先进制程+国产替代",
+        "⚠️设备限制+技术差距",
+        "消息时效:近7日有消息/公告",
+        "小跌-1.3%"
+      ],
+      "news_items": [
+        {
+          "source": "券商研报",
+          "time": "",
+          "sentiment": "一般利好",
+          "content": "晶圆代工龙头+先进制程+国产替代",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有消息/公告",
+      "sub_theme": "晶圆代工",
+      "lifecycle": "退潮期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 168.6,
+      "growth": 55.9,
+      "pe_ladder": {
+        "2026": 168.6,
+        "2027": 137.9,
+        "2028": 117.0
+      },
+      "cagr3": -25.0
+    },
+    {
       "name": "江丰电子",
       "code": "sz300666",
       "sector": "AI/半导体",
       "price": 278.28,
       "pct_chg": 3.13,
       "pe": 139.12,
-      "turnover": 4713839202.0,
+      "turnover": 4778094054.0,
       "score_news": 4,
       "score_tech": 3.5,
       "score_fund": 1.0,
@@ -9538,7 +9541,7 @@
       "theme_reasons": [
         "细分题材:溅射靶材(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日+17.5%强于题材,超额明显",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
@@ -9578,10 +9581,10 @@
       "name": "沪硅产业",
       "code": "sh688126",
       "sector": "AI/半导体",
-      "price": 27.8,
-      "pct_chg": 3.73,
+      "price": 27.79,
+      "pct_chg": 3.69,
       "pe": 0,
-      "turnover": 4403285615.0,
+      "turnover": 4434418029.0,
       "score_news": 4.5,
       "score_tech": 3.0,
       "score_fund": 0,
@@ -9606,11 +9609,11 @@
         "boll_upper": 28.08,
         "boll_mid": 25.46,
         "boll_lower": 22.85,
-        "boll_pos": 94.7,
+        "boll_pos": 94.5,
         "boll_label": "上轨附近",
         "rsi": 64.9,
         "rsi_state": "中性",
-        "reason": "日线多头+中位(46%)+BOLL通道内; BOLL:上轨附近(95%); RSI65(中性)",
+        "reason": "日线多头+中位(46%)+BOLL通道内; BOLL:上轨附近(94%); RSI65(中性)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -9698,10 +9701,10 @@
       "name": "中科曙光",
       "code": "sh603019",
       "sector": "AI/半导体",
-      "price": 89.89,
-      "pct_chg": -0.74,
+      "price": 89.87,
+      "pct_chg": -0.76,
       "pe": 54.21,
-      "turnover": 3673249912.0,
+      "turnover": 3698602239.0,
       "score_news": 0,
       "score_tech": 1.5,
       "score_fund": 4.0,
@@ -9726,7 +9729,7 @@
         "boll_upper": 100.04,
         "boll_mid": 89.52,
         "boll_lower": 78.99,
-        "boll_pos": 51.8,
+        "boll_pos": 51.7,
         "boll_label": "中轨上方",
         "rsi": 57.0,
         "rsi_state": "中性",
@@ -9774,14 +9777,14 @@
       "theme_reasons": [
         "细分题材:AI服务器/算力(内禀5)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日-8.2%弱于题材",
         "板块高度集中(82只上榜)"
       ],
       "news_reasons": [
         "无真实新闻/催化剂",
         "消息时效:近7日有消息/公告",
-        "横盘(-0.7%)"
+        "横盘(-0.8%)"
       ],
       "news_items": [],
       "news_recency": "近7日有消息/公告",
@@ -9804,10 +9807,10 @@
       "name": "长芯博创",
       "code": "sz300548",
       "sector": "AI/半导体",
-      "price": 215.98,
-      "pct_chg": -1.38,
+      "price": 215.65,
+      "pct_chg": -1.53,
       "pe": 169.43,
-      "turnover": 3285394295.0,
+      "turnover": 3316879195.0,
       "score_news": 1.2,
       "score_tech": 2.5,
       "score_fund": 2.5,
@@ -9832,7 +9835,7 @@
         "boll_upper": 213.98,
         "boll_mid": 168.64,
         "boll_lower": 123.29,
-        "boll_pos": 102.2,
+        "boll_pos": 101.8,
         "boll_label": "突破上轨",
         "rsi": 77.9,
         "rsi_state": "超买",
@@ -9877,7 +9880,7 @@
       "theme_reasons": [
         "细分题材:光模块/AOC(内禀5)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日+23.0%强于题材,超额明显",
         "板块高度集中(82只上榜)"
       ],
@@ -9886,7 +9889,7 @@
         "⚠️光通信竞争加剧+技术迭代",
         "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
         "消息时效:近7日无消息",
-        "小跌-1.4%"
+        "小跌-1.5%"
       ],
       "news_items": [
         {
@@ -9915,10 +9918,10 @@
       "name": "华海清科",
       "code": "sh688120",
       "sector": "AI/半导体",
-      "price": 288.6,
-      "pct_chg": 4.02,
+      "price": 288.68,
+      "pct_chg": 4.05,
       "pe": 130.53,
-      "turnover": 3247597995.0,
+      "turnover": 3298775474.0,
       "score_news": 4,
       "score_tech": 3.5,
       "score_fund": 1.0,
@@ -9943,7 +9946,7 @@
         "boll_upper": 290.93,
         "boll_mid": 260.93,
         "boll_lower": 230.94,
-        "boll_pos": 96.1,
+        "boll_pos": 96.3,
         "boll_label": "上轨附近",
         "rsi": 58.1,
         "rsi_state": "中性",
@@ -9988,7 +9991,7 @@
       "theme_reasons": [
         "细分题材:CMP设备(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
       ],
@@ -10030,7 +10033,7 @@
       "price": 39.6,
       "pct_chg": 1.49,
       "pe": 40.77,
-      "turnover": 3207399533.0,
+      "turnover": 3262894973.0,
       "score_news": 3,
       "score_tech": 1.5,
       "score_fund": 3.0,
@@ -10103,7 +10106,7 @@
       "theme_reasons": [
         "细分题材:热管理(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
       ],
@@ -10145,7 +10148,7 @@
       "price": 169.15,
       "pct_chg": -3.71,
       "pe": 182.14,
-      "turnover": 2829719731.0,
+      "turnover": 2847183115.0,
       "score_news": 0,
       "score_tech": 3.0,
       "score_fund": 3.5,
@@ -10255,7 +10258,7 @@
       "price": 57.72,
       "pct_chg": 3.33,
       "pe": 153.66,
-      "turnover": 9809767032.0,
+      "turnover": 9891458148.0,
       "score_news": 3,
       "score_tech": 1.3,
       "score_fund": 2.0,
@@ -10366,10 +10369,10 @@
       "name": "烽火通信",
       "code": "sh600498",
       "sector": "AI/半导体",
-      "price": 40.94,
-      "pct_chg": -1.89,
+      "price": 40.95,
+      "pct_chg": -1.87,
       "pe": 132.73,
-      "turnover": 3656956527.0,
+      "turnover": 3682198107.0,
       "score_news": 1.6,
       "score_tech": 3.0,
       "score_fund": 2.8,
@@ -10398,7 +10401,7 @@
         "boll_label": "上轨附近",
         "rsi": 70.0,
         "rsi_state": "超买",
-        "reason": "日线多头+低位(17%)+BOLL通道内; BOLL:上轨附近(83%); RSI70(超买,短线回调风险)",
+        "reason": "日线多头+低位(17%)+BOLL通道内; BOLL:上轨附近(84%); RSI70(超买,短线回调风险)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -10444,7 +10447,7 @@
       "theme_reasons": [
         "细分题材:光通信设备(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "板块高度集中(82只上榜)"
       ],
       "news_reasons": [
@@ -10483,10 +10486,10 @@
       "name": "康龙化成",
       "code": "sz300759",
       "sector": "综合",
-      "price": 51.18,
-      "pct_chg": 2.13,
+      "price": 51.15,
+      "pct_chg": 2.08,
       "pe": 55.49,
-      "turnover": 3364116457.0,
+      "turnover": 3406519807.0,
       "score_news": 0,
       "score_tech": 1.1,
       "score_fund": 4.0,
@@ -10511,7 +10514,7 @@
         "boll_upper": 52.86,
         "boll_mid": 42.37,
         "boll_lower": 31.87,
-        "boll_pos": 92.0,
+        "boll_pos": 91.9,
         "boll_label": "上轨附近",
         "rsi": 85.0,
         "rsi_state": "超买",
@@ -10588,10 +10591,10 @@
       "name": "普冉股份",
       "code": "sh688766",
       "sector": "AI/半导体",
-      "price": 466.66,
-      "pct_chg": 0.14,
+      "price": 466.81,
+      "pct_chg": 0.17,
       "pe": 157.7,
-      "turnover": 7898708094.0,
+      "turnover": 7938800070.0,
       "score_news": 3,
       "score_tech": 2.5,
       "score_fund": 3,
@@ -10616,7 +10619,7 @@
         "boll_upper": 464.96,
         "boll_mid": 381.61,
         "boll_lower": 298.25,
-        "boll_pos": 101.0,
+        "boll_pos": 101.1,
         "boll_label": "突破上轨",
         "rsi": 73.5,
         "rsi_state": "超买",
@@ -10674,7 +10677,7 @@
         "NOR Flash+MCU+存储芯片",
         "⚠️存储行业周期+竞争加剧",
         "消息时效:近7日有消息/公告",
-        "横盘(+0.1%)"
+        "横盘(+0.2%)"
       ],
       "news_items": [
         {
@@ -10705,10 +10708,10 @@
       "name": "黄河旋风",
       "code": "sh600172",
       "sector": "新材料",
-      "price": 14.31,
-      "pct_chg": 4.91,
+      "price": 14.32,
+      "pct_chg": 4.99,
       "pe": 0,
-      "turnover": 4214819022.0,
+      "turnover": 4246383166.0,
       "score_news": 2,
       "score_tech": 2,
       "score_fund": 2,
@@ -10733,7 +10736,7 @@
         "boll_upper": 14.03,
         "boll_mid": 11.53,
         "boll_lower": 9.03,
-        "boll_pos": 105.6,
+        "boll_pos": 105.8,
         "boll_label": "突破上轨",
         "rsi": 79.3,
         "rsi_state": "超买",
@@ -10783,7 +10786,7 @@
         "人造金刚石+超硬材料",
         "⚠️行业竞争+需求疲软",
         "消息时效:近7日有消息/公告",
-        "上涨+4.9%"
+        "上涨+5.0%"
       ],
       "news_items": [
         {
@@ -10810,10 +10813,10 @@
       "name": "中科飞测",
       "code": "sh688361",
       "sector": "AI/半导体",
-      "price": 371.99,
-      "pct_chg": 0.89,
+      "price": 371.96,
+      "pct_chg": 0.88,
       "pe": 23172.77,
-      "turnover": 3836982059.0,
+      "turnover": 3874008446.0,
       "score_news": 4,
       "score_tech": 3.0,
       "score_fund": 1.0,
@@ -10838,7 +10841,7 @@
         "boll_upper": 388.29,
         "boll_mid": 347.81,
         "boll_lower": 307.33,
-        "boll_pos": 79.9,
+        "boll_pos": 79.8,
         "boll_label": "中轨上方",
         "rsi": 52.3,
         "rsi_state": "中性",
@@ -10883,7 +10886,7 @@
       "theme_reasons": [
         "细分题材:半导体量测(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
       ],
@@ -10922,10 +10925,10 @@
       "name": "昊志机电",
       "code": "sz300503",
       "sector": "综合",
-      "price": 81.99,
-      "pct_chg": 6.79,
+      "price": 82.0,
+      "pct_chg": 6.8,
       "pe": 87.69,
-      "turnover": 2630595159.0,
+      "turnover": 2668126559.0,
       "score_news": 0.5,
       "score_tech": 2,
       "score_fund": 3.0,
@@ -10954,7 +10957,7 @@
         "boll_label": "突破上轨",
         "rsi": 74.6,
         "rsi_state": "超买",
-        "reason": "趋势日线多头+分位(55%); BOLL:突破上轨(103%); RSI75(超买,短线回调风险)",
+        "reason": "趋势日线多头+分位(55%); BOLL:突破上轨(104%); RSI75(超买,短线回调风险)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -11036,10 +11039,10 @@
       "name": "中国稀土",
       "code": "sz000831",
       "sector": "有色资源",
-      "price": 62.5,
-      "pct_chg": -0.46,
+      "price": 62.49,
+      "pct_chg": -0.48,
       "pe": 267.6,
-      "turnover": 2247652348.0,
+      "turnover": 2276085298.0,
       "score_news": 3,
       "score_tech": 2.5,
       "score_fund": 1,
@@ -11151,10 +11154,10 @@
       "name": "彤程新材",
       "code": "sh603650",
       "sector": "化工",
-      "price": 70.55,
-      "pct_chg": 4.06,
+      "price": 70.57,
+      "pct_chg": 4.09,
       "pe": 74.36,
-      "turnover": 2216538364.0,
+      "turnover": 2229523244.0,
       "score_news": 1.2,
       "score_tech": 3.5,
       "score_fund": 1.5,
@@ -11179,7 +11182,7 @@
         "boll_upper": 72.41,
         "boll_mid": 62.05,
         "boll_lower": 51.7,
-        "boll_pos": 91.0,
+        "boll_pos": 91.1,
         "boll_label": "上轨附近",
         "rsi": 67.0,
         "rsi_state": "中性",
@@ -11264,10 +11267,10 @@
       "name": "中恒电气",
       "code": "sz002364",
       "sector": "综合",
-      "price": 43.73,
-      "pct_chg": -4.06,
+      "price": 43.72,
+      "pct_chg": -4.08,
       "pe": 188.06,
-      "turnover": 2203341757.0,
+      "turnover": 2219439461.0,
       "score_news": 0,
       "score_tech": 4.0,
       "score_fund": 2.5,
@@ -11292,7 +11295,7 @@
         "boll_upper": 45.79,
         "boll_mid": 39.23,
         "boll_lower": 32.68,
-        "boll_pos": 84.3,
+        "boll_pos": 84.2,
         "boll_label": "上轨附近",
         "rsi": 68.6,
         "rsi_state": "中性",
@@ -11381,10 +11384,10 @@
       "name": "东阳光",
       "code": "sh600673",
       "sector": "电子材料",
-      "price": 36.71,
-      "pct_chg": -2.29,
+      "price": 36.7,
+      "pct_chg": -2.32,
       "pe": 2120.05,
-      "turnover": 2181643915.0,
+      "turnover": 2192598865.0,
       "score_news": 0.5,
       "score_tech": 2.0,
       "score_fund": 3.0,
@@ -11409,7 +11412,7 @@
         "boll_upper": 37.98,
         "boll_mid": 31.67,
         "boll_lower": 25.35,
-        "boll_pos": 89.9,
+        "boll_pos": 89.8,
         "boll_label": "上轨附近",
         "rsi": 75.8,
         "rsi_state": "超买",
@@ -11493,10 +11496,10 @@
       "name": "风华高科",
       "code": "sz000636",
       "sector": "AI/半导体",
-      "price": 62.35,
-      "pct_chg": -1.72,
+      "price": 62.34,
+      "pct_chg": -1.73,
       "pe": 234.71,
-      "turnover": 9329810762.0,
+      "turnover": 9463296162.0,
       "score_news": 4.5,
       "score_tech": 2.5,
       "score_fund": 1.8,
@@ -11566,7 +11569,7 @@
       "theme_reasons": [
         "细分题材:MLCC/被动元件(内禀3)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日+40.7%强于题材,超额明显",
         "板块高度集中(82只上榜)"
       ],
@@ -11613,10 +11616,10 @@
       "name": "铜冠铜箔",
       "code": "sz301217",
       "sector": "电子材料",
-      "price": 124.2,
-      "pct_chg": -6.07,
+      "price": 124.21,
+      "pct_chg": -6.06,
       "pe": 626.94,
-      "turnover": 6096185183.0,
+      "turnover": 6149571883.0,
       "score_news": 2,
       "score_tech": 2.5,
       "score_fund": 2.0,
@@ -11734,7 +11737,7 @@
       "price": 102.12,
       "pct_chg": 6.73,
       "pe": 39.89,
-      "turnover": 3763577461.0,
+      "turnover": 3787314949.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 2.8,
@@ -11839,7 +11842,7 @@
       "price": 68.71,
       "pct_chg": -3.75,
       "pe": 104.38,
-      "turnover": 3422984167.0,
+      "turnover": 3460630376.0,
       "score_news": 2,
       "score_tech": 4.0,
       "score_fund": 1.5,
@@ -11946,120 +11949,13 @@
       "cagr3": 232.3
     },
     {
-      "name": "西安奕材",
-      "code": "sh688783",
-      "sector": "综合",
-      "price": 36.0,
-      "pct_chg": 9.76,
-      "pe": 0,
-      "turnover": 2344536178.0,
-      "score_news": 1,
-      "score_tech": 3.0,
-      "score_fund": 1.8,
-      "score_theme": 5.0,
-      "total": 11.4,
-      "rating": "B",
-      "advice": "波段操作，轻仓参与",
-      "tech": {
-        "ma5": 31.6,
-        "ma10": 30.8,
-        "ma20": 30.8,
-        "ma60": 41.0,
-        "wma5": 31.8,
-        "wma10": 40.7,
-        "wma20": 35.9,
-        "trend": "日线多头",
-        "bull_level": 1,
-        "position": 36.0,
-        "vol_ratio": 0.71,
-        "amount_ratio": 0.75,
-        "amount_today_yi": 9.2,
-        "boll_upper": 38.46,
-        "boll_mid": 30.76,
-        "boll_lower": 23.05,
-        "boll_pos": 84.0,
-        "boll_label": "上轨附近",
-        "rsi": 62.1,
-        "rsi_state": "中性",
-        "reason": "日线多头+中位(36%)+BOLL通道内; BOLL:上轨附近(84%); RSI62(中性)",
-        "overall": "偏强",
-        "explanations": [
-          "日线多头排列但周线未确认，短线偏强",
-          "接近BOLL上轨压力位，上涨空间有限"
-        ],
-        "support_levels": [
-          [
-            "MA60均线",
-            40.98
-          ],
-          [
-            "MA20均线",
-            30.76
-          ],
-          [
-            "BOLL下轨",
-            23.05
-          ]
-        ],
-        "resistance_levels": [
-          [
-            "BOLL上轨",
-            38.46
-          ],
-          [
-            "MA60均线",
-            40.98
-          ],
-          [
-            "120日高点",
-            61.92
-          ]
-        ],
-        "vol_price_analysis": "量价基本平衡"
-      },
-      "fund_reasons": [
-        "高估值(FwdPE=1688.4)+负增长(-6%)",
-        "估值阶梯强收缩(1688.4→403.3),3年收缩76%,高PE起始,阶梯加分受限",
-        "持续性:盈利下滑,持续性偏弱"
-      ],
-      "theme_reasons": [
-        "板块:综合/其他(内禀3)",
-        "题材近20日中位+25.5%,上涨占比92%(40只样本)",
-        "个股近20日-2.6%弱于题材",
-        "大涨+9.8%验证",
-        "板块5只涨停,做多情绪强",
-        "⚠️题材高潮期,注意追高",
-        "板块高度集中(43只上榜)"
-      ],
-      "news_reasons": [
-        "无真实新闻/催化剂",
-        "消息时效:近7日无消息",
-        "大涨+9.8%"
-      ],
-      "news_items": [],
-      "news_recency": "近7日无消息",
-      "sub_theme": "综合/其他",
-      "lifecycle": "高潮期",
-      "score_sustain": 2.0,
-      "sustain_note": "盈利下滑,持续性偏弱",
-      "is_cyclic": false,
-      "is_storage_mod": false,
-      "fwd_pe": 1688.4,
-      "growth": -6.1,
-      "pe_ladder": {
-        "2027": 1688.4,
-        "2028": 403.3
-      },
-      "cagr3": null
-    },
-    {
       "name": "盛合晶微",
       "code": "sh688820",
       "sector": "AI/半导体",
       "price": 153.62,
       "pct_chg": 0.34,
       "pe": 290.35,
-      "turnover": 2294211406.0,
+      "turnover": 2313828065.0,
       "score_news": 1.2,
       "score_tech": 4.0,
       "score_fund": 2.0,
@@ -12068,27 +11964,27 @@
       "rating": "B",
       "advice": "波段操作，轻仓参与",
       "tech": {
-        "ma5": 140.4,
-        "ma10": 137.8,
-        "ma20": 135.4,
-        "ma60": 169.0,
+        "ma5": 143.6,
+        "ma10": 140.5,
+        "ma20": 135.8,
+        "ma60": 168.0,
         "wma5": null,
         "wma10": null,
         "wma20": null,
         "trend": "日线多头",
         "bull_level": 1,
         "position": 51.0,
-        "vol_ratio": 0.78,
-        "amount_ratio": 0.82,
-        "amount_today_yi": 33.6,
-        "boll_upper": 153.94,
-        "boll_mid": 135.41,
-        "boll_lower": 116.88,
-        "boll_pos": 99.1,
+        "vol_ratio": 0.88,
+        "amount_ratio": 0.95,
+        "amount_today_yi": 23.1,
+        "boll_upper": 155.59,
+        "boll_mid": 135.83,
+        "boll_lower": 116.08,
+        "boll_pos": 95.0,
         "boll_label": "上轨附近",
-        "rsi": 67.4,
+        "rsi": 67.5,
         "rsi_state": "中性",
-        "reason": "日线多头+中位(51%)+BOLL通道内; BOLL:上轨附近(99%); RSI67(中性)",
+        "reason": "日线多头+中位(51%)+BOLL通道内; BOLL:上轨附近(95%); RSI68(中性)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -12097,25 +11993,25 @@
         "support_levels": [
           [
             "MA60均线",
-            168.96
+            167.95
           ],
           [
             "MA20均线",
-            135.41
+            135.83
           ],
           [
             "BOLL下轨",
-            116.88
+            116.08
           ]
         ],
         "resistance_levels": [
           [
             "BOLL上轨",
-            153.94
+            155.59
           ],
           [
             "MA60均线",
-            168.96
+            167.95
           ],
           [
             "120日高点",
@@ -12134,8 +12030,7 @@
       "theme_reasons": [
         "细分题材:先进封装(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
-        "个股近20日+17.4%强于题材,超额明显",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
       ],
@@ -12172,130 +12067,13 @@
       "cagr3": null
     },
     {
-      "name": "中芯国际",
-      "code": "sh688981",
-      "sector": "AI/半导体",
-      "price": 135.0,
-      "pct_chg": -1.29,
-      "pe": 229.03,
-      "turnover": 7708766426.0,
-      "score_news": 4,
-      "score_tech": 2.5,
-      "score_fund": 1.0,
-      "score_theme": 4.0,
-      "total": 11.2,
-      "rating": "B",
-      "advice": "波段操作，轻仓参与",
-      "tech": {
-        "ma5": 130.5,
-        "ma10": 127.8,
-        "ma20": 132.9,
-        "ma60": 140.2,
-        "wma5": 132.8,
-        "wma10": 139.7,
-        "wma20": 129.8,
-        "trend": "偏空",
-        "bull_level": 0,
-        "position": 53.0,
-        "vol_ratio": 0.9,
-        "amount_ratio": 0.88,
-        "amount_today_yi": 93.0,
-        "boll_upper": 155.4,
-        "boll_mid": 132.86,
-        "boll_lower": 110.32,
-        "boll_pos": 54.8,
-        "boll_label": "中轨上方",
-        "rsi": 50.1,
-        "rsi_state": "中性",
-        "reason": "趋势走弱+中位(53%); BOLL:中轨上方(55%); RSI50(中性)",
-        "overall": "震荡",
-        "explanations": [
-          "BOLL中轨上方运行，多头占优"
-        ],
-        "support_levels": [
-          [
-            "MA60均线",
-            140.18
-          ],
-          [
-            "MA20均线",
-            132.86
-          ],
-          [
-            "BOLL下轨",
-            110.32
-          ]
-        ],
-        "resistance_levels": [
-          [
-            "MA60均线",
-            140.18
-          ],
-          [
-            "BOLL上轨",
-            155.4
-          ],
-          [
-            "120日高点",
-            173.0
-          ]
-        ],
-        "vol_price_analysis": "量价基本平衡",
-        "industry_prospect": "行业前景加分+1.0(顶级赛道+绝对龙头)"
-      },
-      "fund_reasons": [
-        "高估值(FwdPE=168.6)",
-        "估值阶梯明显收缩(168.6→137.9→117.0),3年收缩31%,高PE起始,阶梯加分受限",
-        "PEG=3.02(严重高估)",
-        "持续性:盈利持续性中性"
-      ],
-      "theme_reasons": [
-        "细分题材:晶圆代工(内禀5)",
-        "短期(10日)加速强于中期(20日)",
-        "题材近20日中位-19.3%,上涨占比0%(2只样本)",
-        "个股近20日-5.0%强于题材,超额明显",
-        "题材退潮期,短期回避",
-        "板块高度集中(82只上榜)"
-      ],
-      "news_reasons": [
-        "晶圆代工龙头+先进制程+国产替代",
-        "⚠️设备限制+技术差距",
-        "消息时效:近7日有消息/公告",
-        "小跌-1.3%"
-      ],
-      "news_items": [
-        {
-          "source": "券商研报",
-          "time": "",
-          "sentiment": "一般利好",
-          "content": "晶圆代工龙头+先进制程+国产替代",
-          "url": ""
-        }
-      ],
-      "news_recency": "近7日有消息/公告",
-      "sub_theme": "晶圆代工",
-      "lifecycle": "退潮期",
-      "score_sustain": 3.0,
-      "sustain_note": "盈利持续性中性",
-      "is_cyclic": false,
-      "is_storage_mod": false,
-      "fwd_pe": 168.6,
-      "growth": 55.9,
-      "pe_ladder": {
-        "2026": 168.6,
-        "2027": 137.9,
-        "2028": 117.0
-      },
-      "cagr3": -25.0
-    },
-    {
       "name": "深科技",
       "code": "sz000021",
       "sector": "AI/半导体",
-      "price": 41.58,
-      "pct_chg": -2.39,
+      "price": 41.6,
+      "pct_chg": -2.35,
       "pe": 54.63,
-      "turnover": 5797504256.0,
+      "turnover": 5836895296.0,
       "score_news": 2.0,
       "score_tech": 3.0,
       "score_fund": 2,
@@ -12320,7 +12098,7 @@
         "boll_upper": 43.99,
         "boll_mid": 39.67,
         "boll_lower": 35.35,
-        "boll_pos": 72.1,
+        "boll_pos": 72.3,
         "boll_label": "中轨上方",
         "rsi": 53.6,
         "rsi_state": "中性",
@@ -12370,7 +12148,7 @@
       "theme_reasons": [
         "细分题材:存储模组/代工(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "板块高度集中(82只上榜)"
       ],
       "news_reasons": [
@@ -12412,7 +12190,7 @@
       "price": 323.88,
       "pct_chg": -0.86,
       "pe": 295.41,
-      "turnover": 4255030499.0,
+      "turnover": 4289167451.0,
       "score_news": 3,
       "score_tech": 2.0,
       "score_fund": 2.0,
@@ -12483,7 +12261,7 @@
       "theme_reasons": [
         "细分题材:光通信(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日+33.6%强于题材,超额明显",
         "板块高度集中(82只上榜)"
       ],
@@ -12525,7 +12303,7 @@
       "price": 131.7,
       "pct_chg": -2.8,
       "pe": 502.96,
-      "turnover": 4020261704.0,
+      "turnover": 4039674284.0,
       "score_news": 3,
       "score_tech": 3.0,
       "score_fund": 0.8,
@@ -12642,7 +12420,7 @@
       "price": 39.93,
       "pct_chg": 1.63,
       "pe": 23.57,
-      "turnover": 2349566691.0,
+      "turnover": 2370625773.0,
       "score_news": 0,
       "score_tech": 3.0,
       "score_fund": 2.8,
@@ -12739,13 +12517,130 @@
       "cagr3": 7.1
     },
     {
+      "name": "大普微",
+      "code": "sz301666",
+      "sector": "AI/半导体",
+      "price": 466.12,
+      "pct_chg": 1.66,
+      "pe": 15663.06,
+      "turnover": 2176698782.0,
+      "score_news": 1.2,
+      "score_tech": 2.5,
+      "score_fund": 2.8,
+      "score_theme": 4.0,
+      "total": 11.1,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 446.2,
+        "ma10": 441.6,
+        "ma20": 442.4,
+        "ma60": 583.1,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "金叉",
+        "bull_level": 0,
+        "position": 37.0,
+        "vol_ratio": 1.0,
+        "amount_ratio": 1.01,
+        "amount_today_yi": 21.7,
+        "boll_upper": 510.21,
+        "boll_mid": 442.37,
+        "boll_lower": 374.52,
+        "boll_pos": 67.5,
+        "boll_label": "中轨上方",
+        "rsi": 61.4,
+        "rsi_state": "中性",
+        "reason": "金叉+中位(37%)+BOLL通道内; BOLL:中轨上方(68%); RSI61(中性)",
+        "overall": "震荡",
+        "explanations": [
+          "MA5上穿MA20，短线买点信号",
+          "BOLL中轨上方运行，多头占优"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            583.06
+          ],
+          [
+            "MA20均线",
+            442.37
+          ],
+          [
+            "BOLL下轨",
+            374.52
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            510.21
+          ],
+          [
+            "MA60均线",
+            583.06
+          ],
+          [
+            "120日高点",
+            888.99
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "估值偏高(FwdPE=74.6)+增长一般(+-151%)",
+        "估值阶梯强收缩(74.6→37.3→22.7),3年收缩70%,高PE起始,阶梯加分受限",
+        "持续性:盈利下滑,持续性偏弱"
+      ],
+      "theme_reasons": [
+        "细分题材:SSD控制器(内禀4)",
+        "短期(10日)加速强于中期(20日)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
+        "个股近20日-9.6%弱于题材",
+        "题材启动期,可关注",
+        "板块高度集中(82只上榜)"
+      ],
+      "news_reasons": [
+        "存储控制器+企业级SSD+PCIe",
+        "⚠️存储行业周期+竞争加剧",
+        "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
+        "消息时效:近7日无消息",
+        "横盘(+1.7%)"
+      ],
+      "news_items": [
+        {
+          "source": "券商研报",
+          "time": "",
+          "sentiment": "中性",
+          "content": "存储控制器+企业级SSD+PCIe",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日无消息",
+      "sub_theme": "SSD控制器",
+      "lifecycle": "启动期",
+      "score_sustain": 2.0,
+      "sustain_note": "盈利下滑,持续性偏弱",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 74.6,
+      "growth": -150.9,
+      "pe_ladder": {
+        "2026": 74.6,
+        "2027": 37.3,
+        "2028": 22.7
+      },
+      "cagr3": null
+    },
+    {
       "name": "三环集团",
       "code": "sz300408",
       "sector": "电子元件",
-      "price": 124.0,
-      "pct_chg": -4.72,
+      "price": 123.99,
+      "pct_chg": -4.73,
       "pe": 86.06,
-      "turnover": 9203209104.0,
+      "turnover": 9305735567.0,
       "score_news": 2,
       "score_tech": 2.0,
       "score_fund": 2.0,
@@ -12857,13 +12752,130 @@
       "cagr3": 22.6
     },
     {
+      "name": "海光信息",
+      "code": "sh688041",
+      "sector": "AI/半导体",
+      "price": 280.08,
+      "pct_chg": -3.02,
+      "pe": 207.2,
+      "turnover": 7522663428.0,
+      "score_news": 3,
+      "score_tech": 2.5,
+      "score_fund": 1.0,
+      "score_theme": 4.5,
+      "total": 11.0,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 284.7,
+        "ma10": 287.7,
+        "ma20": 290.9,
+        "ma60": 309.1,
+        "wma5": 289.6,
+        "wma10": 310.4,
+        "wma20": 298.1,
+        "trend": "日线空头",
+        "bull_level": 0,
+        "position": 45.0,
+        "vol_ratio": 0.9,
+        "amount_ratio": 0.87,
+        "amount_today_yi": 7540.3,
+        "boll_upper": 323.1,
+        "boll_mid": 290.86,
+        "boll_lower": 258.62,
+        "boll_pos": 33.3,
+        "boll_label": "中轨下方",
+        "rsi": 48.0,
+        "rsi_state": "中性",
+        "reason": "趋势走弱+中位(45%); 高成长(CAGR3=46%)+0.5; BOLL:中轨下方(33%); RSI48(中性)",
+        "overall": "偏弱",
+        "explanations": [
+          "BOLL中轨下方运行，空头占优"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            309.13
+          ],
+          [
+            "MA20均线",
+            290.86
+          ],
+          [
+            "BOLL下轨",
+            258.62
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "MA5均线",
+            284.71
+          ],
+          [
+            "MA60均线",
+            309.13
+          ],
+          [
+            "BOLL上轨",
+            323.1
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡",
+        "industry_prospect": "行业前景加分+1.0(顶级赛道+绝对龙头)"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=145.2)",
+        "估值阶梯强收缩(145.2→95.9→67.2),3年收缩54%,高PE起始,阶梯加分受限",
+        "PEG=5.39(严重高估)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "细分题材:AI芯片/CPU(内禀5)",
+        "短期(10日)加速强于中期(20日)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
+        "个股近20日-18.7%弱于题材",
+        "下跌-3.0%",
+        "板块高度集中(82只上榜)"
+      ],
+      "news_reasons": [
+        "国产CPU龙头+服务器芯片+AI算力",
+        "⚠️技术迭代+生态建设周期",
+        "消息时效:近7日有消息/公告",
+        "下跌-3.0%"
+      ],
+      "news_items": [
+        {
+          "source": "券商研报",
+          "time": "",
+          "sentiment": "一般利好",
+          "content": "国产CPU龙头+服务器芯片+AI算力",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有消息/公告",
+      "sub_theme": "AI芯片/CPU",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 145.2,
+      "growth": 26.9,
+      "pe_ladder": {
+        "2026": 145.2,
+        "2027": 95.9,
+        "2028": 67.2
+      },
+      "cagr3": 45.5
+    },
+    {
       "name": "江海股份",
       "code": "sz002484",
       "sector": "电子元件",
-      "price": 67.42,
-      "pct_chg": -3.62,
+      "price": 67.41,
+      "pct_chg": -3.63,
       "pe": 83.75,
-      "turnover": 4419333069.0,
+      "turnover": 4442468181.0,
       "score_news": 1,
       "score_tech": 3.0,
       "score_fund": 2.0,
@@ -12888,7 +12900,7 @@
         "boll_upper": 73.76,
         "boll_mid": 64.52,
         "boll_lower": 55.28,
-        "boll_pos": 65.7,
+        "boll_pos": 65.6,
         "boll_label": "中轨上方",
         "rsi": 58.1,
         "rsi_state": "中性",
@@ -12980,10 +12992,10 @@
       "name": "圣邦股份",
       "code": "sz300661",
       "sector": "AI/半导体",
-      "price": 117.15,
-      "pct_chg": -4.94,
+      "price": 116.92,
+      "pct_chg": -5.13,
       "pe": 131.19,
-      "turnover": 2666966260.0,
+      "turnover": 2676015868.0,
       "score_news": 3,
       "score_tech": 2.0,
       "score_fund": 1.8,
@@ -13001,18 +13013,18 @@
         "wma20": 107.8,
         "trend": "日线多头",
         "bull_level": 1,
-        "position": 68.0,
+        "position": 67.0,
         "vol_ratio": 0.99,
         "amount_ratio": 1.11,
         "amount_today_yi": 26.6,
         "boll_upper": 125.93,
         "boll_mid": 106.59,
         "boll_lower": 87.26,
-        "boll_pos": 77.3,
+        "boll_pos": 76.7,
         "boll_label": "中轨上方",
         "rsi": 64.3,
         "rsi_state": "中性",
-        "reason": "日线多头+相对高位(68%)+BOLL通道内; BOLL:中轨上方(77%); RSI64(中性)",
+        "reason": "日线多头+相对高位(67%)+BOLL通道内; BOLL:中轨上方(77%); RSI64(中性)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -13052,15 +13064,15 @@
       "theme_reasons": [
         "细分题材:模拟芯片(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
-        "下跌-4.9%",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
+        "下跌-5.1%",
         "板块高度集中(82只上榜)"
       ],
       "news_reasons": [
         "模拟芯片国产替代龙头+信号链+电源管理双平台",
         "⚠️模拟芯片竞争加剧+研发投入大",
         "消息时效:近7日有消息/公告",
-        "下跌-4.9%"
+        "下跌-5.1%"
       ],
       "news_items": [
         {
@@ -13088,13 +13100,121 @@
       "cagr3": -20.3
     },
     {
+      "name": "西安奕材",
+      "code": "sh688783",
+      "sector": "综合",
+      "price": 35.96,
+      "pct_chg": 9.63,
+      "pe": 0,
+      "turnover": 2362709571.0,
+      "score_news": 1,
+      "score_tech": 2.5,
+      "score_fund": 1.8,
+      "score_theme": 5.0,
+      "total": 11.0,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 32.5,
+        "ma10": 31.8,
+        "ma20": 30.7,
+        "ma60": 41.0,
+        "wma5": 31.8,
+        "wma10": 40.7,
+        "wma20": 35.9,
+        "trend": "日线多头",
+        "bull_level": 1,
+        "position": 36.0,
+        "vol_ratio": 0.92,
+        "amount_ratio": 1.02,
+        "amount_today_yi": 23.5,
+        "boll_upper": 38.17,
+        "boll_mid": 30.69,
+        "boll_lower": 23.2,
+        "boll_pos": 85.2,
+        "boll_label": "上轨附近",
+        "rsi": 74.1,
+        "rsi_state": "超买",
+        "reason": "日线多头+中位(36%)+BOLL通道内; BOLL:上轨附近(85%); RSI74(超买,短线回调风险)",
+        "overall": "偏强",
+        "explanations": [
+          "日线多头排列但周线未确认，短线偏强",
+          "接近BOLL上轨压力位，上涨空间有限",
+          "RSI=74 进入超买区(>70)，短线回调概率上升"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            41.03
+          ],
+          [
+            "MA20均线",
+            30.69
+          ],
+          [
+            "BOLL下轨",
+            23.2
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            38.17
+          ],
+          [
+            "MA60均线",
+            41.03
+          ],
+          [
+            "120日高点",
+            61.92
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=1688.4)+负增长(-6%)",
+        "估值阶梯强收缩(1688.4→403.3),3年收缩76%,高PE起始,阶梯加分受限",
+        "持续性:盈利下滑,持续性偏弱"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "题材近20日中位+25.5%,上涨占比92%(40只样本)",
+        "个股近20日-3.7%弱于题材",
+        "大涨+9.6%验证",
+        "板块5只涨停,做多情绪强",
+        "⚠️题材高潮期,注意追高",
+        "板块高度集中(43只上榜)"
+      ],
+      "news_reasons": [
+        "无真实新闻/催化剂",
+        "消息时效:近7日无消息",
+        "大涨+9.6%"
+      ],
+      "news_items": [],
+      "news_recency": "近7日无消息",
+      "sub_theme": "综合/其他",
+      "lifecycle": "高潮期",
+      "score_sustain": 2.0,
+      "sustain_note": "盈利下滑,持续性偏弱",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 1688.4,
+      "growth": -6.1,
+      "pe_ladder": {
+        "2027": 1688.4,
+        "2028": 403.3
+      },
+      "cagr3": null
+    },
+    {
       "name": "云南锗业",
       "code": "sz002428",
       "sector": "有色资源",
       "price": 108.3,
       "pct_chg": -1.23,
       "pe": 3712.29,
-      "turnover": 10422280366.0,
+      "turnover": 10490663369.0,
       "score_news": 1.6,
       "score_tech": 3.0,
       "score_fund": 1,
@@ -13115,7 +13235,7 @@
         "position": 77.0,
         "vol_ratio": 1.25,
         "amount_ratio": 1.46,
-        "amount_today_yi": 102.9,
+        "amount_today_yi": 103.6,
         "boll_upper": 117.35,
         "boll_mid": 86.08,
         "boll_lower": 54.81,
@@ -13207,10 +13327,10 @@
       "name": "中微公司",
       "code": "sh688012",
       "sector": "AI/半导体",
-      "price": 398.24,
-      "pct_chg": 2.69,
+      "price": 398.33,
+      "pct_chg": 2.71,
       "pe": 139.81,
-      "turnover": 8360739143.0,
+      "turnover": 8447273945.0,
       "score_news": 1.6,
       "score_tech": 3.0,
       "score_fund": 1.0,
@@ -13235,7 +13355,7 @@
         "boll_upper": 416.51,
         "boll_mid": 368.51,
         "boll_lower": 320.52,
-        "boll_pos": 81.0,
+        "boll_pos": 81.1,
         "boll_label": "上轨附近",
         "rsi": 59.0,
         "rsi_state": "中性",
@@ -13321,10 +13441,10 @@
       "name": "光迅科技",
       "code": "sz002281",
       "sector": "AI/半导体",
-      "price": 197.69,
-      "pct_chg": -1.03,
+      "price": 197.64,
+      "pct_chg": -1.06,
       "pe": 157.92,
-      "turnover": 6890988602.0,
+      "turnover": 6940629050.0,
       "score_news": 1.2,
       "score_tech": 2.5,
       "score_fund": 1.5,
@@ -13349,7 +13469,7 @@
         "boll_upper": 206.86,
         "boll_mid": 180.45,
         "boll_lower": 154.05,
-        "boll_pos": 82.6,
+        "boll_pos": 82.5,
         "boll_label": "上轨附近",
         "rsi": 63.2,
         "rsi_state": "中性",
@@ -13399,7 +13519,7 @@
       "theme_reasons": [
         "细分题材:光模块/器件(内禀5)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "板块高度集中(82只上榜)"
       ],
       "news_reasons": [
@@ -13407,7 +13527,7 @@
         "⚠️行业竞争加剧+技术迭代",
         "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
         "消息时效:近7日无消息",
-        "小跌-1.0%"
+        "小跌-1.1%"
       ],
       "news_items": [
         {
@@ -13435,136 +13555,13 @@
       "cagr3": 18.8
     },
     {
-      "name": "芯原股份",
-      "code": "sh688521",
-      "sector": "AI/半导体",
-      "price": 213.18,
-      "pct_chg": -5.8,
-      "pe": 0,
-      "turnover": 6877936230.0,
-      "score_news": 2.5,
-      "score_tech": 3.5,
-      "score_fund": 1.0,
-      "score_theme": 4.0,
-      "total": 10.8,
-      "rating": "B",
-      "advice": "波段操作，轻仓参与",
-      "tech": {
-        "ma5": 212.5,
-        "ma10": 214.5,
-        "ma20": 212.2,
-        "ma60": 252.2,
-        "wma5": 213.2,
-        "wma10": 250.2,
-        "wma20": 249.3,
-        "trend": "偏多",
-        "bull_level": 0,
-        "position": 21.0,
-        "vol_ratio": 0.82,
-        "amount_ratio": 0.82,
-        "amount_today_yi": 48.9,
-        "boll_upper": 247.37,
-        "boll_mid": 212.18,
-        "boll_lower": 176.98,
-        "boll_pos": 51.4,
-        "boll_label": "中轨上方",
-        "rsi": 56.6,
-        "rsi_state": "中性",
-        "reason": "偏多+低位(21%)+BOLL通道内; BOLL:中轨上方(51%); RSI57(中性)",
-        "overall": "震荡",
-        "explanations": [
-          "BOLL中轨上方运行，多头占优"
-        ],
-        "support_levels": [
-          [
-            "MA60均线",
-            252.21
-          ],
-          [
-            "MA20均线",
-            212.18
-          ],
-          [
-            "BOLL下轨",
-            176.98
-          ]
-        ],
-        "resistance_levels": [
-          [
-            "BOLL上轨",
-            247.37
-          ],
-          [
-            "MA60均线",
-            252.21
-          ],
-          [
-            "120日高点",
-            371.14
-          ]
-        ],
-        "vol_price_analysis": "量价基本平衡"
-      },
-      "fund_reasons": [
-        "高估值(FwdPE=593.5)",
-        "估值阶梯强收缩(593.5→159.1→77.7),3年收缩87%,高PE起始,阶梯加分受限",
-        "PEG=127.91(严重高估)",
-        "持续性:盈利持续性中性"
-      ],
-      "theme_reasons": [
-        "细分题材:芯片IP(内禀4)",
-        "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
-        "下跌-5.8%",
-        "板块高度集中(82只上榜)"
-      ],
-      "news_reasons": [
-        "芯片设计IP平台+SoC定制服务",
-        "⚠️IP授权竞争+盈利周期长",
-        "公告确认:利好事件",
-        "消息时效:近7日有消息/公告",
-        "下跌-5.8%"
-      ],
-      "news_items": [
-        {
-          "source": "券商研报",
-          "time": "",
-          "sentiment": "中性",
-          "content": "芯片设计IP平台+SoC定制服务",
-          "url": ""
-        },
-        {
-          "source": "交易所公告(akshare)",
-          "time": "",
-          "sentiment": "利好",
-          "content": "公告检测到利好关键词×1",
-          "url": ""
-        }
-      ],
-      "news_recency": "近7日有消息/公告",
-      "sub_theme": "芯片IP",
-      "lifecycle": "震荡期",
-      "score_sustain": 3.0,
-      "sustain_note": "盈利持续性中性",
-      "is_cyclic": false,
-      "is_storage_mod": false,
-      "fwd_pe": 593.5,
-      "growth": 4.6,
-      "pe_ladder": {
-        "2026": 593.5,
-        "2027": 159.1,
-        "2028": 77.7
-      },
-      "cagr3": null
-    },
-    {
       "name": "网宿科技",
       "code": "sz300017",
       "sector": "综合",
-      "price": 16.86,
-      "pct_chg": -4.04,
+      "price": 16.85,
+      "pct_chg": -4.1,
       "pe": 54.27,
-      "turnover": 4130728201.0,
+      "turnover": 4167204407.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 2.8,
@@ -13589,7 +13586,7 @@
         "boll_upper": 17.43,
         "boll_mid": 14.54,
         "boll_lower": 11.65,
-        "boll_pos": 90.1,
+        "boll_pos": 90.0,
         "boll_label": "上轨附近",
         "rsi": 71.7,
         "rsi_state": "超买",
@@ -13635,7 +13632,7 @@
         "板块:综合/其他(内禀3)",
         "题材近20日中位+25.5%,上涨占比92%(40只样本)",
         "个股近20日+12.6%弱于题材",
-        "下跌-4.0%",
+        "下跌-4.1%",
         "板块5只涨停,做多情绪强",
         "题材加速期,趋势延续",
         "板块高度集中(43只上榜)"
@@ -13643,7 +13640,7 @@
       "news_reasons": [
         "公告确认:利好事件",
         "消息时效:近7日有消息/公告",
-        "下跌-4.0%"
+        "下跌-4.1%"
       ],
       "news_items": [
         {
@@ -13674,10 +13671,10 @@
       "name": "士兰微",
       "code": "sh600460",
       "sector": "AI/半导体",
-      "price": 34.86,
-      "pct_chg": 2.38,
+      "price": 34.88,
+      "pct_chg": 2.44,
       "pe": 126.5,
-      "turnover": 4128927400.0,
+      "turnover": 4159185800.0,
       "score_news": 0,
       "score_tech": 3.0,
       "score_fund": 3.0,
@@ -13702,7 +13699,7 @@
         "boll_upper": 35.35,
         "boll_mid": 31.37,
         "boll_lower": 27.39,
-        "boll_pos": 93.9,
+        "boll_pos": 94.1,
         "boll_label": "上轨附近",
         "rsi": 69.2,
         "rsi_state": "中性",
@@ -13751,7 +13748,7 @@
       "theme_reasons": [
         "细分题材:功率半导体/IGBT(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
       ],
@@ -13784,7 +13781,7 @@
       "price": 29.5,
       "pct_chg": -3.91,
       "pe": 0,
-      "turnover": 2755532302.0,
+      "turnover": 2780745952.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 2.8,
@@ -13892,7 +13889,7 @@
       "price": 69.0,
       "pct_chg": 0.2,
       "pe": 4806.32,
-      "turnover": 2350634064.0,
+      "turnover": 2381267580.0,
       "score_news": 1.2,
       "score_tech": 4.0,
       "score_fund": 1.0,
@@ -14005,10 +14002,10 @@
       "name": "精智达",
       "code": "sh688627",
       "sector": "高端制造",
-      "price": 565.0,
-      "pct_chg": 4.24,
+      "price": 565.22,
+      "pct_chg": 4.28,
       "pe": 553.12,
-      "turnover": 2914615789.0,
+      "turnover": 2929339770.0,
       "score_news": 1.2,
       "score_tech": 2,
       "score_fund": 1.8,
@@ -14033,7 +14030,7 @@
         "boll_upper": 562.41,
         "boll_mid": 464.66,
         "boll_lower": 366.9,
-        "boll_pos": 101.3,
+        "boll_pos": 101.4,
         "boll_label": "突破上轨",
         "rsi": 69.0,
         "rsi_state": "中性",
@@ -14088,7 +14085,7 @@
         "⚠️设备验证周期+客户集中",
         "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
         "消息时效:近7日无消息",
-        "上涨+4.2%"
+        "上涨+4.3%"
       ],
       "news_items": [
         {
@@ -14119,10 +14116,10 @@
       "name": "兴森科技",
       "code": "sz002436",
       "sector": "AI/半导体",
-      "price": 37.6,
-      "pct_chg": -1.83,
+      "price": 37.56,
+      "pct_chg": -1.93,
       "pe": 442.35,
-      "turnover": 5523916711.0,
+      "turnover": 5562486549.0,
       "score_news": 1.2,
       "score_tech": 3.0,
       "score_fund": 2.0,
@@ -14147,7 +14144,7 @@
         "boll_upper": 39.25,
         "boll_mid": 32.77,
         "boll_lower": 26.29,
-        "boll_pos": 87.3,
+        "boll_pos": 87.0,
         "boll_label": "上轨附近",
         "rsi": 67.3,
         "rsi_state": "中性",
@@ -14196,7 +14193,7 @@
       "theme_reasons": [
         "细分题材:PCB/IC载板(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日+14.9%强于题材,超额明显",
         "板块高度集中(82只上榜)"
       ],
@@ -14205,7 +14202,7 @@
         "⚠️PCB行业竞争+载板验证周期",
         "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
         "消息时效:近7日无消息",
-        "小跌-1.8%"
+        "小跌-1.9%"
       ],
       "news_items": [
         {
@@ -14236,10 +14233,10 @@
       "name": "南大光电",
       "code": "sz300346",
       "sector": "AI/半导体",
-      "price": 61.88,
-      "pct_chg": 1.11,
+      "price": 61.87,
+      "pct_chg": 1.09,
       "pe": 122.74,
-      "turnover": 3088192774.0,
+      "turnover": 3126886272.0,
       "score_news": 1.2,
       "score_tech": 3.0,
       "score_fund": 2.0,
@@ -14264,7 +14261,7 @@
         "boll_upper": 63.85,
         "boll_mid": 55.01,
         "boll_lower": 46.18,
-        "boll_pos": 88.9,
+        "boll_pos": 88.8,
         "boll_label": "上轨附近",
         "rsi": 70.3,
         "rsi_state": "超买",
@@ -14315,7 +14312,7 @@
       "theme_reasons": [
         "细分题材:光刻胶/MO源(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
       ],
@@ -14355,10 +14352,10 @@
       "name": "信维通信",
       "code": "sz300136",
       "sector": "AI/半导体",
-      "price": 69.63,
-      "pct_chg": -1.09,
+      "price": 69.65,
+      "pct_chg": -1.06,
       "pe": 91.55,
-      "turnover": 2966721678.0,
+      "turnover": 2992267069.0,
       "score_news": 1.2,
       "score_tech": 4.5,
       "score_fund": 2.0,
@@ -14383,7 +14380,7 @@
         "boll_upper": 73.1,
         "boll_mid": 64.57,
         "boll_lower": 56.04,
-        "boll_pos": 79.6,
+        "boll_pos": 79.8,
         "boll_label": "中轨上方",
         "rsi": 65.2,
         "rsi_state": "中性",
@@ -14433,7 +14430,7 @@
       "theme_reasons": [
         "细分题材:天线/射频(内禀3)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "板块高度集中(82只上榜)"
       ],
       "news_reasons": [
@@ -14475,7 +14472,7 @@
       "price": 37.54,
       "pct_chg": 9.99,
       "pe": 188.8,
-      "turnover": 2425834715.0,
+      "turnover": 2426645579.0,
       "score_news": 3,
       "score_tech": 2,
       "score_fund": 1.0,
@@ -14588,10 +14585,10 @@
       "name": "东山精密",
       "code": "sz002384",
       "sector": "AI/半导体",
-      "price": 213.83,
+      "price": 213.82,
       "pct_chg": -1.76,
       "pe": 191.97,
-      "turnover": 11637154076.0,
+      "turnover": 11731662516.0,
       "score_news": 1.6,
       "score_tech": 2.5,
       "score_fund": 2.0,
@@ -14612,7 +14609,7 @@
         "position": 69.0,
         "vol_ratio": 0.74,
         "amount_ratio": 0.8,
-        "amount_today_yi": 116.3,
+        "amount_today_yi": 117.3,
         "boll_upper": 226.2,
         "boll_mid": 193.57,
         "boll_lower": 160.94,
@@ -14706,10 +14703,10 @@
       "name": "昭衍新药",
       "code": "sh603127",
       "sector": "综合",
-      "price": 53.78,
-      "pct_chg": 0.56,
+      "price": 53.9,
+      "pct_chg": 0.79,
       "pe": 81.58,
-      "turnover": 2142764461.0,
+      "turnover": 2163330275.0,
       "score_news": 0,
       "score_tech": 1.1,
       "score_fund": 3.5,
@@ -14734,7 +14731,7 @@
         "boll_upper": 56.2,
         "boll_mid": 47.86,
         "boll_lower": 39.52,
-        "boll_pos": 85.5,
+        "boll_pos": 86.2,
         "boll_label": "上轨附近",
         "rsi": 71.4,
         "rsi_state": "超买",
@@ -14789,7 +14786,7 @@
       "news_reasons": [
         "无真实新闻/催化剂",
         "消息时效:近7日无消息",
-        "横盘(+0.6%)"
+        "横盘(+0.8%)"
       ],
       "news_items": [],
       "news_recency": "近7日无消息",
@@ -14809,130 +14806,13 @@
       "cagr3": -32.7
     },
     {
-      "name": "永鼎股份",
-      "code": "sh600105",
-      "sector": "AI/半导体",
-      "price": 42.15,
-      "pct_chg": -0.82,
-      "pe": 600.22,
-      "turnover": 6274747109.0,
-      "score_news": 0.8,
-      "score_tech": 2.5,
-      "score_fund": 3.5,
-      "score_theme": 3.0,
-      "total": 10.4,
-      "rating": "B",
-      "advice": "波段操作，轻仓参与",
-      "tech": {
-        "ma5": 41.6,
-        "ma10": 39.7,
-        "ma20": 36.5,
-        "ma60": 47.7,
-        "wma5": 37.6,
-        "wma10": 46.0,
-        "wma20": 46.7,
-        "trend": "日线多头",
-        "bull_level": 1,
-        "position": 35.0,
-        "vol_ratio": 1.07,
-        "amount_ratio": 1.22,
-        "amount_today_yi": 62.5,
-        "boll_upper": 43.94,
-        "boll_mid": 36.48,
-        "boll_lower": 29.01,
-        "boll_pos": 88.0,
-        "boll_label": "上轨附近",
-        "rsi": 79.1,
-        "rsi_state": "超买",
-        "reason": "日线多头+中位(35%)+BOLL通道内; 高成长(CAGR3=46%)+0.5; BOLL:上轨附近(88%); RSI79(超买,短线回调风险)",
-        "overall": "偏强",
-        "explanations": [
-          "日线多头排列但周线未确认，短线偏强",
-          "接近BOLL上轨压力位，上涨空间有限",
-          "RSI=79 进入超买区(>70)，短线回调概率上升"
-        ],
-        "support_levels": [
-          [
-            "MA60均线",
-            47.73
-          ],
-          [
-            "MA20均线",
-            36.48
-          ],
-          [
-            "BOLL下轨",
-            29.01
-          ]
-        ],
-        "resistance_levels": [
-          [
-            "BOLL上轨",
-            43.94
-          ],
-          [
-            "MA60均线",
-            47.73
-          ],
-          [
-            "120日高点",
-            72.96
-          ]
-        ],
-        "vol_price_analysis": "量价基本平衡"
-      },
-      "fund_reasons": [
-        "高估值(FwdPE=90.0)但有增长(+399%)",
-        "估值阶梯强收缩(90.0→32.8→14.8),3年收缩84%,高PE起始,阶梯加分受限",
-        "PEG=0.23(严重低估,增速远超估值)",
-        "持续性:盈利持续性中性"
-      ],
-      "theme_reasons": [
-        "细分题材:光缆/超导(内禀3)",
-        "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
-        "板块高度集中(82只上榜)"
-      ],
-      "news_reasons": [
-        "光纤光缆+超导材料",
-        "⚠️行业竞争+超导商业化不确定",
-        "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
-        "消息时效:近7日无消息",
-        "横盘(-0.8%)"
-      ],
-      "news_items": [
-        {
-          "source": "券商研报",
-          "time": "",
-          "sentiment": "小幅利空",
-          "content": "光纤光缆+超导材料",
-          "url": ""
-        }
-      ],
-      "news_recency": "近7日无消息",
-      "sub_theme": "光缆/超导",
-      "lifecycle": "震荡期",
-      "score_sustain": 3.0,
-      "sustain_note": "盈利持续性中性",
-      "is_cyclic": false,
-      "is_storage_mod": false,
-      "fwd_pe": 90.0,
-      "growth": 398.6,
-      "pe_ladder": {
-        "2026": 90.0,
-        "2027": 32.8,
-        "2028": 14.8
-      },
-      "cagr3": 45.8
-    },
-    {
       "name": "利通电子",
       "code": "sh603629",
       "sector": "电子制造",
-      "price": 136.5,
-      "pct_chg": -4.44,
+      "price": 136.47,
+      "pct_chg": -4.46,
       "pe": 93.65,
-      "turnover": 6262066686.0,
+      "turnover": 6354413206.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 2.5,
@@ -14957,7 +14837,7 @@
         "boll_upper": 145.51,
         "boll_mid": 115.49,
         "boll_lower": 85.46,
-        "boll_pos": 85.0,
+        "boll_pos": 84.9,
         "boll_label": "上轨附近",
         "rsi": 70.6,
         "rsi_state": "超买",
@@ -15003,7 +14883,7 @@
         "细分题材:液晶模组(内禀3)",
         "题材近20日中位+16.9%,上涨占比83%(6只样本)",
         "个股近20日+26.9%强于题材,超额明显",
-        "下跌-4.4%",
+        "下跌-4.5%",
         "题材加速期,趋势延续",
         "板块有一定关注度(6只上榜)"
       ],
@@ -15012,7 +14892,7 @@
         "⚠️消费电子周期+客户集中",
         "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
         "消息时效:近7日无消息",
-        "下跌-4.4%"
+        "下跌-4.5%"
       ],
       "news_items": [
         {
@@ -15036,13 +14916,130 @@
       "cagr3": 88.7
     },
     {
+      "name": "永鼎股份",
+      "code": "sh600105",
+      "sector": "AI/半导体",
+      "price": 42.16,
+      "pct_chg": -0.8,
+      "pe": 600.22,
+      "turnover": 6309337787.0,
+      "score_news": 0.8,
+      "score_tech": 2.5,
+      "score_fund": 3.5,
+      "score_theme": 3.0,
+      "total": 10.4,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 41.6,
+        "ma10": 39.7,
+        "ma20": 36.5,
+        "ma60": 47.7,
+        "wma5": 37.6,
+        "wma10": 46.0,
+        "wma20": 46.7,
+        "trend": "日线多头",
+        "bull_level": 1,
+        "position": 36.0,
+        "vol_ratio": 1.07,
+        "amount_ratio": 1.22,
+        "amount_today_yi": 62.5,
+        "boll_upper": 43.94,
+        "boll_mid": 36.48,
+        "boll_lower": 29.01,
+        "boll_pos": 88.0,
+        "boll_label": "上轨附近",
+        "rsi": 79.1,
+        "rsi_state": "超买",
+        "reason": "日线多头+中位(36%)+BOLL通道内; 高成长(CAGR3=46%)+0.5; BOLL:上轨附近(88%); RSI79(超买,短线回调风险)",
+        "overall": "偏强",
+        "explanations": [
+          "日线多头排列但周线未确认，短线偏强",
+          "接近BOLL上轨压力位，上涨空间有限",
+          "RSI=79 进入超买区(>70)，短线回调概率上升"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            47.73
+          ],
+          [
+            "MA20均线",
+            36.48
+          ],
+          [
+            "BOLL下轨",
+            29.01
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            43.94
+          ],
+          [
+            "MA60均线",
+            47.73
+          ],
+          [
+            "120日高点",
+            72.96
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=90.0)但有增长(+399%)",
+        "估值阶梯强收缩(90.0→32.8→14.8),3年收缩84%,高PE起始,阶梯加分受限",
+        "PEG=0.23(严重低估,增速远超估值)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "细分题材:光缆/超导(内禀3)",
+        "短期(10日)加速强于中期(20日)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
+        "板块高度集中(82只上榜)"
+      ],
+      "news_reasons": [
+        "光纤光缆+超导材料",
+        "⚠️行业竞争+超导商业化不确定",
+        "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
+        "消息时效:近7日无消息",
+        "横盘(-0.8%)"
+      ],
+      "news_items": [
+        {
+          "source": "券商研报",
+          "time": "",
+          "sentiment": "小幅利空",
+          "content": "光纤光缆+超导材料",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日无消息",
+      "sub_theme": "光缆/超导",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 90.0,
+      "growth": 398.6,
+      "pe_ladder": {
+        "2026": 90.0,
+        "2027": 32.8,
+        "2028": 14.8
+      },
+      "cagr3": 45.8
+    },
+    {
       "name": "炬光科技",
       "code": "sh688167",
       "sector": "AI/半导体",
-      "price": 289.1,
-      "pct_chg": -0.72,
+      "price": 288.5,
+      "pct_chg": -0.93,
       "pe": 0,
-      "turnover": 3326524027.0,
+      "turnover": 3343643328.0,
       "score_news": 3,
       "score_tech": 2.5,
       "score_fund": 1.0,
@@ -15067,11 +15064,11 @@
         "boll_upper": 288.06,
         "boll_mid": 216.65,
         "boll_lower": 145.25,
-        "boll_pos": 100.7,
+        "boll_pos": 100.3,
         "boll_label": "突破上轨",
         "rsi": 77.2,
         "rsi_state": "超买",
-        "reason": "趋势日线多头+分位(51%); 放量(1.6x/3376亿); BOLL:突破上轨(101%); RSI77(超买,短线回调风险)",
+        "reason": "趋势日线多头+分位(51%); 放量(1.6x/3376亿); BOLL:突破上轨(100%); RSI77(超买,短线回调风险)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -15113,7 +15110,7 @@
       "theme_reasons": [
         "细分题材:激光器(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日+29.3%强于题材,超额明显",
         "板块高度集中(82只上榜)"
       ],
@@ -15121,7 +15118,7 @@
         "激光芯片+光束整形+半导体上游核心",
         "⚠️技术路线不确定+客户集中",
         "消息时效:近7日有消息/公告",
-        "横盘(-0.7%)"
+        "横盘(-0.9%)"
       ],
       "news_items": [
         {
@@ -15155,7 +15152,7 @@
       "price": 69.93,
       "pct_chg": -3.66,
       "pe": 22.06,
-      "turnover": 2834955338.0,
+      "turnover": 2854984618.0,
       "score_news": 0,
       "score_tech": 4.0,
       "score_fund": 2.0,
@@ -15229,7 +15226,7 @@
       "theme_reasons": [
         "细分题材:IDC/液冷算力(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "下跌-3.7%",
         "板块高度集中(82只上榜)"
       ],
@@ -15262,7 +15259,7 @@
       "price": 471.2,
       "pct_chg": 4.99,
       "pe": 199.25,
-      "turnover": 2768849672.0,
+      "turnover": 2784105714.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 2.0,
@@ -15332,7 +15329,7 @@
       "theme_reasons": [
         "细分题材:直写光刻设备(内禀5)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日+16.8%强于题材,超额明显",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
@@ -15363,10 +15360,10 @@
       "name": "金山办公",
       "code": "sh688111",
       "sector": "综合",
-      "price": 258.37,
-      "pct_chg": 1.15,
+      "price": 258.6,
+      "pct_chg": 1.24,
       "pe": 33.07,
-      "turnover": 2616110459.0,
+      "turnover": 2664221954.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 2.5,
@@ -15391,7 +15388,7 @@
         "boll_upper": 283.38,
         "boll_mid": 256.22,
         "boll_lower": 229.06,
-        "boll_pos": 54.0,
+        "boll_pos": 54.4,
         "boll_label": "中轨上方",
         "rsi": 60.1,
         "rsi_state": "中性",
@@ -15443,7 +15440,7 @@
       "news_reasons": [
         "无真实新闻/催化剂",
         "消息时效:近7日无消息",
-        "横盘(+1.1%)"
+        "横盘(+1.2%)"
       ],
       "news_items": [],
       "news_recency": "近7日无消息",
@@ -15466,10 +15463,10 @@
       "name": "星网锐捷",
       "code": "sz002396",
       "sector": "综合",
-      "price": 32.82,
-      "pct_chg": -3.21,
+      "price": 32.76,
+      "pct_chg": -3.39,
       "pe": 43.74,
-      "turnover": 3434768483.0,
+      "turnover": 3467286550.0,
       "score_news": 0,
       "score_tech": 1.9,
       "score_fund": 2.8,
@@ -15487,18 +15484,18 @@
         "wma20": 24.5,
         "trend": "双线多头",
         "bull_level": 3,
-        "position": 90.0,
+        "position": 89.0,
         "vol_ratio": 0.96,
         "amount_ratio": 1.02,
         "amount_today_yi": 34.7,
         "boll_upper": 36.01,
         "boll_mid": 29.87,
         "boll_lower": 23.72,
-        "boll_pos": 74.0,
+        "boll_pos": 73.5,
         "boll_label": "中轨上方",
         "rsi": 70.3,
         "rsi_state": "超买",
-        "reason": "双线多头+高位(90%); BOLL:中轨上方(74%); RSI70(超买,短线回调风险)",
+        "reason": "双线多头+高位(89%); BOLL:中轨上方(74%); RSI70(超买,短线回调风险)",
         "overall": "偏强",
         "explanations": [
           "日线和周线均线均多头排列，中长趋势向上",
@@ -15540,7 +15537,7 @@
         "板块:综合/其他(内禀3)",
         "题材近20日中位+25.5%,上涨占比92%(40只样本)",
         "个股近20日+3.6%弱于题材",
-        "下跌-3.2%",
+        "下跌-3.4%",
         "板块5只涨停,做多情绪强",
         "题材加速期,趋势延续",
         "板块高度集中(43只上榜)"
@@ -15548,7 +15545,7 @@
       "news_reasons": [
         "无真实新闻/催化剂",
         "消息时效:近7日有消息/公告",
-        "下跌-3.2%"
+        "下跌-3.4%"
       ],
       "news_items": [],
       "news_recency": "近7日有消息/公告",
@@ -15568,128 +15565,13 @@
       "cagr3": -13.8
     },
     {
-      "name": "大普微",
-      "code": "sz301666",
-      "sector": "AI/半导体",
-      "price": 466.12,
-      "pct_chg": 1.66,
-      "pe": 15663.06,
-      "turnover": 2163414362.0,
-      "score_news": 1.2,
-      "score_tech": 1.5,
-      "score_fund": 2.8,
-      "score_theme": 4.0,
-      "total": 10.3,
-      "rating": "B",
-      "advice": "波段操作，轻仓参与",
-      "tech": {
-        "ma5": 439.5,
-        "ma10": 436.2,
-        "ma20": 444.8,
-        "ma60": 589.1,
-        "wma5": null,
-        "wma10": null,
-        "wma20": null,
-        "trend": "偏空",
-        "bull_level": 0,
-        "position": 37.0,
-        "vol_ratio": 0.81,
-        "amount_ratio": 0.8,
-        "amount_today_yi": 17.3,
-        "boll_upper": 519.25,
-        "boll_mid": 444.84,
-        "boll_lower": 370.43,
-        "boll_pos": 64.3,
-        "boll_label": "中轨上方",
-        "rsi": 54.7,
-        "rsi_state": "中性",
-        "reason": "趋势走弱+中位(37%); BOLL:中轨上方(64%); RSI55(中性)",
-        "overall": "震荡",
-        "explanations": [
-          "BOLL中轨上方运行，多头占优"
-        ],
-        "support_levels": [
-          [
-            "MA60均线",
-            589.07
-          ],
-          [
-            "MA20均线",
-            444.84
-          ],
-          [
-            "BOLL下轨",
-            370.43
-          ]
-        ],
-        "resistance_levels": [
-          [
-            "BOLL上轨",
-            519.25
-          ],
-          [
-            "MA60均线",
-            589.07
-          ],
-          [
-            "120日高点",
-            888.99
-          ]
-        ],
-        "vol_price_analysis": "量价基本平衡"
-      },
-      "fund_reasons": [
-        "估值偏高(FwdPE=74.6)+增长一般(+-151%)",
-        "估值阶梯强收缩(74.6→37.3→22.7),3年收缩70%,高PE起始,阶梯加分受限",
-        "持续性:盈利下滑,持续性偏弱"
-      ],
-      "theme_reasons": [
-        "细分题材:SSD控制器(内禀4)",
-        "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
-        "题材启动期,可关注",
-        "板块高度集中(82只上榜)"
-      ],
-      "news_reasons": [
-        "存储控制器+企业级SSD+PCIe",
-        "⚠️存储行业周期+竞争加剧",
-        "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
-        "消息时效:近7日无消息",
-        "横盘(+1.7%)"
-      ],
-      "news_items": [
-        {
-          "source": "券商研报",
-          "time": "",
-          "sentiment": "中性",
-          "content": "存储控制器+企业级SSD+PCIe",
-          "url": ""
-        }
-      ],
-      "news_recency": "近7日无消息",
-      "sub_theme": "SSD控制器",
-      "lifecycle": "启动期",
-      "score_sustain": 2.0,
-      "sustain_note": "盈利下滑,持续性偏弱",
-      "is_cyclic": false,
-      "is_storage_mod": false,
-      "fwd_pe": 74.6,
-      "growth": -150.9,
-      "pe_ladder": {
-        "2026": 74.6,
-        "2027": 37.3,
-        "2028": 22.7
-      },
-      "cagr3": null
-    },
-    {
       "name": "通富微电",
       "code": "sz002156",
       "sector": "AI/半导体",
-      "price": 70.67,
-      "pct_chg": 2.04,
+      "price": 70.66,
+      "pct_chg": 2.02,
       "pe": 74.14,
-      "turnover": 12939886242.0,
+      "turnover": 13038866912.0,
       "score_news": 1.2,
       "score_tech": 2.5,
       "score_fund": 3.0,
@@ -15710,11 +15592,11 @@
         "position": 79.0,
         "vol_ratio": 0.7,
         "amount_ratio": 0.72,
-        "amount_today_yi": 128.9,
+        "amount_today_yi": 129.8,
         "boll_upper": 78.26,
         "boll_mid": 64.28,
         "boll_lower": 50.3,
-        "boll_pos": 72.9,
+        "boll_pos": 72.8,
         "boll_label": "中轨上方",
         "rsi": 61.2,
         "rsi_state": "中性",
@@ -15800,10 +15682,10 @@
       "name": "国瓷材料",
       "code": "sz300285",
       "sector": "基础材料",
-      "price": 74.24,
-      "pct_chg": 0.98,
+      "price": 74.26,
+      "pct_chg": 1.01,
       "pe": 115.44,
-      "turnover": 9587477732.0,
+      "turnover": 9648166717.0,
       "score_news": 1.2,
       "score_tech": 2.5,
       "score_fund": 1,
@@ -15828,7 +15710,7 @@
         "boll_upper": 78.89,
         "boll_mid": 65.84,
         "boll_lower": 52.79,
-        "boll_pos": 82.2,
+        "boll_pos": 82.3,
         "boll_label": "上轨附近",
         "rsi": 70.6,
         "rsi_state": "超买",
@@ -15914,13 +15796,137 @@
       "cagr3": 8.8
     },
     {
+      "name": "芯原股份",
+      "code": "sh688521",
+      "sector": "AI/半导体",
+      "price": 213.3,
+      "pct_chg": -5.75,
+      "pe": 0,
+      "turnover": 6902626771.0,
+      "score_news": 2.5,
+      "score_tech": 3.5,
+      "score_fund": 1.0,
+      "score_theme": 3.5,
+      "total": 10.2,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 212.9,
+        "ma10": 215.1,
+        "ma20": 210.6,
+        "ma60": 251.0,
+        "wma5": 213.2,
+        "wma10": 250.2,
+        "wma20": 249.3,
+        "trend": "偏多",
+        "bull_level": 0,
+        "position": 21.0,
+        "vol_ratio": 1.02,
+        "amount_ratio": 1.04,
+        "amount_today_yi": 68.5,
+        "boll_upper": 242.51,
+        "boll_mid": 210.61,
+        "boll_lower": 178.71,
+        "boll_pos": 54.2,
+        "boll_label": "中轨上方",
+        "rsi": 56.8,
+        "rsi_state": "中性",
+        "reason": "偏多+低位(21%)+BOLL通道内; BOLL:中轨上方(54%); RSI57(中性)",
+        "overall": "震荡",
+        "explanations": [
+          "BOLL中轨上方运行，多头占优"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            250.99
+          ],
+          [
+            "MA20均线",
+            210.61
+          ],
+          [
+            "BOLL下轨",
+            178.71
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            242.51
+          ],
+          [
+            "MA60均线",
+            250.99
+          ],
+          [
+            "120日高点",
+            371.14
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=593.5)",
+        "估值阶梯强收缩(593.5→159.1→77.7),3年收缩87%,高PE起始,阶梯加分受限",
+        "PEG=127.91(严重高估)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "细分题材:芯片IP(内禀4)",
+        "短期(10日)加速强于中期(20日)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
+        "个股近20日-12.8%弱于题材",
+        "下跌-5.8%",
+        "板块高度集中(82只上榜)"
+      ],
+      "news_reasons": [
+        "芯片设计IP平台+SoC定制服务",
+        "⚠️IP授权竞争+盈利周期长",
+        "公告确认:利好事件",
+        "消息时效:近7日有消息/公告",
+        "下跌-5.8%"
+      ],
+      "news_items": [
+        {
+          "source": "券商研报",
+          "time": "",
+          "sentiment": "中性",
+          "content": "芯片设计IP平台+SoC定制服务",
+          "url": ""
+        },
+        {
+          "source": "交易所公告(akshare)",
+          "time": "",
+          "sentiment": "利好",
+          "content": "公告检测到利好关键词×1",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有消息/公告",
+      "sub_theme": "芯片IP",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 593.5,
+      "growth": 4.6,
+      "pe_ladder": {
+        "2026": 593.5,
+        "2027": 159.1,
+        "2028": 77.7
+      },
+      "cagr3": null
+    },
+    {
       "name": "景旺电子",
       "code": "sh603228",
       "sector": "电子制造",
       "price": 97.9,
       "pct_chg": 1.0,
       "pe": 86.07,
-      "turnover": 4937716920.0,
+      "turnover": 5003985430.0,
       "score_news": 0,
       "score_tech": 1.1,
       "score_fund": 2.8,
@@ -16023,7 +16029,7 @@
       "price": 19.5,
       "pct_chg": 2.09,
       "pe": 57.48,
-      "turnover": 3237098825.0,
+      "turnover": 3261413375.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 1.8,
@@ -16128,10 +16134,10 @@
       "name": "唯特偶",
       "code": "sz301319",
       "sector": "综合",
-      "price": 130.05,
-      "pct_chg": 5.57,
+      "price": 130.0,
+      "pct_chg": 5.53,
       "pe": 267.43,
-      "turnover": 2768687670.0,
+      "turnover": 2792256670.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 1.8,
@@ -16156,7 +16162,7 @@
         "boll_upper": 130.36,
         "boll_mid": 101.84,
         "boll_lower": 73.33,
-        "boll_pos": 99.5,
+        "boll_pos": 99.4,
         "boll_label": "上轨附近",
         "rsi": 72.2,
         "rsi_state": "超买",
@@ -16202,7 +16208,7 @@
         "板块:综合/其他(内禀3)",
         "题材近20日中位+25.5%,上涨占比92%(40只样本)",
         "个股近20日+35.8%强于题材,超额明显",
-        "大涨+5.6%验证",
+        "大涨+5.5%验证",
         "板块5只涨停,做多情绪强",
         "⚠️题材高潮期,注意追高",
         "板块高度集中(43只上榜)"
@@ -16210,7 +16216,7 @@
       "news_reasons": [
         "无真实新闻/催化剂",
         "消息时效:近7日无消息",
-        "上涨+5.6%"
+        "上涨+5.5%"
       ],
       "news_items": [],
       "news_recency": "近7日无消息",
@@ -16233,10 +16239,10 @@
       "name": "太辰光",
       "code": "sz300570",
       "sector": "AI/半导体",
-      "price": 199.97,
-      "pct_chg": 3.18,
+      "price": 199.27,
+      "pct_chg": 2.82,
       "pe": 149.9,
-      "turnover": 5602557871.0,
+      "turnover": 5658068913.0,
       "score_news": 3,
       "score_tech": 2,
       "score_fund": 1.0,
@@ -16261,11 +16267,11 @@
         "boll_upper": 186.49,
         "boll_mid": 141.54,
         "boll_lower": 96.58,
-        "boll_pos": 115.0,
+        "boll_pos": 114.2,
         "boll_label": "突破上轨",
         "rsi": 84.0,
         "rsi_state": "超买",
-        "reason": "趋势日线多头+分位(54%); BOLL:突破上轨(115%); RSI84(超买,短线回调风险)",
+        "reason": "趋势日线多头+分位(54%); BOLL:突破上轨(114%); RSI84(超买,短线回调风险)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -16307,7 +16313,7 @@
       "theme_reasons": [
         "细分题材:光连接器(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日+30.1%强于题材,超额明显",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
@@ -16316,7 +16322,7 @@
         "光无源器件+光纤连接器+数据中心",
         "⚠️光通信竞争+行业周期",
         "消息时效:近7日有消息/公告",
-        "上涨+3.2%"
+        "横盘(+2.8%)"
       ],
       "news_items": [
         {
@@ -16347,10 +16353,10 @@
       "name": "腾景科技",
       "code": "sh688195",
       "sector": "综合",
-      "price": 185.98,
-      "pct_chg": 10.71,
+      "price": 185.9,
+      "pct_chg": 10.66,
       "pe": 467.46,
-      "turnover": 3358068436.0,
+      "turnover": 3375443207.0,
       "score_news": 1,
       "score_tech": 2.5,
       "score_fund": 1.0,
@@ -16375,7 +16381,7 @@
         "boll_upper": 180.35,
         "boll_mid": 134.87,
         "boll_lower": 89.39,
-        "boll_pos": 106.2,
+        "boll_pos": 106.1,
         "boll_label": "突破上轨",
         "rsi": 84.9,
         "rsi_state": "超买",
@@ -16450,13 +16456,126 @@
       "cagr3": 11.9
     },
     {
+      "name": "盛美上海",
+      "code": "sh688082",
+      "sector": "AI/半导体",
+      "price": 337.4,
+      "pct_chg": 5.93,
+      "pe": 96.4,
+      "turnover": 3183748883.0,
+      "score_news": 3,
+      "score_tech": 2.0,
+      "score_fund": 0,
+      "score_theme": 5.0,
+      "total": 10.0,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 316.2,
+        "ma10": 306.3,
+        "ma20": 293.6,
+        "ma60": 319.3,
+        "wma5": 300.4,
+        "wma10": 334.9,
+        "wma20": 264.9,
+        "trend": "日线多头",
+        "bull_level": 1,
+        "position": 64.0,
+        "vol_ratio": 0.91,
+        "amount_ratio": 0.99,
+        "amount_today_yi": 3254.4,
+        "boll_upper": 339.75,
+        "boll_mid": 293.59,
+        "boll_lower": 247.43,
+        "boll_pos": 97.5,
+        "boll_label": "上轨附近",
+        "rsi": 66.5,
+        "rsi_state": "中性",
+        "reason": "日线多头+相对高位(64%)+BOLL通道内; BOLL:上轨附近(97%); RSI66(中性)",
+        "overall": "偏强",
+        "explanations": [
+          "日线多头排列但周线未确认，短线偏强",
+          "接近BOLL上轨压力位，上涨空间有限"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            319.26
+          ],
+          [
+            "MA20均线",
+            293.59
+          ],
+          [
+            "BOLL下轨",
+            247.43
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            339.75
+          ],
+          [
+            "120日高点",
+            447.33
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=89.8)",
+        "估值阶梯合理收缩(89.8→74.9→64.8),3年收缩28%",
+        "PEG=8.96(严重高估)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "细分题材:半导体设备(内禀4)",
+        "短期(10日)加速强于中期(20日)",
+        "题材近20日中位+3.7%,上涨占比67%(3只样本)",
+        "大涨+5.9%验证",
+        "题材加速期,趋势延续",
+        "板块高度集中(82只上榜)"
+      ],
+      "news_reasons": [
+        "半导体清洗设备国产替代+单片清洗设备",
+        "⚠️设备验证周期长+技术迭代",
+        "消息时效:近7日有消息/公告",
+        "上涨+5.9%"
+      ],
+      "news_items": [
+        {
+          "source": "券商研报",
+          "time": "",
+          "sentiment": "中性",
+          "content": "半导体清洗设备国产替代+单片清洗设备",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有消息/公告",
+      "sub_theme": "半导体设备",
+      "lifecycle": "加速期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 89.8,
+      "growth": 10.0,
+      "pe_ladder": {
+        "2026": 89.8,
+        "2027": 74.9,
+        "2028": 64.8
+      },
+      "cagr3": 20.9
+    },
+    {
       "name": "罗博特科",
       "code": "sz300757",
       "sector": "AI/半导体",
-      "price": 546.39,
-      "pct_chg": 2.9,
+      "price": 546.51,
+      "pct_chg": 2.92,
       "pe": 0,
-      "turnover": 4030325342.0,
+      "turnover": 4064883355.0,
       "score_news": 1.2,
       "score_tech": 2.5,
       "score_fund": 0.8,
@@ -16474,18 +16593,18 @@
         "wma20": 530.9,
         "trend": "日线多头",
         "bull_level": 1,
-        "position": 59.0,
+        "position": 60.0,
         "vol_ratio": 0.88,
         "amount_ratio": 1.0,
         "amount_today_yi": 41.0,
         "boll_upper": 561.19,
         "boll_mid": 459.42,
         "boll_lower": 357.64,
-        "boll_pos": 92.7,
+        "boll_pos": 92.8,
         "boll_label": "上轨附近",
         "rsi": 71.6,
         "rsi_state": "超买",
-        "reason": "日线多头+中位(59%)+BOLL通道内; BOLL:上轨附近(93%); RSI72(超买,短线回调风险)",
+        "reason": "日线多头+中位(60%)+BOLL通道内; BOLL:上轨附近(93%); RSI72(超买,短线回调风险)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -16563,13 +16682,129 @@
       "cagr3": null
     },
     {
+      "name": "联讯仪器",
+      "code": "sh688808",
+      "sector": "AI/半导体",
+      "price": 2372.0,
+      "pct_chg": 5.19,
+      "pe": 891.3,
+      "turnover": 2959211116.0,
+      "score_news": 1.6,
+      "score_tech": 1.8,
+      "score_fund": 1.0,
+      "score_theme": 5.0,
+      "total": 9.9,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 2261.6,
+        "ma10": 2190.3,
+        "ma20": 2011.1,
+        "ma60": 2086.9,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线多头",
+        "bull_level": 1,
+        "position": 83.0,
+        "vol_ratio": 0.63,
+        "amount_ratio": 0.73,
+        "amount_today_yi": 29.7,
+        "boll_upper": 2467.32,
+        "boll_mid": 2011.12,
+        "boll_lower": 1554.91,
+        "boll_pos": 89.6,
+        "boll_label": "上轨附近",
+        "rsi": 69.4,
+        "rsi_state": "中性",
+        "reason": "日线多头+高位(83%)+BOLL触碰上轨; BOLL:上轨附近(90%); RSI69(中性)",
+        "overall": "偏强",
+        "explanations": [
+          "日线多头排列但周线未确认，短线偏强",
+          "接近BOLL上轨压力位，上涨空间有限"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            2086.91
+          ],
+          [
+            "MA20均线",
+            2011.12
+          ],
+          [
+            "BOLL下轨",
+            1554.91
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            2467.32
+          ],
+          [
+            "120日高点",
+            2700.0
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡",
+        "industry_prospect": "行业前景加分+0.5(优质赛道+一线标的)"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=290.9)",
+        "估值阶梯强收缩(290.9→133.7→82.5),3年收缩72%,高PE起始,阶梯加分受限",
+        "PEG=10.19(严重高估)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "细分题材:半导体测试(内禀4)",
+        "短期(10日)加速强于中期(20日)",
+        "题材近20日中位+6.8%,上涨占比50%(2只样本)",
+        "个股近20日+19.0%强于题材,超额明显",
+        "大涨+5.2%验证",
+        "题材加速期,趋势延续",
+        "板块高度集中(82只上榜)"
+      ],
+      "news_reasons": [
+        "半导体测试设备龙头+射频/SoC测试+国产替代加速",
+        "⚠️设备验证周期+客户集中",
+        "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
+        "消息时效:近7日无消息",
+        "上涨+5.2%"
+      ],
+      "news_items": [
+        {
+          "source": "券商研报",
+          "time": "",
+          "sentiment": "一般利好",
+          "content": "半导体测试设备龙头+射频/SoC测试+国产替代加速",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日无消息",
+      "sub_theme": "半导体测试",
+      "lifecycle": "加速期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 290.9,
+      "growth": 28.5,
+      "pe_ladder": {
+        "2026": 290.9,
+        "2027": 133.7,
+        "2028": 82.5
+      },
+      "cagr3": null
+    },
+    {
       "name": "紫光股份",
       "code": "sz000938",
       "sector": "AI/半导体",
       "price": 39.25,
       "pct_chg": -4.34,
       "pe": 52.83,
-      "turnover": 10724688190.0,
+      "turnover": 10839525840.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 3.0,
@@ -16590,7 +16825,7 @@
         "position": 74.0,
         "vol_ratio": 0.88,
         "amount_ratio": 0.89,
-        "amount_today_yi": 106.6,
+        "amount_today_yi": 107.8,
         "boll_upper": 44.58,
         "boll_mid": 38.49,
         "boll_lower": 32.39,
@@ -16639,7 +16874,7 @@
       "theme_reasons": [
         "细分题材:服务器/网络设备(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日-5.3%弱于题材",
         "下跌-4.3%",
         "板块高度集中(82只上榜)"
@@ -16670,10 +16905,10 @@
       "name": "绿的谐波",
       "code": "sh688017",
       "sector": "高端制造",
-      "price": 380.76,
-      "pct_chg": 5.13,
+      "price": 380.8,
+      "pct_chg": 5.14,
       "pe": 510.5,
-      "turnover": 5625180771.0,
+      "turnover": 5676901027.0,
       "score_news": 1.2,
       "score_tech": 2.0,
       "score_fund": 1.0,
@@ -16702,7 +16937,7 @@
         "boll_label": "上轨附近",
         "rsi": 72.4,
         "rsi_state": "超买",
-        "reason": "日线多头+相对高位(65%)+BOLL通道内; BOLL:上轨附近(95%); RSI72(超买,短线回调风险)",
+        "reason": "日线多头+相对高位(65%)+BOLL通道内; BOLL:上轨附近(96%); RSI72(超买,短线回调风险)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -16789,7 +17024,7 @@
       "price": 6.16,
       "pct_chg": -4.2,
       "pe": 14.18,
-      "turnover": 2896979853.0,
+      "turnover": 2936918712.0,
       "score_news": 1,
       "score_tech": 3.0,
       "score_fund": 3.5,
@@ -16905,10 +17140,10 @@
       "name": "行云科技",
       "code": "sz300209",
       "sector": "综合",
-      "price": 36.48,
-      "pct_chg": -7.18,
+      "price": 36.47,
+      "pct_chg": -7.2,
       "pe": 0,
-      "turnover": 4798195965.0,
+      "turnover": 4855245986.0,
       "score_news": 0,
       "score_tech": 1.9,
       "score_fund": 2,
@@ -17004,10 +17239,10 @@
       "name": "锐捷网络",
       "code": "sz301165",
       "sector": "综合",
-      "price": 136.92,
-      "pct_chg": -7.49,
+      "price": 136.99,
+      "pct_chg": -7.44,
       "pe": 162.57,
-      "turnover": 4018639303.0,
+      "turnover": 4172215230.0,
       "score_news": 0,
       "score_tech": 1.9,
       "score_fund": 2.0,
@@ -17032,7 +17267,7 @@
         "boll_upper": 149.21,
         "boll_mid": 123.53,
         "boll_lower": 97.85,
-        "boll_pos": 76.1,
+        "boll_pos": 76.2,
         "boll_label": "中轨上方",
         "rsi": 68.4,
         "rsi_state": "中性",
@@ -17077,7 +17312,7 @@
       "theme_reasons": [
         "板块:综合/其他(内禀3)",
         "题材近20日中位+25.5%,上涨占比92%(40只样本)",
-        "大跌-7.5%,短期降温",
+        "大跌-7.4%,短期降温",
         "板块5只涨停,做多情绪强",
         "题材加速期,趋势延续",
         "板块高度集中(43只上榜)"
@@ -17085,7 +17320,7 @@
       "news_reasons": [
         "无真实新闻/催化剂",
         "消息时效:近7日有消息/公告",
-        "大跌-7.5%(价格确认利空信号)"
+        "大跌-7.4%(价格确认利空信号)"
       ],
       "news_items": [],
       "news_recency": "近7日有消息/公告",
@@ -17111,7 +17346,7 @@
       "price": 290.28,
       "pct_chg": -6.39,
       "pe": 298.07,
-      "turnover": 6672723269.0,
+      "turnover": 6751613245.0,
       "score_news": 1.0,
       "score_tech": 1.5,
       "score_fund": 1.0,
@@ -17222,10 +17457,10 @@
       "name": "天通股份",
       "code": "sh600330",
       "sector": "AI/半导体",
-      "price": 29.4,
-      "pct_chg": 6.99,
+      "price": 29.39,
+      "pct_chg": 6.95,
       "pe": 0,
-      "turnover": 5898406600.0,
+      "turnover": 5936093397.0,
       "score_news": 3,
       "score_tech": 2,
       "score_fund": 0.8,
@@ -17250,7 +17485,7 @@
         "boll_upper": 28.38,
         "boll_mid": 21.09,
         "boll_lower": 13.79,
-        "boll_pos": 107.0,
+        "boll_pos": 106.9,
         "boll_label": "突破上轨",
         "rsi": 85.8,
         "rsi_state": "超买",
@@ -17295,7 +17530,7 @@
       "theme_reasons": [
         "细分题材:蓝宝石/压电晶体(内禀3)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日+53.6%强于题材,超额明显",
         "大涨+7.0%验证",
         "题材启动期,可关注",
@@ -17339,7 +17574,7 @@
       "price": 175.5,
       "pct_chg": 7.42,
       "pe": 197.2,
-      "turnover": 3188716792.0,
+      "turnover": 3206364546.0,
       "score_news": 1,
       "score_tech": 2.5,
       "score_fund": 0.8,
@@ -17413,7 +17648,7 @@
       "theme_reasons": [
         "细分题材:光传输/DCI(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日+28.3%强于题材,超额明显",
         "大涨+7.4%验证",
         "题材启动期,可关注",
@@ -17448,7 +17683,7 @@
       "price": 6.82,
       "pct_chg": 4.12,
       "pe": 0,
-      "turnover": 2587262808.0,
+      "turnover": 2606448150.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 1,
@@ -17549,7 +17784,7 @@
       "price": 22.33,
       "pct_chg": 6.59,
       "pe": 19.48,
-      "turnover": 2475005771.0,
+      "turnover": 2498968094.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 1.0,
@@ -17651,10 +17886,10 @@
       "name": "宝鼎科技",
       "code": "sz002552",
       "sector": "综合",
-      "price": 57.57,
-      "pct_chg": -7.14,
+      "price": 57.6,
+      "pct_chg": -7.1,
       "pe": 129.69,
-      "turnover": 2246518710.0,
+      "turnover": 2285030070.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 1.5,
@@ -17679,7 +17914,7 @@
         "boll_upper": 65.56,
         "boll_mid": 45.06,
         "boll_lower": 24.57,
-        "boll_pos": 80.5,
+        "boll_pos": 80.6,
         "boll_label": "上轨附近",
         "rsi": 74.4,
         "rsi_state": "超买",
@@ -17751,10 +17986,10 @@
       "name": "斯迪克",
       "code": "sz300806",
       "sector": "电子材料",
-      "price": 53.99,
-      "pct_chg": 4.73,
+      "price": 54.02,
+      "pct_chg": 4.79,
       "pe": 519.19,
-      "turnover": 2158513922.0,
+      "turnover": 2177724514.0,
       "score_news": 0.5,
       "score_tech": 2,
       "score_fund": 1.0,
@@ -17779,7 +18014,7 @@
         "boll_upper": 53.63,
         "boll_mid": 45.18,
         "boll_lower": 36.74,
-        "boll_pos": 102.1,
+        "boll_pos": 102.3,
         "boll_label": "突破上轨",
         "rsi": 72.4,
         "rsi_state": "超买",
@@ -17836,7 +18071,7 @@
       "news_reasons": [
         "公告确认:利好事件",
         "消息时效:近7日有消息/公告",
-        "上涨+4.7%"
+        "上涨+4.8%"
       ],
       "news_items": [
         {
@@ -17864,129 +18099,13 @@
       "cagr3": -41.7
     },
     {
-      "name": "联讯仪器",
-      "code": "sh688808",
-      "sector": "AI/半导体",
-      "price": 2373.0,
-      "pct_chg": 5.23,
-      "pe": 891.3,
-      "turnover": 2931835864.0,
-      "score_news": 1.6,
-      "score_tech": 0.8,
-      "score_fund": 1.0,
-      "score_theme": 5.0,
-      "total": 9.1,
-      "rating": "B",
-      "advice": "波段操作，轻仓参与",
-      "tech": {
-        "ma5": 2199.6,
-        "ma10": 2148.0,
-        "ma20": 1992.2,
-        "ma60": 2077.6,
-        "wma5": null,
-        "wma10": null,
-        "wma20": null,
-        "trend": "日线多头",
-        "bull_level": 1,
-        "position": 83.0,
-        "vol_ratio": 0.56,
-        "amount_ratio": 0.63,
-        "amount_today_yi": 19.0,
-        "boll_upper": 2417.26,
-        "boll_mid": 1992.17,
-        "boll_lower": 1567.08,
-        "boll_pos": 94.8,
-        "boll_label": "上轨附近",
-        "rsi": 63.9,
-        "rsi_state": "中性",
-        "reason": "日线多头+高位(83%)+BOLL触碰上轨; 缩量(0.6x); BOLL:上轨附近(95%); RSI64(中性)",
-        "overall": "偏强",
-        "explanations": [
-          "日线多头排列但周线未确认，短线偏强",
-          "接近BOLL上轨压力位，上涨空间有限"
-        ],
-        "support_levels": [
-          [
-            "MA60均线",
-            2077.6
-          ],
-          [
-            "MA20均线",
-            1992.17
-          ],
-          [
-            "BOLL下轨",
-            1567.08
-          ]
-        ],
-        "resistance_levels": [
-          [
-            "BOLL上轨",
-            2417.26
-          ],
-          [
-            "120日高点",
-            2700.0
-          ]
-        ],
-        "vol_price_analysis": "缩量上涨，上涨动力不足",
-        "industry_prospect": "行业前景加分+0.5(优质赛道+一线标的)"
-      },
-      "fund_reasons": [
-        "高估值(FwdPE=290.9)",
-        "估值阶梯强收缩(290.9→133.7→82.5),3年收缩72%,高PE起始,阶梯加分受限",
-        "PEG=10.19(严重高估)",
-        "持续性:盈利持续性中性"
-      ],
-      "theme_reasons": [
-        "细分题材:半导体测试(内禀4)",
-        "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+13.4%,上涨占比50%(2只样本)",
-        "个股近20日+32.2%强于题材,超额明显",
-        "大涨+5.2%验证",
-        "⚠️题材高潮期,注意追高",
-        "板块高度集中(82只上榜)"
-      ],
-      "news_reasons": [
-        "半导体测试设备龙头+射频/SoC测试+国产替代加速",
-        "⚠️设备验证周期+客户集中",
-        "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
-        "消息时效:近7日无消息",
-        "上涨+5.2%"
-      ],
-      "news_items": [
-        {
-          "source": "券商研报",
-          "time": "",
-          "sentiment": "一般利好",
-          "content": "半导体测试设备龙头+射频/SoC测试+国产替代加速",
-          "url": ""
-        }
-      ],
-      "news_recency": "近7日无消息",
-      "sub_theme": "半导体测试",
-      "lifecycle": "高潮期",
-      "score_sustain": 3.0,
-      "sustain_note": "盈利持续性中性",
-      "is_cyclic": false,
-      "is_storage_mod": false,
-      "fwd_pe": 290.9,
-      "growth": 28.5,
-      "pe_ladder": {
-        "2026": 290.9,
-        "2027": 133.7,
-        "2028": 82.5
-      },
-      "cagr3": null
-    },
-    {
       "name": "誉衡药业",
       "code": "sz002437",
       "sector": "综合",
-      "price": 4.79,
-      "pct_chg": -3.81,
+      "price": 4.76,
+      "pct_chg": -4.42,
       "pe": 25.79,
-      "turnover": 3867729623.0,
+      "turnover": 3925831406.0,
       "score_news": 0,
       "score_tech": 2.3,
       "score_fund": 1.0,
@@ -18004,23 +18123,23 @@
         "wma20": 3.2,
         "trend": "日线多头",
         "bull_level": 1,
-        "position": 93.0,
+        "position": 91.0,
         "vol_ratio": 2.47,
         "amount_ratio": 2.78,
         "amount_today_yi": 38.7,
         "boll_upper": 4.76,
         "boll_mid": 3.34,
         "boll_lower": 1.93,
-        "boll_pos": 101.1,
+        "boll_pos": 100.1,
         "boll_label": "突破上轨",
         "rsi": 85.3,
         "rsi_state": "超买",
-        "reason": "日线多头+高位(93%); 放量(2.8x/39亿); BOLL:突破上轨(101%); RSI85(超买,短线回调风险)",
+        "reason": "日线多头+高位(91%); 放量(2.8x/39亿); BOLL:突破上轨(100%); RSI85(超买,短线回调风险)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
           "价格突破BOLL上轨，短期超买注意回调",
-          "价格处于120日93%分位，接近区间高点",
+          "价格处于120日91%分位，接近区间高点",
           "RSI=85 进入超买区(>70)，短线回调概率上升"
         ],
         "support_levels": [
@@ -18059,7 +18178,7 @@
         "板块:综合/其他(内禀3)",
         "题材近20日中位+25.5%,上涨占比92%(40只样本)",
         "个股近20日+68.2%强于题材,超额明显",
-        "下跌-3.8%",
+        "下跌-4.4%",
         "板块5只涨停,做多情绪强",
         "题材加速期,趋势延续",
         "板块高度集中(43只上榜)"
@@ -18067,7 +18186,7 @@
       "news_reasons": [
         "无真实新闻/催化剂",
         "消息时效:近7日有消息/公告",
-        "下跌-3.8%"
+        "下跌-4.4%"
       ],
       "news_items": [],
       "news_recency": "近7日有消息/公告",
@@ -18089,10 +18208,10 @@
       "name": "长光华芯",
       "code": "sh688048",
       "sector": "AI/半导体",
-      "price": 336.92,
-      "pct_chg": 1.21,
+      "price": 336.95,
+      "pct_chg": 1.22,
       "pe": 1760.29,
-      "turnover": 3254790574.0,
+      "turnover": 3277352072.0,
       "score_news": 1.2,
       "score_tech": 2.5,
       "score_fund": 1.0,
@@ -18117,7 +18236,7 @@
         "boll_upper": 345.36,
         "boll_mid": 280.94,
         "boll_lower": 216.51,
-        "boll_pos": 93.4,
+        "boll_pos": 93.5,
         "boll_label": "上轨附近",
         "rsi": 73.9,
         "rsi_state": "超买",
@@ -18167,7 +18286,7 @@
       "theme_reasons": [
         "细分题材:激光芯片(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
       ],
@@ -18207,10 +18326,10 @@
       "name": "哈药股份",
       "code": "sh600664",
       "sector": "综合",
-      "price": 9.1,
-      "pct_chg": 1.0,
+      "price": 9.12,
+      "pct_chg": 1.22,
       "pe": 74.14,
-      "turnover": 2763033978.0,
+      "turnover": 2831595958.0,
       "score_news": 0,
       "score_tech": 1.1,
       "score_fund": 1.8,
@@ -18235,11 +18354,11 @@
         "boll_upper": 9.63,
         "boll_mid": 6.92,
         "boll_lower": 4.21,
-        "boll_pos": 90.3,
+        "boll_pos": 90.7,
         "boll_label": "上轨附近",
         "rsi": 88.7,
         "rsi_state": "超买",
-        "reason": "双线多头+极值高位(100%)+BOLL触碰上轨(超买); BOLL:上轨附近(90%); RSI89(超买,短线回调风险)",
+        "reason": "双线多头+极值高位(100%)+BOLL触碰上轨(超买); BOLL:上轨附近(91%); RSI89(超买,短线回调风险)",
         "overall": "震荡",
         "explanations": [
           "日线和周线均线均多头排列，中长趋势向上",
@@ -18289,7 +18408,7 @@
       "news_reasons": [
         "无真实新闻/催化剂",
         "消息时效:近7日有消息/公告",
-        "横盘(+1.0%)"
+        "横盘(+1.2%)"
       ],
       "news_items": [],
       "news_recency": "近7日有消息/公告",
@@ -18312,10 +18431,10 @@
       "name": "江钨装备",
       "code": "sh600397",
       "sector": "综合",
-      "price": 18.83,
-      "pct_chg": 0.86,
+      "price": 18.84,
+      "pct_chg": 0.91,
       "pe": 0,
-      "turnover": 2277203414.0,
+      "turnover": 2298409718.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 0.8,
@@ -18340,7 +18459,7 @@
         "boll_upper": 20.19,
         "boll_mid": 15.69,
         "boll_lower": 11.2,
-        "boll_pos": 84.9,
+        "boll_pos": 85.0,
         "boll_label": "上轨附近",
         "rsi": 71.5,
         "rsi_state": "超买",
@@ -18418,7 +18537,7 @@
       "price": 1152.0,
       "pct_chg": 516.44,
       "pe": 276.83,
-      "turnover": 7235410577.0,
+      "turnover": 7272152465.0,
       "score_news": 1.5,
       "score_tech": 2,
       "score_fund": 0,
@@ -18475,7 +18594,7 @@
       "price": 6.27,
       "pct_chg": 7.73,
       "pe": 41.04,
-      "turnover": 4511405419.0,
+      "turnover": 4570048102.0,
       "score_news": 1,
       "score_tech": 2.5,
       "score_fund": 0,
@@ -18577,10 +18696,10 @@
       "name": "先导基电",
       "code": "sh600641",
       "sector": "综合",
-      "price": 35.79,
-      "pct_chg": -0.75,
+      "price": 35.8,
+      "pct_chg": -0.72,
       "pe": 793.34,
-      "turnover": 2919699214.0,
+      "turnover": 2938433354.0,
       "score_news": 0,
       "score_tech": 3.0,
       "score_fund": 0.8,
@@ -18657,7 +18776,7 @@
       "news_reasons": [
         "无真实新闻/催化剂",
         "消息时效:近7日有消息/公告",
-        "横盘(-0.8%)"
+        "横盘(-0.7%)"
       ],
       "news_items": [],
       "news_recency": "近7日有消息/公告",
@@ -18680,10 +18799,10 @@
       "name": "立昂微",
       "code": "sh605358",
       "sector": "AI/半导体",
-      "price": 49.6,
-      "pct_chg": 6.46,
+      "price": 49.62,
+      "pct_chg": 6.5,
       "pe": 558.93,
-      "turnover": 4793634374.0,
+      "turnover": 4818045876.0,
       "score_news": 1.2,
       "score_tech": 2,
       "score_fund": 1.0,
@@ -18708,11 +18827,11 @@
         "boll_upper": 49.4,
         "boll_mid": 42.32,
         "boll_lower": 35.24,
-        "boll_pos": 101.4,
+        "boll_pos": 101.6,
         "boll_label": "突破上轨",
         "rsi": 70.2,
         "rsi_state": "超买",
-        "reason": "趋势日线多头+分位(37%); BOLL:突破上轨(101%); RSI70(超买,短线回调风险)",
+        "reason": "趋势日线多头+分位(37%); BOLL:突破上轨(102%); RSI70(超买,短线回调风险)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -18802,7 +18921,7 @@
       "price": 185.25,
       "pct_chg": -5.49,
       "pe": 0,
-      "turnover": 3433897844.0,
+      "turnover": 3451033469.0,
       "score_news": 1,
       "score_tech": 2.5,
       "score_fund": 0.8,
@@ -18876,7 +18995,7 @@
       "theme_reasons": [
         "细分题材:SSD/视频芯片(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日+15.8%强于题材,超额明显",
         "下跌-5.5%",
         "板块高度集中(82只上榜)"
@@ -18914,127 +19033,13 @@
       "cagr3": null
     },
     {
-      "name": "盛美上海",
-      "code": "sh688082",
-      "sector": "AI/半导体",
-      "price": 337.0,
-      "pct_chg": 5.8,
-      "pe": 96.4,
-      "turnover": 3163947552.0,
-      "score_news": 1.2,
-      "score_tech": 2.0,
-      "score_fund": 0,
-      "score_theme": 5.0,
-      "total": 8.6,
-      "rating": "C",
-      "advice": "观望，不新开仓",
-      "tech": {
-        "ma5": 316.2,
-        "ma10": 306.3,
-        "ma20": 293.6,
-        "ma60": 319.3,
-        "wma5": 300.4,
-        "wma10": 334.9,
-        "wma20": 264.9,
-        "trend": "日线多头",
-        "bull_level": 1,
-        "position": 64.0,
-        "vol_ratio": 0.91,
-        "amount_ratio": 0.99,
-        "amount_today_yi": 3254.4,
-        "boll_upper": 339.75,
-        "boll_mid": 293.59,
-        "boll_lower": 247.43,
-        "boll_pos": 97.0,
-        "boll_label": "上轨附近",
-        "rsi": 66.5,
-        "rsi_state": "中性",
-        "reason": "日线多头+相对高位(64%)+BOLL通道内; BOLL:上轨附近(97%); RSI66(中性)",
-        "overall": "偏强",
-        "explanations": [
-          "日线多头排列但周线未确认，短线偏强",
-          "接近BOLL上轨压力位，上涨空间有限"
-        ],
-        "support_levels": [
-          [
-            "MA60均线",
-            319.26
-          ],
-          [
-            "MA20均线",
-            293.59
-          ],
-          [
-            "BOLL下轨",
-            247.43
-          ]
-        ],
-        "resistance_levels": [
-          [
-            "BOLL上轨",
-            339.75
-          ],
-          [
-            "120日高点",
-            447.33
-          ]
-        ],
-        "vol_price_analysis": "量价基本平衡"
-      },
-      "fund_reasons": [
-        "高估值(FwdPE=89.8)",
-        "估值阶梯合理收缩(89.8→74.9→64.8),3年收缩28%",
-        "PEG=8.96(严重高估)",
-        "持续性:盈利持续性中性"
-      ],
-      "theme_reasons": [
-        "细分题材:半导体设备(内禀4)",
-        "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+3.7%,上涨占比67%(3只样本)",
-        "大涨+5.8%验证",
-        "题材加速期,趋势延续",
-        "板块高度集中(82只上榜)"
-      ],
-      "news_reasons": [
-        "半导体清洗设备国产替代+单片清洗设备",
-        "⚠️设备验证周期长+技术迭代",
-        "近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调",
-        "消息时效:近7日无消息",
-        "上涨+5.8%"
-      ],
-      "news_items": [
-        {
-          "source": "券商研报",
-          "time": "",
-          "sentiment": "中性",
-          "content": "半导体清洗设备国产替代+单片清洗设备",
-          "url": ""
-        }
-      ],
-      "news_recency": "近7日无消息",
-      "sub_theme": "半导体设备",
-      "lifecycle": "加速期",
-      "score_sustain": 3.0,
-      "sustain_note": "盈利持续性中性",
-      "is_cyclic": false,
-      "is_storage_mod": false,
-      "fwd_pe": 89.8,
-      "growth": 10.0,
-      "pe_ladder": {
-        "2026": 89.8,
-        "2027": 74.9,
-        "2028": 64.8
-      },
-      "cagr3": 20.9
-    },
-    {
       "name": "长盈通",
       "code": "sh688143",
       "sector": "综合",
-      "price": 145.45,
-      "pct_chg": -5.55,
+      "price": 145.8,
+      "pct_chg": -5.33,
       "pe": 871.23,
-      "turnover": 2711324662.0,
+      "turnover": 2729844615.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 1.0,
@@ -19059,7 +19064,7 @@
         "boll_upper": 146.56,
         "boll_mid": 106.17,
         "boll_lower": 65.78,
-        "boll_pos": 98.6,
+        "boll_pos": 99.1,
         "boll_label": "上轨附近",
         "rsi": 75.1,
         "rsi_state": "超买",
@@ -19105,7 +19110,7 @@
       "theme_reasons": [
         "板块:综合/其他(内禀3)",
         "题材近20日中位+25.5%,上涨占比92%(40只样本)",
-        "下跌-5.5%",
+        "下跌-5.3%",
         "板块5只涨停,做多情绪强",
         "题材加速期,趋势延续",
         "板块高度集中(43只上榜)"
@@ -19113,7 +19118,7 @@
       "news_reasons": [
         "无真实新闻/催化剂",
         "消息时效:近7日有消息/公告",
-        "下跌-5.5%"
+        "下跌-5.3%"
       ],
       "news_items": [],
       "news_recency": "近7日有消息/公告",
@@ -19133,114 +19138,13 @@
       "cagr3": -43.9
     },
     {
-      "name": "杰华特",
-      "code": "sh688141",
-      "sector": "综合",
-      "price": 143.9,
-      "pct_chg": 2.92,
-      "pe": 0,
-      "turnover": 2632058500.0,
-      "score_news": 0,
-      "score_tech": 2.0,
-      "score_fund": 0.8,
-      "score_theme": 5.0,
-      "total": 8.6,
-      "rating": "C",
-      "advice": "观望，不新开仓",
-      "tech": {
-        "ma5": 139.1,
-        "ma10": 134.8,
-        "ma20": 128.9,
-        "ma60": 128.4,
-        "wma5": 134.4,
-        "wma10": 138.7,
-        "wma20": 114.3,
-        "trend": "日线多头",
-        "bull_level": 1,
-        "position": 75.0,
-        "vol_ratio": 0.85,
-        "amount_ratio": 0.92,
-        "amount_today_yi": 39.6,
-        "boll_upper": 155.19,
-        "boll_mid": 128.92,
-        "boll_lower": 102.64,
-        "boll_pos": 78.5,
-        "boll_label": "中轨上方",
-        "rsi": 63.5,
-        "rsi_state": "中性",
-        "reason": "日线多头+相对高位(75%)+BOLL通道内; BOLL:中轨上方(79%); RSI63(中性)",
-        "overall": "偏强",
-        "explanations": [
-          "日线多头排列但周线未确认，短线偏强",
-          "BOLL中轨上方运行，多头占优"
-        ],
-        "support_levels": [
-          [
-            "MA20均线",
-            128.92
-          ],
-          [
-            "MA60均线",
-            128.44
-          ],
-          [
-            "BOLL下轨",
-            102.64
-          ]
-        ],
-        "resistance_levels": [
-          [
-            "BOLL上轨",
-            155.19
-          ],
-          [
-            "120日高点",
-            177.0
-          ]
-        ],
-        "vol_price_analysis": "量价基本平衡"
-      },
-      "fund_reasons": [
-        "高估值(FwdPE=189.6)+负增长(-23%)",
-        "估值阶梯强收缩(189.6→54.2),3年收缩71%,高PE起始,阶梯加分受限",
-        "持续性:盈利下滑,持续性偏弱"
-      ],
-      "theme_reasons": [
-        "板块:综合/其他(内禀3)",
-        "题材近20日中位+25.5%,上涨占比92%(40只样本)",
-        "板块5只涨停,做多情绪强",
-        "⚠️题材高潮期,注意追高",
-        "板块高度集中(43只上榜)"
-      ],
-      "news_reasons": [
-        "无真实新闻/催化剂",
-        "消息时效:近7日无消息",
-        "横盘(+2.9%)"
-      ],
-      "news_items": [],
-      "news_recency": "近7日无消息",
-      "sub_theme": "综合/其他",
-      "lifecycle": "高潮期",
-      "score_sustain": 2.0,
-      "sustain_note": "盈利下滑,持续性偏弱",
-      "is_cyclic": false,
-      "is_storage_mod": false,
-      "fwd_pe": 189.6,
-      "growth": -23.4,
-      "pe_ladder": {
-        "2027": 189.6,
-        "2028": 54.2
-      },
-      "cagr3": null
-    },
-    {
       "name": "宏昌电子",
       "code": "sh603002",
       "sector": "综合",
-      "price": 17.87,
-      "pct_chg": 1.59,
+      "price": 17.84,
+      "pct_chg": 1.42,
       "pe": 688.52,
-      "turnover": 2528134516.0,
+      "turnover": 2544777452.0,
       "score_news": 0,
       "score_tech": 2,
       "score_fund": 0.8,
@@ -19265,7 +19169,7 @@
         "boll_upper": 17.57,
         "boll_mid": 14.2,
         "boll_lower": 10.84,
-        "boll_pos": 104.5,
+        "boll_pos": 104.0,
         "boll_label": "突破上轨",
         "rsi": 78.6,
         "rsi_state": "超买",
@@ -19317,7 +19221,7 @@
       "news_reasons": [
         "无真实新闻/催化剂",
         "消息时效:近7日无消息",
-        "横盘(+1.6%)"
+        "横盘(+1.4%)"
       ],
       "news_items": [],
       "news_recency": "近7日无消息",
@@ -19340,10 +19244,10 @@
       "name": "全志科技",
       "code": "sz300458",
       "sector": "AI/半导体",
-      "price": 34.59,
-      "pct_chg": -3.38,
+      "price": 34.58,
+      "pct_chg": -3.41,
       "pe": 91.97,
-      "turnover": 2423867911.0,
+      "turnover": 2454189176.0,
       "score_news": 0,
       "score_tech": 1.0,
       "score_fund": 2.0,
@@ -19361,18 +19265,18 @@
         "wma20": 35.4,
         "trend": "偏空",
         "bull_level": 0,
-        "position": 52.0,
+        "position": 51.0,
         "vol_ratio": 0.66,
         "amount_ratio": 0.63,
         "amount_today_yi": 24.3,
         "boll_upper": 42.25,
         "boll_mid": 35.96,
         "boll_lower": 29.68,
-        "boll_pos": 39.1,
+        "boll_pos": 39.0,
         "boll_label": "中轨下方",
         "rsi": 36.7,
         "rsi_state": "中性",
-        "reason": "趋势走弱+中位(52%); 缩量(0.6x); 高成长(CAGR3=28%)+0.5; BOLL:中轨下方(39%); RSI37(中性)",
+        "reason": "趋势走弱+中位(51%); 缩量(0.6x); 高成长(CAGR3=28%)+0.5; BOLL:中轨下方(39%); RSI37(中性)",
         "overall": "震荡",
         "explanations": [
           "BOLL中轨下方运行，空头占优"
@@ -19416,7 +19320,7 @@
       "theme_reasons": [
         "板块:AI算力/半导体(内禀5)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日-7.9%弱于题材",
         "下跌-3.4%",
         "板块高度集中(82只上榜)"
@@ -19447,10 +19351,10 @@
       "name": "甬矽电子",
       "code": "sh688362",
       "sector": "AI/半导体",
-      "price": 73.45,
-      "pct_chg": -0.62,
+      "price": 73.4,
+      "pct_chg": -0.69,
       "pe": 397.29,
-      "turnover": 2257026360.0,
+      "turnover": 2269343761.0,
       "score_news": 0.5,
       "score_tech": 3.0,
       "score_fund": 0.8,
@@ -19475,7 +19379,7 @@
         "boll_upper": 84.33,
         "boll_mid": 67.76,
         "boll_lower": 51.19,
-        "boll_pos": 67.2,
+        "boll_pos": 67.0,
         "boll_label": "中轨上方",
         "rsi": 60.5,
         "rsi_state": "中性",
@@ -19530,7 +19434,7 @@
       "news_reasons": [
         "公告确认:利好事件",
         "消息时效:近7日有消息/公告",
-        "横盘(-0.6%)"
+        "横盘(-0.7%)"
       ],
       "news_items": [
         {
@@ -19564,7 +19468,7 @@
       "price": 14.83,
       "pct_chg": 4.81,
       "pe": 0,
-      "turnover": 3876200423.0,
+      "turnover": 3914673892.0,
       "score_news": 4,
       "score_tech": 2,
       "score_fund": 0,
@@ -19636,7 +19540,7 @@
       "theme_reasons": [
         "细分题材:LED/化合物半导体(内禀3)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日+18.8%强于题材,超额明显",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
@@ -19675,7 +19579,7 @@
       "price": 39.67,
       "pct_chg": 7.33,
       "pe": 220.89,
-      "turnover": 2506778862.0,
+      "turnover": 2533492640.0,
       "score_news": 1,
       "score_tech": 0.5,
       "score_fund": 1.0,
@@ -19779,7 +19683,7 @@
       "price": 49.48,
       "pct_chg": 13.43,
       "pe": 261.65,
-      "turnover": 4212983462.0,
+      "turnover": 4251649806.0,
       "score_news": 1,
       "score_tech": 1.9,
       "score_fund": 0,
@@ -19880,10 +19784,10 @@
       "name": "华虹宏力",
       "code": "sh688347",
       "sector": "AI/半导体",
-      "price": 264.61,
-      "pct_chg": -1.97,
+      "price": 264.52,
+      "pct_chg": -2.0,
       "pe": 931.61,
-      "turnover": 5587910631.0,
+      "turnover": 5628507044.0,
       "score_news": 3,
       "score_tech": 1.5,
       "score_fund": 1.8,
@@ -19955,7 +19859,7 @@
       "theme_reasons": [
         "细分题材:晶圆代工(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位-19.3%,上涨占比0%(2只样本)",
+        "题材近20日中位-24.6%,上涨占比0%(2只样本)",
         "个股近20日-33.5%弱于题材",
         "题材退潮期,短期回避",
         "板块高度集中(82只上榜)"
@@ -19995,10 +19899,10 @@
       "name": "超纯应材",
       "code": "sz301717",
       "sector": "综合",
-      "price": 472.0,
-      "pct_chg": -9.23,
+      "price": 473.0,
+      "pct_chg": -9.04,
       "pe": 231.75,
-      "turnover": 3715209611.0,
+      "turnover": 3745342549.0,
       "score_news": 0,
       "score_tech": 2,
       "score_fund": 1.0,
@@ -20017,7 +19921,7 @@
       "theme_reasons": [
         "板块:综合/其他(内禀3)",
         "题材近20日中位+25.5%,上涨占比92%(40只样本)",
-        "大跌-9.2%,短期降温",
+        "大跌-9.0%,短期降温",
         "板块5只涨停,做多情绪强",
         "题材加速期,趋势延续",
         "板块高度集中(43只上榜)"
@@ -20025,7 +19929,7 @@
       "news_reasons": [
         "无真实新闻/催化剂",
         "消息时效:近7日有消息/公告",
-        "大跌-9.2%(价格确认利空信号)"
+        "大跌-9.0%(价格确认利空信号)"
       ],
       "news_items": [],
       "news_recency": "近7日有消息/公告",
@@ -20047,7 +19951,7 @@
       "price": 5.06,
       "pct_chg": -4.89,
       "pe": 0,
-      "turnover": 2816484300.0,
+      "turnover": 2840758132.0,
       "score_news": 0,
       "score_tech": 3.5,
       "score_fund": 0,
@@ -20140,10 +20044,10 @@
       "name": "蓝色光标",
       "code": "sz300058",
       "sector": "传媒娱乐",
-      "price": 14.83,
-      "pct_chg": -3.7,
+      "price": 14.81,
+      "pct_chg": -3.83,
       "pe": 208.3,
-      "turnover": 4287994594.0,
+      "turnover": 4347141810.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 1.0,
@@ -20161,18 +20065,18 @@
         "wma20": 15.4,
         "trend": "偏多",
         "bull_level": 0,
-        "position": 44.0,
+        "position": 43.0,
         "vol_ratio": 1.02,
         "amount_ratio": 1.06,
         "amount_today_yi": 43.3,
         "boll_upper": 17.65,
         "boll_mid": 14.12,
         "boll_lower": 10.59,
-        "boll_pos": 60.1,
+        "boll_pos": 59.8,
         "boll_label": "中轨上方",
         "rsi": 70.1,
         "rsi_state": "超买",
-        "reason": "偏多+中位(44%)+BOLL通道内; BOLL:中轨上方(60%); RSI70(超买,短线回调风险)",
+        "reason": "偏多+中位(43%)+BOLL通道内; BOLL:中轨上方(60%); RSI70(超买,短线回调风险)",
         "overall": "震荡",
         "explanations": [
           "BOLL中轨上方运行，多头占优",
@@ -20214,14 +20118,14 @@
         "板块:综合/其他(内禀3)",
         "短期(10日)弱于中期(20日),动能衰减",
         "题材近20日中位+17.6%,上涨占比100%(1只样本)",
-        "下跌-3.7%",
+        "下跌-3.8%",
         "上涨占比仅0%,多数下跌",
         "题材加速期,趋势延续"
       ],
       "news_reasons": [
         "无真实新闻/催化剂",
         "消息时效:近7日无消息",
-        "下跌-3.7%"
+        "下跌-3.8%"
       ],
       "news_items": [],
       "news_recency": "近7日无消息",
@@ -20241,112 +20145,13 @@
       "cagr3": null
     },
     {
-      "name": "中瓷电子",
-      "code": "sz003031",
-      "sector": "综合",
-      "price": 143.51,
-      "pct_chg": 0.29,
-      "pe": 102.31,
-      "turnover": 2697898929.0,
-      "score_news": 0,
-      "score_tech": 2.5,
-      "score_fund": 0,
-      "score_theme": 5.0,
-      "total": 8.0,
-      "rating": "C",
-      "advice": "观望，不新开仓",
-      "tech": {
-        "ma5": 130.9,
-        "ma10": 122.1,
-        "ma20": 111.4,
-        "ma60": 137.4,
-        "wma5": 118.0,
-        "wma10": 135.6,
-        "wma20": 135.0,
-        "trend": "日线多头",
-        "bull_level": 1,
-        "position": 57.0,
-        "vol_ratio": 1.2,
-        "amount_ratio": 1.41,
-        "amount_today_yi": 26.8,
-        "boll_upper": 140.17,
-        "boll_mid": 111.39,
-        "boll_lower": 82.61,
-        "boll_pos": 105.8,
-        "boll_label": "突破上轨",
-        "rsi": 79.8,
-        "rsi_state": "超买",
-        "reason": "趋势日线多头+分位(57%); 超高成长(CAGR3=61%)+1; BOLL:突破上轨(106%); RSI80(超买,短线回调风险)",
-        "overall": "偏强",
-        "explanations": [
-          "日线多头排列但周线未确认，短线偏强",
-          "价格突破BOLL上轨，短期超买注意回调",
-          "RSI=80 进入超买区(>70)，短线回调概率上升"
-        ],
-        "support_levels": [
-          [
-            "MA60均线",
-            137.4
-          ],
-          [
-            "MA20均线",
-            111.39
-          ],
-          [
-            "BOLL下轨",
-            82.61
-          ]
-        ],
-        "resistance_levels": [
-          [
-            "BOLL上轨",
-            140.17
-          ],
-          [
-            "120日高点",
-            195.57
-          ]
-        ],
-        "vol_price_analysis": "量价基本平衡"
-      },
-      "fund_reasons": [
-        "高估值(FwdPE=102.3)",
-        "PEG=6.76(严重高估)",
-        "持续性:盈利持续性中性"
-      ],
-      "theme_reasons": [
-        "板块:综合/其他(内禀3)",
-        "题材近20日中位+25.5%,上涨占比92%(40只样本)",
-        "板块5只涨停,做多情绪强",
-        "⚠️题材高潮期,注意追高",
-        "板块高度集中(43只上榜)"
-      ],
-      "news_reasons": [
-        "无真实新闻/催化剂",
-        "消息时效:近7日无消息",
-        "横盘(+0.3%)"
-      ],
-      "news_items": [],
-      "news_recency": "近7日无消息",
-      "sub_theme": "综合/其他",
-      "lifecycle": "高潮期",
-      "score_sustain": 3.0,
-      "sustain_note": "盈利持续性中性",
-      "is_cyclic": false,
-      "is_storage_mod": false,
-      "fwd_pe": 102.3,
-      "growth": 15.1,
-      "pe_ladder": null,
-      "cagr3": 60.7
-    },
-    {
       "name": "中国长城",
       "code": "sz000066",
       "sector": "AI/半导体",
       "price": 15.23,
       "pct_chg": 0.26,
       "pe": 2435.28,
-      "turnover": 2690566885.0,
+      "turnover": 2719645524.0,
       "score_news": 0,
       "score_tech": 4.0,
       "score_fund": 1.0,
@@ -20420,7 +20225,7 @@
       "theme_reasons": [
         "细分题材:信创/国产PC(内禀3)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
       ],
@@ -20447,13 +20252,214 @@
       "cagr3": null
     },
     {
+      "name": "中瓷电子",
+      "code": "sz003031",
+      "sector": "综合",
+      "price": 143.61,
+      "pct_chg": 0.36,
+      "pe": 102.31,
+      "turnover": 2711872182.0,
+      "score_news": 0,
+      "score_tech": 2.5,
+      "score_fund": 0,
+      "score_theme": 5.0,
+      "total": 8.0,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 130.9,
+        "ma10": 122.1,
+        "ma20": 111.4,
+        "ma60": 137.4,
+        "wma5": 118.0,
+        "wma10": 135.6,
+        "wma20": 135.0,
+        "trend": "日线多头",
+        "bull_level": 1,
+        "position": 57.0,
+        "vol_ratio": 1.2,
+        "amount_ratio": 1.41,
+        "amount_today_yi": 26.8,
+        "boll_upper": 140.17,
+        "boll_mid": 111.39,
+        "boll_lower": 82.61,
+        "boll_pos": 106.0,
+        "boll_label": "突破上轨",
+        "rsi": 79.8,
+        "rsi_state": "超买",
+        "reason": "趋势日线多头+分位(57%); 超高成长(CAGR3=61%)+1; BOLL:突破上轨(106%); RSI80(超买,短线回调风险)",
+        "overall": "偏强",
+        "explanations": [
+          "日线多头排列但周线未确认，短线偏强",
+          "价格突破BOLL上轨，短期超买注意回调",
+          "RSI=80 进入超买区(>70)，短线回调概率上升"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            137.4
+          ],
+          [
+            "MA20均线",
+            111.39
+          ],
+          [
+            "BOLL下轨",
+            82.61
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            140.17
+          ],
+          [
+            "120日高点",
+            195.57
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=102.3)",
+        "PEG=6.76(严重高估)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "题材近20日中位+25.5%,上涨占比92%(40只样本)",
+        "板块5只涨停,做多情绪强",
+        "⚠️题材高潮期,注意追高",
+        "板块高度集中(43只上榜)"
+      ],
+      "news_reasons": [
+        "无真实新闻/催化剂",
+        "消息时效:近7日无消息",
+        "横盘(+0.4%)"
+      ],
+      "news_items": [],
+      "news_recency": "近7日无消息",
+      "sub_theme": "综合/其他",
+      "lifecycle": "高潮期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 102.3,
+      "growth": 15.1,
+      "pe_ladder": null,
+      "cagr3": 60.7
+    },
+    {
+      "name": "杰华特",
+      "code": "sh688141",
+      "sector": "综合",
+      "price": 143.58,
+      "pct_chg": 2.7,
+      "pe": 0,
+      "turnover": 2645915549.0,
+      "score_news": 0,
+      "score_tech": 2.0,
+      "score_fund": 0.8,
+      "score_theme": 4.5,
+      "total": 8.0,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 139.8,
+        "ma10": 137.7,
+        "ma20": 129.2,
+        "ma60": 129.1,
+        "wma5": 134.4,
+        "wma10": 138.7,
+        "wma20": 114.3,
+        "trend": "日线多头",
+        "bull_level": 1,
+        "position": 75.0,
+        "vol_ratio": 0.92,
+        "amount_ratio": 1.0,
+        "amount_today_yi": 27.1,
+        "boll_upper": 156.03,
+        "boll_mid": 129.23,
+        "boll_lower": 102.42,
+        "boll_pos": 76.8,
+        "boll_label": "中轨上方",
+        "rsi": 65.9,
+        "rsi_state": "中性",
+        "reason": "日线多头+相对高位(75%)+BOLL通道内; BOLL:中轨上方(77%); RSI66(中性)",
+        "overall": "偏强",
+        "explanations": [
+          "日线多头排列但周线未确认，短线偏强",
+          "BOLL中轨上方运行，多头占优"
+        ],
+        "support_levels": [
+          [
+            "MA20均线",
+            129.23
+          ],
+          [
+            "MA60均线",
+            129.11
+          ],
+          [
+            "BOLL下轨",
+            102.42
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            156.03
+          ],
+          [
+            "120日高点",
+            177.0
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=189.6)+负增长(-23%)",
+        "估值阶梯强收缩(189.6→54.2),3年收缩71%,高PE起始,阶梯加分受限",
+        "持续性:盈利下滑,持续性偏弱"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "题材近20日中位+25.5%,上涨占比92%(40只样本)",
+        "个股近20日+4.5%弱于题材",
+        "板块5只涨停,做多情绪强",
+        "⚠️题材高潮期,注意追高",
+        "板块高度集中(43只上榜)"
+      ],
+      "news_reasons": [
+        "无真实新闻/催化剂",
+        "消息时效:近7日无消息",
+        "横盘(+2.7%)"
+      ],
+      "news_items": [],
+      "news_recency": "近7日无消息",
+      "sub_theme": "综合/其他",
+      "lifecycle": "高潮期",
+      "score_sustain": 2.0,
+      "sustain_note": "盈利下滑,持续性偏弱",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 189.6,
+      "growth": -23.4,
+      "pe_ladder": {
+        "2027": 189.6,
+        "2028": 54.2
+      },
+      "cagr3": null
+    },
+    {
       "name": "中巨芯",
       "code": "sh688549",
       "sector": "电子材料",
       "price": 29.29,
       "pct_chg": -3.46,
       "pe": 0,
-      "turnover": 3062566242.0,
+      "turnover": 3090684993.0,
       "score_news": 1,
       "score_tech": 2.0,
       "score_fund": 0,
@@ -20554,92 +20560,93 @@
       "cagr3": null
     },
     {
-      "name": "风范股份",
-      "code": "sh601700",
+      "name": "蓝盾光电",
+      "code": "sz300862",
       "sector": "综合",
-      "price": 7.32,
-      "pct_chg": 1.39,
+      "price": 56.5,
+      "pct_chg": 3.16,
       "pe": 0,
-      "turnover": 2143791506.0,
+      "turnover": 2192595797.0,
       "score_news": 0,
-      "score_tech": 2.3,
+      "score_tech": 2.1,
       "score_fund": 0,
       "score_theme": 5.0,
-      "total": 7.8,
+      "total": 7.7,
       "rating": "C",
       "advice": "观望，不新开仓",
       "tech": {
-        "ma5": 7.2,
-        "ma10": 7.0,
-        "ma20": 6.0,
-        "ma60": 5.2,
-        "wma5": 6.0,
-        "wma10": 5.2,
-        "wma20": 5.3,
-        "trend": "日线多头",
-        "bull_level": 1,
-        "position": 92.0,
-        "vol_ratio": 1.79,
-        "amount_ratio": 1.9,
-        "amount_today_yi": 20.5,
-        "boll_upper": 8.12,
-        "boll_mid": 5.99,
-        "boll_lower": 3.86,
-        "boll_pos": 81.3,
-        "boll_label": "上轨附近",
-        "rsi": 69.1,
-        "rsi_state": "中性",
-        "reason": "日线多头+高位(92%)+BOLL触碰上轨; 放量(1.9x/21亿); BOLL:上轨附近(81%); RSI69(中性)",
-        "overall": "偏强",
+        "ma5": 46.2,
+        "ma10": 33.4,
+        "ma20": 25.2,
+        "ma60": 23.6,
+        "wma5": 31.4,
+        "wma10": 26.2,
+        "wma20": 24.9,
+        "trend": "双线多头",
+        "bull_level": 3,
+        "position": 100.0,
+        "vol_ratio": 2.73,
+        "amount_ratio": 3.45,
+        "amount_today_yi": 22.0,
+        "boll_upper": 51.57,
+        "boll_mid": 25.17,
+        "boll_lower": -1.23,
+        "boll_pos": 109.3,
+        "boll_label": "突破上轨",
+        "rsi": 96.0,
+        "rsi_state": "超买",
+        "reason": "双线多头+极值高位(100%)+BOLL突破上轨(严重超买); 放量(3.4x/22亿); BOLL:突破上轨(109%); RSI96(超买,短线回调风险)",
+        "overall": "震荡",
         "explanations": [
-          "日线多头排列但周线未确认，短线偏强",
-          "接近BOLL上轨压力位，上涨空间有限",
-          "价格处于120日92%分位，接近区间高点"
+          "日线和周线均线均多头排列，中长趋势向上",
+          "价格突破BOLL上轨，短期超买注意回调",
+          "价格处于120日100%分位，接近区间高点",
+          "RSI=96 进入超买区(>70)，短线回调概率上升"
         ],
         "support_levels": [
           [
             "MA20均线",
-            5.99
+            25.17
           ],
           [
             "MA60均线",
-            5.17
+            23.59
           ],
           [
             "120日低点",
-            4.27
+            15.23
           ]
         ],
         "resistance_levels": [
           [
-            "120日高点",
-            7.59
+            "BOLL上轨",
+            51.57
           ],
           [
-            "BOLL上轨",
-            8.12
+            "120日高点",
+            56.5
           ]
         ],
-        "vol_price_analysis": "量价基本平衡"
+        "vol_price_analysis": "放量上涨，资金积极买入，多头量价配合"
       },
       "fund_reasons": [
-        "负增长(-78%)"
+        "负增长(-584%)"
       ],
       "theme_reasons": [
         "板块:综合/其他(内禀3)",
         "题材近20日中位+25.5%,上涨占比92%(40只样本)",
-        "个股近20日+62.1%强于题材,超额明显",
+        "个股近20日+206.3%强于题材,超额明显",
         "板块5只涨停,做多情绪强",
         "⚠️题材高潮期,注意追高",
         "板块高度集中(43只上榜)"
       ],
       "news_reasons": [
         "无真实新闻/催化剂",
-        "消息时效:近7日无消息",
-        "横盘(+1.4%)"
+        "消息时效:近7日有消息/公告",
+        "上涨+3.2%"
       ],
       "news_items": [],
-      "news_recency": "近7日无消息",
+      "news_recency": "近7日有消息/公告",
       "sub_theme": "综合/其他",
       "lifecycle": "高潮期",
       "score_sustain": 3.0,
@@ -20647,7 +20654,7 @@
       "is_cyclic": false,
       "is_storage_mod": false,
       "fwd_pe": null,
-      "growth": -77.8,
+      "growth": -583.8,
       "pe_ladder": null,
       "cagr3": null
     },
@@ -20655,10 +20662,10 @@
       "name": "贵州茅台",
       "code": "sh600519",
       "sector": "消费",
-      "price": 1298.21,
-      "pct_chg": 0.4,
+      "price": 1297.99,
+      "pct_chg": 0.38,
       "pe": 19.93,
-      "turnover": 4963921424.0,
+      "turnover": 5007014692.0,
       "score_news": 2,
       "score_tech": 3.0,
       "score_fund": 0.8,
@@ -20683,7 +20690,7 @@
         "boll_upper": 1372.49,
         "boll_mid": 1323.78,
         "boll_lower": 1275.06,
-        "boll_pos": 23.8,
+        "boll_pos": 23.5,
         "boll_label": "中轨下方",
         "rsi": 45.2,
         "rsi_state": "中性",
@@ -20768,7 +20775,7 @@
       "price": 6.6,
       "pct_chg": 2.17,
       "pe": 7.85,
-      "turnover": 3016004762.0,
+      "turnover": 3041693942.0,
       "score_news": 0,
       "score_tech": 1.5,
       "score_fund": 0.5,
@@ -20871,7 +20878,7 @@
       "price": 249.34,
       "pct_chg": -3.52,
       "pe": 0,
-      "turnover": 4023510693.0,
+      "turnover": 4057844811.0,
       "score_news": 0,
       "score_tech": 2.0,
       "score_fund": 1.5,
@@ -20942,7 +20949,7 @@
       "theme_reasons": [
         "细分题材:红外光学/核材料(内禀3)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日+31.2%强于题材,超额明显",
         "下跌-3.5%",
         "板块高度集中(82只上榜)"
@@ -20973,10 +20980,10 @@
       "name": "东岳硅材",
       "code": "sz300821",
       "sector": "化工",
-      "price": 18.16,
-      "pct_chg": 2.66,
+      "price": 18.18,
+      "pct_chg": 2.77,
       "pe": 158.2,
-      "turnover": 2336667848.0,
+      "turnover": 2356824014.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 0,
@@ -21001,11 +21008,11 @@
         "boll_upper": 18.37,
         "boll_mid": 16.1,
         "boll_lower": 13.84,
-        "boll_pos": 95.4,
+        "boll_pos": 95.9,
         "boll_label": "上轨附近",
         "rsi": 76.5,
         "rsi_state": "超买",
-        "reason": "日线多头+中位(37%)+BOLL通道内; BOLL:上轨附近(95%); RSI77(超买,短线回调风险)",
+        "reason": "日线多头+中位(37%)+BOLL通道内; BOLL:上轨附近(96%); RSI77(超买,短线回调风险)",
         "overall": "偏强",
         "explanations": [
           "日线多头排列但周线未确认，短线偏强",
@@ -21056,7 +21063,7 @@
       "news_reasons": [
         "无真实新闻/催化剂",
         "消息时效:近7日无消息",
-        "横盘(+2.7%)"
+        "横盘(+2.8%)"
       ],
       "news_items": [],
       "news_recency": "近7日无消息",
@@ -21075,10 +21082,10 @@
       "name": "盛科通信",
       "code": "sh688702",
       "sector": "AI/半导体",
-      "price": 434.66,
-      "pct_chg": 3.07,
+      "price": 435.87,
+      "pct_chg": 3.36,
       "pe": 0,
-      "turnover": 4324109041.0,
+      "turnover": 4361283522.0,
       "score_news": 0,
       "score_tech": 1.1,
       "score_fund": 0.8,
@@ -21087,55 +21094,55 @@
       "rating": "C",
       "advice": "观望，不新开仓",
       "tech": {
-        "ma5": 400.0,
-        "ma10": 388.4,
-        "ma20": 377.8,
-        "ma60": 339.5,
+        "ma5": 408.4,
+        "ma10": 398.2,
+        "ma20": 379.8,
+        "ma60": 341.4,
         "wma5": 393.9,
         "wma10": 364.8,
         "wma20": 318.8,
         "trend": "双线多头",
         "bull_level": 3,
-        "position": 102.0,
-        "vol_ratio": 0.76,
-        "amount_ratio": 0.81,
-        "amount_today_yi": 41.8,
-        "boll_upper": 442.89,
-        "boll_mid": 377.77,
-        "boll_lower": 312.65,
-        "boll_pos": 93.7,
+        "position": 100.0,
+        "vol_ratio": 0.83,
+        "amount_ratio": 0.89,
+        "amount_today_yi": 44.5,
+        "boll_upper": 449.37,
+        "boll_mid": 379.81,
+        "boll_lower": 310.25,
+        "boll_pos": 90.3,
         "boll_label": "上轨附近",
-        "rsi": 61.8,
+        "rsi": 66.1,
         "rsi_state": "中性",
-        "reason": "双线多头+极值高位(102%)+BOLL触碰上轨(超买); BOLL:上轨附近(94%); RSI62(中性)",
+        "reason": "双线多头+极值高位(100%)+BOLL触碰上轨(超买); BOLL:上轨附近(90%); RSI66(中性)",
         "overall": "震荡",
         "explanations": [
           "日线和周线均线均多头排列，中长趋势向上",
           "接近BOLL上轨压力位，上涨空间有限",
-          "价格处于120日102%分位，接近区间高点"
+          "价格处于120日100%分位，接近区间高点"
         ],
         "support_levels": [
           [
             "MA20均线",
-            377.77
+            379.81
           ],
           [
             "MA60均线",
-            339.46
+            341.44
           ],
           [
             "BOLL下轨",
-            312.65
+            310.25
           ]
         ],
         "resistance_levels": [
           [
             "120日高点",
-            430.15
+            435.87
           ],
           [
             "BOLL上轨",
-            442.89
+            449.37
           ]
         ],
         "vol_price_analysis": "量价基本平衡"
@@ -21148,15 +21155,14 @@
       "theme_reasons": [
         "细分题材:以太网交换芯片(内禀4)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
-        "个股近20日+26.0%强于题材,超额明显",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "题材启动期,可关注",
         "板块高度集中(82只上榜)"
       ],
       "news_reasons": [
         "无真实新闻/催化剂",
         "消息时效:近7日有消息/公告",
-        "上涨+3.1%"
+        "上涨+3.4%"
       ],
       "news_items": [],
       "news_recency": "近7日有消息/公告",
@@ -21182,7 +21188,7 @@
       "price": 27.19,
       "pct_chg": 1.8,
       "pe": 632.55,
-      "turnover": 2997995525.0,
+      "turnover": 3021656263.0,
       "score_news": 0,
       "score_tech": 1.0,
       "score_fund": 0,
@@ -21282,10 +21288,10 @@
       "name": "太极实业",
       "code": "sh600667",
       "sector": "AI/半导体",
-      "price": 23.01,
-      "pct_chg": -3.56,
+      "price": 23.0,
+      "pct_chg": -3.6,
       "pe": 104.74,
-      "turnover": 6866881661.0,
+      "turnover": 6949759861.0,
       "score_news": 1,
       "score_tech": 2.0,
       "score_fund": 0,
@@ -21310,7 +21316,7 @@
         "boll_upper": 24.57,
         "boll_mid": 19.16,
         "boll_lower": 13.74,
-        "boll_pos": 85.6,
+        "boll_pos": 85.5,
         "boll_label": "上轨附近",
         "rsi": 68.8,
         "rsi_state": "中性",
@@ -21354,7 +21360,7 @@
       "theme_reasons": [
         "细分题材:半导体工程(内禀3)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日+37.8%强于题材,超额明显",
         "下跌-3.6%",
         "板块高度集中(82只上榜)"
@@ -21397,7 +21403,7 @@
       "price": 10.8,
       "pct_chg": 9.98,
       "pe": 674.44,
-      "turnover": 3550223343.0,
+      "turnover": 3553079943.0,
       "score_news": 1,
       "score_tech": 2,
       "score_fund": 0,
@@ -21471,7 +21477,7 @@
       "theme_reasons": [
         "板块:面板/显示(内禀2)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.4%,上涨占比67%(3只样本)",
+        "题材近20日中位+2.5%,上涨占比67%(3只样本)",
         "个股近20日+16.8%强于题材,超额明显",
         "涨停确认强度",
         "板块1只涨停",
@@ -21503,7 +21509,7 @@
       "price": 19.47,
       "pct_chg": -4.09,
       "pe": 0,
-      "turnover": 3518798449.0,
+      "turnover": 3557325977.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 0,
@@ -21575,7 +21581,7 @@
       "theme_reasons": [
         "细分题材:光缆/电缆(内禀3)",
         "短期(10日)加速强于中期(20日)",
-        "题材近20日中位+2.7%,上涨占比65%(82只样本)",
+        "题材近20日中位+2.7%,上涨占比63%(82只样本)",
         "个股近20日+13.0%强于题材,超额明显",
         "下跌-4.1%",
         "板块高度集中(82只上榜)"
@@ -21615,7 +21621,7 @@
       "price": 15.59,
       "pct_chg": -7.86,
       "pe": 566.2,
-      "turnover": 3776197264.0,
+      "turnover": 3821501804.0,
       "score_news": 0,
       "score_tech": 2.5,
       "score_fund": 0,
@@ -21727,8 +21733,8 @@
     "rating_dist": {
       "S": 2,
       "A": 56,
-      "B": 102,
-      "C": 33,
+      "B": 103,
+      "C": 32,
       "D": 1
     },
     "sector_avg": {
@@ -21894,7 +21900,7 @@
       "存储芯片"
     ],
     "hw_ratio": 1.0,
-    "total_news": 111,
+    "total_news": 113,
     "hot_news": 8
   }
 }
