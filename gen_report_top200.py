@@ -471,7 +471,7 @@ mr_up = market_review.get("up"); mr_down = market_review.get("down")
 mr_zt = market_review.get("zt"); mr_dt = market_review.get("dt")
 mr_score = market_review.get("money_score"); mr_phase = market_review.get("money_phase", "")
 idx_chips = " · ".join(f"{k}{v:+.2f}%" for k, v in mr_idx.items()) if mr_idx else "—"
-amt_disp = (f"{mr_amt/10000:.2f}万亿" if (mr_amt and mr_amt >= 10000) else (f"{mr_amt:.0f}亿" if mr_amt else "—"))
+amt_disp = (f"{mr_amt/10000:.2f}万亿" if (mr_amt and mr_amt >= 10000) else (f"{mr_amt:.0f}亿" if mr_amt else "数据暂缺"))
 breadth_disp = (f"涨{mr_up}/跌{mr_down} · 涨停{mr_zt}/跌停{mr_dt}" if (mr_up is not None and mr_down is not None) else "—")
 me_disp = (f"{mr_score}分 {mr_phase}" if mr_score is not None else "—")
 

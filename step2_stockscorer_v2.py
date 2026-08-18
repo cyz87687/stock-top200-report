@@ -990,7 +990,8 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
                roe=None, gross_margin=None, sub_theme_label=None):
     """基本面+竞争力评分 0-5，用估值阶梯替代单年PEG
     v2.8: 增加PEG指标、ROE、毛利率评分
-    v2.10: 增加公司持续性/低PE可持续性子评分(周期股/存储模组重点论证)"""
+    v2.10: 增加公司持续性/低PE可持续性子评分(周期股/存储链重点论证)
+    v2.12: 存储链识别扩至芯片/控制器/分销; 周期股持续性采用封顶策略(陷阱3.5/中性4.5)"""
     effective_pe = fwd_pe if fwd_pe else pe
     if code in KNOWN:
         k_fwd, k_growth = KNOWN[code]
@@ -1131,7 +1132,10 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
     # 判定: 周期股(盈利随景气波动) & 存储模组厂(模组环节薄利/价格周期敏感)
     # 论证低PE是否可持续: 用估值阶梯轨迹(收缩=周期底部错杀/扩张=顶部陷阱)+增速+ROE
     is_cyclic = sector in CYCLICAL_SECTORS
-    is_storage_mod = "存储模组" in (sub_theme_label or "")
+    # v2.12: 存储产业链(芯片/模组/控制器/分销)均为强价格周期环节,
+    # 与有色/化工等周期股同等对待, 需论证低PE可持续性(此前仅识别"存储模组"过窄)
+    STORAGE_CYCLIC_KW = ("存储芯片", "存储模组", "存储控制器", "存储分销")
+    is_storage_mod = any(k in (sub_theme_label or "") for k in STORAGE_CYCLIC_KW)
     ladder_shrink = None
     if pe_ladder_data and len(pe_ladder_data) >= 2:
         ys = sorted(pe_ladder_data.keys())
@@ -1141,18 +1145,18 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
 
     sustain_score = 3.0
     if is_cyclic or is_storage_mod:
+        # v2.12: 周期/存储链的景气期高增速、高ROE本身顺周期失真(盈利高峰),
+        # 不能单独作为"可持续"证据; 需"高增长+估值阶梯收缩"双重确认才算可持续
         low_pe_peak = (effective_pe is not None and effective_pe < 20
-                       and growth is not None and growth <= 15
-                       and (ladder_shrink is None or ladder_shrink < 0.3))
-        durable = ((growth is not None and growth > 30)
-                   or (ladder_shrink is not None and ladder_shrink >= 0.3)
-                   or (roe is not None and roe >= 0.15))
+                       and growth is not None and growth <= 15)
+        durable = (growth is not None and growth > 30
+                   and (ladder_shrink is None or ladder_shrink >= 0.15))
         if low_pe_peak:
             sustain_score = 2.0
-            sustain_note = "周期/存储模组低PE或处盈利高峰,警惕低PE陷阱(盈利不可持续)"
+            sustain_note = "周期/存储链低PE或处盈利高峰,警惕低PE陷阱(盈利不可持续)"
         elif durable:
             sustain_score = 4.0
-            sustain_note = "低PE配合高成长/估值阶梯收缩/高ROE,盈利可持续性强"
+            sustain_note = "高增长配合估值阶梯收缩,盈利可持续性强"
         else:
             sustain_score = 3.0
             sustain_note = "周期性行业,盈利随景气波动,持续性中性"
@@ -1167,8 +1171,19 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
             sustain_score = 3.0
             sustain_note = "盈利持续性中性"
 
-    # 持续性以有限权重(约20%)修正基本面总分, 避免过度主导
-    s = max(0, min(5, s + (sustain_score - 3.0) * 0.2))
+    # v2.12 持续性修正: 非周期股用有限权重(±0.2)微调;
+    # 周期/存储链采用"封顶"策略——只有"可持续"(durable)才允许满分:
+    #   低PE陷阱(2.0) → 基本面封顶3.5; 中性(3.0) → 封顶4.5; 可持续(4.0) → 不封顶
+    # 防止周期股在盈利高峰以低PE虚高拿满分
+    if is_cyclic or is_storage_mod:
+        if sustain_score <= 2.0:
+            s = min(s, 3.5)
+            reasons.append("周期股低PE陷阱,基本面分封顶3.5")
+        elif sustain_score == 3.0:
+            s = min(s, 4.5)
+            reasons.append("周期股持续性中性,基本面分封顶4.5")
+    else:
+        s = max(0, min(5, s + (sustain_score - 3.0) * 0.2))
     reasons.append(f"持续性:{sustain_note}")
     sustain_info = {
         "score": round(sustain_score, 1),
@@ -2154,6 +2169,7 @@ def score_news(news_text, pct, name="", code="", growth=None, ann_text=""):
     """
     reasons = []
     news_items = []  # 结构化消息列表
+    ifd_bull = ann_bull = False  # v2.12 双源共振标记
 
     # ========== Step 1: 消息内容评估 (0-5) ==========
     content_score = 0
@@ -2195,9 +2211,10 @@ def score_news(news_text, pct, name="", code="", growth=None, ann_text=""):
         bear_total = bear_strong * 3 + bear_weak
 
         if bull_total >= 6 and content_score < 5:
-            content_score = min(5, content_score + 1)
+            content_score = min(5, content_score + 0.5)
+            ifd_bull = True
             reasons.append("iFinD确认:多重利好")
-            content_label = {5:"重大利好",4:"一般利好",3:"中性",2:"小幅利空",1:"一般利空"}.get(content_score,"中性")
+            content_label = "一般利好"
             has_content = True
             news_items.append({
                 "source": "财经媒体(iFinD)",
@@ -2207,7 +2224,8 @@ def score_news(news_text, pct, name="", code="", growth=None, ann_text=""):
                 "url": "",
             })
         elif bull_total >= 2 and content_score < 4:
-            content_score = max(content_score, 4)
+            content_score = max(content_score, 3.5)
+            ifd_bull = True
             reasons.append("iFinD确认:偏利好")
             content_label = "一般利好"
             has_content = True
@@ -2257,9 +2275,10 @@ def score_news(news_text, pct, name="", code="", growth=None, ann_text=""):
                                  "计提减值", "终止重组", "风险警示"] if k in al)
         ann_verified = code in KNOWN_CATALYSTS and "negative" not in KNOWN_CATALYSTS[code]
         if a_bull >= 1 and content_score < 5:
-            content_score = min(5, content_score + 1)
+            content_score = min(5, content_score + 0.5)
+            ann_bull = True
             reasons.append("公告确认:利好事件")
-            content_label = {5: "重大利好", 4: "一般利好", 3: "中性", 2: "小幅利空", 1: "一般利空"}.get(content_score, "中性")
+            content_label = "利好"
             has_content = True
             news_items.append({"source": "交易所公告(akshare)", "time": "", "sentiment": "利好",
                                "content": f"公告检测到利好关键词×{a_bull}", "url": ""})
@@ -2277,6 +2296,14 @@ def score_news(news_text, pct, name="", code="", growth=None, ann_text=""):
             has_content = True
             news_items.append({"source": "交易所公告(akshare)", "time": "", "sentiment": "利空",
                                "content": f"公告检测到利空关键词×{a_bear}", "url": ""})
+
+    # 1b3. 多源共振(v2.12): iFinD新闻+交易所公告双源确认利好 → 额外加分(5分的主要通道)
+    # 单源(仅关键词/仅公告)自然封顶约4.5; 双源共振或已验证催化剂(level=5)才可到5
+    if ifd_bull and ann_bull and content_score < 5:
+        content_score = min(5, content_score + 0.5)
+        reasons.append("iFinD+公告双源共振,利好确定性高")
+        news_items.append({"source": "多源共振", "time": "", "sentiment": "利好",
+                           "content": "财经媒体与交易所公告同时确认利好", "url": ""})
 
     # ========== Step 1c: 已知利空（已验证的负面事件）==========
     if code in KNOWN_CATALYSTS and "negative" in KNOWN_CATALYSTS[code]:
@@ -2460,16 +2487,36 @@ def fetch_market_breadth():
     except Exception as e:
         print(f"   ⚠️ 指数获取失败: {e}")
 
-    # ---- 成交额回退(源1/源2未取到时, 单独补一次东方财富全A快照) ----
+    # ---- 成交额多源回退(v2.12): 东财全A(源1已试) → 新浪全A → 指数成交额近似 ----
+    # 此前回退复用与源1相同的东财接口, 东财不可达时回退形同虚设, 导致成交额恒为None
     if b["amount_yi"] is None:
         try:
-            df = ak.stock_zh_a_spot_em()
-            if df is not None and "成交额" in df.columns:
-                b["amount_yi"] = round(float(df["成交额"].astype(float).sum()) / 1e8, 0)
-                if b["source"] is None:
-                    b["source"] = "eastmoney"
+            df = ak.stock_zh_a_spot()  # 新浪全A快照, 含"成交额"列, 与指数源同通道(云端可达)
+            if df is not None and len(df) and "成交额" in df.columns:
+                amt = float(df["成交额"].astype(float).sum()) / 1e8
+                if amt and amt > 0:
+                    b["amount_yi"] = round(amt, 0)
+                    if b["source"] is None:
+                        b["source"] = "sina"
         except Exception as e:
-            print(f"   ⚠️ 成交额回退获取失败: {e}")
+            print(f"   ⚠️ 新浪全A成交额获取失败: {e}")
+    if b["amount_yi"] is None:
+        try:
+            # 指数成交额近似: 上证指数(≈沪市全市场)+深证成指+创业板指 成交额合计
+            idf2 = ak.stock_zh_index_spot_sina()
+            amt = 0.0
+            for _, row in idf2.iterrows():
+                if row.get("名称") in ("上证指数", "深证成指", "创业板指"):
+                    v = row.get("成交额")
+                    if v is not None:
+                        try:
+                            amt += float(v)
+                        except Exception:
+                            pass
+            if amt > 0:
+                b["amount_yi"] = round(amt / 1e8, 0)
+        except Exception as e:
+            print(f"   ⚠️ 指数成交额近似获取失败: {e}")
 
     # 完整性校验
     if b["up"] is None or b["down"] is None:
@@ -3125,7 +3172,7 @@ def main():
     
     out_data = {
         "date": raw.get("date", ""),
-        "model": "stock-scorer v2.11",
+        "model": "stock-scorer v2.12",
         "weights": "题材30% 基本面30%(含行业前景) 消息20% 技术面20%",
         "results": results,
         "stats": {
