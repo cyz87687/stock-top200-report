@@ -44,6 +44,7 @@ for pf in prev_files:
     except:
         pass
 date_str = data.get("date", datetime.now().strftime("%Y-%m-%d"))
+model_str = data.get("model", "stock-scorer")
 total_stocks = len(results)
 
 # 颜色配置
@@ -400,7 +401,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
 <div class="container">
     <div class="header">
         <h1>📊 A股成交额TOP''' + str(total_stocks) + ''' 极简公司评分</h1>
-        <div class="sub">Stock-Scorer v2.7 | 题材动量 · 大盘赚钱效应 · 基本面含行业前景 · 四维加权</div>
+        <div class="sub">''' + model_str + ''' | 题材动量 · 大盘赚钱效应 · 基本面含行业前景 · 四维加权</div>
         <div class="meta">''' + date_str + ''' | 数据源：东方财富 + 腾讯K线 + 同花顺 + 新浪/乐股</div>
     </div>
 
@@ -431,7 +432,7 @@ top3_stocks = sorted(results, key=lambda x: -x["total"])[:3]
 s_count = stats.get("rating_dist", {}).get("S", 0)
 a_count = stats.get("rating_dist", {}).get("A", 0)
 top_sector = sorted_secs[0] if sorted_secs else ("-", {"avg": 0, "count": 0})
-main_line = f"今日S级{s_count}只、A级{a_count}只，主线板块：{top_sector[0]}(均分{top_sector[1].get('avg',0):.1f})"
+main_line = f"今日S级{s_count}只、A级{a_count}只，主线板块：{top_sector[0]}(均分{top_sector[1].get('avg',0):.2f})"
 
 # 大盘赚钱效应 → 入场时机一句话摘要
 if market_breadth and market_breadth.get("available"):
@@ -499,12 +500,12 @@ for i, r in enumerate(top3_stocks):
     dim_names = ["消息", "技术", "基本", "热度"]
     best_name = dim_names[dims.index(best_dim)]
     reason = f"{sector} · {sub}" if sub else sector
-    reason += f" · {best_name}面最强({best_dim}/5)"
+    reason += f" · {best_name}面最强({best_dim:.2f}/5)"
 
     html_parts.append(f'''
             <div class="top3-item" style="border-left:3px solid {RATING_COLORS[rating]};">
                 <div class="t-name">#{i+1} {r["name"]}</div>
-                <div class="t-score" style="color:{RATING_COLORS[rating]}">{total:.1f} <span style="font-size:12px;color:#94a3b8;">/ 20</span></div>
+                <div class="t-score" style="color:{RATING_COLORS[rating]}">{total:.2f} <span style="font-size:12px;color:#94a3b8;">/ 20</span></div>
                 <div class="t-reason">{reason}</div>
             </div>''')
 
@@ -562,7 +563,7 @@ for s, v in sorted_secs:
                     <div style="flex:1;background:#0f172a;border-radius:3px;height:12px;overflow:hidden;">
                         <div style="width:{bar_w}%;height:100%;background:linear-gradient(90deg,#3b82f6,#22c55e);border-radius:3px;"></div>
                     </div>
-                    <span style="color:#94a3b8;font-size:10px;min-width:55px;text-align:right;">{avg:.1f} ({cnt}只)</span>
+                    <span style="color:#94a3b8;font-size:10px;min-width:55px;text-align:right;">{avg:.2f} ({cnt}只)</span>
                 </div>''')
 
 html_parts.append('''
@@ -593,7 +594,7 @@ for i, r in enumerate(portfolio_picks):
                     <div style="display:flex;align-items:center;gap:6px;">
                         <span style="font-size:13px;font-weight:800;color:#f8fafc;">{i+1}. {r["name"]}</span>
                         <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:{RATING_BG[rating]};color:{RATING_COLORS[rating]};">{rating}</span>
-                        <span style="font-size:14px;font-weight:800;color:{RATING_COLORS[rating]};margin-left:auto;">{total:.1f}</span>
+                        <span style="font-size:14px;font-weight:800;color:{RATING_COLORS[rating]};margin-left:auto;">{total:.2f}</span>
                     </div>
                     <div style="display:flex;gap:8px;font-size:10px;color:#94a3b8;margin-top:3px;flex-wrap:wrap;">
                         <span>FwdPE {fwd_str}</span>
@@ -639,6 +640,10 @@ for idx, r in enumerate(top20):
         peg_str = " 阶梯" + "→".join(f"{peg_val[y]}" for y in yrs)
     sub_theme = r.get("sub_theme", "")
     turnover_yi = (r.get("turnover", 0) or 0) / 100000000
+    week_chg = r.get("week_chg")
+    week_chg_str = f"{week_chg:+.2f}%" if week_chg is not None else "N/A"
+    week_chg_cls = "up" if (week_chg or 0) > 0 else "down" if (week_chg or 0) < 0 else ""
+    report_count = r.get("report_count", 0) or 0
 
     news_reasons = r.get("news_reasons", [])
     fund_reasons = r.get("fund_reasons", [])
@@ -649,9 +654,13 @@ for idx, r in enumerate(top20):
     risk_parts = [n for n in news_reasons if "⚠" in n]
     risk_html = "<br>".join([n.replace("⚠️", "") for n in risk_parts[:2]]) if risk_parts else ""
 
-    boll_label = tech.get("boll_label", "")
-    boll_pos = tech.get("boll_pos")
-    boll_info = f"BOLL:{boll_label}({boll_pos:.0f}%)" if boll_label and boll_pos is not None else ""
+    # v2.20: 技术面四因子展示(均线/MACD/量能/RSI)
+    ma_f = tech.get("ma_factor")
+    macd_f = tech.get("macd_factor")
+    vol_f = tech.get("vol_factor")
+    rsi_f = tech.get("rsi_factor")
+    factor_info = (f"均线{ma_f:.1f}·MACD{macd_f:.1f}·量能{vol_f:.1f}·RSI时机{rsi_f:.1f}"
+                   if None not in (ma_f, macd_f, vol_f, rsi_f) else "")
 
     # v2.10: RSI 超买/超卖
     rsi_val = tech.get("rsi")
@@ -662,13 +671,15 @@ for idx, r in enumerate(top20):
     score_sustain = r.get("score_sustain")
     sustain_note = r.get("sustain_note", "")
     cyclic_tag = "周期股" if r.get("is_cyclic") else ("存储模组" if r.get("is_storage_mod") else "")
-    sustain_str = (f"持续性:{score_sustain}/5 {sustain_note}" if score_sustain is not None else (sustain_note or "")) + (f" [{cyclic_tag}]" if cyclic_tag else "")
+    sustain_str = (f"持续性:{score_sustain:.2f}/5 {sustain_note}" if score_sustain is not None else (sustain_note or "")) + (f" [{cyclic_tag}]" if cyclic_tag else "")
     fund_detail = (', '.join(fund_reasons[:2]) if fund_reasons else '数据不足') + (f" · {sustain_str}" if sustain_str else "")
 
     # v2.10: 消息面7日时效
     news_recency = r.get("news_recency", "")
     news_recency_color = "#f97316" if "无消息" in news_recency else "#22c55e"
     news_detail = news_html + (f' · <span style="color:{news_recency_color};font-weight:600;">{news_recency}</span>' if news_recency else "")
+    if report_count:
+        news_detail += f' · <span style="color:#22c55e;font-weight:600;">研报×{report_count}</span>'
 
     justification = []
     if r['score_news'] >= 4: justification.append("消息面强劲")
@@ -705,33 +716,34 @@ for idx, r in enumerate(top20):
                     <div class="code">{r['code']} · {r.get('sector','')}</div>
                 </div>
                 <span class="s-pct {pct_cls}" style="font-size:13px;font-weight:700;">{pct:+.2f}%</span>
-                <div class="total" style="color:{RATING_COLORS[rating]}">{total:.1f}</div>
+                <div class="total" style="color:{RATING_COLORS[rating]}">{total:.2f}</div>
                 <div class="rating" style="background:{RATING_BG[rating]};color:{RATING_COLORS[rating]}">{rating}</div>
             </div>
             <div class="meta-row">
                 <span>💰 成交额: {turnover_yi:.0f}亿</span>
                 <span>📊 {pe_str}{fwd_str}{g_str}{peg_str}</span>
-                <span>🏷️ {r['score_news']}/5消息 · {r['score_tech']}/5技术 · {r['score_fund']}/5基本 · {r.get('score_theme',0)}/5热度</span>
+                <span class="s-pct {week_chg_cls}" style="font-weight:700;">📅 近一周 {week_chg_str}</span>
+                <span>🏷️ {r['score_news']:.2f}/5消息 · {r['score_tech']:.2f}/5技术 · {r['score_fund']:.2f}/5基本 · {r.get('score_theme',0):.2f}/5热度</span>
             </div>
             <div class="dim-row">
                 <div class="dim-card">
-                    <div class="dim-title">📰 消息面 ({r['score_news']}/5)</div>
-                    <div class="dim-score">{r['score_news']}</div>
+                    <div class="dim-title">📰 消息面 ({r['score_news']:.2f}/5)</div>
+                    <div class="dim-score">{r['score_news']:.2f}</div>
                     <div class="dim-detail">{news_detail}</div>
                 </div>
                 <div class="dim-card">
-                    <div class="dim-title">📈 技术面 ({r['score_tech']}/5)</div>
-                    <div class="dim-score">{r['score_tech']}</div>
-                    <div class="dim-detail">趋势: {tech.get('trend','N/A')} · 分位: {tech.get('position','N/A')}%{f' · {boll_info}' if boll_info else ''} · {tech.get('reason','')}{rsi_info}</div>
+                    <div class="dim-title">📈 技术面 ({r['score_tech']:.2f}/5)</div>
+                    <div class="dim-score">{r['score_tech']:.2f}</div>
+                    <div class="dim-detail">趋势: {tech.get('trend','N/A')} · 分位: {tech.get('position','N/A')}%{f' · {factor_info}' if factor_info else ''} · {tech.get('reason','')}</div>
                 </div>
                 <div class="dim-card">
-                    <div class="dim-title">📊 基本面 ({r['score_fund']}/5)</div>
-                    <div class="dim-score">{r['score_fund']}</div>
+                    <div class="dim-title">📊 基本面 ({r['score_fund']:.2f}/5)</div>
+                    <div class="dim-score">{r['score_fund']:.2f}</div>
                     <div class="dim-detail">{fund_detail}</div>
                 </div>
                 <div class="dim-card">
-                    <div class="dim-title">🔥 题材热度 ({r.get('score_theme',0)}/5){f' · {sub_theme}' if sub_theme else ''}</div>
-                    <div class="dim-score">{r.get('score_theme',0)}</div>
+                    <div class="dim-title">🔥 题材热度 ({r.get('score_theme',0):.2f}/5){f' · {sub_theme}' if sub_theme else ''}</div>
+                    <div class="dim-score">{r.get('score_theme',0):.2f}</div>
                     <div class="dim-detail">{', '.join(theme_reasons[:3]) if theme_reasons else '数据不足'}</div>
                 </div>
             </div>''')
@@ -1447,7 +1459,7 @@ def generate_research_analysis(r):
             comp_parts.append(f"<b>技术储备：</b>{profile['patents']}。")
 
         # 结合评分数据补充市场表现
-        comp_parts.append(f"<b>市场表现：</b>题材热度({score_theme}/5)、基本面({score_fund}/5)、消息面({score_news}/5)、技术面({score_tech}/5)，")
+        comp_parts.append(f"<b>市场表现：</b>题材热度({score_theme:.2f}/5)、基本面({score_fund:.2f}/5)、消息面({score_news:.2f}/5)、技术面({score_tech:.2f}/5)，")
         if growth and growth > 50:
             comp_parts.append(f"预期增速<b>+{growth:.0f}%</b>，")
         if fwd_pe and fwd_pe > 0:
@@ -1471,17 +1483,17 @@ def generate_research_analysis(r):
         # 评分维度竞争力
         dim_strengths = []
         if score_theme >= 4:
-            dim_strengths.append(f"题材热度突出({score_theme}/5)，处于市场主线风口")
+            dim_strengths.append(f"题材热度突出({score_theme:.2f}/5)，处于市场主线风口")
         if score_fund >= 4:
-            dim_strengths.append(f"基本面扎实({score_fund}/5)，估值具备吸引力")
+            dim_strengths.append(f"基本面扎实({score_fund:.2f}/5)，估值具备吸引力")
         elif score_fund <= 2 and pe > 80:
-            dim_strengths.append(f"当前PE({pe:.0f}x)偏高，基本面评分({score_fund}/5)有待提升")
+            dim_strengths.append(f"当前PE({pe:.0f}x)偏高，基本面评分({score_fund:.2f}/5)有待提升")
         if score_news >= 4:
-            dim_strengths.append(f"消息面强劲({score_news}/5)，利好催化密集")
+            dim_strengths.append(f"消息面强劲({score_news:.2f}/5)，利好催化密集")
         if score_tech >= 4:
-            dim_strengths.append(f"技术面看多({score_tech}/5)，处于强势趋势")
+            dim_strengths.append(f"技术面看多({score_tech:.2f}/5)，处于强势趋势")
         elif score_tech <= 2:
-            dim_strengths.append(f"技术面承压({score_tech}/5)，短期趋势偏弱")
+            dim_strengths.append(f"技术面承压({score_tech:.2f}/5)，短期趋势偏弱")
 
         if dim_strengths:
             comp_parts.append("；".join(dim_strengths) + "。")
@@ -1547,9 +1559,9 @@ def generate_research_analysis(r):
 
     # 评级定位
     if rating == "S":
-        value_parts.append(f"公司综合评分<b>{total:.1f}/20</b>，获评<b style='color:#fbbf24;'>S级(强烈推荐)</b>，")
+        value_parts.append(f"公司综合评分<b>{total:.2f}/20</b>，获评<b style='color:#fbbf24;'>S级(强烈推荐)</b>，")
     else:
-        value_parts.append(f"公司综合评分<b>{total:.1f}/20</b>，获评<b style='color:#3b82f6;'>A级(重点关注)</b>，")
+        value_parts.append(f"公司综合评分<b>{total:.2f}/20</b>，获评<b style='color:#3b82f6;'>A级(重点关注)</b>，")
 
     # 估值判断
     if fwd_pe and fwd_pe > 0:
@@ -1609,7 +1621,7 @@ def generate_research_analysis(r):
                 <span class="rc-code">{code}</span>
                 <span class="rc-rating" style="background:{rating_bg};color:{rating_color};">{rating}级</span>
                 <span class="rc-code">{sector}{' · ' + sub_theme if sub_theme else ''}</span>
-                <span class="rc-score">综合评分 <b style="color:{rating_color}">{total:.1f}</b>/20</span>
+                <span class="rc-score">综合评分 <b style="color:{rating_color}">{total:.2f}</b>/20</span>
             </div>
             <div class="research-module">
                 <div class="rm-title">📊 核心业务竞争力评估</div>
@@ -1708,6 +1720,7 @@ html_parts.append('''
         <label><input type="checkbox" class="col-check" data-col="rating" checked>评级</label>
         <label><input type="checkbox" class="col-check" data-col="pe" checked>PE/Fwd</label>
         <label><input type="checkbox" class="col-check" data-col="sub" checked>细分题材</label>
+        <label><input type="checkbox" class="col-check" data-col="week" checked>近一周</label>
         <label><input type="checkbox" class="col-check" data-col="turnover" checked>成交额</label>
     </div>
 
@@ -1720,6 +1733,7 @@ html_parts.append('''
                     <th class="s-code col-code">代码</th>
                     <th class="s-sector col-sector">板块</th>
                     <th class="s-pct col-pct" data-sort="pct_chg">涨跌幅 <span class="sort-arrow"></span></th>
+                    <th class="s-week col-week" data-sort="week_chg">近一周 <span class="sort-arrow"></span></th>
                     <th class="s-scores col-scores">四项评分</th>
                     <th class="s-total col-total" data-sort="total">总分 <span class="sort-arrow"></span></th>
                     <th class="s-rating col-rating">评级</th>
@@ -1748,6 +1762,11 @@ for idx, r in enumerate(results):
     sub_theme_t = r.get("sub_theme", "-")
     turnover_yi = (r.get("turnover", 0) or 0) / 100000000
 
+    week_chg = r.get("week_chg")
+    week_chg_val = week_chg if week_chg is not None else 0
+    week_chg_str = f"{week_chg:+.2f}%" if week_chg is not None else "N/A"
+    week_cls = "up" if (week_chg or 0) > 0 else "down" if (week_chg or 0) < 0 else ""
+
     scores = [r["score_news"], r["score_tech"], r["score_fund"], r.get("score_theme", r.get("score_flow", 0))]
     score_colors = ["#ef4444", "#f97316", "#f59e0b", "#3b82f6", "#22c55e"]
     scores_html = "".join([f'<div class="s-score" style="background:{score_colors[min(int(v),4)]}">{v}</div>' for v in scores])
@@ -1765,15 +1784,16 @@ for idx, r in enumerate(results):
 
     html_parts.append(f'''
                 <tr class="expandable" data-rating="{rating}" data-sector="{r.get('sector','')}" data-code="{r['code']}" data-name="{r['name']}" data-original-rank="{i}" data-fwd-pe="{r.get('fwd_pe',0) or 0}" data-growth="{r.get('growth',0) or 0}" data-position="{tech.get('position',50) or 50}" data-score-theme="{r.get('score_theme',0)}"
-                    data-news="{r['score_news']}" data-tech-score="{r['score_tech']}" data-fund-score="{r['score_fund']}" data-theme-score="{r.get('score_theme',0)}"
+                    data-news="{r['score_news']:.2f}" data-tech-score="{r['score_tech']:.2f}" data-fund-score="{r['score_fund']:.2f}" data-theme-score="{r.get('score_theme',0):.2f}"
                     data-news-text="{html_mod.escape(news_text)}" data-tech-text="{html_mod.escape(tech_text)}" data-fund-text="{html_mod.escape(fund_text)}" data-theme-text="{html_mod.escape(theme_text)}">
                     <td class="s-rank" data-value="{i}">{i}</td>
                     <td class="s-name" data-value="{r['name']}">{r['name']}</td>
                     <td class="s-code col-code" data-value="{r['code']}">{r['code']}</td>
                     <td class="s-sector col-sector" data-value="{r.get('sector','')}">{r.get('sector','')}</td>
                     <td class="s-pct {pct_cls} col-pct" data-value="{pct}">{pct:+.2f}%</td>
+                    <td class="s-week col-week {week_cls}" data-value="{week_chg_val}">{week_chg_str}</td>
                     <td class="s-scores col-scores">{scores_html}</td>
-                    <td class="s-total col-total" data-value="{r['total']}" style="color:{RATING_COLORS[rating]}">{r['total']:.1f}</td>
+                    <td class="s-total col-total" data-value="{r['total']}" style="color:{RATING_COLORS[rating]}">{r['total']:.2f}</td>
                     <td class="s-rating col-rating" style="background:{RATING_BG[rating]};color:{RATING_COLORS[rating]}" data-value="{rating}">{rating}</td>
                     <td class="s-pe col-pe" data-value="{r.get('pe',0)}">{pe}/{fwd} {ladder_t} {growth}</td>
                     <td class="s-sector col-sub">{sub_theme_t if sub_theme_t else '-'}</td>
@@ -1981,6 +2001,10 @@ function applyFilters() {
             case 'pct_chg':
                 aVal = parseFloat(a.querySelector('.s-pct').dataset.value);
                 bVal = parseFloat(b.querySelector('.s-pct').dataset.value);
+                break;
+            case 'week_chg':
+                aVal = parseFloat(a.querySelector('.s-week').dataset.value);
+                bVal = parseFloat(b.querySelector('.s-week').dataset.value);
                 break;
             case 'total':
                 aVal = parseFloat(a.querySelector('.s-total').dataset.value);
