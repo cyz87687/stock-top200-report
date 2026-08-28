@@ -360,6 +360,8 @@ def fetch_fund_flow(code):
 
 
 def run_ifind_fin(name, code):
+    if os.environ.get("SKIP_IFIND"):
+        return ""
     raw = code[2:]
     q = f"{name}{raw}市盈率PE扣非净利润增速同行业排名ROE"
     try:
@@ -370,6 +372,8 @@ def run_ifind_fin(name, code):
 
 
 def run_ifind_news(name, code):
+    if os.environ.get("SKIP_IFIND"):
+        return ""
     raw = code[2:]
     q = f"{name} {raw} 最新公告业绩利好利空"
     tdy = datetime.now()
@@ -416,8 +420,76 @@ def fetch_announcements_map(days=7):
     return {c: " | ".join(v) for c, v in ann.items()}
 
 
+def fetch_research_reports_map(days=7, codes=None):
+    """近 days 日个股研报(akshare stock_research_report_em), 按6位代码聚合。
+    v2.17 新增: 作为消息面评分信号源, 弥补 iFinD新闻/交易所公告未覆盖券商研报的缺口
+    (此前新易盛等个股有密集研报却被判"近7日无消息")。
+    返回 {code6: {"count":N, "titles":"...", "latest":"YYYY-MM-DD", "ratings":[...]}}。
+    并行抓取 + 单只超时 + 失败跳过(降级不阻塞个股评分)。
+    """
+    try:
+        import akshare as ak
+    except Exception:
+        print("   ⚠️ akshare 不可用，跳过研报覆盖")
+        return {}
+    os.environ.setdefault("TQDM_DISABLE", "1")
+    from datetime import datetime as _dt, timedelta as _td
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    cutoff = _dt.now() - _td(days=days)
+
+    def _fetch_one(code):
+        try:
+            df = ak.stock_research_report_em(symbol=code)
+        except Exception:
+            return (code, None)
+        if df is None or len(df) == 0:
+            return (code, None)
+        titles, ratings, latest = [], [], ""
+        for _, row in df.iterrows():
+            d = str(row.get("日期", row.get("发布日期", ""))).strip()
+            if not d:
+                continue
+            try:
+                dt = _dt.strptime(d, "%Y-%m-%d")
+            except Exception:
+                continue
+            if dt < cutoff:
+                continue
+            t = str(row.get("报告名称", row.get("标题", ""))).strip()
+            if t:
+                titles.append(t)
+            rt = str(row.get("东财评级", "")).strip()
+            if rt:
+                ratings.append(rt)
+            if not latest or d > latest:
+                latest = d
+        if not titles:
+            return (code, None)
+        return (code, {"count": len(titles), "titles": " | ".join(titles[:8]),
+                       "latest": latest, "ratings": ratings[:8]})
+
+    if not codes:
+        return {}
+    out = {}
+    timeout_per = 20
+    try:
+        with ThreadPoolExecutor(max_workers=12) as ex:
+            futs = {ex.submit(_fetch_one, c): c for c in codes}
+            for fut in as_completed(futs):
+                try:
+                    code, res = fut.result(timeout=timeout_per)
+                except Exception:
+                    continue
+                if res:
+                    out[code] = res
+    except Exception as e:
+        print(f"   ⚠️ 研报并行抓取异常(降级): {type(e).__name__}")
+    print(f"   研报覆盖 {len(out)} 只标的 (近{days}日, 共查{len(codes)}只)")
+    return out
+
+
 # ============================================================
-# 1. 技术面 (0-5) × 25%
+# 1. 技术面 (0-5) × 20%
 # ============================================================
 def ma(kl, n):
     if len(kl) < n: return None
@@ -431,19 +503,58 @@ def boll(kl, n=20, k=2):
     return mid + k * std, mid, mid - k * std
 
 def rsi(closes, period=14):
-    """标准 RSI(相对强弱指标), 用于判断超买/超卖。返回 0-100 或 None。"""
+    """Wilder平滑 RSI(相对强弱指标), 与同花顺/东财/通达信/腾讯自选股等主流平台一致。
+    v2.19: 由简单平均改为 Wilder 平滑(EMA式递归), 修复与外部平台口径不一致的问题
+    (此前简单平均会把工业富联算成29.3, 主流平台口径为44.3)。返回 0-100 或 None。"""
     if closes is None or len(closes) < period + 1:
         return None
     deltas = [closes[i] - closes[i - 1] for i in range(1, len(closes))]
-    recent = deltas[-period:]
-    gains = [d for d in recent if d > 0]
-    losses = [-d for d in recent if d < 0]
-    avg_gain = sum(gains) / period if gains else 0.0
-    avg_loss = sum(losses) / period if losses else 0.0
+    gains = [max(d, 0.0) for d in deltas]
+    losses = [max(-d, 0.0) for d in deltas]
+    avg_gain = sum(gains[:period]) / period
+    avg_loss = sum(losses[:period]) / period
+    for i in range(period, len(deltas)):
+        avg_gain = (avg_gain * (period - 1) + gains[i]) / period
+        avg_loss = (avg_loss * (period - 1) + losses[i]) / period
     if avg_loss == 0:
         return 100.0 if avg_gain > 0 else 50.0
     rs = avg_gain / avg_loss
     return 100 - 100 / (1 + rs)
+
+
+def macd(closes, fast=12, slow=26, signal=9):
+    """MACD(指数平滑异同移动平均): DIF=EMA(fast)-EMA(slow), DEA=EMA(DIF, signal),
+    HIST=(DIF-DEA)*2(柱). 用于判断趋势动能方向/强度。closes 为收盘价序列, 返回
+    (dif, dea, hist) 或 None(数据不足)。"""
+    n = len(closes)
+    if closes is None or n < slow + signal:
+        return None
+    # EMA 递推
+    def ema(vals, span):
+        k = 2.0 / (span + 1)
+        e = vals[0]
+        out = [e]
+        for v in vals[1:]:
+            e = v * k + e * (1 - k)
+            out.append(e)
+        return out
+    ema_fast = ema(closes, fast)
+    ema_slow = ema(closes, slow)
+    dif = [ema_fast[i] - ema_slow[i] for i in range(n)]
+    dea = ema(dif, signal)
+    hist = [(dif[i] - dea[i]) * 2 for i in range(n)]
+    return dif[-1], dea[-1], hist[-1]
+
+
+def _ema(closes, span):
+    if closes is None or len(closes) < span:
+        return None
+    k = 2.0 / (span + 1)
+    e = closes[0]
+    for v in closes[1:]:
+        e = v * k + e * (1 - k)
+    return e
+
 
 def score_tech(kl, price, pct, cagr3=None, wkl=None):
     if len(kl) < 60:
@@ -476,6 +587,8 @@ def score_tech(kl, price, pct, cagr3=None, wkl=None):
     amt20 = sum(k.get("amount", k["vol"] * k["close"]) for k in kl[-20:]) / 20
     amt_ratio = amt5 / amt20 if amt20 > 0 else 1.0
     amt_today = kl[-1].get("amount", kl[-1]["vol"] * kl[-1]["close"]) / 1e8
+    is_volume_up = amt_ratio > 1.5
+    is_shrink = amt_ratio < 0.7
 
     prev_ma5 = sum(k["close"] for k in kl[-6:-1]) / 5 if len(kl) >= 6 else None
     prev_ma20 = sum(k["close"] for k in kl[-21:-1]) / 20 if len(kl) >= 21 else None
@@ -555,111 +668,94 @@ def score_tech(kl, price, pct, cagr3=None, wkl=None):
     elif daily_bear:
         bear_level = 1
 
-    s = 3
+    # ===== 结构分四因子 (v2.20重构: 去掉BOLL/高成长, 改为均线/MACD/RSI/成交量) =====
+    # 因子1: 均线(趋势) — 多空排列等级 + 金叉死叉 + MA60确认
+    if bull_level == 3:
+        ma_factor = 5.0
+    elif bull_level == 2:
+        ma_factor = 4.3
+    elif bull_level == 1:
+        ma_factor = 3.6
+    elif trend in ("金叉", "偏多"):
+        ma_factor = 3.2
+    elif trend == "缠绕":
+        ma_factor = 2.5
+    elif trend in ("死叉", "偏空"):
+        ma_factor = 1.8
+    elif bear_level == 1:
+        ma_factor = 1.2
+    elif bear_level == 2:
+        ma_factor = 0.7
+    else:
+        ma_factor = 0.3
+    if ma60v and price > ma60v:
+        ma_factor = min(5.0, ma_factor + 0.2)
+    elif ma60v and price < ma60v:
+        ma_factor = max(0.0, ma_factor - 0.2)
+
+    # 因子2: MACD(动能) — DIF/DEA零轴位置 + 柱方向
+    mc = macd(cls)
+    if mc is None:
+        macd_factor = None
+    else:
+        _dif, _dea, _hist = mc
+        if _dif > 0:
+            macd_factor = 4.6 if _hist > 0 else 3.2
+        else:
+            macd_factor = 1.0 if _hist < 0 else 2.3
+        if abs(_hist) / price > 0.005:
+            macd_factor += 0.2 if _hist > 0 else -0.2
+        macd_factor = max(0.0, min(5.0, macd_factor))
+
+    # 因子3: 成交量(资金参与) — 量比/额比 + 量价配合
+    if amt_ratio >= 2.0:
+        vol_factor = 5.0
+    elif amt_ratio >= 1.5:
+        vol_factor = 4.3
+    elif amt_ratio >= 1.0:
+        vol_factor = 3.8
+    elif amt_ratio >= 0.7:
+        vol_factor = 3.0
+    else:
+        vol_factor = 2.0
+    if amt_ratio > 1.5 and pct >= 0:
+        vol_factor = min(5.0, vol_factor + 0.3)
+    elif amt_ratio > 1.5 and pct < 0:
+        vol_factor = max(0.0, vol_factor - 0.3)
+
+    # 因子4: RSI(入场时机) — 低位超卖=好时机, 高位超买=差时机
+    if rsi14 is None:
+        rsi_factor = 2.5
+    elif rsi14 < 20:
+        rsi_factor = 3.0
+    elif rsi14 < 35:
+        rsi_factor = 4.8
+    elif rsi14 < 50:
+        rsi_factor = 4.2
+    elif rsi14 < 65:
+        rsi_factor = 3.6
+    elif rsi14 < 75:
+        rsi_factor = 2.8
+    else:
+        rsi_factor = 1.8
+
+    W_MA, W_MACD, W_VOL, W_RSI = 0.35, 0.25, 0.25, 0.15
+    _macd_f = macd_factor if macd_factor is not None else 2.5
+    s = W_MA * ma_factor + W_MACD * _macd_f + W_VOL * vol_factor + W_RSI * rsi_factor
     r = ""
 
-    if is_bullish and pos < 30 and (boll_inside or boll_touch_upper):
-        # 低位+看多: 双线5, 周线4.5, 日线4, 其他3.5
-        s = 3.5 + bull_level * 0.5
-        r = f"{trend}+低位({pos:.0f}%)+BOLL通道内"
-    elif is_bullish and 30 <= pos < 60 and boll_inside:
-        # 中位+看多: 双线4, 周线3.5, 日线3, 其他2.5
-        s = 2.5 + bull_level * 0.5
-        r = f"{trend}+中位({pos:.0f}%)+BOLL通道内"
-    elif is_bullish and 60 <= pos < 80 and boll_inside:
-        # 相对高位+看多: 双线3, 周线2.5, 日线2, 其他1.5
-        s = 1.5 + bull_level * 0.5
-        r = f"{trend}+相对高位({pos:.0f}%)+BOLL通道内"
-    elif is_bullish and 80 <= pos < 95 and boll_touch_upper:
-        s = 1 + bull_level * 0.3
-        r = f"{trend}+高位({pos:.0f}%)+BOLL触碰上轨"
-    elif is_bullish and pos >= 95 and boll_above_upper:
-        s = 0.5 + bull_level * 0.2
-        r = f"{trend}+极值高位({pos:.0f}%)+BOLL突破上轨(严重超买)"
-    elif is_bullish and pos >= 95 and boll_touch_upper:
-        s = 0.5 + bull_level * 0.2
-        r = f"{trend}+极值高位({pos:.0f}%)+BOLL触碰上轨(超买)"
-    elif is_bullish and pos >= 80:
-        s = 1 + bull_level * 0.3
-        r = f"{trend}+高位({pos:.0f}%)"
-    elif is_bullish and boll_below_lower:
-        s = 1 + bull_level * 0.3
-        r = f"趋势偏多+BOLL破下轨(异常)"
-    elif is_bearish and pos < 20 and boll_below_lower:
-        s = 0
-        r = f"趋势走弱+低位BOLL连续破下轨"
-    elif is_bearish and boll_below_lower:
-        s = 0
-        r = f"趋势走弱+BOLL破下轨"
-    elif is_bearish and pos >= 80 and boll_above_upper:
-        s = 0
-        r = f"{trend}+高位+BOLL破上轨(极度危险)"
-    elif is_bearish and pos >= 60:
-        s = max(0, 1.5 - bear_level * 0.5)
-        r = f"趋势走弱+高位({pos:.0f}%)"
-    elif is_bearish and pos < 30:
-        s = max(0, 2.5 - bear_level * 0.5)
-        r = f"趋势走弱+低位({pos:.0f}%)可能反弹"
-    elif is_bearish:
-        s = max(0, 1.5 - bear_level * 0.5)
-        r = f"趋势走弱+中位({pos:.0f}%)"
-    elif is_neutral and boll_inside:
-        s = 3
-        r = f"趋势震荡+BOLL通道内+分位({pos:.0f}%)"
-    elif is_neutral:
-        s = 2
-        r = f"趋势震荡+分位({pos:.0f}%)"
-    else:
-        s = 2
-        r = f"趋势{trend}+分位({pos:.0f}%)"
+    # ---- 动量分 (v2.17 新增): 与结构分融合, 动量占技术面 40% ----
+    _mom = _stock_momentum(kl)
+    _s_mom = _momentum_score(_mom)
+    W_MOM = 0.40
+    _s_struct = s
+    s = _s_struct * (1 - W_MOM) + _s_mom * W_MOM
+    r += f"; 结构{_s_struct:.1f}/动量{_s_mom:.1f}(权重{W_MOM:.0%})"
 
-    # 成交额放量/缩量调节
-    is_volume_up = amt_ratio > 1.5
-    is_shrink = amt_ratio < 0.7
-    if is_volume_up and s < 5:
-        s = min(5, s + 1)
-        r += f"; 放量({amt_ratio:.1f}x/{amt_today:.0f}亿)"
-    elif is_shrink and s > 0:
-        s = max(0, s - 1)
-        r += f"; 缩量({amt_ratio:.1f}x)"
-
-    # 3年CAGR成长加分
-    if cagr3 is not None:
-        if cagr3 >= 50:
-            s = min(5, s + 1)
-            r += f"; 超高成长(CAGR3={cagr3:.0f}%)+1"
-        elif cagr3 >= 25:
-            s = min(5, s + 0.5)
-            r += f"; 高成长(CAGR3={cagr3:.0f}%)+0.5"
-
-    boll_label = ""
-    if boll_pos is not None:
-        if boll_pos > 100:
-            boll_label = "突破上轨"
-        elif boll_pos > 80:
-            boll_label = "上轨附近"
-        elif boll_pos > 50:
-            boll_label = "中轨上方"
-        elif boll_pos > 20:
-            boll_label = "中轨下方"
-        elif boll_pos > 0:
-            boll_label = "下轨附近"
-        else:
-            boll_label = "跌破下轨"
-        r += f"; BOLL:{boll_label}({boll_pos:.0f}%)"
-
-    # RSI 超买/超卖调节 (v2.10)
-    if rsi14 is not None:
-        if rsi_state == "超买":
-            if s > 2.5:
-                s = 2.5
-            r += f"; RSI{rsi14:.0f}(超买,短线回调风险)"
-        elif rsi_state == "超卖":
-            if s < 3:
-                s = min(5, s + 0.5)
-            r += f"; RSI{rsi14:.0f}(超卖,存在反弹机会)"
-        else:
-            r += f"; RSI{rsi14:.0f}(中性)"
+    # ---- 结构分四因子说明 ----
+    _macd_f = macd_factor if macd_factor is not None else 2.5
+    r += (f"; 均线{ma_factor:.1f}({trend})·MACD{_macd_f:.1f}·量能{vol_factor:.1f}"
+          f"·RSI时机{rsi_factor:.1f}(RSI{rsi14:.0f})")
 
     detail = {
         "ma5": round(ma5v, 1) if ma5v else None,
@@ -675,13 +771,19 @@ def score_tech(kl, price, pct, cagr3=None, wkl=None):
         "vol_ratio": round(vr, 2),
         "amount_ratio": round(amt_ratio, 2),
         "amount_today_yi": round(amt_today, 1),
-        "boll_upper": round(boll_upper, 2) if boll_upper else None,
-        "boll_mid": round(boll_mid, 2) if boll_mid else None,
-        "boll_lower": round(boll_lower, 2) if boll_lower else None,
-        "boll_pos": round(boll_pos, 1) if boll_pos is not None else None,
-        "boll_label": boll_label if boll_label else None,
+        "macd_dif": round(mc[0], 3) if mc else None,
+        "macd_dea": round(mc[1], 3) if mc else None,
+        "macd_hist": round(mc[2], 3) if mc else None,
+        "ma_factor": round(ma_factor, 2),
+        "macd_factor": round(_macd_f, 2),
+        "vol_factor": round(vol_factor, 2),
+        "rsi_factor": round(rsi_factor, 2),
         "rsi": round(rsi14, 1) if rsi14 is not None else None,
         "rsi_state": rsi_state,
+        "mom5": round(_mom.get(5), 1) if _mom and _mom.get(5) is not None else None,
+        "mom10": round(_mom.get(10), 1) if _mom and _mom.get(10) is not None else None,
+        "mom20": round(_mom.get(20), 1) if _mom and _mom.get(20) is not None else None,
+        "momentum_score": round(_s_mom, 2),
         "reason": r,
     }
 
@@ -714,17 +816,6 @@ def score_tech(kl, price, pct, cagr3=None, wkl=None):
         explanations.append("MA5上穿MA20，短线买点信号")
     elif trend == "死叉":
         explanations.append("MA5下穿MA20，短线卖点信号")
-    if boll_label:
-        boll_explain = {
-            "突破上轨": "价格突破BOLL上轨，短期超买注意回调",
-            "上轨附近": "接近BOLL上轨压力位，上涨空间有限",
-            "中轨上方": "BOLL中轨上方运行，多头占优",
-            "中轨下方": "BOLL中轨下方运行，空头占优",
-            "下轨附近": "接近BOLL下轨支撑位，可能反弹",
-            "跌破下轨": "价格跌破BOLL下轨，短期超卖可能反弹",
-        }
-        if boll_label in boll_explain:
-            explanations.append(boll_explain[boll_label])
     if pos >= 90:
         explanations.append(f"价格处于120日{pos:.0f}%分位，接近区间高点")
     elif pos <= 10:
@@ -1571,9 +1662,73 @@ def _agg_momentum(moms):
     return out
 
 
+def _momentum_score(mom):
+    """由个股近5/10/20日收益率映射动量分(0-5)。v2.17 新增, 作为技术面动量子项。
+    规则: 中性基准2.5; 20日收益为主(权重0.6), 10日(0.3), 5日(0.1); 分级加成。
+    短中期均强(20日≥10%且10日≥5%)额外+0.3; 均弱额外-0.3。
+    """
+    if not mom:
+        return 2.5
+    r20 = mom.get(20)
+    r10 = mom.get(10)
+    r5 = mom.get(5)
+
+    def adj(v):
+        if v is None:
+            return 0
+        if v >= 30: return 1.5
+        if v >= 20: return 1.2
+        if v >= 10: return 0.8
+        if v >= 5:  return 0.4
+        if v >= 0:  return 0.0
+        if v >= -5: return -0.4
+        if v >= -10: return -0.8
+        if v >= -20: return -1.2
+        return -1.5
+
+    s = 2.5
+    s += adj(r20) * 0.6 + adj(r10) * 0.3 + adj(r5) * 0.1
+    if r20 is not None and r10 is not None and r20 >= 10 and r10 >= 5:
+        s += 0.3
+    if r20 is not None and r10 is not None and r20 <= -10 and r10 <= -5:
+        s -= 0.3
+    return max(0.0, min(5.0, s))
+
+
+def _sector_momentum_score(mom20, mom10, mom5):
+    """题材板块动量因子 → 0-5: 由成分股近20/10/5日中位动量构造(权重6:3:1)。"""
+    def _f(r):
+        if r is None:
+            return 2.5
+        if r >= 15: return 5.0
+        if r >= 8:  return 4.2
+        if r >= 3:  return 3.4
+        if r >= 0:  return 2.6
+        if r >= -3: return 2.0
+        if r >= -8: return 1.3
+        return 0.6
+    vals = [(mom20, 0.6), (mom10, 0.3), (mom5, 0.1)]
+    avail = [(m, w) for m, w in vals if m is not None]
+    if not avail:
+        return 2.5
+    s = sum(_f(m) * w for m, w in avail) / sum(w for _, w in avail)
+    if mom20 is not None and mom10 is not None:
+        if mom10 - mom20 >= 5: s += 0.2
+        elif mom10 - mom20 <= -5: s -= 0.2
+    return max(0.0, min(5.0, round(s, 2)))
+
+
+def _turnover_rank_score(pct_rank):
+    """成交额排名因子 → 0-5: pct_rank∈[0,1], 1=成交额最高(全市场关注度最强)。"""
+    if pct_rank is None:
+        return 2.5
+    return max(0.0, min(5.0, round(pct_rank * 5, 2)))
+
+
 def score_theme(name, sector, pct, turnover, all_top200_sectors,
                 sector_data=None, sector_zt_counts=None,
-                mom_map=None, theme_mom=None, sub_mom=None, code=None):
+                mom_map=None, theme_mom=None, sub_mom=None, code=None,
+                turnover_pct_map=None):
     """
     题材热度评分 (0-5): 以内禀质量(THEME_DB/SUB_THEME)为先验，以成分股近
     5/10/20日真实动量(中位数+上涨占比)为主导信号。
@@ -1612,67 +1767,59 @@ def score_theme(name, sector, pct, turnover, all_top200_sectors,
         sub_label = theme["label"]
         reasons = [f"板块:{sub_label}(内禀{intrinsic})"]
 
-    # ===== 真实动量信号(主导): 成分股近20/10/5日中位数收益 =====
+    # ============================================================
+    # 因子1: 题材板块动量 (0-5) —— 成分股近20/10/5日中位动量构造
     # 优先细分题材聚合, 其次板块聚合; 均来自TOP200内成分股, 不依赖外部接口
+    # ============================================================
     agg = None
     if sub_label and sub_mom and sub_label in sub_mom:
         agg = sub_mom[sub_label]
-    if (not agg or agg.get(20, {}).get("n", 0) < 2) and theme_mom and sector in theme_mom:
+    # v2.20: 仅当细分题材完全无聚合数据(agg is None)时才 fallback 到粗板块;
+    # 细分题材哪怕仅1-2只成分股, 也用自身动量作为该细分板块动量, 恢复细分区分度。
+    # (旧逻辑: 细分<2只即 fallback 粗板块, 导致同粗板块下消费电子/光模块等
+    #  细分题材共用同一板块动量值, 丧失区分度 — 老大核查发现两者均为3.84)
+    if agg is None and theme_mom and sector in theme_mom:
         agg = theme_mom[sector]
     mom20 = agg.get(20, {}).get("median") if agg else None
     mom10 = agg.get(10, {}).get("median") if agg else None
     mom5 = agg.get(5, {}).get("median") if agg else None
     up_ratio20 = agg.get(20, {}).get("up_ratio") if agg else None
     n_cons = agg.get(20, {}).get("n", 0) if agg else 0
-
-    def _mom_delta(r):
-        if r is None:
-            return 0.0
-        if r >= 8:    return 1.5    # 强势主线
-        if r >= 3:    return 0.75
-        if r > -3:    return -0.25  # 横盘: 轻微拖累(不再默认满分)
-        if r > -8:    return -1.0
-        return -1.75               # 明显退潮
-
-    delta = _mom_delta(mom20)
-    if mom20 is not None and mom10 is not None:
-        if mom10 - mom20 >= 5:
-            delta += 0.25
-            reasons.append("短期(10日)加速强于中期(20日)")
-        elif mom10 - mom20 <= -5:
-            delta -= 0.25
-            reasons.append("短期(10日)弱于中期(20日),动能衰减")
-    if mom20 is not None and up_ratio20 is not None:
-        reasons.append(f"题材近20日中位{mom20:+.1f}%,上涨占比{up_ratio20:.0%}({n_cons}只样本)")
+    M = _sector_momentum_score(mom20, mom10, mom5)
+    if mom20 is not None:
+        reasons.append(f"板块动量因子 {M:.2f}/5 (近20日中位{mom20:+.1f}%, 上涨占比{up_ratio20:.0%}, {n_cons}只样本)")
     else:
-        reasons.append("题材成分股动量样本不足,以内禀分为主")
+        reasons.append("板块动量样本不足, 因子取中性2.50")
 
-    # ===== 个股自身近20日动量(与题材背离时修正) =====
+    # ============================================================
+    # 因子2: 成交额排名 (0-5) —— 个股成交额在TOP200全市场的百分位
+    # ============================================================
+    _tp = turnover_pct_map.get(code, 0.5) if turnover_pct_map else 0.5
+    T = _turnover_rank_score(_tp)
+    _rank_pct = int((1 - _tp) * 100)
+    reasons.append(f"成交额排名因子 {T:.2f}/5 (成交额位于全市场前{_rank_pct}%)")
+
+    # ============================================================
+    # 因子3: 情绪确认 (0-5) —— 个股背离 + 今日单日 + 新浪板块 + 涨停验证
+    # ============================================================
+    _cdelta = 0.0
     sm = mom_map.get(code) if (mom_map and code) else None
     if sm and sm.get(20) is not None:
         s20 = sm[20]
         if s20 - (mom20 or 0) >= 8:
-            delta += 0.25
+            _cdelta += 0.25
             reasons.append(f"个股近20日{s20:+.1f}%强于题材,超额明显")
         elif s20 - (mom20 or 0) <= -8:
-            delta -= 0.25
+            _cdelta -= 0.25
             reasons.append(f"个股近20日{s20:+.1f}%弱于题材")
-
-    # ===== 今日单日确认 =====
     if pct >= 9.9:
-        delta += 0.5
-        reasons.append("涨停确认强度")
+        _cdelta += 0.5; reasons.append("涨停确认强度")
     elif pct >= 5:
-        delta += 0.25
-        reasons.append(f"大涨{pct:+.1f}%验证")
+        _cdelta += 0.25; reasons.append(f"大涨{pct:+.1f}%验证")
     elif pct <= -7:
-        delta -= 0.5
-        reasons.append(f"大跌{pct:.1f}%,短期降温")
+        _cdelta -= 0.5; reasons.append(f"大跌{pct:.1f}%,短期降温")
     elif pct <= -3:
-        delta -= 0.25
-        reasons.append(f"下跌{pct:.1f}%")
-
-    # ===== 新浪板块接口(补充信号, 非门控) =====
+        _cdelta -= 0.25; reasons.append(f"下跌{pct:.1f}%")
     sector_pct = None
     if sector_data:
         sina_name = SECTOR_SINA_MAP.get(sector, "")
@@ -1680,13 +1827,9 @@ def score_theme(name, sector, pct, turnover, all_top200_sectors,
         if sd:
             sector_pct = sd["pct"]
             if sector_pct <= -2:
-                delta -= 0.25
-                reasons.append(f"板块当日下跌{sector_pct:.1f}%(新浪)")
+                _cdelta -= 0.25; reasons.append(f"板块当日下跌{sector_pct:.1f}%(新浪)")
             elif sector_pct >= 3:
-                delta += 0.25
-                reasons.append(f"板块当日大涨{sector_pct:+.1f}%(新浪)")
-
-    # ===== 涨停验证(今日情绪, 非门控) =====
+                _cdelta += 0.25; reasons.append(f"板块当日大涨{sector_pct:+.1f}%(新浪)")
     zt_count = up_count = sector_total = 0
     if sector_zt_counts:
         zt_count = sector_zt_counts.get(sector, {}).get("zt", 0)
@@ -1695,15 +1838,14 @@ def score_theme(name, sector, pct, turnover, all_top200_sectors,
     if sector_total > 0:
         upr = up_count / sector_total
         if zt_count >= 3:
-            delta += 0.3
-            reasons.append(f"板块{zt_count}只涨停,做多情绪强")
+            _cdelta += 0.3; reasons.append(f"板块{zt_count}只涨停,做多情绪强")
         elif zt_count >= 1:
-            delta += 0.15
-            reasons.append(f"板块{zt_count}只涨停")
+            _cdelta += 0.15; reasons.append(f"板块{zt_count}只涨停")
         if upr >= 0.7:
             reasons.append(f"上涨占比{upr:.0%},普涨")
         elif upr <= 0.3:
             reasons.append(f"上涨占比仅{upr:.0%},多数下跌")
+    C = max(0.0, min(5.0, 2.5 + _cdelta))
 
     # ===== 生命周期(基于真实动量) =====
     lifecycle = "震荡期"
@@ -1732,8 +1874,10 @@ def score_theme(name, sector, pct, turnover, all_top200_sectors,
     elif sector_count >= 5:
         reasons.append(f"板块有一定关注度({sector_count}只上榜)")
 
-    score = _clamp(intrinsic + delta, 0, 5)
-    return round(score * 2) / 2, reasons, sub_label, lifecycle
+    # ===== 综合(透明加权): 内禀×0.30 + 板块动量×0.35 + 成交额排名×0.15 + 情绪确认×0.20 =====
+    W_I, W_M, W_T, W_C = 0.30, 0.35, 0.15, 0.20
+    score = _clamp(W_I * intrinsic + W_M * M + W_T * T + W_C * C, 0, 5)
+    return round(score, 2), reasons, sub_label, lifecycle
 
 
 # ============================================================
@@ -2205,7 +2349,7 @@ KNOWN_CATALYSTS = {
     "sh601958": {"level": 3, "reason": "钼矿龙头+钼价上行+军工高温合金需求增长", "risk": "钼价波动+资源枯竭风险"},
 }
 
-def score_news(news_text, pct, name="", code="", growth=None, ann_text=""):
+def score_news(news_text, pct, name="", code="", growth=None, ann_text="", report_text="", report_count=0):
     """
     消息面评分 (v2.9):
     仅依据真实新闻/已验证催化剂/交易所公告评分，业绩数据不作为消息面依据
@@ -2345,6 +2489,49 @@ def score_news(news_text, pct, name="", code="", growth=None, ann_text=""):
             news_items.append({"source": "交易所公告(akshare)", "time": "", "sentiment": "利空",
                                "content": f"公告检测到利空关键词×{a_bear}", "url": ""})
 
+    # 1b2c. 定期报告(财报)披露识别 — v2.21 修复
+    # 此前公告关键词仅含"业绩预增/预减"等预告词, 漏识别正式半年报/季报/年报披露,
+    # 导致"有财报"的标的(如胜宏科技300476于2026-08-27披露半年报净利+33%)被判"近7日无消息"。
+    # 现补充: 检测到定期报告披露即视为有效消息(消除"无消息"误判);
+    # 若报告含增长类措辞判为利好, 含下滑/亏损判为利空, 否则中性。
+    REPORT_KW = ["半年度报告", "半年报", "季度报告", "一季报", "三季报", "年报", "年度报告",
+                 "财报", "定期报告", "业绩报告", "中报"]
+    if ann_text and any(k in ann_text for k in REPORT_KW):
+        has_content = True
+        _grow = any(k in ann_text for k in ["增长", "提升", "扭亏", "增盈", "同比增", "回暖", "创新高"])
+        _decl = any(k in ann_text for k in ["下降", "下滑", "减少", "亏损", "预减", "同比降", "承压"])
+        if _grow and not _decl:
+            if content_score < 5:
+                content_score = min(5, content_score + 0.6)
+            if content_label in ("无消息", "中性"):
+                content_label = "利好"
+            reasons.append("财报披露:业绩增长(定期报告)")
+            news_items.append({"source": "交易所公告(akshare)", "time": "", "sentiment": "利好",
+                               "content": "定期报告披露且业绩增长", "url": ""})
+        elif _decl and not _grow:
+            if content_score > 0:
+                content_score = max(1, content_score - 0.5)
+            reasons.append("财报披露:业绩下滑(定期报告)")
+            news_items.append({"source": "交易所公告(akshare)", "time": "", "sentiment": "利空",
+                               "content": "定期报告披露且业绩下滑", "url": ""})
+        else:
+            reasons.append("财报披露(定期报告,中性)")
+            news_items.append({"source": "交易所公告(akshare)", "time": "", "sentiment": "中性",
+                               "content": "定期报告披露", "url": ""})
+
+    # 1b2b. 研报覆盖(akshare 个股研报, 近7日) — v2.17 新增信号源
+    # 弥补 iFinD新闻/交易所公告未覆盖券商研报的缺口(此前新易盛有密集研报却被判"近7日无消息")
+    if report_count and report_count > 0:
+        rep_bonus = min(1.0, 0.5 + 0.15 * (report_count - 1))
+        if content_score < 5:
+            content_score = min(5, content_score + rep_bonus)
+        if content_label in ("无消息", "中性"):
+            content_label = "利好"
+        has_content = True
+        reasons.append(f"近7日研报覆盖×{report_count}篇(机构关注度高)")
+        news_items.append({"source": "券商研报(东财)", "time": "", "sentiment": "机构关注",
+                           "content": f"近7日研报{report_count}篇", "url": ""})
+
     # 1b3. 多源共振(v2.12): iFinD新闻+交易所公告双源确认利好 → 额外加分(5分的主要通道)
     # 单源(仅关键词/仅公告)自然封顶约4.5; 双源共振或已验证催化剂(level=5)才可到5
     if ifd_bull and ann_bull and content_score < 5:
@@ -2373,19 +2560,28 @@ def score_news(news_text, pct, name="", code="", growth=None, ann_text=""):
     if not has_content:
         reasons.append("无真实新闻/催化剂")
 
-    # ========== Step 1d: 近7日时效判定 (v2.10) ==========
-    # 仅7日内新闻(iFinD)/公告(akshare)视为"近期信号"; 已验证催化剂(KNOWN_CATALYSTS)
-    # 若近7日无新增消息, 视为时效性减弱, 评分下调
-    recent_signal = bool(news_text and len(news_text) > 20) or bool(ann_text and len(ann_text) > 2)
+    # ========== Step 1d: 近7日时效判定 (v2.10, v2.17 扩展研报) ==========
+    # 7日内新闻(iFinD)/公告(akshare)/研报(东财)任一存在即视为"近期信号"。
+    # 已验证催化剂(KNOWN_CATALYSTS)若近7日无新增消息/公告/研报, 视为时效性减弱, 评分下调
+    recent_signal = (bool(news_text and len(news_text) > 20)
+                     or bool(ann_text and len(ann_text) > 2)
+                     or bool(report_count and report_count > 0))
     recency_penalty = False
     if not recent_signal:
         if code in KNOWN_CATALYSTS and content_score > 0:
             content_score = max(0, round(content_score * 0.4, 1))
-            reasons.append("近7日无新增消息/公告,已验证催化剂时效性减弱,消息面评分下调")
+            reasons.append("近7日无新增消息/公告/研报,已验证催化剂时效性减弱,消息面评分下调")
             recency_penalty = True
         news_recency = "近7日无消息"
     else:
-        news_recency = "近7日有消息/公告"
+        parts = []
+        if news_text and len(news_text) > 20:
+            parts.append("新闻")
+        if ann_text and len(ann_text) > 2:
+            parts.append("公告")
+        if report_count and report_count > 0:
+            parts.append(f"研报×{report_count}")
+        news_recency = "近7日有" + "/".join(parts) if parts else "近7日有消息/公告"
     reasons.append(f"消息时效:{news_recency}")
 
     # ========== Step 2: 股价反应调节 (次要) ==========
@@ -3077,13 +3273,38 @@ def main():
             a = sub_mom[lab].get(20, {})
             print(f"   题材[{lab}] 近20日中位{a.get('median', 0):+.1f}% 上涨占比{a.get('up_ratio', 0):.0%} ({a.get('n', 0)}只)")
 
+    # v2.21 诊断: 短期(10日) vs 中期(20日) 题材动量对比 — 验证"动能衰减"是否普遍/异常
+    _ns = _nd = 0; _dex = []
+    for _lab, _agg in sub_mom.items():
+        _m10 = _agg.get(10, {}).get("median"); _m20 = _agg.get(20, {}).get("median")
+        if _m10 is not None and _m20 is not None:
+            _ns += 1
+            if _m10 < _m20:
+                _nd += 1
+                if len(_dex) < 10:
+                    _dex.append(f"{_lab}:10日{_m10:+.1f}% < 20日{_m20:+.1f}%")
+    print(f"   ⚠️ 题材动量诊断: {_nd}/{_ns} 个细分题材 近10日中位 < 近20日中位 (动能衰减占比 {_nd/max(1,_ns):.0%})")
+    for _e in _dex: print("     ", _e)
+
     # --- Step 4.8: 全市场公告覆盖 (近7日, akshare) ---
     print(f"\n📢 Step 4.8: 全市场公告覆盖 (近7日)")
     ann_map = fetch_announcements_map(days=7)
     print(f"   公告覆盖 {len(ann_map)} 只标的")
 
+    # --- Step 4.8b: 近7日研报覆盖 (akshare 个股研报, v2.17 新增信号源) ---
+    print(f"\n📑 Step 4.8b: 近7日研报覆盖 (akshare)")
+    _codes6 = [s["code"][2:] for s in stocks if len(s.get("code", "")) >= 6]
+    report_map = fetch_research_reports_map(days=7, codes=_codes6)
+
     # --- Step 5: Score all ---
     print(f"\n🎯 Step 5: 四维评分(题材30%+基本面30%(含行业前景)+消息20%+技术面20%)")
+    # 成交额排名百分位(TOP200全市场口径): 最高成交额=1.0
+    _tns = [st.get("turnover", 0) or 0 for st in stocks]
+    _order = sorted(range(len(stocks)), key=lambda i: _tns[i], reverse=True)
+    turnover_pct_map = {}
+    _N = max(1, len(stocks) - 1)
+    for _rank, _idx in enumerate(_order):
+        turnover_pct_map[stocks[_idx]["code"]] = 1.0 - _rank / _N
     results = []
     for i, s in enumerate(stocks):
         code = s["code"]
@@ -3126,12 +3347,22 @@ def main():
         ths, thr, sub_theme_label, lifecycle = score_theme(
             name, sector, pct, turnover, all_top200_sectors,
             sector_data=sector_data, sector_zt_counts=sector_zt_counts,
-            mom_map=mom_map, theme_mom=theme_mom, sub_mom=sub_mom, code=code)
+            mom_map=mom_map, theme_mom=theme_mom, sub_mom=sub_mom, code=code,
+            turnover_pct_map=turnover_pct_map)
         
-        # News (传入增速用于动态评估; ann_text 为近7日公告覆盖)
+        # News (传入增速用于动态评估; ann_text 为近7日公告覆盖; 研报为近7日券商研报覆盖)
         ntext = news_map.get(code, "")
         ann_text = ann_map.get(code[2:], "")
-        ns, nr, news_items, news_recency = score_news(ntext, pct, name, code, growth=growth_resolved, ann_text=ann_text)
+        rep = report_map.get(code[2:], {}) or {}
+        report_count = rep.get("count", 0) if rep else 0
+        report_text = rep.get("titles", "") if rep else ""
+        ns, nr, news_items, news_recency = score_news(
+            ntext, pct, name, code, growth=growth_resolved,
+            ann_text=ann_text, report_text=report_text, report_count=report_count)
+
+        # 近一周(约5交易日)涨幅, 由日K线计算
+        _mom_tmp = _stock_momentum(kl)
+        week_chg = round(_mom_tmp.get(5), 2) if _mom_tmp and _mom_tmp.get(5) is not None else None
         
         # Weighted total: 题材30% + 基本面30% + 消息20% + 技术面20%
         # 行业前景加分叠加到技术面,上限5分
@@ -3143,8 +3374,8 @@ def main():
                 td = dict(td)
                 td["industry_prospect"] = f"行业前景{'加分' if industry_bonus > 0 else '减分'}{industry_bonus:+.1f}({label})"
         w = ns * 0.20 + ts_adj * 0.20 + fs * 0.30 + ths * 0.30
-        total = w * 4
-        
+        total = round(w * 4, 2)
+
         if total >= 17: rating, advice = "S", "优先买入，可重仓"
         elif total >= 13: rating, advice = "A", "逢低加仓，重点关注"
         elif total >= 9: rating, advice = "B", "波段操作，轻仓参与"
@@ -3157,16 +3388,17 @@ def main():
             "name": name, "code": code, "sector": sector,
             "price": price, "pct_chg": pct, "pe": pe,
             "turnover": turnover,
-            "score_news": ns, "score_tech": ts_adj, "score_fund": fs,
-            "score_theme": ths, "total": round(total, 1), "rating": rating,
+            "score_news": round(ns, 2), "score_tech": round(ts_adj, 2), "score_fund": round(fs, 2),
+            "score_theme": round(ths, 2), "total": total, "rating": rating,
             "advice": advice,
             "tech": td, "fund_reasons": fr, "theme_reasons": thr,
             "news_reasons": nr,
             "news_items": news_items,
             "news_recency": news_recency,
+            "report_count": report_count,
             "sub_theme": sub_theme_label,
             "lifecycle": lifecycle,
-            "score_sustain": sustain_info["score"],
+            "score_sustain": round(sustain_info["score"], 2),
             "sustain_note": sustain_info["note"],
             "is_cyclic": sustain_info["is_cyclic"],
             "is_storage_mod": sustain_info["is_storage_mod"],
@@ -3174,6 +3406,7 @@ def main():
             "growth": round(growth_resolved, 1) if growth_resolved else None,
             "pe_ladder": ladder_resolved if ladder_resolved else None,
             "cagr3": cagr3_input,
+            "week_chg": week_chg,
         })
 
         print(f"   {i+1:2d}. {name:6s} {em}{rating} {total:4.1f}  "
@@ -3227,8 +3460,8 @@ def main():
     
     out_data = {
         "date": raw.get("date", ""),
-        "model": "stock-scorer v2.16",
-        "weights": "题材30% 基本面30%(含行业前景) 消息20% 技术面20%",
+        "model": "stock-scorer v2.21",
+        "weights": "题材30%(内禀0.30+板块动量0.35+成交额排名0.15+情绪确认0.20) 消息20% 技术面20%(结构60%[均线趋势35%/MACD动能25%/量能资金25%/RSI入场时机15%]+动量40%,RSI为Wilder平滑口径) 基本面30%(含行业前景)",
         "results": results,
         "stats": {
             "rating_dist": {r: rc.get(r, 0) for r in "SABCD"},
