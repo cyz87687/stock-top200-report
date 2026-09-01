@@ -12173,6 +12173,119 @@
       "week_chg": 37.49
     },
     {
+      "name": "景旺电子",
+      "code": "sh603228",
+      "sector": "电子制造",
+      "price": 89.3,
+      "pct_chg": -7.45,
+      "pe": 75.58,
+      "turnover": 3673579379.0,
+      "score_news": 0,
+      "score_tech": 3.25,
+      "score_fund": 3.5,
+      "score_theme": 3.36,
+      "total": 10.83,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 93.3,
+        "ma10": 92.1,
+        "ma20": 92.7,
+        "ma60": 79.4,
+        "wma5": 94.2,
+        "wma10": 83.2,
+        "wma20": 78.7,
+        "trend": "周线多头",
+        "bull_level": 2,
+        "position": 80.0,
+        "vol_ratio": 0.73,
+        "amount_ratio": 0.74,
+        "amount_today_yi": 36.5,
+        "macd_dif": 3.618,
+        "macd_dea": 4.434,
+        "macd_hist": -1.631,
+        "ma_factor": 4.5,
+        "macd_factor": 3.0,
+        "vol_factor": 3.0,
+        "rsi_factor": 3.6,
+        "rsi": 50.8,
+        "rsi_state": "中性",
+        "mom5": -1.9,
+        "mom10": -8.8,
+        "mom20": 11.6,
+        "momentum_score": 2.7,
+        "reason": "; 结构3.6/动量2.7(权重40%); 均线4.5(周线多头)·MACD3.0·量能3.0·RSI时机3.6(RSI51)",
+        "overall": "偏强",
+        "explanations": [
+          "周线多头排列但日线未确认，中线偏强"
+        ],
+        "support_levels": [
+          [
+            "MA20均线",
+            92.73
+          ],
+          [
+            "BOLL下轨",
+            82.87
+          ],
+          [
+            "MA60均线",
+            79.38
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "120日高点",
+            98.21
+          ],
+          [
+            "BOLL上轨",
+            102.6
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "估值偏高(FwdPE=40.8)+适度增长(+15%)",
+        "估值阶梯强收缩(40.8→24.1→16.7),3年收缩59%,高PE起始,阶梯加分受限",
+        "PEG=2.72(偏高估值)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "细分题材:PCB/HDI(内禀4)",
+        "板块动量因子 3.74/5 (近20日中位+51.3%, 上涨占比100%, 2只样本)",
+        "成交额排名因子 3.33/5 (成交额位于全市场前33%)",
+        "个股近20日+11.6%弱于题材",
+        "大跌-7.5%,短期降温",
+        "上涨占比仅0%,多数下跌",
+        "题材加速期,趋势延续",
+        "板块有一定关注度(6只上榜)"
+      ],
+      "news_reasons": [
+        "无真实新闻/催化剂",
+        "消息时效:近7日有公告",
+        "大跌-7.5%(价格确认利空信号)"
+      ],
+      "news_items": [],
+      "news_recency": "近7日有公告",
+      "report_count": 0,
+      "sub_theme": "PCB/HDI",
+      "lifecycle": "加速期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 40.8,
+      "growth": null,
+      "pe_ladder": {
+        "2026": 40.8,
+        "2027": 24.1,
+        "2028": 16.7
+      },
+      "cagr3": null,
+      "week_chg": -1.9
+    },
+    {
       "name": "江丰电子",
       "code": "sz300666",
       "sector": "AI/半导体",
@@ -15552,118 +15665,6 @@
       "week_chg": 0.74
     },
     {
-      "name": "景旺电子",
-      "code": "sh603228",
-      "sector": "电子制造",
-      "price": 89.3,
-      "pct_chg": -7.45,
-      "pe": 75.58,
-      "turnover": 3673579379.0,
-      "score_news": 0,
-      "score_tech": 3.25,
-      "score_fund": 2.8,
-      "score_theme": 3.36,
-      "total": 9.99,
-      "rating": "B",
-      "advice": "波段操作，轻仓参与",
-      "tech": {
-        "ma5": 93.3,
-        "ma10": 92.1,
-        "ma20": 92.7,
-        "ma60": 79.4,
-        "wma5": 94.2,
-        "wma10": 83.2,
-        "wma20": 78.7,
-        "trend": "周线多头",
-        "bull_level": 2,
-        "position": 80.0,
-        "vol_ratio": 0.73,
-        "amount_ratio": 0.74,
-        "amount_today_yi": 36.5,
-        "macd_dif": 3.618,
-        "macd_dea": 4.434,
-        "macd_hist": -1.631,
-        "ma_factor": 4.5,
-        "macd_factor": 3.0,
-        "vol_factor": 3.0,
-        "rsi_factor": 3.6,
-        "rsi": 50.8,
-        "rsi_state": "中性",
-        "mom5": -1.9,
-        "mom10": -8.8,
-        "mom20": 11.6,
-        "momentum_score": 2.7,
-        "reason": "; 结构3.6/动量2.7(权重40%); 均线4.5(周线多头)·MACD3.0·量能3.0·RSI时机3.6(RSI51)",
-        "overall": "偏强",
-        "explanations": [
-          "周线多头排列但日线未确认，中线偏强"
-        ],
-        "support_levels": [
-          [
-            "MA20均线",
-            92.73
-          ],
-          [
-            "BOLL下轨",
-            82.87
-          ],
-          [
-            "MA60均线",
-            79.38
-          ]
-        ],
-        "resistance_levels": [
-          [
-            "120日高点",
-            98.21
-          ],
-          [
-            "BOLL上轨",
-            102.6
-          ]
-        ],
-        "vol_price_analysis": "量价基本平衡"
-      },
-      "fund_reasons": [
-        "估值偏高(FwdPE=40.8)+增长一般(+-3%)",
-        "估值阶梯强收缩(40.8→24.1→16.7),3年收缩59%,高PE起始,阶梯加分受限",
-        "持续性:盈利下滑,持续性偏弱"
-      ],
-      "theme_reasons": [
-        "细分题材:PCB/HDI(内禀4)",
-        "板块动量因子 3.74/5 (近20日中位+51.3%, 上涨占比100%, 2只样本)",
-        "成交额排名因子 3.33/5 (成交额位于全市场前33%)",
-        "个股近20日+11.6%弱于题材",
-        "大跌-7.5%,短期降温",
-        "上涨占比仅0%,多数下跌",
-        "题材加速期,趋势延续",
-        "板块有一定关注度(6只上榜)"
-      ],
-      "news_reasons": [
-        "无真实新闻/催化剂",
-        "消息时效:近7日有公告",
-        "大跌-7.5%(价格确认利空信号)"
-      ],
-      "news_items": [],
-      "news_recency": "近7日有公告",
-      "report_count": 0,
-      "sub_theme": "PCB/HDI",
-      "lifecycle": "加速期",
-      "score_sustain": 2.0,
-      "sustain_note": "盈利下滑,持续性偏弱",
-      "is_cyclic": false,
-      "is_storage_mod": false,
-      "fwd_pe": 40.8,
-      "growth": -3.1,
-      "pe_ladder": {
-        "2026": 40.8,
-        "2027": 24.1,
-        "2028": 16.7
-      },
-      "cagr3": 2.2,
-      "week_chg": -1.9
-    },
-    {
       "name": "信维通信",
       "code": "sz300136",
       "sector": "AI/半导体",
@@ -19007,11 +19008,11 @@
       ],
       "news_reasons": [
         "无真实新闻/催化剂",
-        "消息时效:近7日无消息",
+        "消息时效:近7日有公告",
         "上涨+4.5%"
       ],
       "news_items": [],
-      "news_recency": "近7日无消息",
+      "news_recency": "近7日有公告",
       "report_count": 0,
       "sub_theme": "综合/其他",
       "lifecycle": "高潮期",
@@ -24264,7 +24265,7 @@
       },
       "电子制造": {
         "count": 6,
-        "avg": 10.1
+        "avg": 10.2
       },
       "高端制造": {
         "count": 3,
