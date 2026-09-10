@@ -478,13 +478,16 @@ me_disp = (f"{mr_score}分 {mr_phase}" if mr_score is not None else "—")
 
 # ===== v2.22 AI 复盘点评(每日由AI生成, 优先于模板文本) =====
 ai_review = {}
-_ai_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ai_review_today.json")
-try:
-    if os.path.exists(_ai_path):
-        with open(_ai_path, "r", encoding="utf-8") as _f:
-            ai_review = json.load(_f)
-except Exception:
-    ai_review = {}
+_ai_dir = os.path.dirname(os.path.abspath(__file__))
+for _cand in ("ai_assessment.json", "ai_review_today.json"):
+    if not ai_review:
+        _p = os.path.join(_ai_dir, _cand)
+        try:
+            if os.path.exists(_p):
+                with open(_p, "r", encoding="utf-8") as _f:
+                    ai_review = json.load(_f)
+        except Exception:
+            ai_review = {}
 
 ai_text = (ai_review.get("commentary") or "").strip()
 ai_watch = ai_review.get("watch_directions") or []
@@ -712,6 +715,23 @@ for idx, r in enumerate(top20):
     sustain_str = (f"持续性:{score_sustain:.2f}/5 {sustain_note}" if score_sustain is not None else (sustain_note or "")) + (f" [{cyclic_tag}]" if cyclic_tag else "")
     fund_detail = (', '.join(fund_reasons[:2]) if fund_reasons else '数据不足') + (f" · {sustain_str}" if sustain_str else "")
 
+    # v2.30: AI增强层 — 业绩一/二阶导 + AI赋分徽标
+    ai_fd = r.get("fund_detail") or {}
+    deriv_str = ""
+    if ai_fd:
+        _g1 = ai_fd.get("deriv1_growth")
+        _s1 = ai_fd.get("deriv1_score")
+        _d2 = ai_fd.get("deriv2_delta")
+        _s2 = ai_fd.get("deriv2_score")
+        if _g1 is not None:
+            deriv_str = f" · 业绩一阶导(增速{_g1:+.0f}%) {_s1:.1f}分"
+            if _d2 is not None:
+                deriv_str += f" · 二阶导(加速度{_d2:+.0f}pt) {_s2:.1f}分"
+    ai_badge = ""
+    if r.get("ai_applied"):
+        ai_badge = ('<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;'
+                    'background:#ede9fe;color:#7c3aed;margin-left:6px;">🤖AI增强</span>')
+
     # v2.10: 消息面7日时效
     news_recency = r.get("news_recency", "")
     news_recency_color = "#f97316" if "无消息" in news_recency else "#22c55e"
@@ -750,7 +770,7 @@ for idx, r in enumerate(top20):
             <div class="header-row">
                 <div class="rank" style="background:{rank_color}">#{i}</div>
                 <div>
-                    <div class="name">{r['name']}{change_tag}</div>
+                    <div class="name">{r['name']}{change_tag}{ai_badge}</div>
                     <div class="code">{r['code']} · {r.get('sector','')}</div>
                 </div>
                 <span class="s-pct {pct_cls}" style="font-size:13px;font-weight:700;">{pct:+.2f}%</span>
@@ -777,12 +797,12 @@ for idx, r in enumerate(top20):
                 <div class="dim-card">
                     <div class="dim-title">📊 基本面 ({r['score_fund']:.2f}/5)</div>
                     <div class="dim-score">{r['score_fund']:.2f}</div>
-                    <div class="dim-detail">{fund_detail}</div>
+                    <div class="dim-detail">{fund_detail}{deriv_str}</div>
                 </div>
                 <div class="dim-card">
                     <div class="dim-title">🔥 题材热度 ({r.get('score_theme',0):.2f}/5){f' · {sub_theme}' if sub_theme else ''}</div>
                     <div class="dim-score">{r.get('score_theme',0):.2f}</div>
-                    <div class="dim-detail">{', '.join(theme_reasons[:3]) if theme_reasons else '数据不足'}</div>
+                    <div class="dim-detail">{', '.join(theme_reasons[:3]) if theme_reasons else '数据不足'}{f" · 🤖AI赋分 消息{r['ai_news']:.2f}/热度{r['ai_theme_heat']:.2f} | {r.get('ai_theme_label','')}" if r.get('ai_applied') else ''}</div>
                 </div>
             </div>''')
 
@@ -1850,9 +1870,24 @@ html_parts.append('''
         <button id="nextPage">下一页 →</button>
     </div>
 
+''')
+
+# ===== v2.30 AI 评分模型总结 (由AI生成) =====
+_ams = data.get("ai_model_summary", "").strip()
+ai_model_html = ""
+if _ams:
+    ai_model_html = ('    <div class="ai-model-summary" style="margin:24px 0;padding:18px 20px;'
+                     'background:linear-gradient(135deg,#1e1b4b,#0f172a);border:1px solid #6d28d9;border-radius:12px;">'
+                     '<div style="font-size:15px;font-weight:800;color:#c4b5fd;margin-bottom:10px;">'
+                     '🤖 评分模型总结 (v2.30 AI增强版)</div>'
+                     '<div style="font-size:13px;line-height:1.9;color:#e2e8f0;white-space:pre-wrap;">'
+                     + html_mod.escape(_ams) + '</div></div>')
+html_parts.append(ai_model_html)
+
+html_parts.append('''
     <div class="footer">
         <p>⚠️ 免责声明: 本报告由AI基于stock-scorer极简评分模型自动生成,仅供参考,不构成投资建议。投资有风险,入市需谨慎。</p>
-        <p>评分模型: 题材热度30% + 基本面30%(含行业前景) + 消息面20% + 技术面20%</p>
+        <p>评分模型 (v2.30 AI增强版): 题材热度30% + 基本面30%(含业绩一阶导/二阶导) + 消息面20%(AI赋分) + 技术面20%；消息/题材热度由AI基于当日题材资金共识赋分(0.7×AI+0.3×算法)</p>
         <p>Generated: ''' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '''</p>
     </div>
 </div>
