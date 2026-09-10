@@ -476,11 +476,49 @@ amt_disp = (f"{mr_amt/10000:.2f}万亿" if (mr_amt and mr_amt >= 10000) else (f"
 breadth_disp = (f"涨{mr_up}/跌{mr_down} · 涨停{mr_zt}/跌停{mr_dt}" if (mr_up is not None and mr_down is not None) else "—")
 me_disp = (f"{mr_score}分 {mr_phase}" if mr_score is not None else "—")
 
+# ===== v2.22 AI 复盘点评(每日由AI生成, 优先于模板文本) =====
+ai_review = {}
+_ai_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ai_review_today.json")
+try:
+    if os.path.exists(_ai_path):
+        with open(_ai_path, "r", encoding="utf-8") as _f:
+            ai_review = json.load(_f)
+except Exception:
+    ai_review = {}
+
+ai_text = (ai_review.get("commentary") or "").strip()
+ai_watch = ai_review.get("watch_directions") or []
+ai_risk = (ai_review.get("risk_note") or "").strip()
+ai_date = ai_review.get("date", "")
+
+if ai_text:
+    review_title = (f'🤖 AI 盘面复盘点评 <span style="font-size:11px;color:#64748b;font-weight:400;">'
+                   f'(每日AI生成 · {ai_date})</span>')
+    if ai_watch:
+        _items = "".join(f"<li style='margin:4px 0;'>{html_mod.escape(str(w))}</li>" for w in ai_watch)
+        watch_html = (f'<div style="margin:12px 0;padding:10px 14px;background:#0f172a;'
+                      f'border-left:3px solid #f59e0b;border-radius:8px;">'
+                      f'<b style="color:#f59e0b;font-size:13px;">📌 需要关注的方向</b>'
+                      f'<ol style="margin:8px 0 0 18px;padding:0;font-size:12.5px;line-height:1.7;color:#e2e8f0;">{_items}</ol></div>')
+    else:
+        watch_html = ""
+    risk_html = (f'<div style="margin:10px 0;padding:8px 14px;background:#1a1208;'
+                 f'border-left:3px solid #ef4444;border-radius:8px;'
+                 f'font-size:12.5px;color:#fca5a5;">⚠️ {html_mod.escape(ai_risk)}</div>') if ai_risk else ""
+    review_body = (f'<div class="review-text" style="font-size:13px;line-height:1.9;color:#e2e8f0;'
+                   f'background:#0f172a;border-left:3px solid #3b82f6;padding:12px 14px;border-radius:8px;margin:10px 0;">'
+                   f'{html_mod.escape(ai_text)}</div>{watch_html}{risk_html}')
+else:
+    review_title = "📝 盘面复盘点评"
+    review_body = (f'<div class="review-text" style="font-size:13px;line-height:1.9;color:#e2e8f0;'
+                   f'background:#0f172a;border-left:3px solid #3b82f6;padding:12px 14px;border-radius:8px;margin:10px 0;">'
+                   f'{html_mod.escape(mr_text)}</div>')
+
 html_parts.append(f'''
-    <!-- 复盘点评 (v2.11) -->
+    <!-- 复盘点评 (v2.22 AI生成优先) -->
     <div class="core-conclusion review-card">
-        <h2>📝 盘面复盘点评</h2>
-        <div class="review-text" style="font-size:13px;line-height:1.9;color:#e2e8f0;background:#0f172a;border-left:3px solid #3b82f6;padding:12px 14px;border-radius:8px;margin:10px 0;">{mr_text}</div>
+        <h2>{review_title}</h2>
+        {review_body}
         <div class="review-metrics" style="display:flex;flex-wrap:wrap;gap:10px;margin:12px 0;font-size:12px;color:#cbd5e1;">
             <span style="background:#1e293b;padding:6px 10px;border-radius:6px;"><b style="color:#94a3b8;">指数</b> {idx_chips}</span>
             <span style="background:#1e293b;padding:6px 10px;border-radius:6px;"><b style="color:#94a3b8;">成交</b> {amt_disp}</span>
