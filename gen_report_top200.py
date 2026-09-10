@@ -610,41 +610,94 @@ for s, v in sorted_secs:
 html_parts.append('''
         </div>
 
-        <!-- 组合推荐 -->
+        <!-- 组合推荐 (AI 过审优先) -->
         <div class="chart-card" style="padding:16px;">
-            <h3 style="font-size:13px;margin-bottom:10px;">🎯 组合推荐 · 板块分散+估值合理</h3>''')
+''')
+results_by_name = {r["name"]: r for r in results}
+ai_port = (ai_review.get("portfolio") or {})
+ai_picks = ai_port.get("picks") or []
+use_ai_port = bool(ai_picks)
 
-for i, r in enumerate(portfolio_picks):
-    rating = r["rating"]
-    total = r["total"]
-    fwd = r.get("fwd_pe", "-")
-    growth = r.get("growth", "-")
-    sub = r.get("sub_theme", r["sector"])
-    tech = r.get("tech", {})
-    position = tech.get("position", 0)
-    dims = [r["score_news"], r["score_tech"], r["score_fund"], r.get("score_theme", 0)]
-    min_dim = min(dims)
-    growth_str = f"{growth:+.0f}%" if isinstance(growth, (int, float)) else str(growth)
-    fwd_str = f"{fwd:.1f}x" if isinstance(fwd, (int, float)) else str(fwd)
-    pos_str = f"分位{position:.0f}%" if position else ""
-    balance_tag = "均衡" if min_dim >= 3 else ""
-    tags = [t for t in [sub, pos_str, balance_tag] if t]
+if use_ai_port:
+    ptitle = ai_port.get("title") or "组合推荐 · 产业链分散+估值校验(AI)"
+    html_parts.append(f'            <h3 style="font-size:13px;margin-bottom:10px;">🎯 {html_mod.escape(ptitle)}</h3>')
+    div_note = ai_port.get("diversification", "")
+    if div_note:
+        html_parts.append(f'''            <div style="font-size:11.5px;line-height:1.7;color:#e2e8f0;background:#0f172a;border-left:3px solid #3b82f6;padding:8px 10px;border-radius:6px;margin-bottom:8px;">🔗 <b style="color:#93c5fd;">分散度校验：</b>{html_mod.escape(div_note)}</div>''')
+    val_note = ai_port.get("valuation", "")
+    if val_note:
+        html_parts.append(f'''            <div style="font-size:11.5px;line-height:1.7;color:#e2e8f0;background:#0f172a;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:8px;">💰 <b style="color:#fbbf24;">估值校验：</b>{html_mod.escape(val_note)}</div>''')
+    for i, pk in enumerate(ai_picks):
+        name = pk.get("name") if isinstance(pk, dict) else pk
+        r = results_by_name.get(name)
+        if not r:
+            continue
+        rating = r["rating"]; total = r["total"]
+        fwd = r.get("fwd_pe"); growth = r.get("growth")
+        tech = r.get("tech", {}); position = tech.get("position", 0)
+        fwd_str = f"{fwd:.1f}x" if isinstance(fwd, (int, float)) else "—"
+        growth_str = f"{growth:+.0f}%" if isinstance(growth, (int, float)) else "—"
+        pos_str = f"分位{position:.0f}%" if position else ""
+        vlabel = pk.get("valuation", "") if isinstance(pk, dict) else ""
+        note = pk.get("note", "") if isinstance(pk, dict) else ""
+        extra = " · ".join([x for x in [pos_str, note] if x])
+        vcolor = "#22c55e" if "合理" in vlabel else ("#ef4444" if ("偏贵" in vlabel or "陷阱" in vlabel) else "#94a3b8")
+        html_parts.append(f'''
+                    <div style="background:#0f172a;border-radius:6px;padding:8px 10px;margin-bottom:6px;border-left:3px solid {RATING_COLORS[rating]};">
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:13px;font-weight:800;color:#f8fafc;">{i+1}. {html_mod.escape(str(name))}</span>
+                            <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:{RATING_BG[rating]};color:{RATING_COLORS[rating]};">{rating}</span>
+                            <span style="font-size:11px;color:{vcolor};margin-left:4px;">{html_mod.escape(str(vlabel))}</span>
+                            <span style="font-size:14px;font-weight:800;color:{RATING_COLORS[rating]};margin-left:auto;">{total:.2f}</span>
+                        </div>
+                        <div style="display:flex;gap:8px;font-size:10px;color:#94a3b8;margin-top:3px;flex-wrap:wrap;">
+                            <span>FwdPE {fwd_str}</span>
+                            <span>增速 {growth_str}</span>
+                            <span>{html_mod.escape(extra)}</span>
+                        </div>
+                    </div>''')
+    verdict = ai_port.get("verdict", "")
+    if verdict:
+        html_parts.append(f'''            <div style="font-size:11px;color:#cbd5e1;margin-top:6px;padding:6px 8px;background:rgba(59,130,246,0.1);border-radius:4px;">📌 {html_mod.escape(verdict)}</div>''')
+    html_parts.append('''
+                <div style="font-size:9px;color:#475569;margin-top:6px;padding:6px 8px;background:rgba(249,115,22,0.1);border-radius:4px;">
+                    ⚠️ AI基于真实产业链联动与估值分位校验生成，仅供研究参考，非投资建议
+                </div>
+        </div>
+    </div>''')
+else:
+    html_parts.append('''            <h3 style="font-size:13px;margin-bottom:10px;">🎯 组合推荐 · 板块分散+估值合理</h3>''')
+    for i, r in enumerate(portfolio_picks):
+        rating = r["rating"]
+        total = r["total"]
+        fwd = r.get("fwd_pe", "-")
+        growth = r.get("growth", "-")
+        sub = r.get("sub_theme", r["sector"])
+        tech = r.get("tech", {})
+        position = tech.get("position", 0)
+        dims = [r["score_news"], r["score_tech"], r["score_fund"], r.get("score_theme", 0)]
+        min_dim = min(dims)
+        growth_str = f"{growth:+.0f}%" if isinstance(growth, (int, float)) else str(growth)
+        fwd_str = f"{fwd:.1f}x" if isinstance(fwd, (int, float)) else str(fwd)
+        pos_str = f"分位{position:.0f}%" if position else ""
+        balance_tag = "均衡" if min_dim >= 3 else ""
+        tags = [t for t in [sub, pos_str, balance_tag] if t]
 
-    html_parts.append(f'''
-                <div style="background:#0f172a;border-radius:6px;padding:8px 10px;margin-bottom:6px;border-left:3px solid {RATING_COLORS[rating]};">
-                    <div style="display:flex;align-items:center;gap:6px;">
-                        <span style="font-size:13px;font-weight:800;color:#f8fafc;">{i+1}. {r["name"]}</span>
-                        <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:{RATING_BG[rating]};color:{RATING_COLORS[rating]};">{rating}</span>
-                        <span style="font-size:14px;font-weight:800;color:{RATING_COLORS[rating]};margin-left:auto;">{total:.2f}</span>
-                    </div>
-                    <div style="display:flex;gap:8px;font-size:10px;color:#94a3b8;margin-top:3px;flex-wrap:wrap;">
-                        <span>FwdPE {fwd_str}</span>
-                        <span>增速 {growth_str}</span>
-                        <span>{' · '.join(tags)}</span>
-                    </div>
-                </div>''')
+        html_parts.append(f'''
+                    <div style="background:#0f172a;border-radius:6px;padding:8px 10px;margin-bottom:6px;border-left:3px solid {RATING_COLORS[rating]};">
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:13px;font-weight:800;color:#f8fafc;">{i+1}. {r["name"]}</span>
+                            <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:{RATING_BG[rating]};color:{RATING_COLORS[rating]};">{rating}</span>
+                            <span style="font-size:14px;font-weight:800;color:{RATING_COLORS[rating]};margin-left:auto;">{total:.2f}</span>
+                        </div>
+                        <div style="display:flex;gap:8px;font-size:10px;color:#94a3b8;margin-top:3px;flex-wrap:wrap;">
+                            <span>FwdPE {fwd_str}</span>
+                            <span>增速 {growth_str}</span>
+                            <span>{' · '.join(tags)}</span>
+                        </div>
+                    </div>''')
 
-html_parts.append('''
+    html_parts.append('''
                 <div style="font-size:9px;color:#475569;margin-top:6px;padding:6px 8px;background:rgba(249,115,22,0.1);border-radius:4px;">
                     ⚠️ 筛选：S/A级 + FwdPE≤60 + 增速≥15% + 分位≤95% + 板块去重 + 四维均衡加分，仅供研究参考
                 </div>
