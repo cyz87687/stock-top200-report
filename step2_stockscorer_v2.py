@@ -2946,29 +2946,39 @@ def build_market_review(market_breadth, stats, results):
     else:
         s4 = "当前市场风格趋于均衡，硬件制造与景气兑现并重的方向更受资金青睐。"
 
-    # ---------- 5) 关口展望 ----------
+    # ---------- 5) 关口展望 + 财报季动态(去除写死"等待中报", 按月份动态) ----------
+    m = datetime.now().month
+    if m in (7, 8):
+        season = "中报密集披露期，密切跟踪业绩兑现与赛道景气度的匹配度。"
+    elif m == 9:
+        season = "中报已披露完毕，重点验证业绩兑现成色与赛道景气度的匹配度，关注绩优方向的持续性。"
+    elif m in (10, 11):
+        season = "三季报预告陆续披露，聚焦业绩边际变化与全年指引。"
+    elif m in (1, 2, 3, 4):
+        season = "年报与一季报密集披露，关注业绩确定性及全年预期修正。"
+    else:
+        season = "处于财报真空期，题材与资金博弈主导，跟踪产业政策与景气前瞻信号。"
     sh_level = idx_level.get("上证")
     if sh_level:
         gate = (int(sh_level) // 500 + 1) * 500
         if 0 < gate - sh_level <= 100:
-            s5 = (f"沪指报{sh_level:.0f}点，逼近{gate}点关口，"
-                  f"后续重点观察成交量能否持续维持高位，"
-                  f"同时等待中报业绩进一步验证赛道景气度。")
+            s5 = f"沪指报{sh_level:.0f}点，逼近{gate}点关口，后续重点观察成交量能否持续维持高位；{season}"
         else:
-            s5 = (f"沪指报{sh_level:.0f}点，"
-                  f"后续重点观察成交量能否持续维持高位，"
-                  f"同时等待中报业绩进一步验证赛道景气度。")
+            s5 = f"沪指报{sh_level:.0f}点，{season}"
     else:
-        s5 = ("后续重点观察成交量能否持续维持高位，"
-              "同时等待中报业绩进一步验证赛道景气度。")
-
-    text = "".join([s for s in (s1, s2, s3, s4, s5) if s])
+        s5 = season
 
     # 消息面催化密集度(仅统计近7日有真实消息/公告覆盖的标的, 对齐v2.10时效口径, 不虚构标题)
     total_news = sum(1 for r in results if r.get("news_recency") == "近7日有消息/公告")
     hot_news = sum(1 for r in results
                    if r.get("news_recency") == "近7日有消息/公告"
                    and (r.get("sub_theme") or r.get("sector") or "") in set(hot))
+    if total_news:
+        s6 = f"消息面：近7日 {total_news} 只上榜个股有公告/中报催化，其中 {hot_news} 只集中于强势方向，事件驱动仍是资金主攻线索。"
+    else:
+        s6 = ""
+
+    text = "".join([s for s in (s1, s2, s3, s4, s5, s6) if s])
 
     return {
         "available": True,
@@ -3460,7 +3470,7 @@ def main():
     
     out_data = {
         "date": raw.get("date", ""),
-        "model": "stock-scorer v2.21",
+        "model": "stock-scorer v2.22",
         "weights": "题材30%(内禀0.30+板块动量0.35+成交额排名0.15+情绪确认0.20) 消息20% 技术面20%(结构60%[均线趋势35%/MACD动能25%/量能资金25%/RSI入场时机15%]+动量40%,RSI为Wilder平滑口径) 基本面30%(含行业前景)",
         "results": results,
         "stats": {
