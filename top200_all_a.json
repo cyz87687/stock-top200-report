@@ -3,2809 +3,2809 @@
     {
       "name": "中际旭创",
       "code": "sz300308",
-      "price": 908.9,
-      "pct_chg": 0.72,
-      "turnover": 18420917475.0,
-      "amount": 18420917475.0
-    },
-    {
-      "name": "东山精密",
-      "code": "sz002384",
-      "price": 196.06,
-      "pct_chg": 5.17,
-      "turnover": 16160062787.0,
-      "amount": 16160062787.0
-    },
-    {
-      "name": "亨通光电",
-      "code": "sh600487",
-      "price": 66.62,
-      "pct_chg": 5.56,
-      "turnover": 14492707429.0,
-      "amount": 14492707429.0
-    },
-    {
-      "name": "宁德时代",
-      "code": "sz300750",
-      "price": 336.84,
-      "pct_chg": 0.4,
-      "turnover": 12957469558.0,
-      "amount": 12957469558.0
-    },
-    {
-      "name": "新易盛",
-      "code": "sz300502",
-      "price": 414.8,
-      "pct_chg": -0.38,
-      "turnover": 12024951079.0,
-      "amount": 12024951079.0
-    },
-    {
-      "name": "华工科技",
-      "code": "sz000988",
-      "price": 108.79,
-      "pct_chg": 8.22,
-      "turnover": 11116402001.0,
-      "amount": 11116402001.0
-    },
-    {
-      "name": "长鑫科技",
-      "code": "sh688825",
-      "price": 56.87,
-      "pct_chg": -2.6,
-      "turnover": 10277241099.0,
-      "amount": 10277241099.0
-    },
-    {
-      "name": "中天科技",
-      "code": "sh600522",
-      "price": 34.12,
-      "pct_chg": 4.95,
-      "turnover": 8996226302.0,
-      "amount": 8996226302.0
-    },
-    {
-      "name": "长飞光纤",
-      "code": "sh601869",
-      "price": 442.03,
-      "pct_chg": 6.04,
-      "turnover": 8886271897.0,
-      "amount": 8886271897.0
-    },
-    {
-      "name": "兆易创新",
-      "code": "sh603986",
-      "price": 381.87,
-      "pct_chg": -1.06,
-      "turnover": 8816384418.0,
-      "amount": 8816384418.0
-    },
-    {
-      "name": "生益科技",
-      "code": "sh600183",
-      "price": 148.16,
-      "pct_chg": 1.28,
-      "turnover": 8801337181.0,
-      "amount": 8801337181.0
-    },
-    {
-      "name": "中国巨石",
-      "code": "sh600176",
-      "price": 42.67,
-      "pct_chg": 3.09,
-      "turnover": 8408234978.0,
-      "amount": 8408234978.0
+      "price": 890.1,
+      "pct_chg": -2.07,
+      "turnover": 15491122257.0,
+      "amount": 15491122257.0
     },
     {
       "name": "天孚通信",
       "code": "sz300394",
-      "price": 258.03,
-      "pct_chg": -0.18,
-      "turnover": 7907332901.0,
-      "amount": 7907332901.0
+      "price": 269.0,
+      "pct_chg": 4.25,
+      "turnover": 13799920488.0,
+      "amount": 13799920488.0
     },
     {
-      "name": "光迅科技",
-      "code": "sz002281",
-      "price": 182.79,
-      "pct_chg": 1.59,
-      "turnover": 7454716651.0,
-      "amount": 7454716651.0
+      "name": "东山精密",
+      "code": "sz002384",
+      "price": 193.74,
+      "pct_chg": -1.18,
+      "turnover": 10905979359.0,
+      "amount": 10905979359.0
     },
     {
       "name": "远东股份",
       "code": "sh600869",
-      "price": 24.93,
-      "pct_chg": 10.02,
-      "turnover": 7371146996.0,
-      "amount": 7371146996.0
+      "price": 24.1,
+      "pct_chg": -3.33,
+      "turnover": 10166276199.0,
+      "amount": 10166276199.0
     },
     {
-      "name": "永鼎股份",
-      "code": "sh600105",
-      "price": 41.48,
-      "pct_chg": 6.06,
-      "turnover": 7161382095.0,
-      "amount": 7161382095.0
+      "name": "宁德时代",
+      "code": "sz300750",
+      "price": 338.06,
+      "pct_chg": 0.36,
+      "turnover": 9828547427.0,
+      "amount": 9828547427.0
     },
     {
-      "name": "寒武纪",
-      "code": "sh688256",
-      "price": 1054.96,
-      "pct_chg": -0.38,
-      "turnover": 6913648256.0,
-      "amount": 6913648256.0
+      "name": "亨通光电",
+      "code": "sh600487",
+      "price": 63.91,
+      "pct_chg": -4.07,
+      "turnover": 9447321897.0,
+      "amount": 9447321897.0
     },
     {
-      "name": "杭电股份",
-      "code": "sh603618",
-      "price": 41.58,
-      "pct_chg": 3.67,
-      "turnover": 6910451043.0,
-      "amount": 6910451043.0
+      "name": "长鑫科技",
+      "code": "sh688825",
+      "price": 57.2,
+      "pct_chg": 0.58,
+      "turnover": 9348854964.0,
+      "amount": 9348854964.0
     },
     {
-      "name": "兴森科技",
-      "code": "sz002436",
-      "price": 39.45,
-      "pct_chg": -1.67,
-      "turnover": 6886889693.0,
-      "amount": 6886889693.0
+      "name": "新易盛",
+      "code": "sz300502",
+      "price": 410.9,
+      "pct_chg": -0.94,
+      "turnover": 9041258594.0,
+      "amount": 9041258594.0
     },
     {
-      "name": "紫金矿业",
-      "code": "sh601899",
-      "price": 34.4,
-      "pct_chg": 1.59,
-      "turnover": 6802972940.0,
-      "amount": 6802972940.0
+      "name": "华工科技",
+      "code": "sz000988",
+      "price": 105.8,
+      "pct_chg": -2.75,
+      "turnover": 8892342096.0,
+      "amount": 8892342096.0
     },
     {
-      "name": "胜宏科技",
-      "code": "sz300476",
-      "price": 233.51,
-      "pct_chg": 1.97,
-      "turnover": 6290028923.0,
-      "amount": 6290028923.0
+      "name": "生益科技",
+      "code": "sh600183",
+      "price": 146.96,
+      "pct_chg": -0.81,
+      "turnover": 8625341225.0,
+      "amount": 8625341225.0
+    },
+    {
+      "name": "中国巨石",
+      "code": "sh600176",
+      "price": 43.46,
+      "pct_chg": 1.85,
+      "turnover": 8564498376.0,
+      "amount": 8564498376.0
+    },
+    {
+      "name": "兆易创新",
+      "code": "sh603986",
+      "price": 380.64,
+      "pct_chg": -0.32,
+      "turnover": 8242535193.0,
+      "amount": 8242535193.0
     },
     {
       "name": "剑桥科技",
       "code": "sh603083",
-      "price": 218.99,
-      "pct_chg": -1.49,
-      "turnover": 6188605063.0,
-      "amount": 6188605063.0
-    },
-    {
-      "name": "三环集团",
-      "code": "sz300408",
-      "price": 117.77,
-      "pct_chg": 2.26,
-      "turnover": 6136462375.0,
-      "amount": 6136462375.0
-    },
-    {
-      "name": "沪电股份",
-      "code": "sz002463",
-      "price": 127.55,
-      "pct_chg": 2.12,
-      "turnover": 6100788161.0,
-      "amount": 6100788161.0
-    },
-    {
-      "name": "中粮糖业",
-      "code": "sh600737",
-      "price": 19.8,
-      "pct_chg": 9.03,
-      "turnover": 5479681336.0,
-      "amount": 5479681336.0
-    },
-    {
-      "name": "江西铜业",
-      "code": "sh600362",
-      "price": 49.57,
-      "pct_chg": 2.14,
-      "turnover": 5343000874.0,
-      "amount": 5343000874.0
-    },
-    {
-      "name": "香农芯创",
-      "code": "sz300475",
-      "price": 174.52,
-      "pct_chg": -2.86,
-      "turnover": 5259217981.0,
-      "amount": 5259217981.0
-    },
-    {
-      "name": "大族激光",
-      "code": "sz002008",
-      "price": 94.85,
-      "pct_chg": -0.91,
-      "turnover": 5111620691.0,
-      "amount": 5111620691.0
-    },
-    {
-      "name": "云南锗业",
-      "code": "sz002428",
-      "price": 91.43,
-      "pct_chg": 1.53,
-      "turnover": 5073131945.0,
-      "amount": 5073131945.0
-    },
-    {
-      "name": "浪潮信息",
-      "code": "sz000977",
-      "price": 71.38,
-      "pct_chg": -1.3,
-      "turnover": 5058632842.0,
-      "amount": 5058632842.0
-    },
-    {
-      "name": "工业富联",
-      "code": "sh601138",
-      "price": 65.24,
-      "pct_chg": 0.76,
-      "turnover": 4971511293.0,
-      "amount": 4971511293.0
+      "price": 234.43,
+      "pct_chg": 7.05,
+      "turnover": 7387430360.0,
+      "amount": 7387430360.0
     },
     {
       "name": "中国船舶",
       "code": "sh600150",
-      "price": 39.53,
-      "pct_chg": 1.15,
-      "turnover": 4688484622.0,
-      "amount": 4688484622.0
+      "price": 40.82,
+      "pct_chg": 3.26,
+      "turnover": 7144558405.0,
+      "amount": 7144558405.0
+    },
+    {
+      "name": "国际复材",
+      "code": "sz301526",
+      "price": 29.42,
+      "pct_chg": 6.79,
+      "turnover": 6096799111.0,
+      "amount": 6096799111.0
+    },
+    {
+      "name": "寒武纪",
+      "code": "sh688256",
+      "price": 1043.84,
+      "pct_chg": -1.05,
+      "turnover": 5938529252.0,
+      "amount": 5938529252.0
+    },
+    {
+      "name": "兴森科技",
+      "code": "sz002436",
+      "price": 39.71,
+      "pct_chg": 0.66,
+      "turnover": 5726013308.0,
+      "amount": 5726013308.0
     },
     {
       "name": "华正新材",
       "code": "sh603186",
-      "price": 212.06,
+      "price": 217.99,
+      "pct_chg": 2.8,
+      "turnover": 5413184615.0,
+      "amount": 5413184615.0
+    },
+    {
+      "name": "德明利",
+      "code": "sz001309",
+      "price": 418.22,
+      "pct_chg": 2.09,
+      "turnover": 5180466333.0,
+      "amount": 5180466333.0
+    },
+    {
+      "name": "长飞光纤",
+      "code": "sh601869",
+      "price": 435.74,
+      "pct_chg": -1.42,
+      "turnover": 4967840426.0,
+      "amount": 4967840426.0
+    },
+    {
+      "name": "金安国纪",
+      "code": "sz002636",
+      "price": 76.45,
       "pct_chg": 10.0,
-      "turnover": 4658624546.0,
-      "amount": 4658624546.0
+      "turnover": 4791046362.0,
+      "amount": 4791046362.0
     },
     {
-      "name": "亚盛集团",
-      "code": "sh600108",
-      "price": 5.71,
-      "pct_chg": 8.14,
-      "turnover": 4525026596.0,
-      "amount": 4525026596.0
+      "name": "风华高科",
+      "code": "sz000636",
+      "price": 50.9,
+      "pct_chg": 2.41,
+      "turnover": 4574921601.0,
+      "amount": 4574921601.0
     },
     {
-      "name": "景旺电子",
-      "code": "sh603228",
-      "price": 109.59,
-      "pct_chg": 2.45,
-      "turnover": 4506673191.0,
-      "amount": 4506673191.0
+      "name": "沪电股份",
+      "code": "sz002463",
+      "price": 127.92,
+      "pct_chg": 0.29,
+      "turnover": 4554301574.0,
+      "amount": 4554301574.0
     },
     {
-      "name": "源杰科技",
-      "code": "sh688498",
-      "price": 1718.0,
-      "pct_chg": 0.17,
-      "turnover": 4491656861.0,
-      "amount": 4491656861.0
+      "name": "恒瑞医药",
+      "code": "sh600276",
+      "price": 42.93,
+      "pct_chg": -3.98,
+      "turnover": 4488705829.0,
+      "amount": 4488705829.0
     },
     {
-      "name": "药明康德",
-      "code": "sh603259",
-      "price": 154.88,
-      "pct_chg": -0.94,
-      "turnover": 4442359326.0,
-      "amount": 4442359326.0
+      "name": "招商轮船",
+      "code": "sh601872",
+      "price": 20.58,
+      "pct_chg": -1.95,
+      "turnover": 4356377053.0,
+      "amount": 4356377053.0
     },
     {
-      "name": "北方铜业",
-      "code": "sz000737",
-      "price": 16.47,
-      "pct_chg": 4.84,
-      "turnover": 4387931784.0,
-      "amount": 4387931784.0
+      "name": "中天科技",
+      "code": "sh600522",
+      "price": 33.3,
+      "pct_chg": -2.4,
+      "turnover": 4280061105.0,
+      "amount": 4280061105.0
     },
     {
-      "name": "德科立",
-      "code": "sh688205",
-      "price": 223.3,
-      "pct_chg": 5.33,
-      "turnover": 4344056633.0,
-      "amount": 4344056633.0
+      "name": "光迅科技",
+      "code": "sz002281",
+      "price": 179.39,
+      "pct_chg": -1.86,
+      "turnover": 4251683578.0,
+      "amount": 4251683578.0
     },
     {
-      "name": "太辰光",
-      "code": "sz300570",
-      "price": 201.55,
-      "pct_chg": 0.0,
-      "turnover": 4324081851.0,
-      "amount": 4324081851.0
-    },
-    {
-      "name": "通鼎互联",
-      "code": "sz002491",
-      "price": 22.22,
-      "pct_chg": 3.59,
-      "turnover": 4320140679.0,
-      "amount": 4320140679.0
+      "name": "立讯精密",
+      "code": "sz002475",
+      "price": 54.45,
+      "pct_chg": -2.52,
+      "turnover": 4234383066.0,
+      "amount": 4234383066.0
     },
     {
       "name": "协创数据",
       "code": "sz300857",
-      "price": 259.12,
-      "pct_chg": -2.6,
-      "turnover": 4299528663.0,
-      "amount": 4299528663.0
+      "price": 263.52,
+      "pct_chg": 1.7,
+      "turnover": 4204577185.0,
+      "amount": 4204577185.0
     },
     {
-      "name": "紫光股份",
-      "code": "sz000938",
-      "price": 33.57,
-      "pct_chg": -0.94,
-      "turnover": 4290572481.0,
-      "amount": 4290572481.0
-    },
-    {
-      "name": "长电科技",
-      "code": "sh600584",
-      "price": 68.64,
-      "pct_chg": 0.06,
-      "turnover": 4248234360.0,
-      "amount": 4248234360.0
-    },
-    {
-      "name": "黄河旋风",
-      "code": "sh600172",
-      "price": 16.93,
-      "pct_chg": 2.61,
-      "turnover": 4197422824.0,
-      "amount": 4197422824.0
-    },
-    {
-      "name": "贵州茅台",
-      "code": "sh600519",
-      "price": 1290.88,
-      "pct_chg": -1.41,
-      "turnover": 4168500462.0,
-      "amount": 4168500462.0
+      "name": "深科技",
+      "code": "sz000021",
+      "price": 36.5,
+      "pct_chg": 4.32,
+      "turnover": 4174930342.0,
+      "amount": 4174930342.0
     },
     {
       "name": "京东方Ａ",
       "code": "sz000725",
-      "price": 5.55,
-      "pct_chg": -0.18,
-      "turnover": 4106974880.0,
-      "amount": 4106974880.0
+      "price": 5.46,
+      "pct_chg": -1.62,
+      "turnover": 4169035353.0,
+      "amount": 4169035353.0
     },
     {
-      "name": "烽火通信",
-      "code": "sh600498",
-      "price": 41.04,
-      "pct_chg": 1.99,
-      "turnover": 4106069894.0,
-      "amount": 4106069894.0
+      "name": "杭电股份",
+      "code": "sh603618",
+      "price": 39.3,
+      "pct_chg": -5.48,
+      "turnover": 4151566808.0,
+      "amount": 4151566808.0
     },
     {
-      "name": "平潭发展",
-      "code": "sz000592",
-      "price": 8.06,
-      "pct_chg": 2.02,
-      "turnover": 4065503141.0,
-      "amount": 4065503141.0
+      "name": "华电辽能",
+      "code": "sh600396",
+      "price": 15.51,
+      "pct_chg": 5.15,
+      "turnover": 4141490573.0,
+      "amount": 4141490573.0
     },
     {
-      "name": "湖南黄金",
-      "code": "sz002155",
-      "price": 28.45,
+      "name": "德福科技",
+      "code": "sz301511",
+      "price": 108.68,
+      "pct_chg": 2.82,
+      "turnover": 4090270346.0,
+      "amount": 4090270346.0
+    },
+    {
+      "name": "胜宏科技",
+      "code": "sz300476",
+      "price": 229.95,
+      "pct_chg": -1.52,
+      "turnover": 4087800254.0,
+      "amount": 4087800254.0
+    },
+    {
+      "name": "永鼎股份",
+      "code": "sh600105",
+      "price": 40.38,
+      "pct_chg": -2.65,
+      "turnover": 3964698606.0,
+      "amount": 3964698606.0
+    },
+    {
+      "name": "药明康德",
+      "code": "sh603259",
+      "price": 154.5,
+      "pct_chg": -0.24,
+      "turnover": 3946792528.0,
+      "amount": 3946792528.0
+    },
+    {
+      "name": "江西铜业",
+      "code": "sh600362",
+      "price": 49.64,
+      "pct_chg": 0.14,
+      "turnover": 3936982600.0,
+      "amount": 3936982600.0
+    },
+    {
+      "name": "太辰光",
+      "code": "sz300570",
+      "price": 203.27,
+      "pct_chg": 0.85,
+      "turnover": 3917435771.0,
+      "amount": 3917435771.0
+    },
+    {
+      "name": "源杰科技",
+      "code": "sh688498",
+      "price": 1719.0,
+      "pct_chg": 0.06,
+      "turnover": 3911817714.0,
+      "amount": 3911817714.0
+    },
+    {
+      "name": "三环集团",
+      "code": "sz300408",
+      "price": 117.7,
+      "pct_chg": -0.06,
+      "turnover": 3848138950.0,
+      "amount": 3848138950.0
+    },
+    {
+      "name": "黄河旋风",
+      "code": "sh600172",
+      "price": 15.36,
+      "pct_chg": -9.27,
+      "turnover": 3785729438.0,
+      "amount": 3785729438.0
+    },
+    {
+      "name": "浪潮信息",
+      "code": "sz000977",
+      "price": 70.43,
+      "pct_chg": -1.33,
+      "turnover": 3763756624.0,
+      "amount": 3763756624.0
+    },
+    {
+      "name": "太极实业",
+      "code": "sh600667",
+      "price": 19.98,
       "pct_chg": 10.02,
-      "turnover": 4053062628.0,
-      "amount": 4053062628.0
+      "turnover": 3743778504.0,
+      "amount": 3743778504.0
+    },
+    {
+      "name": "香农芯创",
+      "code": "sz300475",
+      "price": 173.18,
+      "pct_chg": -0.77,
+      "turnover": 3733287813.0,
+      "amount": 3733287813.0
+    },
+    {
+      "name": "中粮糖业",
+      "code": "sh600737",
+      "price": 17.82,
+      "pct_chg": -10.0,
+      "turnover": 3681396245.0,
+      "amount": 3681396245.0
+    },
+    {
+      "name": "大族激光",
+      "code": "sz002008",
+      "price": 94.78,
+      "pct_chg": -0.07,
+      "turnover": 3667523280.0,
+      "amount": 3667523280.0
+    },
+    {
+      "name": "澜起科技",
+      "code": "sh688008",
+      "price": 195.33,
+      "pct_chg": 0.01,
+      "turnover": 3657242720.0,
+      "amount": 3657242720.0
+    },
+    {
+      "name": "工业富联",
+      "code": "sh601138",
+      "price": 63.91,
+      "pct_chg": -2.04,
+      "turnover": 3640258032.0,
+      "amount": 3640258032.0
+    },
+    {
+      "name": "芯原股份",
+      "code": "sh688521",
+      "price": 184.15,
+      "pct_chg": -3.59,
+      "turnover": 3631799991.0,
+      "amount": 3631799991.0
     }
   ],
   "top100": [
     {
       "name": "中际旭创",
       "code": "sz300308",
-      "price": 908.9,
-      "pct_chg": 0.72,
-      "turnover": 18420917475.0,
-      "amount": 18420917475.0
-    },
-    {
-      "name": "东山精密",
-      "code": "sz002384",
-      "price": 196.06,
-      "pct_chg": 5.17,
-      "turnover": 16160062787.0,
-      "amount": 16160062787.0
-    },
-    {
-      "name": "亨通光电",
-      "code": "sh600487",
-      "price": 66.62,
-      "pct_chg": 5.56,
-      "turnover": 14492707429.0,
-      "amount": 14492707429.0
-    },
-    {
-      "name": "宁德时代",
-      "code": "sz300750",
-      "price": 336.84,
-      "pct_chg": 0.4,
-      "turnover": 12957469558.0,
-      "amount": 12957469558.0
-    },
-    {
-      "name": "新易盛",
-      "code": "sz300502",
-      "price": 414.8,
-      "pct_chg": -0.38,
-      "turnover": 12024951079.0,
-      "amount": 12024951079.0
-    },
-    {
-      "name": "华工科技",
-      "code": "sz000988",
-      "price": 108.79,
-      "pct_chg": 8.22,
-      "turnover": 11116402001.0,
-      "amount": 11116402001.0
-    },
-    {
-      "name": "长鑫科技",
-      "code": "sh688825",
-      "price": 56.87,
-      "pct_chg": -2.6,
-      "turnover": 10277241099.0,
-      "amount": 10277241099.0
-    },
-    {
-      "name": "中天科技",
-      "code": "sh600522",
-      "price": 34.12,
-      "pct_chg": 4.95,
-      "turnover": 8996226302.0,
-      "amount": 8996226302.0
-    },
-    {
-      "name": "长飞光纤",
-      "code": "sh601869",
-      "price": 442.03,
-      "pct_chg": 6.04,
-      "turnover": 8886271897.0,
-      "amount": 8886271897.0
-    },
-    {
-      "name": "兆易创新",
-      "code": "sh603986",
-      "price": 381.87,
-      "pct_chg": -1.06,
-      "turnover": 8816384418.0,
-      "amount": 8816384418.0
-    },
-    {
-      "name": "生益科技",
-      "code": "sh600183",
-      "price": 148.16,
-      "pct_chg": 1.28,
-      "turnover": 8801337181.0,
-      "amount": 8801337181.0
-    },
-    {
-      "name": "中国巨石",
-      "code": "sh600176",
-      "price": 42.67,
-      "pct_chg": 3.09,
-      "turnover": 8408234978.0,
-      "amount": 8408234978.0
+      "price": 890.1,
+      "pct_chg": -2.07,
+      "turnover": 15491122257.0,
+      "amount": 15491122257.0
     },
     {
       "name": "天孚通信",
       "code": "sz300394",
-      "price": 258.03,
-      "pct_chg": -0.18,
-      "turnover": 7907332901.0,
-      "amount": 7907332901.0
+      "price": 269.0,
+      "pct_chg": 4.25,
+      "turnover": 13799920488.0,
+      "amount": 13799920488.0
     },
     {
-      "name": "光迅科技",
-      "code": "sz002281",
-      "price": 182.79,
-      "pct_chg": 1.59,
-      "turnover": 7454716651.0,
-      "amount": 7454716651.0
+      "name": "东山精密",
+      "code": "sz002384",
+      "price": 193.74,
+      "pct_chg": -1.18,
+      "turnover": 10905979359.0,
+      "amount": 10905979359.0
     },
     {
       "name": "远东股份",
       "code": "sh600869",
-      "price": 24.93,
-      "pct_chg": 10.02,
-      "turnover": 7371146996.0,
-      "amount": 7371146996.0
+      "price": 24.1,
+      "pct_chg": -3.33,
+      "turnover": 10166276199.0,
+      "amount": 10166276199.0
     },
     {
-      "name": "永鼎股份",
-      "code": "sh600105",
-      "price": 41.48,
-      "pct_chg": 6.06,
-      "turnover": 7161382095.0,
-      "amount": 7161382095.0
+      "name": "宁德时代",
+      "code": "sz300750",
+      "price": 338.06,
+      "pct_chg": 0.36,
+      "turnover": 9828547427.0,
+      "amount": 9828547427.0
     },
     {
-      "name": "寒武纪",
-      "code": "sh688256",
-      "price": 1054.96,
-      "pct_chg": -0.38,
-      "turnover": 6913648256.0,
-      "amount": 6913648256.0
+      "name": "亨通光电",
+      "code": "sh600487",
+      "price": 63.91,
+      "pct_chg": -4.07,
+      "turnover": 9447321897.0,
+      "amount": 9447321897.0
     },
     {
-      "name": "杭电股份",
-      "code": "sh603618",
-      "price": 41.58,
-      "pct_chg": 3.67,
-      "turnover": 6910451043.0,
-      "amount": 6910451043.0
+      "name": "长鑫科技",
+      "code": "sh688825",
+      "price": 57.2,
+      "pct_chg": 0.58,
+      "turnover": 9348854964.0,
+      "amount": 9348854964.0
     },
     {
-      "name": "兴森科技",
-      "code": "sz002436",
-      "price": 39.45,
-      "pct_chg": -1.67,
-      "turnover": 6886889693.0,
-      "amount": 6886889693.0
+      "name": "新易盛",
+      "code": "sz300502",
+      "price": 410.9,
+      "pct_chg": -0.94,
+      "turnover": 9041258594.0,
+      "amount": 9041258594.0
     },
     {
-      "name": "紫金矿业",
-      "code": "sh601899",
-      "price": 34.4,
-      "pct_chg": 1.59,
-      "turnover": 6802972940.0,
-      "amount": 6802972940.0
+      "name": "华工科技",
+      "code": "sz000988",
+      "price": 105.8,
+      "pct_chg": -2.75,
+      "turnover": 8892342096.0,
+      "amount": 8892342096.0
     },
     {
-      "name": "胜宏科技",
-      "code": "sz300476",
-      "price": 233.51,
-      "pct_chg": 1.97,
-      "turnover": 6290028923.0,
-      "amount": 6290028923.0
+      "name": "生益科技",
+      "code": "sh600183",
+      "price": 146.96,
+      "pct_chg": -0.81,
+      "turnover": 8625341225.0,
+      "amount": 8625341225.0
+    },
+    {
+      "name": "中国巨石",
+      "code": "sh600176",
+      "price": 43.46,
+      "pct_chg": 1.85,
+      "turnover": 8564498376.0,
+      "amount": 8564498376.0
+    },
+    {
+      "name": "兆易创新",
+      "code": "sh603986",
+      "price": 380.64,
+      "pct_chg": -0.32,
+      "turnover": 8242535193.0,
+      "amount": 8242535193.0
     },
     {
       "name": "剑桥科技",
       "code": "sh603083",
-      "price": 218.99,
-      "pct_chg": -1.49,
-      "turnover": 6188605063.0,
-      "amount": 6188605063.0
-    },
-    {
-      "name": "三环集团",
-      "code": "sz300408",
-      "price": 117.77,
-      "pct_chg": 2.26,
-      "turnover": 6136462375.0,
-      "amount": 6136462375.0
-    },
-    {
-      "name": "沪电股份",
-      "code": "sz002463",
-      "price": 127.55,
-      "pct_chg": 2.12,
-      "turnover": 6100788161.0,
-      "amount": 6100788161.0
-    },
-    {
-      "name": "中粮糖业",
-      "code": "sh600737",
-      "price": 19.8,
-      "pct_chg": 9.03,
-      "turnover": 5479681336.0,
-      "amount": 5479681336.0
-    },
-    {
-      "name": "江西铜业",
-      "code": "sh600362",
-      "price": 49.57,
-      "pct_chg": 2.14,
-      "turnover": 5343000874.0,
-      "amount": 5343000874.0
-    },
-    {
-      "name": "香农芯创",
-      "code": "sz300475",
-      "price": 174.52,
-      "pct_chg": -2.86,
-      "turnover": 5259217981.0,
-      "amount": 5259217981.0
-    },
-    {
-      "name": "大族激光",
-      "code": "sz002008",
-      "price": 94.85,
-      "pct_chg": -0.91,
-      "turnover": 5111620691.0,
-      "amount": 5111620691.0
-    },
-    {
-      "name": "云南锗业",
-      "code": "sz002428",
-      "price": 91.43,
-      "pct_chg": 1.53,
-      "turnover": 5073131945.0,
-      "amount": 5073131945.0
-    },
-    {
-      "name": "浪潮信息",
-      "code": "sz000977",
-      "price": 71.38,
-      "pct_chg": -1.3,
-      "turnover": 5058632842.0,
-      "amount": 5058632842.0
-    },
-    {
-      "name": "工业富联",
-      "code": "sh601138",
-      "price": 65.24,
-      "pct_chg": 0.76,
-      "turnover": 4971511293.0,
-      "amount": 4971511293.0
+      "price": 234.43,
+      "pct_chg": 7.05,
+      "turnover": 7387430360.0,
+      "amount": 7387430360.0
     },
     {
       "name": "中国船舶",
       "code": "sh600150",
-      "price": 39.53,
-      "pct_chg": 1.15,
-      "turnover": 4688484622.0,
-      "amount": 4688484622.0
-    },
-    {
-      "name": "华正新材",
-      "code": "sh603186",
-      "price": 212.06,
-      "pct_chg": 10.0,
-      "turnover": 4658624546.0,
-      "amount": 4658624546.0
-    },
-    {
-      "name": "亚盛集团",
-      "code": "sh600108",
-      "price": 5.71,
-      "pct_chg": 8.14,
-      "turnover": 4525026596.0,
-      "amount": 4525026596.0
-    },
-    {
-      "name": "景旺电子",
-      "code": "sh603228",
-      "price": 109.59,
-      "pct_chg": 2.45,
-      "turnover": 4506673191.0,
-      "amount": 4506673191.0
-    },
-    {
-      "name": "源杰科技",
-      "code": "sh688498",
-      "price": 1718.0,
-      "pct_chg": 0.17,
-      "turnover": 4491656861.0,
-      "amount": 4491656861.0
-    },
-    {
-      "name": "药明康德",
-      "code": "sh603259",
-      "price": 154.88,
-      "pct_chg": -0.94,
-      "turnover": 4442359326.0,
-      "amount": 4442359326.0
-    },
-    {
-      "name": "北方铜业",
-      "code": "sz000737",
-      "price": 16.47,
-      "pct_chg": 4.84,
-      "turnover": 4387931784.0,
-      "amount": 4387931784.0
-    },
-    {
-      "name": "德科立",
-      "code": "sh688205",
-      "price": 223.3,
-      "pct_chg": 5.33,
-      "turnover": 4344056633.0,
-      "amount": 4344056633.0
-    },
-    {
-      "name": "太辰光",
-      "code": "sz300570",
-      "price": 201.55,
-      "pct_chg": 0.0,
-      "turnover": 4324081851.0,
-      "amount": 4324081851.0
-    },
-    {
-      "name": "通鼎互联",
-      "code": "sz002491",
-      "price": 22.22,
-      "pct_chg": 3.59,
-      "turnover": 4320140679.0,
-      "amount": 4320140679.0
-    },
-    {
-      "name": "协创数据",
-      "code": "sz300857",
-      "price": 259.12,
-      "pct_chg": -2.6,
-      "turnover": 4299528663.0,
-      "amount": 4299528663.0
-    },
-    {
-      "name": "紫光股份",
-      "code": "sz000938",
-      "price": 33.57,
-      "pct_chg": -0.94,
-      "turnover": 4290572481.0,
-      "amount": 4290572481.0
-    },
-    {
-      "name": "长电科技",
-      "code": "sh600584",
-      "price": 68.64,
-      "pct_chg": 0.06,
-      "turnover": 4248234360.0,
-      "amount": 4248234360.0
-    },
-    {
-      "name": "黄河旋风",
-      "code": "sh600172",
-      "price": 16.93,
-      "pct_chg": 2.61,
-      "turnover": 4197422824.0,
-      "amount": 4197422824.0
-    },
-    {
-      "name": "贵州茅台",
-      "code": "sh600519",
-      "price": 1290.88,
-      "pct_chg": -1.41,
-      "turnover": 4168500462.0,
-      "amount": 4168500462.0
-    },
-    {
-      "name": "京东方Ａ",
-      "code": "sz000725",
-      "price": 5.55,
-      "pct_chg": -0.18,
-      "turnover": 4106974880.0,
-      "amount": 4106974880.0
-    },
-    {
-      "name": "烽火通信",
-      "code": "sh600498",
-      "price": 41.04,
-      "pct_chg": 1.99,
-      "turnover": 4106069894.0,
-      "amount": 4106069894.0
-    },
-    {
-      "name": "平潭发展",
-      "code": "sz000592",
-      "price": 8.06,
-      "pct_chg": 2.02,
-      "turnover": 4065503141.0,
-      "amount": 4065503141.0
-    },
-    {
-      "name": "湖南黄金",
-      "code": "sz002155",
-      "price": 28.45,
-      "pct_chg": 10.02,
-      "turnover": 4053062628.0,
-      "amount": 4053062628.0
-    },
-    {
-      "name": "博云新材",
-      "code": "sz002297",
-      "price": 22.5,
-      "pct_chg": 0.81,
-      "turnover": 4043670228.0,
-      "amount": 4043670228.0
-    },
-    {
-      "name": "立讯精密",
-      "code": "sz002475",
-      "price": 55.86,
-      "pct_chg": 1.45,
-      "turnover": 4011223895.0,
-      "amount": 4011223895.0
-    },
-    {
-      "name": "海光信息",
-      "code": "sh688041",
-      "price": 235.8,
-      "pct_chg": -0.46,
-      "turnover": 3973502045.0,
-      "amount": 3973502045.0
-    },
-    {
-      "name": "德明利",
-      "code": "sz001309",
-      "price": 409.66,
-      "pct_chg": -1.72,
-      "turnover": 3950791750.0,
-      "amount": 3950791750.0
-    },
-    {
-      "name": "招商轮船",
-      "code": "sh601872",
-      "price": 20.99,
-      "pct_chg": 10.01,
-      "turnover": 3892801792.0,
-      "amount": 3892801792.0
-    },
-    {
-      "name": "罗博特科",
-      "code": "sz300757",
-      "price": 642.6,
-      "pct_chg": -0.19,
-      "turnover": 3825316217.0,
-      "amount": 3825316217.0
-    },
-    {
-      "name": "XD洛阳钼",
-      "code": "sh603993",
-      "price": 19.09,
-      "pct_chg": 1.27,
-      "turnover": 3732174148.0,
-      "amount": 3732174148.0
-    },
-    {
-      "name": "澜起科技",
-      "code": "sh688008",
-      "price": 195.3,
-      "pct_chg": -0.18,
-      "turnover": 3693163431.0,
-      "amount": 3693163431.0
-    },
-    {
-      "name": "星网锐捷",
-      "code": "sz002396",
-      "price": 35.81,
-      "pct_chg": -4.07,
-      "turnover": 3669698106.0,
-      "amount": 3669698106.0
-    },
-    {
-      "name": "长光华芯",
-      "code": "sh688048",
-      "price": 310.7,
-      "pct_chg": -1.52,
-      "turnover": 3652453246.0,
-      "amount": 3652453246.0
-    },
-    {
-      "name": "云铝股份",
-      "code": "sz000807",
-      "price": 29.03,
-      "pct_chg": 5.6,
-      "turnover": 3645082710.0,
-      "amount": 3645082710.0
-    },
-    {
-      "name": "有研新材",
-      "code": "sh600206",
-      "price": 46.42,
-      "pct_chg": -0.92,
-      "turnover": 3638522944.0,
-      "amount": 3638522944.0
-    },
-    {
-      "name": "方正科技",
-      "code": "sh600601",
-      "price": 14.62,
-      "pct_chg": 0.97,
-      "turnover": 3618449522.0,
-      "amount": 3618449522.0
-    },
-    {
-      "name": "金健米业",
-      "code": "sh600127",
-      "price": 14.33,
-      "pct_chg": -3.11,
-      "turnover": 3614297526.0,
-      "amount": 3614297526.0
-    },
-    {
-      "name": "风华高科",
-      "code": "sz000636",
-      "price": 49.7,
-      "pct_chg": -0.26,
-      "turnover": 3588299275.0,
-      "amount": 3588299275.0
-    },
-    {
-      "name": "太极实业",
-      "code": "sh600667",
-      "price": 18.16,
-      "pct_chg": -2.31,
-      "turnover": 3541489740.0,
-      "amount": 3541489740.0
-    },
-    {
-      "name": "摩尔线程",
-      "code": "sh688795",
-      "price": 387.15,
-      "pct_chg": -3.24,
-      "turnover": 3515702664.0,
-      "amount": 3515702664.0
-    },
-    {
-      "name": "德福科技",
-      "code": "sz301511",
-      "price": 105.7,
-      "pct_chg": 2.54,
-      "turnover": 3495345685.0,
-      "amount": 3495345685.0
-    },
-    {
-      "name": "金安国纪",
-      "code": "sz002636",
-      "price": 69.5,
-      "pct_chg": 1.25,
-      "turnover": 3485865080.0,
-      "amount": 3485865080.0
-    },
-    {
-      "name": "行云科技",
-      "code": "sz300209",
-      "price": 37.69,
-      "pct_chg": 6.05,
-      "turnover": 3472612989.0,
-      "amount": 3472612989.0
-    },
-    {
-      "name": "金牛化工",
-      "code": "sh600722",
-      "price": 20.0,
-      "pct_chg": 1.16,
-      "turnover": 3465288441.0,
-      "amount": 3465288441.0
-    },
-    {
-      "name": "中微公司",
-      "code": "sh688012",
-      "price": 333.0,
-      "pct_chg": -0.9,
-      "turnover": 3377718853.0,
-      "amount": 3377718853.0
+      "price": 40.82,
+      "pct_chg": 3.26,
+      "turnover": 7144558405.0,
+      "amount": 7144558405.0
     },
     {
       "name": "国际复材",
       "code": "sz301526",
-      "price": 27.55,
-      "pct_chg": 1.59,
-      "turnover": 3372220075.0,
-      "amount": 3372220075.0
+      "price": 29.42,
+      "pct_chg": 6.79,
+      "turnover": 6096799111.0,
+      "amount": 6096799111.0
     },
     {
-      "name": "光库科技",
-      "code": "sz300620",
-      "price": 291.88,
-      "pct_chg": 1.07,
-      "turnover": 3359309051.0,
-      "amount": 3359309051.0
+      "name": "寒武纪",
+      "code": "sh688256",
+      "price": 1043.84,
+      "pct_chg": -1.05,
+      "turnover": 5938529252.0,
+      "amount": 5938529252.0
     },
     {
-      "name": "华电辽能",
-      "code": "sh600396",
-      "price": 14.75,
-      "pct_chg": 5.66,
-      "turnover": 3349008856.0,
-      "amount": 3349008856.0
+      "name": "兴森科技",
+      "code": "sz002436",
+      "price": 39.71,
+      "pct_chg": 0.66,
+      "turnover": 5726013308.0,
+      "amount": 5726013308.0
     },
     {
-      "name": "江波龙",
-      "code": "sz301308",
-      "price": 348.03,
-      "pct_chg": -3.02,
-      "turnover": 3344507400.0,
-      "amount": 3344507400.0
+      "name": "华正新材",
+      "code": "sh603186",
+      "price": 217.99,
+      "pct_chg": 2.8,
+      "turnover": 5413184615.0,
+      "amount": 5413184615.0
     },
     {
-      "name": "天通股份",
-      "code": "sh600330",
-      "price": 29.36,
-      "pct_chg": -2.39,
-      "turnover": 3337938860.0,
-      "amount": 3337938860.0
+      "name": "德明利",
+      "code": "sz001309",
+      "price": 418.22,
+      "pct_chg": 2.09,
+      "turnover": 5180466333.0,
+      "amount": 5180466333.0
     },
     {
-      "name": "芒果超媒",
-      "code": "sz300413",
-      "price": 18.57,
-      "pct_chg": -9.94,
-      "turnover": 3294277997.0,
-      "amount": 3294277997.0
+      "name": "长飞光纤",
+      "code": "sh601869",
+      "price": 435.74,
+      "pct_chg": -1.42,
+      "turnover": 4967840426.0,
+      "amount": 4967840426.0
     },
     {
-      "name": "芯原股份",
-      "code": "sh688521",
-      "price": 191.0,
-      "pct_chg": 0.06,
-      "turnover": 3253609805.0,
-      "amount": 3253609805.0
+      "name": "金安国纪",
+      "code": "sz002636",
+      "price": 76.45,
+      "pct_chg": 10.0,
+      "turnover": 4791046362.0,
+      "amount": 4791046362.0
     },
     {
-      "name": "飞龙股份",
-      "code": "sz002536",
-      "price": 56.82,
-      "pct_chg": -3.02,
-      "turnover": 3221717326.0,
-      "amount": 3221717326.0
+      "name": "风华高科",
+      "code": "sz000636",
+      "price": 50.9,
+      "pct_chg": 2.41,
+      "turnover": 4574921601.0,
+      "amount": 4574921601.0
+    },
+    {
+      "name": "沪电股份",
+      "code": "sz002463",
+      "price": 127.92,
+      "pct_chg": 0.29,
+      "turnover": 4554301574.0,
+      "amount": 4554301574.0
     },
     {
       "name": "恒瑞医药",
       "code": "sh600276",
-      "price": 44.71,
-      "pct_chg": -2.19,
-      "turnover": 3214392264.0,
-      "amount": 3214392264.0
+      "price": 42.93,
+      "pct_chg": -3.98,
+      "turnover": 4488705829.0,
+      "amount": 4488705829.0
     },
     {
-      "name": "蓝色光标",
-      "code": "sz300058",
-      "price": 13.6,
-      "pct_chg": -2.72,
-      "turnover": 3207000562.0,
-      "amount": 3207000562.0
+      "name": "招商轮船",
+      "code": "sh601872",
+      "price": 20.58,
+      "pct_chg": -1.95,
+      "turnover": 4356377053.0,
+      "amount": 4356377053.0
     },
     {
-      "name": "哈药股份",
-      "code": "sh600664",
-      "price": 7.63,
-      "pct_chg": -1.55,
-      "turnover": 3163666528.0,
-      "amount": 3163666528.0
+      "name": "中天科技",
+      "code": "sh600522",
+      "price": 33.3,
+      "pct_chg": -2.4,
+      "turnover": 4280061105.0,
+      "amount": 4280061105.0
     },
     {
-      "name": "长芯博创",
-      "code": "sz300548",
-      "price": 215.2,
-      "pct_chg": 1.8,
-      "turnover": 3163383583.0,
-      "amount": 3163383583.0
+      "name": "光迅科技",
+      "code": "sz002281",
+      "price": 179.39,
+      "pct_chg": -1.86,
+      "turnover": 4251683578.0,
+      "amount": 4251683578.0
     },
     {
-      "name": "中京电子",
-      "code": "sz002579",
-      "price": 16.81,
-      "pct_chg": -1.47,
-      "turnover": 3137493829.0,
-      "amount": 3137493829.0
+      "name": "立讯精密",
+      "code": "sz002475",
+      "price": 54.45,
+      "pct_chg": -2.52,
+      "turnover": 4234383066.0,
+      "amount": 4234383066.0
     },
     {
-      "name": "四方达",
-      "code": "sz300179",
-      "price": 42.3,
-      "pct_chg": 7.33,
-      "turnover": 3119757434.0,
-      "amount": 3119757434.0
+      "name": "协创数据",
+      "code": "sz300857",
+      "price": 263.52,
+      "pct_chg": 1.7,
+      "turnover": 4204577185.0,
+      "amount": 4204577185.0
     },
     {
-      "name": "联瑞新材",
-      "code": "sh688300",
-      "price": 181.79,
-      "pct_chg": 8.41,
-      "turnover": 3087333879.0,
-      "amount": 3087333879.0
+      "name": "深科技",
+      "code": "sz000021",
+      "price": 36.5,
+      "pct_chg": 4.32,
+      "turnover": 4174930342.0,
+      "amount": 4174930342.0
     },
     {
-      "name": "潍柴动力",
-      "code": "sz000338",
-      "price": 27.85,
-      "pct_chg": 4.66,
-      "turnover": 3085515061.0,
-      "amount": 3085515061.0
+      "name": "京东方Ａ",
+      "code": "sz000725",
+      "price": 5.46,
+      "pct_chg": -1.62,
+      "turnover": 4169035353.0,
+      "amount": 4169035353.0
     },
     {
-      "name": "阳光电源",
-      "code": "sz300274",
-      "price": 87.0,
-      "pct_chg": -0.97,
-      "turnover": 3007495912.0,
-      "amount": 3007495912.0
+      "name": "杭电股份",
+      "code": "sh603618",
+      "price": 39.3,
+      "pct_chg": -5.48,
+      "turnover": 4151566808.0,
+      "amount": 4151566808.0
+    },
+    {
+      "name": "华电辽能",
+      "code": "sh600396",
+      "price": 15.51,
+      "pct_chg": 5.15,
+      "turnover": 4141490573.0,
+      "amount": 4141490573.0
+    },
+    {
+      "name": "德福科技",
+      "code": "sz301511",
+      "price": 108.68,
+      "pct_chg": 2.82,
+      "turnover": 4090270346.0,
+      "amount": 4090270346.0
+    },
+    {
+      "name": "胜宏科技",
+      "code": "sz300476",
+      "price": 229.95,
+      "pct_chg": -1.52,
+      "turnover": 4087800254.0,
+      "amount": 4087800254.0
+    },
+    {
+      "name": "永鼎股份",
+      "code": "sh600105",
+      "price": 40.38,
+      "pct_chg": -2.65,
+      "turnover": 3964698606.0,
+      "amount": 3964698606.0
+    },
+    {
+      "name": "药明康德",
+      "code": "sh603259",
+      "price": 154.5,
+      "pct_chg": -0.24,
+      "turnover": 3946792528.0,
+      "amount": 3946792528.0
+    },
+    {
+      "name": "江西铜业",
+      "code": "sh600362",
+      "price": 49.64,
+      "pct_chg": 0.14,
+      "turnover": 3936982600.0,
+      "amount": 3936982600.0
+    },
+    {
+      "name": "太辰光",
+      "code": "sz300570",
+      "price": 203.27,
+      "pct_chg": 0.85,
+      "turnover": 3917435771.0,
+      "amount": 3917435771.0
+    },
+    {
+      "name": "源杰科技",
+      "code": "sh688498",
+      "price": 1719.0,
+      "pct_chg": 0.06,
+      "turnover": 3911817714.0,
+      "amount": 3911817714.0
+    },
+    {
+      "name": "三环集团",
+      "code": "sz300408",
+      "price": 117.7,
+      "pct_chg": -0.06,
+      "turnover": 3848138950.0,
+      "amount": 3848138950.0
+    },
+    {
+      "name": "黄河旋风",
+      "code": "sh600172",
+      "price": 15.36,
+      "pct_chg": -9.27,
+      "turnover": 3785729438.0,
+      "amount": 3785729438.0
+    },
+    {
+      "name": "浪潮信息",
+      "code": "sz000977",
+      "price": 70.43,
+      "pct_chg": -1.33,
+      "turnover": 3763756624.0,
+      "amount": 3763756624.0
+    },
+    {
+      "name": "太极实业",
+      "code": "sh600667",
+      "price": 19.98,
+      "pct_chg": 10.02,
+      "turnover": 3743778504.0,
+      "amount": 3743778504.0
+    },
+    {
+      "name": "香农芯创",
+      "code": "sz300475",
+      "price": 173.18,
+      "pct_chg": -0.77,
+      "turnover": 3733287813.0,
+      "amount": 3733287813.0
+    },
+    {
+      "name": "中粮糖业",
+      "code": "sh600737",
+      "price": 17.82,
+      "pct_chg": -10.0,
+      "turnover": 3681396245.0,
+      "amount": 3681396245.0
+    },
+    {
+      "name": "大族激光",
+      "code": "sz002008",
+      "price": 94.78,
+      "pct_chg": -0.07,
+      "turnover": 3667523280.0,
+      "amount": 3667523280.0
+    },
+    {
+      "name": "澜起科技",
+      "code": "sh688008",
+      "price": 195.33,
+      "pct_chg": 0.01,
+      "turnover": 3657242720.0,
+      "amount": 3657242720.0
+    },
+    {
+      "name": "工业富联",
+      "code": "sh601138",
+      "price": 63.91,
+      "pct_chg": -2.04,
+      "turnover": 3640258032.0,
+      "amount": 3640258032.0
+    },
+    {
+      "name": "芯原股份",
+      "code": "sh688521",
+      "price": 184.15,
+      "pct_chg": -3.59,
+      "turnover": 3631799991.0,
+      "amount": 3631799991.0
     },
     {
       "name": "华天科技",
       "code": "sz002185",
-      "price": 16.17,
-      "pct_chg": 1.25,
-      "turnover": 3006734420.0,
-      "amount": 3006734420.0
+      "price": 16.38,
+      "pct_chg": 1.3,
+      "turnover": 3609109694.0,
+      "amount": 3609109694.0
     },
     {
-      "name": "白银有色",
-      "code": "sh601212",
-      "price": 7.09,
-      "pct_chg": -0.28,
-      "turnover": 3000128698.0,
-      "amount": 3000128698.0
+      "name": "鹏鼎控股",
+      "code": "sz002938",
+      "price": 91.85,
+      "pct_chg": -0.65,
+      "turnover": 3552056305.0,
+      "amount": 3552056305.0
     },
     {
-      "name": "国瓷材料",
-      "code": "sz300285",
-      "price": 60.37,
-      "pct_chg": 0.05,
-      "turnover": 2981898488.0,
-      "amount": 2981898488.0
+      "name": "菲利华",
+      "code": "sz300395",
+      "price": 100.49,
+      "pct_chg": 2.13,
+      "turnover": 3414216256.0,
+      "amount": 3414216256.0
     },
     {
-      "name": "中钨高新",
-      "code": "sz000657",
-      "price": 60.5,
-      "pct_chg": 1.07,
-      "turnover": 2980208730.0,
-      "amount": 2980208730.0
+      "name": "亚盛集团",
+      "code": "sh600108",
+      "price": 5.25,
+      "pct_chg": -8.06,
+      "turnover": 3413491379.0,
+      "amount": 3413491379.0
     },
     {
-      "name": "中国平安",
-      "code": "sh601318",
-      "price": 56.26,
-      "pct_chg": 1.0,
-      "turnover": 2944585975.0,
-      "amount": 2944585975.0
+      "name": "紫金矿业",
+      "code": "sh601899",
+      "price": 34.11,
+      "pct_chg": -0.84,
+      "turnover": 3407050574.0,
+      "amount": 3407050574.0
     },
     {
-      "name": "联讯仪器",
-      "code": "sh688808",
-      "price": 2471.0,
-      "pct_chg": -6.86,
-      "turnover": 2939653025.0,
-      "amount": 2939653025.0
+      "name": "平潭发展",
+      "code": "sz000592",
+      "price": 8.27,
+      "pct_chg": 2.6,
+      "turnover": 3388799435.0,
+      "amount": 3388799435.0
     },
     {
-      "name": "铜冠铜箔",
-      "code": "sz301217",
-      "price": 107.21,
-      "pct_chg": 1.62,
-      "turnover": 2935757055.0,
-      "amount": 2935757055.0
+      "name": "有研新材",
+      "code": "sh600206",
+      "price": 46.79,
+      "pct_chg": 0.8,
+      "turnover": 3355161952.0,
+      "amount": 3355161952.0
     },
     {
-      "name": "普冉股份",
-      "code": "sh688766",
-      "price": 393.39,
-      "pct_chg": -1.97,
-      "turnover": 2921883124.0,
-      "amount": 2921883124.0
-    },
-    {
-      "name": "深南电路",
-      "code": "sz002916",
-      "price": 383.3,
-      "pct_chg": 0.21,
-      "turnover": 2913977784.0,
-      "amount": 2913977784.0
-    },
-    {
-      "name": "麦格米特",
-      "code": "sz002851",
-      "price": 127.06,
-      "pct_chg": -1.2,
-      "turnover": 2896714818.0,
-      "amount": 2896714818.0
+      "name": "飞龙股份",
+      "code": "sz002536",
+      "price": 53.71,
+      "pct_chg": -5.47,
+      "turnover": 3336536601.0,
+      "amount": 3336536601.0
     },
     {
       "name": "炬光科技",
       "code": "sh688167",
-      "price": 302.55,
-      "pct_chg": 0.14,
-      "turnover": 2875514785.0,
-      "amount": 2875514785.0
+      "price": 315.0,
+      "pct_chg": 4.12,
+      "turnover": 3310860218.0,
+      "amount": 3310860218.0
+    },
+    {
+      "name": "长电科技",
+      "code": "sh600584",
+      "price": 68.12,
+      "pct_chg": -0.76,
+      "turnover": 3301892359.0,
+      "amount": 3301892359.0
+    },
+    {
+      "name": "摩尔线程",
+      "code": "sh688795",
+      "price": 364.05,
+      "pct_chg": -5.97,
+      "turnover": 3254402494.0,
+      "amount": 3254402494.0
+    },
+    {
+      "name": "深南电路",
+      "code": "sz002916",
+      "price": 392.31,
+      "pct_chg": 2.35,
+      "turnover": 3235269298.0,
+      "amount": 3235269298.0
+    },
+    {
+      "name": "方正科技",
+      "code": "sh600601",
+      "price": 14.82,
+      "pct_chg": 1.37,
+      "turnover": 3216755424.0,
+      "amount": 3216755424.0
+    },
+    {
+      "name": "铜冠铜箔",
+      "code": "sz301217",
+      "price": 108.45,
+      "pct_chg": 1.16,
+      "turnover": 3189987824.0,
+      "amount": 3189987824.0
+    },
+    {
+      "name": "景旺电子",
+      "code": "sh603228",
+      "price": 110.01,
+      "pct_chg": 0.38,
+      "turnover": 3136256987.0,
+      "amount": 3136256987.0
+    },
+    {
+      "name": "湖南黄金",
+      "code": "sz002155",
+      "price": 28.54,
+      "pct_chg": 0.32,
+      "turnover": 3134457759.0,
+      "amount": 3134457759.0
+    },
+    {
+      "name": "联瑞新材",
+      "code": "sh688300",
+      "price": 183.37,
+      "pct_chg": 0.87,
+      "turnover": 3126705527.0,
+      "amount": 3126705527.0
+    },
+    {
+      "name": "昊华科技",
+      "code": "sh600378",
+      "price": 48.22,
+      "pct_chg": 1.97,
+      "turnover": 3096745343.0,
+      "amount": 3096745343.0
+    },
+    {
+      "name": "德科立",
+      "code": "sh688205",
+      "price": 227.25,
+      "pct_chg": 1.77,
+      "turnover": 3093609595.0,
+      "amount": 3093609595.0
+    },
+    {
+      "name": "海光信息",
+      "code": "sh688041",
+      "price": 232.37,
+      "pct_chg": -1.46,
+      "turnover": 3039215519.0,
+      "amount": 3039215519.0
+    },
+    {
+      "name": "光库科技",
+      "code": "sz300620",
+      "price": 300.0,
+      "pct_chg": 2.78,
+      "turnover": 3012512237.0,
+      "amount": 3012512237.0
+    },
+    {
+      "name": "博云新材",
+      "code": "sz002297",
+      "price": 21.9,
+      "pct_chg": -2.67,
+      "turnover": 2976153140.0,
+      "amount": 2976153140.0
+    },
+    {
+      "name": "金健米业",
+      "code": "sh600127",
+      "price": 14.0,
+      "pct_chg": -2.3,
+      "turnover": 2941858805.0,
+      "amount": 2941858805.0
+    },
+    {
+      "name": "哈药股份",
+      "code": "sh600664",
+      "price": 7.13,
+      "pct_chg": -6.55,
+      "turnover": 2906055503.0,
+      "amount": 2906055503.0
+    },
+    {
+      "name": "金牛化工",
+      "code": "sh600722",
+      "price": 18.31,
+      "pct_chg": -8.45,
+      "turnover": 2875169998.0,
+      "amount": 2875169998.0
+    },
+    {
+      "name": "东材科技",
+      "code": "sh601208",
+      "price": 48.59,
+      "pct_chg": 3.01,
+      "turnover": 2856160657.0,
+      "amount": 2856160657.0
+    },
+    {
+      "name": "罗博特科",
+      "code": "sz300757",
+      "price": 638.5,
+      "pct_chg": -0.64,
+      "turnover": 2847634878.0,
+      "amount": 2847634878.0
+    },
+    {
+      "name": "佰维存储",
+      "code": "sh688525",
+      "price": 218.79,
+      "pct_chg": 0.5,
+      "turnover": 2840278348.0,
+      "amount": 2840278348.0
+    },
+    {
+      "name": "大唐发电",
+      "code": "sh601991",
+      "price": 6.02,
+      "pct_chg": 3.26,
+      "turnover": 2803052253.0,
+      "amount": 2803052253.0
+    },
+    {
+      "name": "中信证券",
+      "code": "sh600030",
+      "price": 27.6,
+      "pct_chg": 0.99,
+      "turnover": 2792020063.0,
+      "amount": 2792020063.0
+    },
+    {
+      "name": "比亚迪",
+      "code": "sz002594",
+      "price": 83.52,
+      "pct_chg": -2.75,
+      "turnover": 2783701703.0,
+      "amount": 2783701703.0
+    },
+    {
+      "name": "中微公司",
+      "code": "sh688012",
+      "price": 334.19,
+      "pct_chg": 0.36,
+      "turnover": 2783286905.0,
+      "amount": 2783286905.0
+    },
+    {
+      "name": "超声电子",
+      "code": "sz000823",
+      "price": 18.7,
+      "pct_chg": 10.0,
+      "turnover": 2769778931.0,
+      "amount": 2769778931.0
+    },
+    {
+      "name": "长川科技",
+      "code": "sz300604",
+      "price": 268.5,
+      "pct_chg": 2.05,
+      "turnover": 2768971889.0,
+      "amount": 2768971889.0
+    },
+    {
+      "name": "仕佳光子",
+      "code": "sh688313",
+      "price": 149.75,
+      "pct_chg": 1.22,
+      "turnover": 2746916186.0,
+      "amount": 2746916186.0
+    },
+    {
+      "name": "招商银行",
+      "code": "sh600036",
+      "price": 41.57,
+      "pct_chg": 1.39,
+      "turnover": 2733649678.0,
+      "amount": 2733649678.0
+    },
+    {
+      "name": "国瓷材料",
+      "code": "sz300285",
+      "price": 60.35,
+      "pct_chg": -0.03,
+      "turnover": 2731720799.0,
+      "amount": 2731720799.0
+    },
+    {
+      "name": "云南锗业",
+      "code": "sz002428",
+      "price": 90.04,
+      "pct_chg": -1.52,
+      "turnover": 2718000698.0,
+      "amount": 2718000698.0
+    },
+    {
+      "name": "阳光电源",
+      "code": "sz300274",
+      "price": 85.93,
+      "pct_chg": -1.23,
+      "turnover": 2703107556.0,
+      "amount": 2703107556.0
+    },
+    {
+      "name": "斯迪克",
+      "code": "sz300806",
+      "price": 53.59,
+      "pct_chg": 8.7,
+      "turnover": 2691348689.0,
+      "amount": 2691348689.0
+    },
+    {
+      "name": "雅克科技",
+      "code": "sz002409",
+      "price": 133.48,
+      "pct_chg": 1.49,
+      "turnover": 2654345609.0,
+      "amount": 2654345609.0
+    },
+    {
+      "name": "通鼎互联",
+      "code": "sz002491",
+      "price": 21.02,
+      "pct_chg": -5.4,
+      "turnover": 2640436677.0,
+      "amount": 2640436677.0
+    },
+    {
+      "name": "紫光股份",
+      "code": "sz000938",
+      "price": 33.1,
+      "pct_chg": -1.4,
+      "turnover": 2595958403.0,
+      "amount": 2595958403.0
+    },
+    {
+      "name": "拓斯达",
+      "code": "sz300607",
+      "price": 35.09,
+      "pct_chg": -8.09,
+      "turnover": 2577357286.0,
+      "amount": 2577357286.0
+    },
+    {
+      "name": "领益智造",
+      "code": "sz002600",
+      "price": 12.84,
+      "pct_chg": 3.21,
+      "turnover": 2576551764.0,
+      "amount": 2576551764.0
+    },
+    {
+      "name": "中京电子",
+      "code": "sz002579",
+      "price": 16.73,
+      "pct_chg": -0.48,
+      "turnover": 2562191217.0,
+      "amount": 2562191217.0
+    },
+    {
+      "name": "行云科技",
+      "code": "sz300209",
+      "price": 36.4,
+      "pct_chg": -3.42,
+      "turnover": 2543708808.0,
+      "amount": 2543708808.0
+    },
+    {
+      "name": "普冉股份",
+      "code": "sh688766",
+      "price": 398.95,
+      "pct_chg": 1.41,
+      "turnover": 2543510983.0,
+      "amount": 2543510983.0
+    },
+    {
+      "name": "红棉股份",
+      "code": "sz000523",
+      "price": 4.46,
+      "pct_chg": 2.29,
+      "turnover": 2540839538.0,
+      "amount": 2540839538.0
+    },
+    {
+      "name": "蓝思科技",
+      "code": "sz300433",
+      "price": 33.81,
+      "pct_chg": -3.73,
+      "turnover": 2537909623.0,
+      "amount": 2537909623.0
     }
   ],
   "top200": [
     {
       "name": "中际旭创",
       "code": "sz300308",
-      "price": 908.9,
-      "pct_chg": 0.72,
-      "turnover": 18420917475.0,
-      "amount": 18420917475.0
-    },
-    {
-      "name": "东山精密",
-      "code": "sz002384",
-      "price": 196.06,
-      "pct_chg": 5.17,
-      "turnover": 16160062787.0,
-      "amount": 16160062787.0
-    },
-    {
-      "name": "亨通光电",
-      "code": "sh600487",
-      "price": 66.62,
-      "pct_chg": 5.56,
-      "turnover": 14492707429.0,
-      "amount": 14492707429.0
-    },
-    {
-      "name": "宁德时代",
-      "code": "sz300750",
-      "price": 336.84,
-      "pct_chg": 0.4,
-      "turnover": 12957469558.0,
-      "amount": 12957469558.0
-    },
-    {
-      "name": "新易盛",
-      "code": "sz300502",
-      "price": 414.8,
-      "pct_chg": -0.38,
-      "turnover": 12024951079.0,
-      "amount": 12024951079.0
-    },
-    {
-      "name": "华工科技",
-      "code": "sz000988",
-      "price": 108.79,
-      "pct_chg": 8.22,
-      "turnover": 11116402001.0,
-      "amount": 11116402001.0
-    },
-    {
-      "name": "长鑫科技",
-      "code": "sh688825",
-      "price": 56.87,
-      "pct_chg": -2.6,
-      "turnover": 10277241099.0,
-      "amount": 10277241099.0
-    },
-    {
-      "name": "中天科技",
-      "code": "sh600522",
-      "price": 34.12,
-      "pct_chg": 4.95,
-      "turnover": 8996226302.0,
-      "amount": 8996226302.0
-    },
-    {
-      "name": "长飞光纤",
-      "code": "sh601869",
-      "price": 442.03,
-      "pct_chg": 6.04,
-      "turnover": 8886271897.0,
-      "amount": 8886271897.0
-    },
-    {
-      "name": "兆易创新",
-      "code": "sh603986",
-      "price": 381.87,
-      "pct_chg": -1.06,
-      "turnover": 8816384418.0,
-      "amount": 8816384418.0
-    },
-    {
-      "name": "生益科技",
-      "code": "sh600183",
-      "price": 148.16,
-      "pct_chg": 1.28,
-      "turnover": 8801337181.0,
-      "amount": 8801337181.0
-    },
-    {
-      "name": "中国巨石",
-      "code": "sh600176",
-      "price": 42.67,
-      "pct_chg": 3.09,
-      "turnover": 8408234978.0,
-      "amount": 8408234978.0
+      "price": 890.1,
+      "pct_chg": -2.07,
+      "turnover": 15491122257.0,
+      "amount": 15491122257.0
     },
     {
       "name": "天孚通信",
       "code": "sz300394",
-      "price": 258.03,
-      "pct_chg": -0.18,
-      "turnover": 7907332901.0,
-      "amount": 7907332901.0
+      "price": 269.0,
+      "pct_chg": 4.25,
+      "turnover": 13799920488.0,
+      "amount": 13799920488.0
     },
     {
-      "name": "光迅科技",
-      "code": "sz002281",
-      "price": 182.79,
-      "pct_chg": 1.59,
-      "turnover": 7454716651.0,
-      "amount": 7454716651.0
+      "name": "东山精密",
+      "code": "sz002384",
+      "price": 193.74,
+      "pct_chg": -1.18,
+      "turnover": 10905979359.0,
+      "amount": 10905979359.0
     },
     {
       "name": "远东股份",
       "code": "sh600869",
-      "price": 24.93,
-      "pct_chg": 10.02,
-      "turnover": 7371146996.0,
-      "amount": 7371146996.0
+      "price": 24.1,
+      "pct_chg": -3.33,
+      "turnover": 10166276199.0,
+      "amount": 10166276199.0
     },
     {
-      "name": "永鼎股份",
-      "code": "sh600105",
-      "price": 41.48,
-      "pct_chg": 6.06,
-      "turnover": 7161382095.0,
-      "amount": 7161382095.0
+      "name": "宁德时代",
+      "code": "sz300750",
+      "price": 338.06,
+      "pct_chg": 0.36,
+      "turnover": 9828547427.0,
+      "amount": 9828547427.0
     },
     {
-      "name": "寒武纪",
-      "code": "sh688256",
-      "price": 1054.96,
-      "pct_chg": -0.38,
-      "turnover": 6913648256.0,
-      "amount": 6913648256.0
+      "name": "亨通光电",
+      "code": "sh600487",
+      "price": 63.91,
+      "pct_chg": -4.07,
+      "turnover": 9447321897.0,
+      "amount": 9447321897.0
     },
     {
-      "name": "杭电股份",
-      "code": "sh603618",
-      "price": 41.58,
-      "pct_chg": 3.67,
-      "turnover": 6910451043.0,
-      "amount": 6910451043.0
+      "name": "长鑫科技",
+      "code": "sh688825",
+      "price": 57.2,
+      "pct_chg": 0.58,
+      "turnover": 9348854964.0,
+      "amount": 9348854964.0
     },
     {
-      "name": "兴森科技",
-      "code": "sz002436",
-      "price": 39.45,
-      "pct_chg": -1.67,
-      "turnover": 6886889693.0,
-      "amount": 6886889693.0
+      "name": "新易盛",
+      "code": "sz300502",
+      "price": 410.9,
+      "pct_chg": -0.94,
+      "turnover": 9041258594.0,
+      "amount": 9041258594.0
     },
     {
-      "name": "紫金矿业",
-      "code": "sh601899",
-      "price": 34.4,
-      "pct_chg": 1.59,
-      "turnover": 6802972940.0,
-      "amount": 6802972940.0
+      "name": "华工科技",
+      "code": "sz000988",
+      "price": 105.8,
+      "pct_chg": -2.75,
+      "turnover": 8892342096.0,
+      "amount": 8892342096.0
     },
     {
-      "name": "胜宏科技",
-      "code": "sz300476",
-      "price": 233.51,
-      "pct_chg": 1.97,
-      "turnover": 6290028923.0,
-      "amount": 6290028923.0
+      "name": "生益科技",
+      "code": "sh600183",
+      "price": 146.96,
+      "pct_chg": -0.81,
+      "turnover": 8625341225.0,
+      "amount": 8625341225.0
+    },
+    {
+      "name": "中国巨石",
+      "code": "sh600176",
+      "price": 43.46,
+      "pct_chg": 1.85,
+      "turnover": 8564498376.0,
+      "amount": 8564498376.0
+    },
+    {
+      "name": "兆易创新",
+      "code": "sh603986",
+      "price": 380.64,
+      "pct_chg": -0.32,
+      "turnover": 8242535193.0,
+      "amount": 8242535193.0
     },
     {
       "name": "剑桥科技",
       "code": "sh603083",
-      "price": 218.99,
-      "pct_chg": -1.49,
-      "turnover": 6188605063.0,
-      "amount": 6188605063.0
-    },
-    {
-      "name": "三环集团",
-      "code": "sz300408",
-      "price": 117.77,
-      "pct_chg": 2.26,
-      "turnover": 6136462375.0,
-      "amount": 6136462375.0
-    },
-    {
-      "name": "沪电股份",
-      "code": "sz002463",
-      "price": 127.55,
-      "pct_chg": 2.12,
-      "turnover": 6100788161.0,
-      "amount": 6100788161.0
-    },
-    {
-      "name": "中粮糖业",
-      "code": "sh600737",
-      "price": 19.8,
-      "pct_chg": 9.03,
-      "turnover": 5479681336.0,
-      "amount": 5479681336.0
-    },
-    {
-      "name": "江西铜业",
-      "code": "sh600362",
-      "price": 49.57,
-      "pct_chg": 2.14,
-      "turnover": 5343000874.0,
-      "amount": 5343000874.0
-    },
-    {
-      "name": "香农芯创",
-      "code": "sz300475",
-      "price": 174.52,
-      "pct_chg": -2.86,
-      "turnover": 5259217981.0,
-      "amount": 5259217981.0
-    },
-    {
-      "name": "大族激光",
-      "code": "sz002008",
-      "price": 94.85,
-      "pct_chg": -0.91,
-      "turnover": 5111620691.0,
-      "amount": 5111620691.0
-    },
-    {
-      "name": "云南锗业",
-      "code": "sz002428",
-      "price": 91.43,
-      "pct_chg": 1.53,
-      "turnover": 5073131945.0,
-      "amount": 5073131945.0
-    },
-    {
-      "name": "浪潮信息",
-      "code": "sz000977",
-      "price": 71.38,
-      "pct_chg": -1.3,
-      "turnover": 5058632842.0,
-      "amount": 5058632842.0
-    },
-    {
-      "name": "工业富联",
-      "code": "sh601138",
-      "price": 65.24,
-      "pct_chg": 0.76,
-      "turnover": 4971511293.0,
-      "amount": 4971511293.0
+      "price": 234.43,
+      "pct_chg": 7.05,
+      "turnover": 7387430360.0,
+      "amount": 7387430360.0
     },
     {
       "name": "中国船舶",
       "code": "sh600150",
-      "price": 39.53,
-      "pct_chg": 1.15,
-      "turnover": 4688484622.0,
-      "amount": 4688484622.0
-    },
-    {
-      "name": "华正新材",
-      "code": "sh603186",
-      "price": 212.06,
-      "pct_chg": 10.0,
-      "turnover": 4658624546.0,
-      "amount": 4658624546.0
-    },
-    {
-      "name": "亚盛集团",
-      "code": "sh600108",
-      "price": 5.71,
-      "pct_chg": 8.14,
-      "turnover": 4525026596.0,
-      "amount": 4525026596.0
-    },
-    {
-      "name": "景旺电子",
-      "code": "sh603228",
-      "price": 109.59,
-      "pct_chg": 2.45,
-      "turnover": 4506673191.0,
-      "amount": 4506673191.0
-    },
-    {
-      "name": "源杰科技",
-      "code": "sh688498",
-      "price": 1718.0,
-      "pct_chg": 0.17,
-      "turnover": 4491656861.0,
-      "amount": 4491656861.0
-    },
-    {
-      "name": "药明康德",
-      "code": "sh603259",
-      "price": 154.88,
-      "pct_chg": -0.94,
-      "turnover": 4442359326.0,
-      "amount": 4442359326.0
-    },
-    {
-      "name": "北方铜业",
-      "code": "sz000737",
-      "price": 16.47,
-      "pct_chg": 4.84,
-      "turnover": 4387931784.0,
-      "amount": 4387931784.0
-    },
-    {
-      "name": "德科立",
-      "code": "sh688205",
-      "price": 223.3,
-      "pct_chg": 5.33,
-      "turnover": 4344056633.0,
-      "amount": 4344056633.0
-    },
-    {
-      "name": "太辰光",
-      "code": "sz300570",
-      "price": 201.55,
-      "pct_chg": 0.0,
-      "turnover": 4324081851.0,
-      "amount": 4324081851.0
-    },
-    {
-      "name": "通鼎互联",
-      "code": "sz002491",
-      "price": 22.22,
-      "pct_chg": 3.59,
-      "turnover": 4320140679.0,
-      "amount": 4320140679.0
-    },
-    {
-      "name": "协创数据",
-      "code": "sz300857",
-      "price": 259.12,
-      "pct_chg": -2.6,
-      "turnover": 4299528663.0,
-      "amount": 4299528663.0
-    },
-    {
-      "name": "紫光股份",
-      "code": "sz000938",
-      "price": 33.57,
-      "pct_chg": -0.94,
-      "turnover": 4290572481.0,
-      "amount": 4290572481.0
-    },
-    {
-      "name": "长电科技",
-      "code": "sh600584",
-      "price": 68.64,
-      "pct_chg": 0.06,
-      "turnover": 4248234360.0,
-      "amount": 4248234360.0
-    },
-    {
-      "name": "黄河旋风",
-      "code": "sh600172",
-      "price": 16.93,
-      "pct_chg": 2.61,
-      "turnover": 4197422824.0,
-      "amount": 4197422824.0
-    },
-    {
-      "name": "贵州茅台",
-      "code": "sh600519",
-      "price": 1290.88,
-      "pct_chg": -1.41,
-      "turnover": 4168500462.0,
-      "amount": 4168500462.0
-    },
-    {
-      "name": "京东方Ａ",
-      "code": "sz000725",
-      "price": 5.55,
-      "pct_chg": -0.18,
-      "turnover": 4106974880.0,
-      "amount": 4106974880.0
-    },
-    {
-      "name": "烽火通信",
-      "code": "sh600498",
-      "price": 41.04,
-      "pct_chg": 1.99,
-      "turnover": 4106069894.0,
-      "amount": 4106069894.0
-    },
-    {
-      "name": "平潭发展",
-      "code": "sz000592",
-      "price": 8.06,
-      "pct_chg": 2.02,
-      "turnover": 4065503141.0,
-      "amount": 4065503141.0
-    },
-    {
-      "name": "湖南黄金",
-      "code": "sz002155",
-      "price": 28.45,
-      "pct_chg": 10.02,
-      "turnover": 4053062628.0,
-      "amount": 4053062628.0
-    },
-    {
-      "name": "博云新材",
-      "code": "sz002297",
-      "price": 22.5,
-      "pct_chg": 0.81,
-      "turnover": 4043670228.0,
-      "amount": 4043670228.0
-    },
-    {
-      "name": "立讯精密",
-      "code": "sz002475",
-      "price": 55.86,
-      "pct_chg": 1.45,
-      "turnover": 4011223895.0,
-      "amount": 4011223895.0
-    },
-    {
-      "name": "海光信息",
-      "code": "sh688041",
-      "price": 235.8,
-      "pct_chg": -0.46,
-      "turnover": 3973502045.0,
-      "amount": 3973502045.0
-    },
-    {
-      "name": "德明利",
-      "code": "sz001309",
-      "price": 409.66,
-      "pct_chg": -1.72,
-      "turnover": 3950791750.0,
-      "amount": 3950791750.0
-    },
-    {
-      "name": "招商轮船",
-      "code": "sh601872",
-      "price": 20.99,
-      "pct_chg": 10.01,
-      "turnover": 3892801792.0,
-      "amount": 3892801792.0
-    },
-    {
-      "name": "罗博特科",
-      "code": "sz300757",
-      "price": 642.6,
-      "pct_chg": -0.19,
-      "turnover": 3825316217.0,
-      "amount": 3825316217.0
-    },
-    {
-      "name": "XD洛阳钼",
-      "code": "sh603993",
-      "price": 19.09,
-      "pct_chg": 1.27,
-      "turnover": 3732174148.0,
-      "amount": 3732174148.0
-    },
-    {
-      "name": "澜起科技",
-      "code": "sh688008",
-      "price": 195.3,
-      "pct_chg": -0.18,
-      "turnover": 3693163431.0,
-      "amount": 3693163431.0
-    },
-    {
-      "name": "星网锐捷",
-      "code": "sz002396",
-      "price": 35.81,
-      "pct_chg": -4.07,
-      "turnover": 3669698106.0,
-      "amount": 3669698106.0
-    },
-    {
-      "name": "长光华芯",
-      "code": "sh688048",
-      "price": 310.7,
-      "pct_chg": -1.52,
-      "turnover": 3652453246.0,
-      "amount": 3652453246.0
-    },
-    {
-      "name": "云铝股份",
-      "code": "sz000807",
-      "price": 29.03,
-      "pct_chg": 5.6,
-      "turnover": 3645082710.0,
-      "amount": 3645082710.0
-    },
-    {
-      "name": "有研新材",
-      "code": "sh600206",
-      "price": 46.42,
-      "pct_chg": -0.92,
-      "turnover": 3638522944.0,
-      "amount": 3638522944.0
-    },
-    {
-      "name": "方正科技",
-      "code": "sh600601",
-      "price": 14.62,
-      "pct_chg": 0.97,
-      "turnover": 3618449522.0,
-      "amount": 3618449522.0
-    },
-    {
-      "name": "金健米业",
-      "code": "sh600127",
-      "price": 14.33,
-      "pct_chg": -3.11,
-      "turnover": 3614297526.0,
-      "amount": 3614297526.0
-    },
-    {
-      "name": "风华高科",
-      "code": "sz000636",
-      "price": 49.7,
-      "pct_chg": -0.26,
-      "turnover": 3588299275.0,
-      "amount": 3588299275.0
-    },
-    {
-      "name": "太极实业",
-      "code": "sh600667",
-      "price": 18.16,
-      "pct_chg": -2.31,
-      "turnover": 3541489740.0,
-      "amount": 3541489740.0
-    },
-    {
-      "name": "摩尔线程",
-      "code": "sh688795",
-      "price": 387.15,
-      "pct_chg": -3.24,
-      "turnover": 3515702664.0,
-      "amount": 3515702664.0
-    },
-    {
-      "name": "德福科技",
-      "code": "sz301511",
-      "price": 105.7,
-      "pct_chg": 2.54,
-      "turnover": 3495345685.0,
-      "amount": 3495345685.0
-    },
-    {
-      "name": "金安国纪",
-      "code": "sz002636",
-      "price": 69.5,
-      "pct_chg": 1.25,
-      "turnover": 3485865080.0,
-      "amount": 3485865080.0
-    },
-    {
-      "name": "行云科技",
-      "code": "sz300209",
-      "price": 37.69,
-      "pct_chg": 6.05,
-      "turnover": 3472612989.0,
-      "amount": 3472612989.0
-    },
-    {
-      "name": "金牛化工",
-      "code": "sh600722",
-      "price": 20.0,
-      "pct_chg": 1.16,
-      "turnover": 3465288441.0,
-      "amount": 3465288441.0
-    },
-    {
-      "name": "中微公司",
-      "code": "sh688012",
-      "price": 333.0,
-      "pct_chg": -0.9,
-      "turnover": 3377718853.0,
-      "amount": 3377718853.0
+      "price": 40.82,
+      "pct_chg": 3.26,
+      "turnover": 7144558405.0,
+      "amount": 7144558405.0
     },
     {
       "name": "国际复材",
       "code": "sz301526",
-      "price": 27.55,
-      "pct_chg": 1.59,
-      "turnover": 3372220075.0,
-      "amount": 3372220075.0
+      "price": 29.42,
+      "pct_chg": 6.79,
+      "turnover": 6096799111.0,
+      "amount": 6096799111.0
     },
     {
-      "name": "光库科技",
-      "code": "sz300620",
-      "price": 291.88,
-      "pct_chg": 1.07,
-      "turnover": 3359309051.0,
-      "amount": 3359309051.0
+      "name": "寒武纪",
+      "code": "sh688256",
+      "price": 1043.84,
+      "pct_chg": -1.05,
+      "turnover": 5938529252.0,
+      "amount": 5938529252.0
     },
     {
-      "name": "华电辽能",
-      "code": "sh600396",
-      "price": 14.75,
-      "pct_chg": 5.66,
-      "turnover": 3349008856.0,
-      "amount": 3349008856.0
+      "name": "兴森科技",
+      "code": "sz002436",
+      "price": 39.71,
+      "pct_chg": 0.66,
+      "turnover": 5726013308.0,
+      "amount": 5726013308.0
     },
     {
-      "name": "江波龙",
-      "code": "sz301308",
-      "price": 348.03,
-      "pct_chg": -3.02,
-      "turnover": 3344507400.0,
-      "amount": 3344507400.0
+      "name": "华正新材",
+      "code": "sh603186",
+      "price": 217.99,
+      "pct_chg": 2.8,
+      "turnover": 5413184615.0,
+      "amount": 5413184615.0
     },
     {
-      "name": "天通股份",
-      "code": "sh600330",
-      "price": 29.36,
-      "pct_chg": -2.39,
-      "turnover": 3337938860.0,
-      "amount": 3337938860.0
+      "name": "德明利",
+      "code": "sz001309",
+      "price": 418.22,
+      "pct_chg": 2.09,
+      "turnover": 5180466333.0,
+      "amount": 5180466333.0
     },
     {
-      "name": "芒果超媒",
-      "code": "sz300413",
-      "price": 18.57,
-      "pct_chg": -9.94,
-      "turnover": 3294277997.0,
-      "amount": 3294277997.0
+      "name": "长飞光纤",
+      "code": "sh601869",
+      "price": 435.74,
+      "pct_chg": -1.42,
+      "turnover": 4967840426.0,
+      "amount": 4967840426.0
     },
     {
-      "name": "芯原股份",
-      "code": "sh688521",
-      "price": 191.0,
-      "pct_chg": 0.06,
-      "turnover": 3253609805.0,
-      "amount": 3253609805.0
+      "name": "金安国纪",
+      "code": "sz002636",
+      "price": 76.45,
+      "pct_chg": 10.0,
+      "turnover": 4791046362.0,
+      "amount": 4791046362.0
     },
     {
-      "name": "飞龙股份",
-      "code": "sz002536",
-      "price": 56.82,
-      "pct_chg": -3.02,
-      "turnover": 3221717326.0,
-      "amount": 3221717326.0
+      "name": "风华高科",
+      "code": "sz000636",
+      "price": 50.9,
+      "pct_chg": 2.41,
+      "turnover": 4574921601.0,
+      "amount": 4574921601.0
+    },
+    {
+      "name": "沪电股份",
+      "code": "sz002463",
+      "price": 127.92,
+      "pct_chg": 0.29,
+      "turnover": 4554301574.0,
+      "amount": 4554301574.0
     },
     {
       "name": "恒瑞医药",
       "code": "sh600276",
-      "price": 44.71,
-      "pct_chg": -2.19,
-      "turnover": 3214392264.0,
-      "amount": 3214392264.0
+      "price": 42.93,
+      "pct_chg": -3.98,
+      "turnover": 4488705829.0,
+      "amount": 4488705829.0
     },
     {
-      "name": "蓝色光标",
-      "code": "sz300058",
-      "price": 13.6,
-      "pct_chg": -2.72,
-      "turnover": 3207000562.0,
-      "amount": 3207000562.0
+      "name": "招商轮船",
+      "code": "sh601872",
+      "price": 20.58,
+      "pct_chg": -1.95,
+      "turnover": 4356377053.0,
+      "amount": 4356377053.0
     },
     {
-      "name": "哈药股份",
-      "code": "sh600664",
-      "price": 7.63,
-      "pct_chg": -1.55,
-      "turnover": 3163666528.0,
-      "amount": 3163666528.0
+      "name": "中天科技",
+      "code": "sh600522",
+      "price": 33.3,
+      "pct_chg": -2.4,
+      "turnover": 4280061105.0,
+      "amount": 4280061105.0
     },
     {
-      "name": "长芯博创",
-      "code": "sz300548",
-      "price": 215.2,
-      "pct_chg": 1.8,
-      "turnover": 3163383583.0,
-      "amount": 3163383583.0
+      "name": "光迅科技",
+      "code": "sz002281",
+      "price": 179.39,
+      "pct_chg": -1.86,
+      "turnover": 4251683578.0,
+      "amount": 4251683578.0
     },
     {
-      "name": "中京电子",
-      "code": "sz002579",
-      "price": 16.81,
-      "pct_chg": -1.47,
-      "turnover": 3137493829.0,
-      "amount": 3137493829.0
+      "name": "立讯精密",
+      "code": "sz002475",
+      "price": 54.45,
+      "pct_chg": -2.52,
+      "turnover": 4234383066.0,
+      "amount": 4234383066.0
     },
     {
-      "name": "四方达",
-      "code": "sz300179",
-      "price": 42.3,
-      "pct_chg": 7.33,
-      "turnover": 3119757434.0,
-      "amount": 3119757434.0
+      "name": "协创数据",
+      "code": "sz300857",
+      "price": 263.52,
+      "pct_chg": 1.7,
+      "turnover": 4204577185.0,
+      "amount": 4204577185.0
     },
     {
-      "name": "联瑞新材",
-      "code": "sh688300",
-      "price": 181.79,
-      "pct_chg": 8.41,
-      "turnover": 3087333879.0,
-      "amount": 3087333879.0
+      "name": "深科技",
+      "code": "sz000021",
+      "price": 36.5,
+      "pct_chg": 4.32,
+      "turnover": 4174930342.0,
+      "amount": 4174930342.0
     },
     {
-      "name": "潍柴动力",
-      "code": "sz000338",
-      "price": 27.85,
-      "pct_chg": 4.66,
-      "turnover": 3085515061.0,
-      "amount": 3085515061.0
+      "name": "京东方Ａ",
+      "code": "sz000725",
+      "price": 5.46,
+      "pct_chg": -1.62,
+      "turnover": 4169035353.0,
+      "amount": 4169035353.0
     },
     {
-      "name": "阳光电源",
-      "code": "sz300274",
-      "price": 87.0,
-      "pct_chg": -0.97,
-      "turnover": 3007495912.0,
-      "amount": 3007495912.0
+      "name": "杭电股份",
+      "code": "sh603618",
+      "price": 39.3,
+      "pct_chg": -5.48,
+      "turnover": 4151566808.0,
+      "amount": 4151566808.0
+    },
+    {
+      "name": "华电辽能",
+      "code": "sh600396",
+      "price": 15.51,
+      "pct_chg": 5.15,
+      "turnover": 4141490573.0,
+      "amount": 4141490573.0
+    },
+    {
+      "name": "德福科技",
+      "code": "sz301511",
+      "price": 108.68,
+      "pct_chg": 2.82,
+      "turnover": 4090270346.0,
+      "amount": 4090270346.0
+    },
+    {
+      "name": "胜宏科技",
+      "code": "sz300476",
+      "price": 229.95,
+      "pct_chg": -1.52,
+      "turnover": 4087800254.0,
+      "amount": 4087800254.0
+    },
+    {
+      "name": "永鼎股份",
+      "code": "sh600105",
+      "price": 40.38,
+      "pct_chg": -2.65,
+      "turnover": 3964698606.0,
+      "amount": 3964698606.0
+    },
+    {
+      "name": "药明康德",
+      "code": "sh603259",
+      "price": 154.5,
+      "pct_chg": -0.24,
+      "turnover": 3946792528.0,
+      "amount": 3946792528.0
+    },
+    {
+      "name": "江西铜业",
+      "code": "sh600362",
+      "price": 49.64,
+      "pct_chg": 0.14,
+      "turnover": 3936982600.0,
+      "amount": 3936982600.0
+    },
+    {
+      "name": "太辰光",
+      "code": "sz300570",
+      "price": 203.27,
+      "pct_chg": 0.85,
+      "turnover": 3917435771.0,
+      "amount": 3917435771.0
+    },
+    {
+      "name": "源杰科技",
+      "code": "sh688498",
+      "price": 1719.0,
+      "pct_chg": 0.06,
+      "turnover": 3911817714.0,
+      "amount": 3911817714.0
+    },
+    {
+      "name": "三环集团",
+      "code": "sz300408",
+      "price": 117.7,
+      "pct_chg": -0.06,
+      "turnover": 3848138950.0,
+      "amount": 3848138950.0
+    },
+    {
+      "name": "黄河旋风",
+      "code": "sh600172",
+      "price": 15.36,
+      "pct_chg": -9.27,
+      "turnover": 3785729438.0,
+      "amount": 3785729438.0
+    },
+    {
+      "name": "浪潮信息",
+      "code": "sz000977",
+      "price": 70.43,
+      "pct_chg": -1.33,
+      "turnover": 3763756624.0,
+      "amount": 3763756624.0
+    },
+    {
+      "name": "太极实业",
+      "code": "sh600667",
+      "price": 19.98,
+      "pct_chg": 10.02,
+      "turnover": 3743778504.0,
+      "amount": 3743778504.0
+    },
+    {
+      "name": "香农芯创",
+      "code": "sz300475",
+      "price": 173.18,
+      "pct_chg": -0.77,
+      "turnover": 3733287813.0,
+      "amount": 3733287813.0
+    },
+    {
+      "name": "中粮糖业",
+      "code": "sh600737",
+      "price": 17.82,
+      "pct_chg": -10.0,
+      "turnover": 3681396245.0,
+      "amount": 3681396245.0
+    },
+    {
+      "name": "大族激光",
+      "code": "sz002008",
+      "price": 94.78,
+      "pct_chg": -0.07,
+      "turnover": 3667523280.0,
+      "amount": 3667523280.0
+    },
+    {
+      "name": "澜起科技",
+      "code": "sh688008",
+      "price": 195.33,
+      "pct_chg": 0.01,
+      "turnover": 3657242720.0,
+      "amount": 3657242720.0
+    },
+    {
+      "name": "工业富联",
+      "code": "sh601138",
+      "price": 63.91,
+      "pct_chg": -2.04,
+      "turnover": 3640258032.0,
+      "amount": 3640258032.0
+    },
+    {
+      "name": "芯原股份",
+      "code": "sh688521",
+      "price": 184.15,
+      "pct_chg": -3.59,
+      "turnover": 3631799991.0,
+      "amount": 3631799991.0
     },
     {
       "name": "华天科技",
       "code": "sz002185",
-      "price": 16.17,
-      "pct_chg": 1.25,
-      "turnover": 3006734420.0,
-      "amount": 3006734420.0
-    },
-    {
-      "name": "白银有色",
-      "code": "sh601212",
-      "price": 7.09,
-      "pct_chg": -0.28,
-      "turnover": 3000128698.0,
-      "amount": 3000128698.0
-    },
-    {
-      "name": "国瓷材料",
-      "code": "sz300285",
-      "price": 60.37,
-      "pct_chg": 0.05,
-      "turnover": 2981898488.0,
-      "amount": 2981898488.0
-    },
-    {
-      "name": "中钨高新",
-      "code": "sz000657",
-      "price": 60.5,
-      "pct_chg": 1.07,
-      "turnover": 2980208730.0,
-      "amount": 2980208730.0
-    },
-    {
-      "name": "中国平安",
-      "code": "sh601318",
-      "price": 56.26,
-      "pct_chg": 1.0,
-      "turnover": 2944585975.0,
-      "amount": 2944585975.0
-    },
-    {
-      "name": "联讯仪器",
-      "code": "sh688808",
-      "price": 2471.0,
-      "pct_chg": -6.86,
-      "turnover": 2939653025.0,
-      "amount": 2939653025.0
-    },
-    {
-      "name": "铜冠铜箔",
-      "code": "sz301217",
-      "price": 107.21,
-      "pct_chg": 1.62,
-      "turnover": 2935757055.0,
-      "amount": 2935757055.0
-    },
-    {
-      "name": "普冉股份",
-      "code": "sh688766",
-      "price": 393.39,
-      "pct_chg": -1.97,
-      "turnover": 2921883124.0,
-      "amount": 2921883124.0
-    },
-    {
-      "name": "深南电路",
-      "code": "sz002916",
-      "price": 383.3,
-      "pct_chg": 0.21,
-      "turnover": 2913977784.0,
-      "amount": 2913977784.0
-    },
-    {
-      "name": "麦格米特",
-      "code": "sz002851",
-      "price": 127.06,
-      "pct_chg": -1.2,
-      "turnover": 2896714818.0,
-      "amount": 2896714818.0
-    },
-    {
-      "name": "炬光科技",
-      "code": "sh688167",
-      "price": 302.55,
-      "pct_chg": 0.14,
-      "turnover": 2875514785.0,
-      "amount": 2875514785.0
-    },
-    {
-      "name": "佰维存储",
-      "code": "sh688525",
-      "price": 217.7,
-      "pct_chg": -1.72,
-      "turnover": 2875038826.0,
-      "amount": 2875038826.0
-    },
-    {
-      "name": "菲利华",
-      "code": "sz300395",
-      "price": 98.39,
-      "pct_chg": 3.25,
-      "turnover": 2874553424.0,
-      "amount": 2874553424.0
-    },
-    {
-      "name": "腾景科技",
-      "code": "sh688195",
-      "price": 203.12,
-      "pct_chg": 0.31,
-      "turnover": 2871297839.0,
-      "amount": 2871297839.0
-    },
-    {
-      "name": "通富微电",
-      "code": "sz002156",
-      "price": 58.35,
-      "pct_chg": 0.05,
-      "turnover": 2799489891.0,
-      "amount": 2799489891.0
-    },
-    {
-      "name": "百合花",
-      "code": "sh603823",
-      "price": 58.38,
-      "pct_chg": -8.55,
-      "turnover": 2746988786.0,
-      "amount": 2746988786.0
-    },
-    {
-      "name": "长川科技",
-      "code": "sz300604",
-      "price": 263.11,
-      "pct_chg": -1.63,
-      "turnover": 2724909568.0,
-      "amount": 2724909568.0
-    },
-    {
-      "name": "昊华科技",
-      "code": "sh600378",
-      "price": 47.29,
-      "pct_chg": 1.72,
-      "turnover": 2713113346.0,
-      "amount": 2713113346.0
-    },
-    {
-      "name": "三孚股份",
-      "code": "sh603938",
-      "price": 47.11,
-      "pct_chg": 6.03,
-      "turnover": 2661988529.0,
-      "amount": 2661988529.0
-    },
-    {
-      "name": "中芯国际",
-      "code": "sh688981",
-      "price": 120.51,
-      "pct_chg": -0.83,
-      "turnover": 2646565747.0,
-      "amount": 2646565747.0
-    },
-    {
-      "name": "仕佳光子",
-      "code": "sh688313",
-      "price": 147.95,
-      "pct_chg": -1.5,
-      "turnover": 2645743329.0,
-      "amount": 2645743329.0
-    },
-    {
-      "name": "敦煌种业",
-      "code": "sh600354",
-      "price": 10.98,
-      "pct_chg": 4.77,
-      "turnover": 2634249226.0,
-      "amount": 2634249226.0
-    },
-    {
-      "name": "长盈通",
-      "code": "sh688143",
-      "price": 174.2,
-      "pct_chg": 3.69,
-      "turnover": 2615386960.0,
-      "amount": 2615386960.0
-    },
-    {
-      "name": "多氟多",
-      "code": "sz002407",
-      "price": 33.69,
-      "pct_chg": 0.51,
-      "turnover": 2553524070.0,
-      "amount": 2553524070.0
-    },
-    {
-      "name": "利通电子",
-      "code": "sh603629",
-      "price": 109.26,
-      "pct_chg": 0.25,
-      "turnover": 2511753997.0,
-      "amount": 2511753997.0
-    },
-    {
-      "name": "昆仑万维",
-      "code": "sz300418",
-      "price": 45.69,
-      "pct_chg": -0.87,
-      "turnover": 2508710649.0,
-      "amount": 2508710649.0
-    },
-    {
-      "name": "长城军工",
-      "code": "sh601606",
-      "price": 35.46,
-      "pct_chg": 0.74,
-      "turnover": 2506809720.0,
-      "amount": 2506809720.0
-    },
-    {
-      "name": "中国铝业",
-      "code": "sh601600",
-      "price": 10.03,
-      "pct_chg": 2.98,
-      "turnover": 2506284194.0,
-      "amount": 2506284194.0
-    },
-    {
-      "name": "北方华创",
-      "code": "sz002371",
-      "price": 646.4,
-      "pct_chg": -0.23,
-      "turnover": 2456899586.0,
-      "amount": 2456899586.0
-    },
-    {
-      "name": "光智科技",
-      "code": "sz300489",
-      "price": 220.78,
-      "pct_chg": 0.35,
-      "turnover": 2451814056.0,
-      "amount": 2451814056.0
-    },
-    {
-      "name": "易点天下",
-      "code": "sz301171",
-      "price": 37.18,
-      "pct_chg": -3.65,
-      "turnover": 2438756320.0,
-      "amount": 2438756320.0
-    },
-    {
-      "name": "内蒙一机",
-      "code": "sh600967",
-      "price": 14.43,
-      "pct_chg": 4.04,
-      "turnover": 2433500027.0,
-      "amount": 2433500027.0
-    },
-    {
-      "name": "崇达技术",
-      "code": "sz002815",
-      "price": 18.06,
-      "pct_chg": 5.74,
-      "turnover": 2433017444.0,
-      "amount": 2433017444.0
-    },
-    {
-      "name": "粤桂股份",
-      "code": "sz000833",
-      "price": 23.22,
-      "pct_chg": 1.71,
-      "turnover": 2369811032.0,
-      "amount": 2369811032.0
-    },
-    {
-      "name": "莲花控股",
-      "code": "sh600186",
-      "price": 12.03,
-      "pct_chg": -2.91,
-      "turnover": 2369164098.0,
-      "amount": 2369164098.0
-    },
-    {
-      "name": "海南橡胶",
-      "code": "sh601118",
-      "price": 8.15,
-      "pct_chg": 3.56,
-      "turnover": 2363347055.0,
-      "amount": 2363347055.0
-    },
-    {
-      "name": "天娱数科",
-      "code": "sz002354",
-      "price": 7.93,
-      "pct_chg": -4.0,
-      "turnover": 2347418466.0,
-      "amount": 2347418466.0
-    },
-    {
-      "name": "晓程科技",
-      "code": "sz300139",
-      "price": 51.4,
-      "pct_chg": 3.59,
-      "turnover": 2338476278.0,
-      "amount": 2338476278.0
-    },
-    {
-      "name": "英维克",
-      "code": "sz002837",
-      "price": 62.43,
-      "pct_chg": -0.91,
-      "turnover": 2317662601.0,
-      "amount": 2317662601.0
-    },
-    {
-      "name": "中石科技",
-      "code": "sz300684",
-      "price": 83.66,
-      "pct_chg": -5.18,
-      "turnover": 2315193396.0,
-      "amount": 2315193396.0
-    },
-    {
-      "name": "神农种业",
-      "code": "sz300189",
-      "price": 7.78,
+      "price": 16.38,
       "pct_chg": 1.3,
-      "turnover": 2312996222.0,
-      "amount": 2312996222.0
-    },
-    {
-      "name": "四方股份",
-      "code": "sh601126",
-      "price": 43.14,
-      "pct_chg": 7.58,
-      "turnover": 2290748016.0,
-      "amount": 2290748016.0
-    },
-    {
-      "name": "华盛昌",
-      "code": "sz002980",
-      "price": 134.32,
-      "pct_chg": 3.4,
-      "turnover": 2276020054.0,
-      "amount": 2276020054.0
-    },
-    {
-      "name": "湖南白银",
-      "code": "sz002716",
-      "price": 10.8,
-      "pct_chg": 1.79,
-      "turnover": 2273881317.0,
-      "amount": 2273881317.0
-    },
-    {
-      "name": "麦捷科技",
-      "code": "sz300319",
-      "price": 20.05,
-      "pct_chg": 1.42,
-      "turnover": 2271016480.0,
-      "amount": 2271016480.0
-    },
-    {
-      "name": "新安股份",
-      "code": "sh600596",
-      "price": 12.62,
-      "pct_chg": 4.47,
-      "turnover": 2265805531.0,
-      "amount": 2265805531.0
-    },
-    {
-      "name": "宝丰能源",
-      "code": "sh600989",
-      "price": 24.91,
-      "pct_chg": 2.13,
-      "turnover": 2250617619.0,
-      "amount": 2250617619.0
-    },
-    {
-      "name": "西部矿业",
-      "code": "sh601168",
-      "price": 41.15,
-      "pct_chg": 1.13,
-      "turnover": 2235797872.0,
-      "amount": 2235797872.0
-    },
-    {
-      "name": "中金黄金",
-      "code": "sh600489",
-      "price": 25.89,
-      "pct_chg": 2.74,
-      "turnover": 2213647524.0,
-      "amount": 2213647524.0
-    },
-    {
-      "name": "中远海能",
-      "code": "sh600026",
-      "price": 21.43,
-      "pct_chg": 5.93,
-      "turnover": 2207222104.0,
-      "amount": 2207222104.0
-    },
-    {
-      "name": "山东黄金",
-      "code": "sh600547",
-      "price": 36.25,
-      "pct_chg": 0.67,
-      "turnover": 2204473216.0,
-      "amount": 2204473216.0
-    },
-    {
-      "name": "中船特气",
-      "code": "sh688146",
-      "price": 225.7,
-      "pct_chg": -1.17,
-      "turnover": 2199017812.0,
-      "amount": 2199017812.0
-    },
-    {
-      "name": "东方财富",
-      "code": "sz300059",
-      "price": 18.91,
-      "pct_chg": 0.37,
-      "turnover": 2189233304.0,
-      "amount": 2189233304.0
-    },
-    {
-      "name": "华虹宏力",
-      "code": "sh688347",
-      "price": 224.0,
-      "pct_chg": -0.36,
-      "turnover": 2178524118.0,
-      "amount": 2178524118.0
-    },
-    {
-      "name": "海康威视",
-      "code": "sz002415",
-      "price": 33.75,
-      "pct_chg": 0.3,
-      "turnover": 2170438700.0,
-      "amount": 2170438700.0
-    },
-    {
-      "name": "彤程新材",
-      "code": "sh603650",
-      "price": 65.22,
-      "pct_chg": 10.0,
-      "turnover": 2156858320.0,
-      "amount": 2156858320.0
-    },
-    {
-      "name": "赤天化",
-      "code": "sh600227",
-      "price": 4.92,
-      "pct_chg": -0.81,
-      "turnover": 2154320377.0,
-      "amount": 2154320377.0
-    },
-    {
-      "name": "杰瑞股份",
-      "code": "sz002353",
-      "price": 125.7,
-      "pct_chg": -0.06,
-      "turnover": 2153702637.0,
-      "amount": 2153702637.0
-    },
-    {
-      "name": "东方电气",
-      "code": "sh600875",
-      "price": 26.36,
-      "pct_chg": 5.52,
-      "turnover": 2152570941.0,
-      "amount": 2152570941.0
-    },
-    {
-      "name": "生益电子",
-      "code": "sh688183",
-      "price": 128.53,
-      "pct_chg": 1.56,
-      "turnover": 2144284100.0,
-      "amount": 2144284100.0
-    },
-    {
-      "name": "铜陵有色",
-      "code": "sz000630",
-      "price": 6.57,
-      "pct_chg": 0.46,
-      "turnover": 2129577491.0,
-      "amount": 2129577491.0
-    },
-    {
-      "name": "我爱我家",
-      "code": "sz000560",
-      "price": 3.12,
-      "pct_chg": -9.3,
-      "turnover": 2100580574.0,
-      "amount": 2100580574.0
-    },
-    {
-      "name": "江海股份",
-      "code": "sz002484",
-      "price": 58.97,
-      "pct_chg": -1.06,
-      "turnover": 2078359488.0,
-      "amount": 2078359488.0
-    },
-    {
-      "name": "万华化学",
-      "code": "sh600309",
-      "price": 78.87,
-      "pct_chg": 1.0,
-      "turnover": 2069157360.0,
-      "amount": 2069157360.0
-    },
-    {
-      "name": "康龙化成",
-      "code": "sz300759",
-      "price": 41.69,
-      "pct_chg": -2.5,
-      "turnover": 2049965230.0,
-      "amount": 2049965230.0
-    },
-    {
-      "name": "神火股份",
-      "code": "sz000933",
-      "price": 28.91,
-      "pct_chg": 5.2,
-      "turnover": 2048421480.0,
-      "amount": 2048421480.0
-    },
-    {
-      "name": "蓝思科技",
-      "code": "sz300433",
-      "price": 35.12,
-      "pct_chg": 1.5,
-      "turnover": 2047229075.0,
-      "amount": 2047229075.0
-    },
-    {
-      "name": "赤峰黄金",
-      "code": "sh600988",
-      "price": 43.88,
-      "pct_chg": -0.72,
-      "turnover": 2037640243.0,
-      "amount": 2037640243.0
-    },
-    {
-      "name": "超声电子",
-      "code": "sz000823",
-      "price": 17.0,
-      "pct_chg": 2.84,
-      "turnover": 2033839159.0,
-      "amount": 2033839159.0
-    },
-    {
-      "name": "航发动力",
-      "code": "sh600893",
-      "price": 41.37,
-      "pct_chg": 0.29,
-      "turnover": 2016187447.0,
-      "amount": 2016187447.0
+      "turnover": 3609109694.0,
+      "amount": 3609109694.0
     },
     {
       "name": "鹏鼎控股",
       "code": "sz002938",
-      "price": 92.45,
-      "pct_chg": 3.34,
-      "turnover": 2008319897.0,
-      "amount": 2008319897.0
+      "price": 91.85,
+      "pct_chg": -0.65,
+      "turnover": 3552056305.0,
+      "amount": 3552056305.0
     },
     {
-      "name": "巨人网络",
-      "code": "sz002558",
-      "price": 26.13,
-      "pct_chg": -4.63,
-      "turnover": 1997179804.0,
-      "amount": 1997179804.0
+      "name": "菲利华",
+      "code": "sz300395",
+      "price": 100.49,
+      "pct_chg": 2.13,
+      "turnover": 3414216256.0,
+      "amount": 3414216256.0
+    },
+    {
+      "name": "亚盛集团",
+      "code": "sh600108",
+      "price": 5.25,
+      "pct_chg": -8.06,
+      "turnover": 3413491379.0,
+      "amount": 3413491379.0
+    },
+    {
+      "name": "紫金矿业",
+      "code": "sh601899",
+      "price": 34.11,
+      "pct_chg": -0.84,
+      "turnover": 3407050574.0,
+      "amount": 3407050574.0
+    },
+    {
+      "name": "平潭发展",
+      "code": "sz000592",
+      "price": 8.27,
+      "pct_chg": 2.6,
+      "turnover": 3388799435.0,
+      "amount": 3388799435.0
+    },
+    {
+      "name": "有研新材",
+      "code": "sh600206",
+      "price": 46.79,
+      "pct_chg": 0.8,
+      "turnover": 3355161952.0,
+      "amount": 3355161952.0
+    },
+    {
+      "name": "飞龙股份",
+      "code": "sz002536",
+      "price": 53.71,
+      "pct_chg": -5.47,
+      "turnover": 3336536601.0,
+      "amount": 3336536601.0
+    },
+    {
+      "name": "炬光科技",
+      "code": "sh688167",
+      "price": 315.0,
+      "pct_chg": 4.12,
+      "turnover": 3310860218.0,
+      "amount": 3310860218.0
+    },
+    {
+      "name": "长电科技",
+      "code": "sh600584",
+      "price": 68.12,
+      "pct_chg": -0.76,
+      "turnover": 3301892359.0,
+      "amount": 3301892359.0
+    },
+    {
+      "name": "摩尔线程",
+      "code": "sh688795",
+      "price": 364.05,
+      "pct_chg": -5.97,
+      "turnover": 3254402494.0,
+      "amount": 3254402494.0
+    },
+    {
+      "name": "深南电路",
+      "code": "sz002916",
+      "price": 392.31,
+      "pct_chg": 2.35,
+      "turnover": 3235269298.0,
+      "amount": 3235269298.0
+    },
+    {
+      "name": "方正科技",
+      "code": "sh600601",
+      "price": 14.82,
+      "pct_chg": 1.37,
+      "turnover": 3216755424.0,
+      "amount": 3216755424.0
+    },
+    {
+      "name": "铜冠铜箔",
+      "code": "sz301217",
+      "price": 108.45,
+      "pct_chg": 1.16,
+      "turnover": 3189987824.0,
+      "amount": 3189987824.0
+    },
+    {
+      "name": "景旺电子",
+      "code": "sh603228",
+      "price": 110.01,
+      "pct_chg": 0.38,
+      "turnover": 3136256987.0,
+      "amount": 3136256987.0
+    },
+    {
+      "name": "湖南黄金",
+      "code": "sz002155",
+      "price": 28.54,
+      "pct_chg": 0.32,
+      "turnover": 3134457759.0,
+      "amount": 3134457759.0
+    },
+    {
+      "name": "联瑞新材",
+      "code": "sh688300",
+      "price": 183.37,
+      "pct_chg": 0.87,
+      "turnover": 3126705527.0,
+      "amount": 3126705527.0
+    },
+    {
+      "name": "昊华科技",
+      "code": "sh600378",
+      "price": 48.22,
+      "pct_chg": 1.97,
+      "turnover": 3096745343.0,
+      "amount": 3096745343.0
+    },
+    {
+      "name": "德科立",
+      "code": "sh688205",
+      "price": 227.25,
+      "pct_chg": 1.77,
+      "turnover": 3093609595.0,
+      "amount": 3093609595.0
+    },
+    {
+      "name": "海光信息",
+      "code": "sh688041",
+      "price": 232.37,
+      "pct_chg": -1.46,
+      "turnover": 3039215519.0,
+      "amount": 3039215519.0
+    },
+    {
+      "name": "光库科技",
+      "code": "sz300620",
+      "price": 300.0,
+      "pct_chg": 2.78,
+      "turnover": 3012512237.0,
+      "amount": 3012512237.0
+    },
+    {
+      "name": "博云新材",
+      "code": "sz002297",
+      "price": 21.9,
+      "pct_chg": -2.67,
+      "turnover": 2976153140.0,
+      "amount": 2976153140.0
+    },
+    {
+      "name": "金健米业",
+      "code": "sh600127",
+      "price": 14.0,
+      "pct_chg": -2.3,
+      "turnover": 2941858805.0,
+      "amount": 2941858805.0
+    },
+    {
+      "name": "哈药股份",
+      "code": "sh600664",
+      "price": 7.13,
+      "pct_chg": -6.55,
+      "turnover": 2906055503.0,
+      "amount": 2906055503.0
+    },
+    {
+      "name": "金牛化工",
+      "code": "sh600722",
+      "price": 18.31,
+      "pct_chg": -8.45,
+      "turnover": 2875169998.0,
+      "amount": 2875169998.0
+    },
+    {
+      "name": "东材科技",
+      "code": "sh601208",
+      "price": 48.59,
+      "pct_chg": 3.01,
+      "turnover": 2856160657.0,
+      "amount": 2856160657.0
+    },
+    {
+      "name": "罗博特科",
+      "code": "sz300757",
+      "price": 638.5,
+      "pct_chg": -0.64,
+      "turnover": 2847634878.0,
+      "amount": 2847634878.0
+    },
+    {
+      "name": "佰维存储",
+      "code": "sh688525",
+      "price": 218.79,
+      "pct_chg": 0.5,
+      "turnover": 2840278348.0,
+      "amount": 2840278348.0
     },
     {
       "name": "大唐发电",
       "code": "sh601991",
-      "price": 5.83,
-      "pct_chg": 3.55,
-      "turnover": 1973936841.0,
-      "amount": 1973936841.0
+      "price": 6.02,
+      "pct_chg": 3.26,
+      "turnover": 2803052253.0,
+      "amount": 2803052253.0
     },
     {
       "name": "中信证券",
       "code": "sh600030",
-      "price": 27.33,
-      "pct_chg": -0.04,
-      "turnover": 1965061395.0,
-      "amount": 1965061395.0
+      "price": 27.6,
+      "pct_chg": 0.99,
+      "turnover": 2792020063.0,
+      "amount": 2792020063.0
     },
     {
-      "name": "盈新发展",
-      "code": "sz000620",
-      "price": 3.24,
-      "pct_chg": -2.41,
-      "turnover": 1961487243.0,
-      "amount": 1961487243.0
+      "name": "比亚迪",
+      "code": "sz002594",
+      "price": 83.52,
+      "pct_chg": -2.75,
+      "turnover": 2783701703.0,
+      "amount": 2783701703.0
     },
     {
-      "name": "天山铝业",
-      "code": "sz002532",
-      "price": 14.04,
-      "pct_chg": 6.04,
-      "turnover": 1960839065.0,
-      "amount": 1960839065.0
+      "name": "中微公司",
+      "code": "sh688012",
+      "price": 334.19,
+      "pct_chg": 0.36,
+      "turnover": 2783286905.0,
+      "amount": 2783286905.0
     },
     {
-      "name": "长江电力",
-      "code": "sh600900",
-      "price": 28.05,
-      "pct_chg": 0.65,
-      "turnover": 1956050913.0,
-      "amount": 1956050913.0
+      "name": "超声电子",
+      "code": "sz000823",
+      "price": 18.7,
+      "pct_chg": 10.0,
+      "turnover": 2769778931.0,
+      "amount": 2769778931.0
     },
     {
-      "name": "中巨芯",
-      "code": "sh688549",
-      "price": 22.54,
-      "pct_chg": 2.92,
-      "turnover": 1935465491.0,
-      "amount": 1935465491.0
+      "name": "长川科技",
+      "code": "sz300604",
+      "price": 268.5,
+      "pct_chg": 2.05,
+      "turnover": 2768971889.0,
+      "amount": 2768971889.0
     },
     {
-      "name": "君正股份",
-      "code": "sz300223",
-      "price": 131.98,
-      "pct_chg": -1.35,
-      "turnover": 1927931161.0,
-      "amount": 1927931161.0
-    },
-    {
-      "name": "联特科技",
-      "code": "sz301205",
-      "price": 297.59,
-      "pct_chg": -3.72,
-      "turnover": 1922237948.0,
-      "amount": 1922237948.0
-    },
-    {
-      "name": "睿创微纳",
-      "code": "sh688002",
-      "price": 182.02,
-      "pct_chg": 1.86,
-      "turnover": 1921820166.0,
-      "amount": 1921820166.0
-    },
-    {
-      "name": "云南铜业",
-      "code": "sz000878",
-      "price": 18.63,
-      "pct_chg": 1.69,
-      "turnover": 1916852286.0,
-      "amount": 1916852286.0
-    },
-    {
-      "name": "力量钻石",
-      "code": "sz301071",
-      "price": 64.97,
-      "pct_chg": 4.67,
-      "turnover": 1900792165.0,
-      "amount": 1900792165.0
-    },
-    {
-      "name": "致尚科技",
-      "code": "sz301486",
-      "price": 195.55,
-      "pct_chg": 3.53,
-      "turnover": 1899678657.0,
-      "amount": 1899678657.0
-    },
-    {
-      "name": "厦门钨业",
-      "code": "sh600549",
-      "price": 50.78,
-      "pct_chg": 1.82,
-      "turnover": 1884276255.0,
-      "amount": 1884276255.0
-    },
-    {
-      "name": "迈瑞医疗",
-      "code": "sz300760",
-      "price": 165.2,
-      "pct_chg": -2.79,
-      "turnover": 1868054817.0,
-      "amount": 1868054817.0
-    },
-    {
-      "name": "金 螳 螂",
-      "code": "sz002081",
-      "price": 5.18,
-      "pct_chg": -6.83,
-      "turnover": 1860306663.0,
-      "amount": 1860306663.0
-    },
-    {
-      "name": "中兵红箭",
-      "code": "sz000519",
-      "price": 16.63,
-      "pct_chg": 3.55,
-      "turnover": 1849440437.0,
-      "amount": 1849440437.0
-    },
-    {
-      "name": "N洛轴",
-      "code": "sz301699",
-      "price": 31.99,
-      "pct_chg": 101.45,
-      "turnover": 1840767558.0,
-      "amount": 1840767558.0
-    },
-    {
-      "name": "兴业银锡",
-      "code": "sz000426",
-      "price": 38.66,
-      "pct_chg": 2.49,
-      "turnover": 1837756120.0,
-      "amount": 1837756120.0
-    },
-    {
-      "name": "高澜股份",
-      "code": "sz300499",
-      "price": 36.82,
-      "pct_chg": 8.42,
-      "turnover": 1832561067.0,
-      "amount": 1832561067.0
-    },
-    {
-      "name": "雅克科技",
-      "code": "sz002409",
-      "price": 131.52,
-      "pct_chg": -0.45,
-      "turnover": 1823074444.0,
-      "amount": 1823074444.0
-    },
-    {
-      "name": "三祥新材",
-      "code": "sh603663",
-      "price": 41.93,
-      "pct_chg": 7.21,
-      "turnover": 1807469018.0,
-      "amount": 1807469018.0
-    },
-    {
-      "name": "斯迪克",
-      "code": "sz300806",
-      "price": 49.3,
-      "pct_chg": 5.82,
-      "turnover": 1804896693.0,
-      "amount": 1804896693.0
-    },
-    {
-      "name": "歌尔股份",
-      "code": "sz002241",
-      "price": 23.01,
-      "pct_chg": -2.83,
-      "turnover": 1794164209.0,
-      "amount": 1794164209.0
-    },
-    {
-      "name": "江丰电子",
-      "code": "sz300666",
-      "price": 231.01,
-      "pct_chg": -1.57,
-      "turnover": 1785034720.0,
-      "amount": 1785034720.0
-    },
-    {
-      "name": "汇川技术",
-      "code": "sz300124",
-      "price": 55.92,
-      "pct_chg": -2.15,
-      "turnover": 1783338247.0,
-      "amount": 1783338247.0
+      "name": "仕佳光子",
+      "code": "sh688313",
+      "price": 149.75,
+      "pct_chg": 1.22,
+      "turnover": 2746916186.0,
+      "amount": 2746916186.0
     },
     {
       "name": "招商银行",
       "code": "sh600036",
-      "price": 41.0,
-      "pct_chg": 0.24,
-      "turnover": 1773818777.0,
-      "amount": 1773818777.0
+      "price": 41.57,
+      "pct_chg": 1.39,
+      "turnover": 2733649678.0,
+      "amount": 2733649678.0
+    },
+    {
+      "name": "国瓷材料",
+      "code": "sz300285",
+      "price": 60.35,
+      "pct_chg": -0.03,
+      "turnover": 2731720799.0,
+      "amount": 2731720799.0
+    },
+    {
+      "name": "云南锗业",
+      "code": "sz002428",
+      "price": 90.04,
+      "pct_chg": -1.52,
+      "turnover": 2718000698.0,
+      "amount": 2718000698.0
+    },
+    {
+      "name": "阳光电源",
+      "code": "sz300274",
+      "price": 85.93,
+      "pct_chg": -1.23,
+      "turnover": 2703107556.0,
+      "amount": 2703107556.0
+    },
+    {
+      "name": "斯迪克",
+      "code": "sz300806",
+      "price": 53.59,
+      "pct_chg": 8.7,
+      "turnover": 2691348689.0,
+      "amount": 2691348689.0
+    },
+    {
+      "name": "雅克科技",
+      "code": "sz002409",
+      "price": 133.48,
+      "pct_chg": 1.49,
+      "turnover": 2654345609.0,
+      "amount": 2654345609.0
+    },
+    {
+      "name": "通鼎互联",
+      "code": "sz002491",
+      "price": 21.02,
+      "pct_chg": -5.4,
+      "turnover": 2640436677.0,
+      "amount": 2640436677.0
+    },
+    {
+      "name": "紫光股份",
+      "code": "sz000938",
+      "price": 33.1,
+      "pct_chg": -1.4,
+      "turnover": 2595958403.0,
+      "amount": 2595958403.0
+    },
+    {
+      "name": "拓斯达",
+      "code": "sz300607",
+      "price": 35.09,
+      "pct_chg": -8.09,
+      "turnover": 2577357286.0,
+      "amount": 2577357286.0
+    },
+    {
+      "name": "领益智造",
+      "code": "sz002600",
+      "price": 12.84,
+      "pct_chg": 3.21,
+      "turnover": 2576551764.0,
+      "amount": 2576551764.0
+    },
+    {
+      "name": "中京电子",
+      "code": "sz002579",
+      "price": 16.73,
+      "pct_chg": -0.48,
+      "turnover": 2562191217.0,
+      "amount": 2562191217.0
+    },
+    {
+      "name": "行云科技",
+      "code": "sz300209",
+      "price": 36.4,
+      "pct_chg": -3.42,
+      "turnover": 2543708808.0,
+      "amount": 2543708808.0
+    },
+    {
+      "name": "普冉股份",
+      "code": "sh688766",
+      "price": 398.95,
+      "pct_chg": 1.41,
+      "turnover": 2543510983.0,
+      "amount": 2543510983.0
+    },
+    {
+      "name": "红棉股份",
+      "code": "sz000523",
+      "price": 4.46,
+      "pct_chg": 2.29,
+      "turnover": 2540839538.0,
+      "amount": 2540839538.0
+    },
+    {
+      "name": "蓝思科技",
+      "code": "sz300433",
+      "price": 33.81,
+      "pct_chg": -3.73,
+      "turnover": 2537909623.0,
+      "amount": 2537909623.0
+    },
+    {
+      "name": "东方财富",
+      "code": "sz300059",
+      "price": 18.97,
+      "pct_chg": 0.32,
+      "turnover": 2528154712.0,
+      "amount": 2528154712.0
+    },
+    {
+      "name": "N电科思",
+      "code": "sz301689",
+      "price": 54.0,
+      "pct_chg": 237.5,
+      "turnover": 2524557529.0,
+      "amount": 2524557529.0
+    },
+    {
+      "name": "江波龙",
+      "code": "sz301308",
+      "price": 347.0,
+      "pct_chg": -0.3,
+      "turnover": 2516150561.0,
+      "amount": 2516150561.0
+    },
+    {
+      "name": "北方华创",
+      "code": "sz002371",
+      "price": 638.64,
+      "pct_chg": -1.2,
+      "turnover": 2495550165.0,
+      "amount": 2495550165.0
+    },
+    {
+      "name": "敦煌种业",
+      "code": "sh600354",
+      "price": 11.45,
+      "pct_chg": 4.28,
+      "turnover": 2471328050.0,
+      "amount": 2471328050.0
+    },
+    {
+      "name": "XD中国平",
+      "code": "sh601318",
+      "price": 55.52,
+      "pct_chg": 0.43,
+      "turnover": 2460779156.0,
+      "amount": 2460779156.0
+    },
+    {
+      "name": "四方达",
+      "code": "sz300179",
+      "price": 39.99,
+      "pct_chg": -5.46,
+      "turnover": 2460450057.0,
+      "amount": 2460450057.0
+    },
+    {
+      "name": "麦格米特",
+      "code": "sz002851",
+      "price": 127.8,
+      "pct_chg": 0.58,
+      "turnover": 2452415039.0,
+      "amount": 2452415039.0
+    },
+    {
+      "name": "烽火通信",
+      "code": "sh600498",
+      "price": 40.13,
+      "pct_chg": -2.22,
+      "turnover": 2450766283.0,
+      "amount": 2450766283.0
+    },
+    {
+      "name": "长光华芯",
+      "code": "sh688048",
+      "price": 305.96,
+      "pct_chg": -1.53,
+      "turnover": 2440549206.0,
+      "amount": 2440549206.0
+    },
+    {
+      "name": "星网锐捷",
+      "code": "sz002396",
+      "price": 35.99,
+      "pct_chg": 0.5,
+      "turnover": 2436116887.0,
+      "amount": 2436116887.0
+    },
+    {
+      "name": "贵州茅台",
+      "code": "sh600519",
+      "price": 1285.13,
+      "pct_chg": -0.45,
+      "turnover": 2428698784.0,
+      "amount": 2428698784.0
+    },
+    {
+      "name": "通富微电",
+      "code": "sz002156",
+      "price": 58.34,
+      "pct_chg": -0.02,
+      "turnover": 2422551522.0,
+      "amount": 2422551522.0
+    },
+    {
+      "name": "宝鼎科技",
+      "code": "sz002552",
+      "price": 50.35,
+      "pct_chg": 5.96,
+      "turnover": 2404300651.0,
+      "amount": 2404300651.0
+    },
+    {
+      "name": "协鑫能科",
+      "code": "sz002015",
+      "price": 17.18,
+      "pct_chg": 4.57,
+      "turnover": 2394898807.0,
+      "amount": 2394898807.0
+    },
+    {
+      "name": "中芯国际",
+      "code": "sh688981",
+      "price": 119.18,
+      "pct_chg": -1.1,
+      "turnover": 2288876808.0,
+      "amount": 2288876808.0
+    },
+    {
+      "name": "潍柴动力",
+      "code": "sz000338",
+      "price": 26.83,
+      "pct_chg": -3.66,
+      "turnover": 2263368088.0,
+      "amount": 2263368088.0
+    },
+    {
+      "name": "长芯博创",
+      "code": "sz300548",
+      "price": 214.7,
+      "pct_chg": -0.23,
+      "turnover": 2234418066.0,
+      "amount": 2234418066.0
     },
     {
       "name": "宏和科技",
       "code": "sh603256",
-      "price": 128.25,
-      "pct_chg": 1.16,
-      "turnover": 1771891314.0,
-      "amount": 1771891314.0
+      "price": 129.1,
+      "pct_chg": 0.66,
+      "turnover": 2233381360.0,
+      "amount": 2233381360.0
     },
     {
-      "name": "南大光电",
-      "code": "sz300346",
-      "price": 52.74,
-      "pct_chg": 2.29,
-      "turnover": 1763401245.0,
-      "amount": 1763401245.0
+      "name": "科翔股份",
+      "code": "sz300903",
+      "price": 88.16,
+      "pct_chg": 1.77,
+      "turnover": 2219534584.0,
+      "amount": 2219534584.0
     },
     {
-      "name": "中文在线",
-      "code": "sz300364",
-      "price": 25.1,
-      "pct_chg": -3.35,
-      "turnover": 1748481957.0,
-      "amount": 1748481957.0
+      "name": "海通发展",
+      "code": "sh603162",
+      "price": 15.52,
+      "pct_chg": 0.58,
+      "turnover": 2215234444.0,
+      "amount": 2215234444.0
     },
     {
-      "name": "楚天龙",
-      "code": "sz003040",
-      "price": 21.0,
-      "pct_chg": -5.62,
-      "turnover": 1743441275.0,
-      "amount": 1743441275.0
+      "name": "利通电子",
+      "code": "sh603629",
+      "price": 106.38,
+      "pct_chg": -2.64,
+      "turnover": 2184377891.0,
+      "amount": 2184377891.0
     },
     {
-      "name": "兆龙互连",
-      "code": "sz300913",
-      "price": 41.08,
-      "pct_chg": 14.72,
-      "turnover": 1733800812.0,
-      "amount": 1733800812.0
+      "name": "生益电子",
+      "code": "sh688183",
+      "price": 125.57,
+      "pct_chg": -2.3,
+      "turnover": 2160330595.0,
+      "amount": 2160330595.0
     },
     {
-      "name": "晶方科技",
-      "code": "sh603005",
-      "price": 30.25,
-      "pct_chg": 4.42,
-      "turnover": 1723257616.0,
-      "amount": 1723257616.0
+      "name": "天通股份",
+      "code": "sh600330",
+      "price": 28.34,
+      "pct_chg": -3.47,
+      "turnover": 2156174413.0,
+      "amount": 2156174413.0
     },
     {
-      "name": "拓荆科技",
-      "code": "sh688072",
-      "price": 631.18,
-      "pct_chg": -0.13,
-      "turnover": 1719912517.0,
-      "amount": 1719912517.0
+      "name": "腾景科技",
+      "code": "sh688195",
+      "price": 202.66,
+      "pct_chg": -0.23,
+      "turnover": 2127538202.0,
+      "amount": 2127538202.0
     },
     {
-      "name": "工商银行",
-      "code": "sh601398",
-      "price": 8.0,
-      "pct_chg": 0.76,
-      "turnover": 1717501611.0,
-      "amount": 1717501611.0
+      "name": "北方铜业",
+      "code": "sz000737",
+      "price": 16.38,
+      "pct_chg": -0.55,
+      "turnover": 2104843632.0,
+      "amount": 2104843632.0
     },
     {
-      "name": "世纪华通",
-      "code": "sz002602",
-      "price": 15.78,
-      "pct_chg": -2.17,
-      "turnover": 1716117396.0,
-      "amount": 1716117396.0
+      "name": "莲花控股",
+      "code": "sh600186",
+      "price": 11.79,
+      "pct_chg": -2.0,
+      "turnover": 2099428579.0,
+      "amount": 2099428579.0
+    },
+    {
+      "name": "芒果超媒",
+      "code": "sz300413",
+      "price": 17.75,
+      "pct_chg": -4.42,
+      "turnover": 2098442586.0,
+      "amount": 2098442586.0
+    },
+    {
+      "name": "洛阳钼业",
+      "code": "sh603993",
+      "price": 19.01,
+      "pct_chg": -0.42,
+      "turnover": 2083254215.0,
+      "amount": 2083254215.0
+    },
+    {
+      "name": "合锻智能",
+      "code": "sh603011",
+      "price": 26.83,
+      "pct_chg": 1.44,
+      "turnover": 2075836639.0,
+      "amount": 2075836639.0
+    },
+    {
+      "name": "中百集团",
+      "code": "sz000759",
+      "price": 8.69,
+      "pct_chg": 2.6,
+      "turnover": 2074508402.0,
+      "amount": 2074508402.0
+    },
+    {
+      "name": "中粮科技",
+      "code": "sz000930",
+      "price": 6.5,
+      "pct_chg": 1.4,
+      "turnover": 2020632255.0,
+      "amount": 2020632255.0
+    },
+    {
+      "name": "白银有色",
+      "code": "sh601212",
+      "price": 6.81,
+      "pct_chg": -3.95,
+      "turnover": 2020269254.0,
+      "amount": 2020269254.0
+    },
+    {
+      "name": "南亚新材",
+      "code": "sh688519",
+      "price": 309.59,
+      "pct_chg": 6.15,
+      "turnover": 2018526465.0,
+      "amount": 2018526465.0
+    },
+    {
+      "name": "高澜股份",
+      "code": "sz300499",
+      "price": 36.53,
+      "pct_chg": -0.79,
+      "turnover": 2015983328.0,
+      "amount": 2015983328.0
+    },
+    {
+      "name": "杰华特",
+      "code": "sh688141",
+      "price": 111.59,
+      "pct_chg": -5.75,
+      "turnover": 2013749116.0,
+      "amount": 2013749116.0
+    },
+    {
+      "name": "蓝色光标",
+      "code": "sz300058",
+      "price": 13.46,
+      "pct_chg": -1.03,
+      "turnover": 2007692691.0,
+      "amount": 2007692691.0
+    },
+    {
+      "name": "宝丰能源",
+      "code": "sh600989",
+      "price": 24.7,
+      "pct_chg": -0.84,
+      "turnover": 2004005274.0,
+      "amount": 2004005274.0
+    },
+    {
+      "name": "亚星锚链",
+      "code": "sh601890",
+      "price": 10.38,
+      "pct_chg": 2.98,
+      "turnover": 2000191606.0,
+      "amount": 2000191606.0
+    },
+    {
+      "name": "杰瑞股份",
+      "code": "sz002353",
+      "price": 122.11,
+      "pct_chg": -2.86,
+      "turnover": 1975565958.0,
+      "amount": 1975565958.0
+    },
+    {
+      "name": "郑州煤电",
+      "code": "sh600121",
+      "price": 5.58,
+      "pct_chg": -2.1,
+      "turnover": 1971927673.0,
+      "amount": 1971927673.0
+    },
+    {
+      "name": "再升科技",
+      "code": "sh603601",
+      "price": 9.96,
+      "pct_chg": 10.05,
+      "turnover": 1965507854.0,
+      "amount": 1965507854.0
+    },
+    {
+      "name": "长盈通",
+      "code": "sh688143",
+      "price": 168.84,
+      "pct_chg": -3.08,
+      "turnover": 1963833485.0,
+      "amount": 1963833485.0
+    },
+    {
+      "name": "三孚股份",
+      "code": "sh603938",
+      "price": 45.05,
+      "pct_chg": -4.37,
+      "turnover": 1947308656.0,
+      "amount": 1947308656.0
+    },
+    {
+      "name": "山东玻纤",
+      "code": "sh605006",
+      "price": 17.32,
+      "pct_chg": 6.0,
+      "turnover": 1931073183.0,
+      "amount": 1931073183.0
+    },
+    {
+      "name": "万华化学",
+      "code": "sh600309",
+      "price": 77.15,
+      "pct_chg": -2.18,
+      "turnover": 1916538673.0,
+      "amount": 1916538673.0
+    },
+    {
+      "name": "西部矿业",
+      "code": "sh601168",
+      "price": 40.47,
+      "pct_chg": -1.65,
+      "turnover": 1900597993.0,
+      "amount": 1900597993.0
+    },
+    {
+      "name": "睿创微纳",
+      "code": "sh688002",
+      "price": 183.43,
+      "pct_chg": 0.78,
+      "turnover": 1895695691.0,
+      "amount": 1895695691.0
+    },
+    {
+      "name": "君正股份",
+      "code": "sz300223",
+      "price": 132.45,
+      "pct_chg": 0.36,
+      "turnover": 1893203266.0,
+      "amount": 1893203266.0
+    },
+    {
+      "name": "农业银行",
+      "code": "sh601288",
+      "price": 6.94,
+      "pct_chg": 1.91,
+      "turnover": 1889032390.0,
+      "amount": 1889032390.0
+    },
+    {
+      "name": "崇达技术",
+      "code": "sz002815",
+      "price": 18.25,
+      "pct_chg": 1.05,
+      "turnover": 1848521716.0,
+      "amount": 1848521716.0
+    },
+    {
+      "name": "中兴通讯",
+      "code": "sz000063",
+      "price": 32.45,
+      "pct_chg": -1.93,
+      "turnover": 1844287623.0,
+      "amount": 1844287623.0
+    },
+    {
+      "name": "中材科技",
+      "code": "sz002080",
+      "price": 50.85,
+      "pct_chg": 0.63,
+      "turnover": 1816040611.0,
+      "amount": 1816040611.0
+    },
+    {
+      "name": "大有能源",
+      "code": "sh600403",
+      "price": 7.78,
+      "pct_chg": 4.01,
+      "turnover": 1811511243.0,
+      "amount": 1811511243.0
+    },
+    {
+      "name": "英维克",
+      "code": "sz002837",
+      "price": 61.08,
+      "pct_chg": -2.16,
+      "turnover": 1811225191.0,
+      "amount": 1811225191.0
+    },
+    {
+      "name": "豫能控股",
+      "code": "sz001896",
+      "price": 12.43,
+      "pct_chg": 5.7,
+      "turnover": 1810964672.0,
+      "amount": 1810964672.0
+    },
+    {
+      "name": "神农种业",
+      "code": "sz300189",
+      "price": 7.21,
+      "pct_chg": -7.33,
+      "turnover": 1805024518.0,
+      "amount": 1805024518.0
+    },
+    {
+      "name": "三祥新材",
+      "code": "sh603663",
+      "price": 43.18,
+      "pct_chg": 2.98,
+      "turnover": 1792015004.0,
+      "amount": 1792015004.0
+    },
+    {
+      "name": "多氟多",
+      "code": "sz002407",
+      "price": 32.82,
+      "pct_chg": -2.58,
+      "turnover": 1791319728.0,
+      "amount": 1791319728.0
+    },
+    {
+      "name": "赤峰黄金",
+      "code": "sh600988",
+      "price": 44.3,
+      "pct_chg": 0.96,
+      "turnover": 1787996216.0,
+      "amount": 1787996216.0
+    },
+    {
+      "name": "金正大",
+      "code": "sz002470",
+      "price": 2.51,
+      "pct_chg": -9.71,
+      "turnover": 1779092879.0,
+      "amount": 1779092879.0
     },
     {
       "name": "沃尔德",
       "code": "sh688028",
-      "price": 124.35,
-      "pct_chg": 10.15,
-      "turnover": 1713241342.0,
-      "amount": 1713241342.0
+      "price": 120.0,
+      "pct_chg": -3.5,
+      "turnover": 1766585805.0,
+      "amount": 1766585805.0
     },
     {
-      "name": "旭光电子",
-      "code": "sh600353",
-      "price": 32.37,
-      "pct_chg": 2.02,
-      "turnover": 1711623765.0,
-      "amount": 1711623765.0
+      "name": "美的集团",
+      "code": "sz000333",
+      "price": 86.2,
+      "pct_chg": 0.21,
+      "turnover": 1764174850.0,
+      "amount": 1764174850.0
     },
     {
-      "name": "华丰科技",
-      "code": "sh688629",
-      "price": 126.29,
-      "pct_chg": 2.2,
-      "turnover": 1701172393.0,
-      "amount": 1701172393.0
+      "name": "江丰电子",
+      "code": "sz300666",
+      "price": 233.7,
+      "pct_chg": 1.16,
+      "turnover": 1756664075.0,
+      "amount": 1756664075.0
     },
     {
-      "name": "利欧股份",
-      "code": "sz002131",
-      "price": 4.61,
-      "pct_chg": -3.56,
-      "turnover": 1699995697.0,
-      "amount": 1699995697.0
+      "name": "金风科技",
+      "code": "sz002202",
+      "price": 18.14,
+      "pct_chg": 1.62,
+      "turnover": 1749147497.0,
+      "amount": 1749147497.0
+    },
+    {
+      "name": "华虹宏力",
+      "code": "sh688347",
+      "price": 224.11,
+      "pct_chg": 0.05,
+      "turnover": 1737199554.0,
+      "amount": 1737199554.0
+    },
+    {
+      "name": "云铝股份",
+      "code": "sz000807",
+      "price": 28.33,
+      "pct_chg": -2.41,
+      "turnover": 1732149168.0,
+      "amount": 1732149168.0
+    },
+    {
+      "name": "博敏电子",
+      "code": "sh603936",
+      "price": 18.98,
+      "pct_chg": 4.51,
+      "turnover": 1729404830.0,
+      "amount": 1729404830.0
+    },
+    {
+      "name": "联特科技",
+      "code": "sz301205",
+      "price": 303.09,
+      "pct_chg": 1.85,
+      "turnover": 1729007244.0,
+      "amount": 1729007244.0
+    },
+    {
+      "name": "光智科技",
+      "code": "sz300489",
+      "price": 211.69,
+      "pct_chg": -4.12,
+      "turnover": 1728870501.0,
+      "amount": 1728870501.0
+    },
+    {
+      "name": "山东黄金",
+      "code": "sh600547",
+      "price": 35.59,
+      "pct_chg": -1.82,
+      "turnover": 1727435130.0,
+      "amount": 1727435130.0
+    },
+    {
+      "name": "长江电力",
+      "code": "sh600900",
+      "price": 28.09,
+      "pct_chg": 0.14,
+      "turnover": 1727430920.0,
+      "amount": 1727430920.0
+    },
+    {
+      "name": "牧原股份",
+      "code": "sz002714",
+      "price": 42.22,
+      "pct_chg": -2.38,
+      "turnover": 1704248119.0,
+      "amount": 1704248119.0
+    },
+    {
+      "name": "应流股份",
+      "code": "sh603308",
+      "price": 44.56,
+      "pct_chg": -3.76,
+      "turnover": 1699347889.0,
+      "amount": 1699347889.0
+    },
+    {
+      "name": "中钨高新",
+      "code": "sz000657",
+      "price": 59.42,
+      "pct_chg": -1.78,
+      "turnover": 1697483501.0,
+      "amount": 1697483501.0
+    },
+    {
+      "name": "工商银行",
+      "code": "sh601398",
+      "price": 8.1,
+      "pct_chg": 1.25,
+      "turnover": 1694761554.0,
+      "amount": 1694761554.0
+    },
+    {
+      "name": "联讯仪器",
+      "code": "sh688808",
+      "price": 2436.0,
+      "pct_chg": -1.42,
+      "turnover": 1685210632.0,
+      "amount": 1685210632.0
+    },
+    {
+      "name": "楚江新材",
+      "code": "sz002171",
+      "price": 11.04,
+      "pct_chg": -0.18,
+      "turnover": 1661327679.0,
+      "amount": 1661327679.0
+    },
+    {
+      "name": "昆仑万维",
+      "code": "sz300418",
+      "price": 44.26,
+      "pct_chg": -3.13,
+      "turnover": 1648134366.0,
+      "amount": 1648134366.0
+    },
+    {
+      "name": "中船特气",
+      "code": "sh688146",
+      "price": 224.8,
+      "pct_chg": -0.4,
+      "turnover": 1638483476.0,
+      "amount": 1638483476.0
+    },
+    {
+      "name": "盾安环境",
+      "code": "sz002011",
+      "price": 13.14,
+      "pct_chg": 5.54,
+      "turnover": 1633041298.0,
+      "amount": 1633041298.0
+    },
+    {
+      "name": "易点天下",
+      "code": "sz301171",
+      "price": 36.24,
+      "pct_chg": -2.53,
+      "turnover": 1630659284.0,
+      "amount": 1630659284.0
+    },
+    {
+      "name": "彤程新材",
+      "code": "sh603650",
+      "price": 64.51,
+      "pct_chg": -1.09,
+      "turnover": 1628940876.0,
+      "amount": 1628940876.0
+    },
+    {
+      "name": "晓程科技",
+      "code": "sz300139",
+      "price": 50.6,
+      "pct_chg": -1.56,
+      "turnover": 1628549511.0,
+      "amount": 1628549511.0
+    },
+    {
+      "name": "沃格光电",
+      "code": "sh603773",
+      "price": 87.11,
+      "pct_chg": 1.28,
+      "turnover": 1621885382.0,
+      "amount": 1621885382.0
+    },
+    {
+      "name": "黑猫股份",
+      "code": "sz002068",
+      "price": 10.3,
+      "pct_chg": 2.9,
+      "turnover": 1620586648.0,
+      "amount": 1620586648.0
+    },
+    {
+      "name": "麦捷科技",
+      "code": "sz300319",
+      "price": 20.0,
+      "pct_chg": -0.25,
+      "turnover": 1612264431.0,
+      "amount": 1612264431.0
+    },
+    {
+      "name": "宁波银行",
+      "code": "sz002142",
+      "price": 35.87,
+      "pct_chg": 3.49,
+      "turnover": 1602459052.0,
+      "amount": 1602459052.0
+    },
+    {
+      "name": "湖南白银",
+      "code": "sz002716",
+      "price": 10.48,
+      "pct_chg": -2.96,
+      "turnover": 1588869205.0,
+      "amount": 1588869205.0
+    },
+    {
+      "name": "通源石油",
+      "code": "sz300164",
+      "price": 10.64,
+      "pct_chg": -3.8,
+      "turnover": 1578419598.0,
+      "amount": 1578419598.0
+    },
+    {
+      "name": "中兵红箭",
+      "code": "sz000519",
+      "price": 16.14,
+      "pct_chg": -2.95,
+      "turnover": 1575935509.0,
+      "amount": 1575935509.0
+    },
+    {
+      "name": "中远海能",
+      "code": "sh600026",
+      "price": 21.3,
+      "pct_chg": -0.61,
+      "turnover": 1575067599.0,
+      "amount": 1575067599.0
+    },
+    {
+      "name": "五 粮 液",
+      "code": "sz000858",
+      "price": 70.48,
+      "pct_chg": -0.96,
+      "turnover": 1574547312.0,
+      "amount": 1574547312.0
+    },
+    {
+      "name": "康龙化成",
+      "code": "sz300759",
+      "price": 41.55,
+      "pct_chg": -0.34,
+      "turnover": 1570593907.0,
+      "amount": 1570593907.0
+    },
+    {
+      "name": "同花顺",
+      "code": "sz300033",
+      "price": 215.8,
+      "pct_chg": -0.3,
+      "turnover": 1566912886.0,
+      "amount": 1566912886.0
+    },
+    {
+      "name": "海南橡胶",
+      "code": "sh601118",
+      "price": 7.34,
+      "pct_chg": -9.94,
+      "turnover": 1564119931.0,
+      "amount": 1564119931.0
+    },
+    {
+      "name": "立新能源",
+      "code": "sz001258",
+      "price": 12.45,
+      "pct_chg": 2.89,
+      "turnover": 1555103160.0,
+      "amount": 1555103160.0
+    },
+    {
+      "name": "中国海油",
+      "code": "sh600938",
+      "price": 34.42,
+      "pct_chg": 0.7,
+      "turnover": 1544763226.0,
+      "amount": 1544763226.0
+    },
+    {
+      "name": "大港股份",
+      "code": "sz002077",
+      "price": 14.05,
+      "pct_chg": 2.26,
+      "turnover": 1533467396.0,
+      "amount": 1533467396.0
+    },
+    {
+      "name": "驰宏锌锗",
+      "code": "sh600497",
+      "price": 10.33,
+      "pct_chg": 1.37,
+      "turnover": 1524931904.0,
+      "amount": 1524931904.0
     }
   ],
   "all_count": 320,
-  "date": "2026-09-09",
+  "date": "2026-09-10",
   "source": "新浪财经全市场行情接口"
 }
