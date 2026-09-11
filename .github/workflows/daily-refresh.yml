@@ -64,7 +64,7 @@ jobs:
               break
             fi
 
-            # Step 3: Generate HTML report
+            # Step 3: Locate scored JSON
             SCORED_JSON=$(ls -t top200_scored_*.json 2>/dev/null | head -1)
             if [ -z "$SCORED_JSON" ]; then
               echo "[$(date -u '+%H:%M:%S')] ❌ No scored JSON found" >> $LOG
@@ -72,6 +72,22 @@ jobs:
               break
             fi
 
+            # Step 3.5: AI-augmented enhancement (v2.30 four-step logic)
+            # ① AI 盘面点评/题材资金共识 (来自 ai_assessment.json)
+            # ② 消息面/题材热度 = 0.7×AI + 0.3×算法
+            # ③ 基本面 = 基础×0.6 + 业绩一阶导×0.2 + 业绩二阶导×0.2
+            # ④ AI 关注方向 / 模型总结 注入报告
+            # 说明: ai_assessment.json 由 WorkBuddy 智能体每日收盘后生成并推送(含真实行情数据)。
+            #       若缺失, enhance_scores.py 自动降级为仅基本面导数增强, 不阻断流水线。
+            echo "[$(date -u '+%H:%M:%S')] Running enhance_scores.py (AI augmentation, four-step) ..." >> $LOG
+            if python3 enhance_scores.py "$SCORED_JSON" ai_assessment.json >> $LOG 2>&1; then
+              MODEL=$(grep -o '"model": *"[^"]*"' "$SCORED_JSON" | head -1 | sed 's/.*: *//; s/"//g')
+              echo "[$(date -u '+%H:%M:%S')] ✅ Enhancement succeeded (model: ${MODEL:-v2.30})" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ Enhancement failed, report will use base scores" >> $LOG
+            fi
+
+            # Step 4: Generate HTML report
             echo "[$(date -u '+%H:%M:%S')] Running gen_report_top200.py ..." >> $LOG
             if python3 gen_report_top200.py "$SCORED_JSON" >> $LOG 2>&1; then
               echo "[$(date -u '+%H:%M:%S')] ✅ Report generation succeeded" >> $LOG
@@ -105,6 +121,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add index.html top200_report_*.html refresh_log.txt
           git add -f top200_scored_*.json top200_all_a.json
+          git add enhance_scores.py gen_report_top200.py
           git diff --cached --quiet && echo "No changes to commit" && exit 0
           git commit -m "auto: daily report refresh $(date -u '+%Y-%m-%d')"
           git push
