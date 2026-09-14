@@ -573,11 +573,11 @@ html_parts.append('''
         <button class="quick-btn" data-quick="new">🆕 新晋上榜</button>
     </div>
 
-    <!-- 今日数据总结 + 组合推荐 -->
+    <!-- 今日市场总结与组合推荐 (合并) -->
     <div class="charts">
-        <!-- 今日数据总结 -->
-        <div class="chart-card" style="padding:16px;">
-            <h3 style="font-size:13px;margin-bottom:10px;">📋 今日数据总结</h3>
+        <!-- 合并卡片：今日市场总结 + 组合推荐 -->
+        <div class="chart-card" style="padding:16px;grid-column:1 / -1;">
+            <h3 style="font-size:13px;margin-bottom:10px;">📋 今日市场总结与组合推荐</h3>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
                 <div style="background:#0f172a;border-radius:6px;padding:8px;text-align:center;">
                     <div style="font-size:10px;color:#94a3b8;">覆盖个股</div>
@@ -608,10 +608,7 @@ for s, v in sorted_secs:
                 </div>''')
 
 html_parts.append('''
-        </div>
-
-        <!-- 组合推荐 (AI 过审优先) -->
-        <div class="chart-card" style="padding:16px;">
+            <hr style="border:none;border-top:1px solid #1e293b;margin:14px 0;" />
 ''')
 results_by_name = {r["name"]: r for r in results}
 ai_port = (ai_review.get("portfolio") or {})
@@ -619,14 +616,8 @@ ai_picks = ai_port.get("picks") or []
 use_ai_port = bool(ai_picks)
 
 if use_ai_port:
-    ptitle = ai_port.get("title") or "组合推荐 · 产业链分散+估值校验(AI)"
+    ptitle = ai_port.get("title") or "组合推荐"
     html_parts.append(f'            <h3 style="font-size:13px;margin-bottom:10px;">🎯 {html_mod.escape(ptitle)}</h3>')
-    div_note = ai_port.get("diversification", "")
-    if div_note:
-        html_parts.append(f'''            <div style="font-size:11.5px;line-height:1.7;color:#e2e8f0;background:#0f172a;border-left:3px solid #3b82f6;padding:8px 10px;border-radius:6px;margin-bottom:8px;">🔗 <b style="color:#93c5fd;">分散度校验：</b>{html_mod.escape(div_note)}</div>''')
-    val_note = ai_port.get("valuation", "")
-    if val_note:
-        html_parts.append(f'''            <div style="font-size:11.5px;line-height:1.7;color:#e2e8f0;background:#0f172a;border-left:3px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-bottom:8px;">💰 <b style="color:#fbbf24;">估值校验：</b>{html_mod.escape(val_note)}</div>''')
     for i, pk in enumerate(ai_picks):
         name = pk.get("name") if isinstance(pk, dict) else pk
         r = results_by_name.get(name)
@@ -666,7 +657,7 @@ if use_ai_port:
         </div>
     </div>''')
 else:
-    html_parts.append('''            <h3 style="font-size:13px;margin-bottom:10px;">🎯 组合推荐 · 板块分散+估值合理</h3>''')
+    html_parts.append('''            <h3 style="font-size:13px;margin-bottom:10px;">🎯 组合推荐</h3>''')
     for i, r in enumerate(portfolio_picks):
         rating = r["rating"]
         total = r["total"]
