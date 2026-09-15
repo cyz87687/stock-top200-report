@@ -123,8 +123,21 @@ def main():
                 ai_news = _clamp(0.7 * float(t_news) + 0.3 * base_news)
             if t_heat is not None:
                 ai_theme = _clamp(0.7 * float(t_heat) + 0.3 * base_theme)
+            else:
+                ai_theme = base_theme
             ai_label = tlabel
             ai_applied = True
+        # 当日涨跌修正: 题材热度必须与当日真实涨跌幅方向一致(涨停+1.0 / 跌停-1.0)。
+        # 修复项——此前 ai_theme_heat 完全等于算法原始分(base_theme), 且 AI 覆盖层未生效,
+        # 导致大涨题材(PCB/CXO)热度反而低于当日大跌的光模块; 现叠加个股当日涨跌幅偏移纠偏。
+        _pct = r.get("pct_chg")
+        _day_mod = 0.0
+        if _pct is not None:
+            try:
+                _day_mod = _clamp(float(_pct) / 10.0, -1.0, 1.0)  # 涨跌幅映射到[-1,+1]
+            except Exception:
+                _day_mod = 0.0
+        ai_theme = _clamp(ai_theme + _day_mod)
 
         # ---- 3) 重算总分与评级 ----
         total = round((ai_news * W_NEWS + tech * W_TECH + new_fund * W_FUND + ai_theme * W_THEME) * 4, 2)
@@ -154,6 +167,7 @@ def main():
         r["ai_theme_label"] = ai_label
         r["ai_news"] = round(ai_news, 2)
         r["ai_theme_heat"] = round(ai_theme, 2)
+        r["ai_theme_day_mod"] = round(_day_mod, 3)
         if ai_applied:
             changed += 1
 
