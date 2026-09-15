@@ -27,6 +27,10 @@ jobs:
 
       - name: Fetch & Score & Generate Report
         id: build
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL }}
         run: |
           LOG="refresh_log.txt"
           echo "=== Refresh started at $(date -u '+%Y-%m-%d %H:%M:%S UTC') ===" > $LOG
@@ -72,13 +76,21 @@ jobs:
               break
             fi
 
-            # Step 3.5: AI-augmented enhancement (v2.30 four-step logic)
+            # Step 3.5: Generate AI assessment layer (auto by LLM, fallback to rule engine)
+            echo "[$(date -u '+%H:%M:%S')] Running generate_ai_assessment.py ..." >> $LOG
+            if python3 generate_ai_assessment.py "$SCORED_JSON" >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ AI assessment generated" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ AI assessment generation failed, continuing with fallback/last version" >> $LOG
+            fi
+
+            # Step 3.6: AI-augmented enhancement (v2.30 four-step logic)
             # ① AI 盘面点评/题材资金共识 (来自 ai_assessment.json)
             # ② 消息面/题材热度 = 0.7×AI + 0.3×算法
             # ③ 基本面 = 基础×0.6 + 业绩一阶导×0.2 + 业绩二阶导×0.2
             # ④ AI 关注方向 / 模型总结 注入报告
-            # 说明: ai_assessment.json 由 WorkBuddy 智能体每日收盘后生成并推送(含真实行情数据)。
-            #       若缺失, enhance_scores.py 自动降级为仅基本面导数增强, 不阻断流水线。
+            # 说明: ai_assessment.json 由 generate_ai_assessment.py 每日收盘后自动生成(优先 LLM，失败则 fallback 规则引擎)。
+            #       若仍缺失, enhance_scores.py 自动降级为仅基本面导数增强, 不阻断流水线。
             echo "[$(date -u '+%H:%M:%S')] Running enhance_scores.py (AI augmentation, four-step) ..." >> $LOG
             if python3 enhance_scores.py "$SCORED_JSON" ai_assessment.json >> $LOG 2>&1; then
               MODEL=$(grep -o '"model": *"[^"]*"' "$SCORED_JSON" | head -1 | sed 's/.*: *//; s/"//g')
@@ -120,8 +132,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add index.html top200_report_*.html refresh_log.txt
-          git add -f top200_scored_*.json top200_all_a.json
-          git add enhance_scores.py gen_report_top200.py
+          git add -f top200_scored_*.json top200_all_a.json ai_assessment.json
+          git add enhance_scores.py gen_report_top200.py generate_ai_assessment.py
           git diff --cached --quiet && echo "No changes to commit" && exit 0
           git commit -m "auto: daily report refresh $(date -u '+%Y-%m-%d')"
           git push
