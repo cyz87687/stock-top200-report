@@ -5,3 +5,8 @@ __pycache__/
 *.json
 !package.json
 update_rating.py
+# 本地 LLM 凭据（严禁入库；GitHub Actions 请用 repository secrets）
+.llm_env
+.env
+.env.local
+llm_env.sh

@@ -20,8 +20,12 @@ from collections import defaultdict
 from datetime import datetime
 
 # ---------- 配置 ----------
-DEFAULT_BASE_URL = "https://ark.cn-beijing.volces.com/api/v3/"
-DEFAULT_MODEL = "kimi-k2.7-code"
+# 已验证可用的默认通道（火山方舟 plan 通道，OpenAI 兼容）：
+#   base_url = https://ark.cn-beijing.volces.com/api/plan/v3
+#   model    = deepseek-v4-pro
+# 如需切换，优先用环境变量覆盖，不要在代码里硬编码 API Key。
+DEFAULT_BASE_URL = "https://ark.cn-beijing.volces.com/api/plan/v3"
+DEFAULT_MODEL = "deepseek-v4-pro"
 API_KEY = os.environ.get("LLM_API_KEY")
 BASE_URL = os.environ.get("LLM_BASE_URL") or DEFAULT_BASE_URL
 MODEL = os.environ.get("LLM_MODEL") or DEFAULT_MODEL
@@ -96,6 +100,8 @@ def _build_summary(scored_path):
         "top_losers": top_losers,
         "sector_avg": sector_avg,
         "theme_avg": theme_avg,
+        "theme_map": {k: v for k, v in theme_map.items()},
+        "sector_map": {k: v for k, v in sector_map.items()},
     }
 
 
@@ -126,6 +132,20 @@ def _build_prompt(s):
     lines.append("跌幅前列个股（TOP200）：")
     for r in s["top_losers"][:8]:
         lines.append(f"  - {r['name']}({r.get('code','')}): {_pct_fmt(r.get('pct_chg'))}, {r.get('sector','')}/{r.get('sub_theme','')}")
+    lines.append("")
+    _mrtext = (s.get("mr") or {}).get("text")
+    if _mrtext:
+        lines.append("【算法层盘面速览（数据驱动，供参考，请勿直接照抄）】")
+        lines.append(str(_mrtext))
+        lines.append("")
+    lines.append("【当日 TOP200 在榜个股名单（按细分题材分组，格式 名称(涨跌幅)）】")
+    lines.append("⚠️ 硬约束：themes[].stocks 只能从下面名单中选取，且必须与名单中文名【完全一致】（不得加后缀、不得简写、不得虚构名单外个股）。")
+    _tm = s.get("theme_map") or {}
+    _tm_sorted = sorted(_tm.items(), key=lambda kv: -max((x.get("pct_chg", 0) for x in kv[1]), default=0))
+    for _st, _lst in _tm_sorted:
+        _top = sorted(_lst, key=lambda x: x.get("pct_chg", 0), reverse=True)[:8]
+        _names = ", ".join(f"{r['name']}({_pct_fmt(r.get('pct_chg'))})" for r in _top)
+        lines.append(f"  - {_st}：{_names}")
     lines.append("")
     lines.append("输出要求：")
     lines.append("1. 严格输出可解析的 JSON，不要 Markdown 代码块，不要额外说明。")
@@ -330,6 +350,23 @@ def main():
         ai["fallback"] = False
         ai["date"] = summary["date"]
         ai["generated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        ai["generated_by"] = f"WorkBuddy LLM ({MODEL})，基于当日真实行情数据"
+
+        # 清洗 themes[].stocks：剔除不在当日 TOP200 名单内的名称，否则 enhance_scores 无法命中赋分
+        _valid = {r["name"] for r in summary["results"]}
+        _cleaned = {}
+        for _k, _t in (ai.get("themes") or {}).items():
+            if not isinstance(_t, dict):
+                continue
+            _stocks = [x for x in (_t.get("stocks") or []) if x in _valid]
+            _dropped = [x for x in (_t.get("stocks") or []) if x not in _valid]
+            if _dropped:
+                print(f"   ⚠️ [{_k}] 剔除名单外个股: {_dropped}")
+            if _stocks:
+                _t["stocks"] = _stocks
+                _cleaned[_k] = _t
+        ai["themes"] = _cleaned
+        print(f"   主题清洗后: {len(_cleaned)} 个，命中个股 {sum(len(v['stocks']) for v in _cleaned.values())} 只")
 
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(ai, f, ensure_ascii=False, indent=2)
