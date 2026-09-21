@@ -1,0 +1,2314 @@
+{
+ "meta": {
+  "start": "2021-01-04",
+  "end": "2026-09-18",
+  "n_days": 1386,
+  "n_stocks": 5019,
+  "n_sectors": 124,
+  "holds": [
+   5,
+   10,
+   20,
+   60
+  ],
+  "universe": "申万二级行业(131个, 建指数124个)",
+  "weighted": "equal"
+ },
+ "coverage": {
+  "L0_strict_R60=1_R10<=3": {
+   "hit_days": 532,
+   "pct_days": 38.4,
+   "avg_sectors": 0.38,
+   "max_sectors": 1
+  },
+  "L1_fb_R60<=3_R10<=5": {
+   "hit_days": 948,
+   "pct_days": 68.4,
+   "avg_sectors": 1.04,
+   "max_sectors": 3
+  },
+  "L2_fb_R60<=5_R10<=10": {
+   "hit_days": 1219,
+   "pct_days": 88.0,
+   "avg_sectors": 2.06,
+   "max_sectors": 5
+  },
+  "only_R60=1": {
+   "hit_days": 1386,
+   "pct_days": 100.0,
+   "avg_sectors": 1.0,
+   "max_sectors": 1
+  },
+  "only_R10<=3": {
+   "hit_days": 1386,
+   "pct_days": 100.0,
+   "avg_sectors": 3.0,
+   "max_sectors": 3
+  },
+  "rev_R60_last3": {
+   "hit_days": 1386,
+   "pct_days": 100.0,
+   "avg_sectors": 3.0,
+   "max_sectors": 3
+  }
+ },
+ "rules": {
+  "L0_strict_R60=1_R10<=3": {
+   "all": {
+    "5": {
+     "n_events": 10807,
+     "n_days": 532,
+     "avg_stocks": 20.3,
+     "mean_ret": -0.508,
+     "win_rate": 40.32,
+     "day_exc": -0.5934,
+     "ann_exc": -28.48,
+     "t_stat": -1.67,
+     "day_win": 41.92
+    },
+    "10": {
+     "n_events": 10730,
+     "n_days": 528,
+     "avg_stocks": 20.3,
+     "mean_ret": -0.759,
+     "win_rate": 39.38,
+     "day_exc": -1.0466,
+     "ann_exc": -25.12,
+     "t_stat": -2.13,
+     "day_win": 39.2
+    },
+    "20": {
+     "n_events": 10667,
+     "n_days": 525,
+     "avg_stocks": 20.3,
+     "mean_ret": -1.178,
+     "win_rate": 37.24,
+     "day_exc": -1.3069,
+     "ann_exc": -15.68,
+     "t_stat": -1.97,
+     "day_win": 37.14
+    },
+    "60": {
+     "n_events": 10083,
+     "n_days": 511,
+     "avg_stocks": 19.7,
+     "mean_ret": -1.213,
+     "win_rate": 34.08,
+     "day_exc": -3.6665,
+     "ann_exc": -14.67,
+     "t_stat": -3.45,
+     "day_win": 35.03
+    }
+   },
+   "liq200": {
+    "5": {
+     "n_events": 917,
+     "n_days": 220,
+     "avg_stocks": 4.2,
+     "mean_ret": 0.949,
+     "win_rate": 44.93,
+     "day_exc": 1.6792,
+     "ann_exc": 80.6,
+     "t_stat": 1.75,
+     "day_win": 46.36
+    },
+    "10": {
+     "n_events": 917,
+     "n_days": 220,
+     "avg_stocks": 4.2,
+     "mean_ret": 0.109,
+     "win_rate": 37.95,
+     "day_exc": 3.3685,
+     "ann_exc": 80.84,
+     "t_stat": 2.51,
+     "day_win": 45.0
+    },
+    "20": {
+     "n_events": 908,
+     "n_days": 219,
+     "avg_stocks": 4.1,
+     "mean_ret": -1.857,
+     "win_rate": 35.35,
+     "day_exc": 1.3364,
+     "ann_exc": 16.04,
+     "t_stat": 0.79,
+     "day_win": 43.38
+    },
+    "60": {
+     "n_events": 793,
+     "n_days": 206,
+     "avg_stocks": 3.8,
+     "mean_ret": -7.214,
+     "win_rate": 26.86,
+     "day_exc": -9.6425,
+     "ann_exc": -38.57,
+     "t_stat": -6.13,
+     "day_win": 29.13
+    }
+   },
+   "top5": {}
+  },
+  "L1_fb_R60<=3_R10<=5": {
+   "all": {
+    "5": {
+     "n_events": 39058,
+     "n_days": 948,
+     "avg_stocks": 41.2,
+     "mean_ret": -0.144,
+     "win_rate": 42.57,
+     "day_exc": -0.2155,
+     "ann_exc": -10.34,
+     "t_stat": -0.92,
+     "day_win": 44.3
+    },
+    "10": {
+     "n_events": 38936,
+     "n_days": 943,
+     "avg_stocks": 41.3,
+     "mean_ret": -0.941,
+     "win_rate": 40.35,
+     "day_exc": -0.7769,
+     "ann_exc": -18.64,
+     "t_stat": -2.57,
+     "day_win": 39.02
+    },
+    "20": {
+     "n_events": 38762,
+     "n_days": 934,
+     "avg_stocks": 41.5,
+     "mean_ret": -1.253,
+     "win_rate": 39.21,
+     "day_exc": -1.0324,
+     "ann_exc": -12.39,
+     "t_stat": -2.54,
+     "day_win": 37.47
+    },
+    "60": {
+     "n_events": 36248,
+     "n_days": 912,
+     "avg_stocks": 39.7,
+     "mean_ret": -1.448,
+     "win_rate": 35.54,
+     "day_exc": -2.7434,
+     "ann_exc": -10.97,
+     "t_stat": -4.49,
+     "day_win": 33.22
+    }
+   },
+   "liq200": {
+    "5": {
+     "n_events": 4919,
+     "n_days": 432,
+     "avg_stocks": 11.4,
+     "mean_ret": -0.4,
+     "win_rate": 40.92,
+     "day_exc": -0.2374,
+     "ann_exc": -11.4,
+     "t_stat": -0.45,
+     "day_win": 41.2
+    },
+    "10": {
+     "n_events": 4919,
+     "n_days": 432,
+     "avg_stocks": 11.4,
+     "mean_ret": -2.654,
+     "win_rate": 35.6,
+     "day_exc": -0.3061,
+     "ann_exc": -7.35,
+     "t_stat": -0.41,
+     "day_win": 37.04
+    },
+    "20": {
+     "n_events": 4913,
+     "n_days": 431,
+     "avg_stocks": 11.4,
+     "mean_ret": -4.106,
+     "win_rate": 36.52,
+     "day_exc": -1.3805,
+     "ann_exc": -16.57,
+     "t_stat": -1.46,
+     "day_win": 38.28
+    },
+    "60": {
+     "n_events": 4091,
+     "n_days": 413,
+     "avg_stocks": 9.9,
+     "mean_ret": -5.723,
+     "win_rate": 30.95,
+     "day_exc": -10.141,
+     "ann_exc": -40.56,
+     "t_stat": -10.4,
+     "day_win": 24.46
+    }
+   },
+   "top5": {
+    "5": {
+     "n_events": 222,
+     "n_days": 80,
+     "avg_stocks": 2.8,
+     "mean_ret": -2.875,
+     "win_rate": 32.88,
+     "day_exc": -3.3302,
+     "ann_exc": -159.85,
+     "t_stat": -3.57,
+     "day_win": 28.75
+    },
+    "10": {
+     "n_events": 222,
+     "n_days": 80,
+     "avg_stocks": 2.8,
+     "mean_ret": -6.19,
+     "win_rate": 25.68,
+     "day_exc": -5.9122,
+     "ann_exc": -141.89,
+     "t_stat": -5.97,
+     "day_win": 17.5
+    },
+    "20": {
+     "n_events": 222,
+     "n_days": 80,
+     "avg_stocks": 2.8,
+     "mean_ret": -5.77,
+     "win_rate": 36.04,
+     "day_exc": -3.6673,
+     "ann_exc": -44.01,
+     "t_stat": -2.32,
+     "day_win": 31.25
+    }
+   }
+  },
+  "L2_fb_R60<=5_R10<=10": {
+   "all": {
+    "5": {
+     "n_events": 84054,
+     "n_days": 1215,
+     "avg_stocks": 69.2,
+     "mean_ret": -0.365,
+     "win_rate": 42.02,
+     "day_exc": -0.4846,
+     "ann_exc": -23.26,
+     "t_stat": -2.93,
+     "day_win": 41.89
+    },
+    "10": {
+     "n_events": 83858,
+     "n_days": 1210,
+     "avg_stocks": 69.3,
+     "mean_ret": -0.469,
+     "win_rate": 41.68,
+     "day_exc": -0.9251,
+     "ann_exc": -22.2,
+     "t_stat": -4.24,
+     "day_win": 38.43
+    },
+    "20": {
+     "n_events": 83454,
+     "n_days": 1200,
+     "avg_stocks": 69.5,
+     "mean_ret": -0.942,
+     "win_rate": 39.36,
+     "day_exc": -1.1344,
+     "ann_exc": -13.61,
+     "t_stat": -3.52,
+     "day_win": 36.5
+    },
+    "60": {
+     "n_events": 80133,
+     "n_days": 1170,
+     "avg_stocks": 68.5,
+     "mean_ret": -0.63,
+     "win_rate": 36.91,
+     "day_exc": -2.277,
+     "ann_exc": -9.11,
+     "t_stat": -4.78,
+     "day_win": 34.53
+    }
+   },
+   "liq200": {
+    "5": {
+     "n_events": 9728,
+     "n_days": 655,
+     "avg_stocks": 14.9,
+     "mean_ret": -0.301,
+     "win_rate": 41.1,
+     "day_exc": -0.8195,
+     "ann_exc": -39.33,
+     "t_stat": -2.32,
+     "day_win": 39.08
+    },
+    "10": {
+     "n_events": 9726,
+     "n_days": 655,
+     "avg_stocks": 14.8,
+     "mean_ret": -1.242,
+     "win_rate": 40.09,
+     "day_exc": -1.1539,
+     "ann_exc": -27.69,
+     "t_stat": -2.2,
+     "day_win": 34.96
+    },
+    "20": {
+     "n_events": 9714,
+     "n_days": 654,
+     "avg_stocks": 14.9,
+     "mean_ret": -2.631,
+     "win_rate": 37.48,
+     "day_exc": -2.6088,
+     "ann_exc": -31.31,
+     "t_stat": -4.02,
+     "day_win": 33.18
+    },
+    "60": {
+     "n_events": 8759,
+     "n_days": 634,
+     "avg_stocks": 13.8,
+     "mean_ret": -3.632,
+     "win_rate": 34.64,
+     "day_exc": -8.7625,
+     "ann_exc": -35.05,
+     "t_stat": -12.66,
+     "day_win": 25.08
+    }
+   },
+   "top5": {
+    "5": {
+     "n_events": 458,
+     "n_days": 169,
+     "avg_stocks": 2.7,
+     "mean_ret": -1.828,
+     "win_rate": 37.12,
+     "day_exc": -1.7843,
+     "ann_exc": -85.65,
+     "t_stat": -2.53,
+     "day_win": 36.69
+    },
+    "10": {
+     "n_events": 458,
+     "n_days": 169,
+     "avg_stocks": 2.7,
+     "mean_ret": -3.409,
+     "win_rate": 36.46,
+     "day_exc": -3.271,
+     "ann_exc": -78.5,
+     "t_stat": -4.33,
+     "day_win": 32.54
+    },
+    "20": {
+     "n_events": 458,
+     "n_days": 169,
+     "avg_stocks": 2.7,
+     "mean_ret": -4.42,
+     "win_rate": 36.03,
+     "day_exc": -4.6005,
+     "ann_exc": -55.21,
+     "t_stat": -4.67,
+     "day_win": 32.54
+    },
+    "60": {
+     "n_events": 412,
+     "n_days": 160,
+     "avg_stocks": 2.6,
+     "mean_ret": -6.839,
+     "win_rate": 26.7,
+     "day_exc": -7.7507,
+     "ann_exc": -31.0,
+     "t_stat": -5.28,
+     "day_win": 25.0
+    }
+   }
+  },
+  "only_R60=1": {
+   "all": {
+    "5": {
+     "n_events": 31778,
+     "n_days": 1380,
+     "avg_stocks": 23.0,
+     "mean_ret": -0.562,
+     "win_rate": 42.16,
+     "day_exc": -0.4199,
+     "ann_exc": -20.16,
+     "t_stat": -2.12,
+     "day_win": 43.91
+    },
+    "10": {
+     "n_events": 31678,
+     "n_days": 1375,
+     "avg_stocks": 23.0,
+     "mean_ret": -0.617,
+     "win_rate": 40.94,
+     "day_exc": -0.7919,
+     "ann_exc": -19.01,
+     "t_stat": -2.88,
+     "day_win": 40.65
+    },
+    "20": {
+     "n_events": 31401,
+     "n_days": 1365,
+     "avg_stocks": 23.0,
+     "mean_ret": -2.179,
+     "win_rate": 35.58,
+     "day_exc": -1.8218,
+     "ann_exc": -21.86,
+     "t_stat": -5.24,
+     "day_win": 36.48
+    },
+    "60": {
+     "n_events": 29251,
+     "n_days": 1325,
+     "avg_stocks": 22.1,
+     "mean_ret": -0.582,
+     "win_rate": 37.28,
+     "day_exc": -2.7406,
+     "ann_exc": -10.96,
+     "t_stat": -4.61,
+     "day_win": 36.98
+    }
+   },
+   "liq200": {
+    "5": {
+     "n_events": 3079,
+     "n_days": 533,
+     "avg_stocks": 5.8,
+     "mean_ret": -2.225,
+     "win_rate": 37.12,
+     "day_exc": -0.5916,
+     "ann_exc": -28.4,
+     "t_stat": -1.15,
+     "day_win": 40.15
+    },
+    "10": {
+     "n_events": 3079,
+     "n_days": 533,
+     "avg_stocks": 5.8,
+     "mean_ret": -2.074,
+     "win_rate": 37.03,
+     "day_exc": -1.3288,
+     "ann_exc": -31.89,
+     "t_stat": -1.84,
+     "day_win": 35.65
+    },
+    "20": {
+     "n_events": 3048,
+     "n_days": 529,
+     "avg_stocks": 5.8,
+     "mean_ret": -3.392,
+     "win_rate": 34.68,
+     "day_exc": -3.6417,
+     "ann_exc": -43.7,
+     "t_stat": -4.23,
+     "day_win": 32.89
+    },
+    "60": {
+     "n_events": 2321,
+     "n_days": 497,
+     "avg_stocks": 4.7,
+     "mean_ret": -2.049,
+     "win_rate": 38.95,
+     "day_exc": -9.9549,
+     "ann_exc": -39.82,
+     "t_stat": -11.42,
+     "day_win": 26.96
+    }
+   },
+   "top5": {}
+  },
+  "only_R10<=3": {
+   "all": {
+    "5": {
+     "n_events": 130990,
+     "n_days": 1380,
+     "avg_stocks": 94.9,
+     "mean_ret": 0.363,
+     "win_rate": 44.89,
+     "day_exc": -0.2678,
+     "ann_exc": -12.85,
+     "t_stat": -2.13,
+     "day_win": 45.65
+    },
+    "10": {
+     "n_events": 130746,
+     "n_days": 1375,
+     "avg_stocks": 95.1,
+     "mean_ret": 0.125,
+     "win_rate": 43.81,
+     "day_exc": -0.5549,
+     "ann_exc": -13.32,
+     "t_stat": -3.27,
+     "day_win": 41.75
+    },
+    "20": {
+     "n_events": 130313,
+     "n_days": 1365,
+     "avg_stocks": 95.5,
+     "mean_ret": 0.541,
+     "win_rate": 43.39,
+     "day_exc": -0.8211,
+     "ann_exc": -9.85,
+     "t_stat": -3.54,
+     "day_win": 39.71
+    },
+    "60": {
+     "n_events": 125435,
+     "n_days": 1325,
+     "avg_stocks": 94.7,
+     "mean_ret": 1.299,
+     "win_rate": 38.66,
+     "day_exc": -0.4306,
+     "ann_exc": -1.72,
+     "t_stat": -0.34,
+     "day_win": 34.11
+    }
+   },
+   "liq200": {
+    "5": {
+     "n_events": 14043,
+     "n_days": 908,
+     "avg_stocks": 15.5,
+     "mean_ret": 0.56,
+     "win_rate": 45.3,
+     "day_exc": -0.7438,
+     "ann_exc": -35.7,
+     "t_stat": -2.66,
+     "day_win": 40.64
+    },
+    "10": {
+     "n_events": 14035,
+     "n_days": 906,
+     "avg_stocks": 15.5,
+     "mean_ret": -0.678,
+     "win_rate": 41.93,
+     "day_exc": -1.1315,
+     "ann_exc": -27.16,
+     "t_stat": -2.93,
+     "day_win": 37.97
+    },
+    "20": {
+     "n_events": 14036,
+     "n_days": 903,
+     "avg_stocks": 15.5,
+     "mean_ret": -0.192,
+     "win_rate": 41.56,
+     "day_exc": -2.4374,
+     "ann_exc": -29.25,
+     "t_stat": -5.52,
+     "day_win": 35.66
+    },
+    "60": {
+     "n_events": 13173,
+     "n_days": 879,
+     "avg_stocks": 15.0,
+     "mean_ret": -3.079,
+     "win_rate": 33.53,
+     "day_exc": -6.6553,
+     "ann_exc": -26.62,
+     "t_stat": -11.05,
+     "day_win": 29.12
+    }
+   },
+   "top5": {
+    "5": {
+     "n_events": 601,
+     "n_days": 238,
+     "avg_stocks": 2.5,
+     "mean_ret": -0.054,
+     "win_rate": 42.93,
+     "day_exc": -0.963,
+     "ann_exc": -46.22,
+     "t_stat": -1.4,
+     "day_win": 42.44
+    },
+    "10": {
+     "n_events": 602,
+     "n_days": 238,
+     "avg_stocks": 2.5,
+     "mean_ret": -1.45,
+     "win_rate": 40.37,
+     "day_exc": -2.0743,
+     "ann_exc": -49.78,
+     "t_stat": -2.52,
+     "day_win": 37.39
+    },
+    "20": {
+     "n_events": 604,
+     "n_days": 238,
+     "avg_stocks": 2.5,
+     "mean_ret": -1.369,
+     "win_rate": 42.05,
+     "day_exc": -3.0293,
+     "ann_exc": -36.35,
+     "t_stat": -2.78,
+     "day_win": 34.87
+    },
+    "60": {
+     "n_events": 566,
+     "n_days": 231,
+     "avg_stocks": 2.5,
+     "mean_ret": -5.236,
+     "win_rate": 31.63,
+     "day_exc": -7.2669,
+     "ann_exc": -29.07,
+     "t_stat": -5.5,
+     "day_win": 34.63
+    }
+   }
+  },
+  "rev_R60_last3": {
+   "all": {
+    "5": {
+     "n_events": 105667,
+     "n_days": 1380,
+     "avg_stocks": 76.6,
+     "mean_ret": 1.028,
+     "win_rate": 51.66,
+     "day_exc": 0.3799,
+     "ann_exc": 18.24,
+     "t_stat": 4.68,
+     "day_win": 49.49
+    },
+    "10": {
+     "n_events": 105206,
+     "n_days": 1375,
+     "avg_stocks": 76.5,
+     "mean_ret": 1.738,
+     "win_rate": 52.52,
+     "day_exc": 0.5226,
+     "ann_exc": 12.54,
+     "t_stat": 4.87,
+     "day_win": 51.35
+    },
+    "20": {
+     "n_events": 104092,
+     "n_days": 1365,
+     "avg_stocks": 76.3,
+     "mean_ret": 2.492,
+     "win_rate": 51.07,
+     "day_exc": 0.4654,
+     "ann_exc": 5.58,
+     "t_stat": 2.85,
+     "day_win": 47.25
+    },
+    "60": {
+     "n_events": 101574,
+     "n_days": 1325,
+     "avg_stocks": 76.7,
+     "mean_ret": 5.053,
+     "win_rate": 48.93,
+     "day_exc": 0.1613,
+     "ann_exc": 0.65,
+     "t_stat": 0.5,
+     "day_win": 41.66
+    }
+   },
+   "liq200": {
+    "5": {
+     "n_events": 7225,
+     "n_days": 695,
+     "avg_stocks": 10.4,
+     "mean_ret": 2.119,
+     "win_rate": 52.25,
+     "day_exc": 0.2482,
+     "ann_exc": 11.92,
+     "t_stat": 1.18,
+     "day_win": 49.5
+    },
+    "10": {
+     "n_events": 7194,
+     "n_days": 691,
+     "avg_stocks": 10.4,
+     "mean_ret": 3.628,
+     "win_rate": 53.6,
+     "day_exc": 0.1149,
+     "ann_exc": 2.76,
+     "t_stat": 0.42,
+     "day_win": 45.3
+    },
+    "20": {
+     "n_events": 7160,
+     "n_days": 685,
+     "avg_stocks": 10.5,
+     "mean_ret": 3.566,
+     "win_rate": 49.41,
+     "day_exc": -0.9506,
+     "ann_exc": -11.41,
+     "t_stat": -2.55,
+     "day_win": 37.66
+    },
+    "60": {
+     "n_events": 7032,
+     "n_days": 665,
+     "avg_stocks": 10.6,
+     "mean_ret": 3.527,
+     "win_rate": 43.84,
+     "day_exc": -2.1679,
+     "ann_exc": -8.67,
+     "t_stat": -3.38,
+     "day_win": 33.83
+    }
+   },
+   "top5": {}
+  }
+ },
+ "filters": {
+  "L1_fb_R60<=3_R10<=5 | liq200 | no_filter": {
+   "5": {
+    "n_events": 4919,
+    "n_days": 432,
+    "avg_stocks": 11.4,
+    "mean_ret": -0.4,
+    "win_rate": 40.92,
+    "day_exc": -0.2374,
+    "ann_exc": -11.4,
+    "t_stat": -0.45,
+    "day_win": 41.2
+   },
+   "10": {
+    "n_events": 4919,
+    "n_days": 432,
+    "avg_stocks": 11.4,
+    "mean_ret": -2.654,
+    "win_rate": 35.6,
+    "day_exc": -0.3061,
+    "ann_exc": -7.35,
+    "t_stat": -0.41,
+    "day_win": 37.04
+   },
+   "20": {
+    "n_events": 4913,
+    "n_days": 431,
+    "avg_stocks": 11.4,
+    "mean_ret": -4.106,
+    "win_rate": 36.52,
+    "day_exc": -1.3805,
+    "ann_exc": -16.57,
+    "t_stat": -1.46,
+    "day_win": 38.28
+   },
+   "60": {
+    "n_events": 4091,
+    "n_days": 413,
+    "avg_stocks": 9.9,
+    "mean_ret": -5.723,
+    "win_rate": 30.95,
+    "day_exc": -10.141,
+    "ann_exc": -40.56,
+    "t_stat": -10.4,
+    "day_win": 24.46
+   }
+  },
+  "L1_fb_R60<=3_R10<=5 | liq200 | ex_RSI>70": {
+   "5": {
+    "n_events": 3426,
+    "n_days": 362,
+    "avg_stocks": 9.5,
+    "mean_ret": 0.05,
+    "win_rate": 42.12,
+    "day_exc": 0.8804,
+    "ann_exc": 42.26,
+    "t_stat": 1.51,
+    "day_win": 44.2
+   },
+   "10": {
+    "n_events": 3425,
+    "n_days": 362,
+    "avg_stocks": 9.5,
+    "mean_ret": -2.091,
+    "win_rate": 36.67,
+    "day_exc": 1.346,
+    "ann_exc": 32.3,
+    "t_stat": 1.51,
+    "day_win": 37.85
+   },
+   "20": {
+    "n_events": 3418,
+    "n_days": 361,
+    "avg_stocks": 9.5,
+    "mean_ret": -3.615,
+    "win_rate": 36.83,
+    "day_exc": 0.4966,
+    "ann_exc": 5.96,
+    "t_stat": 0.47,
+    "day_win": 37.67
+   },
+   "60": {
+    "n_events": 2812,
+    "n_days": 343,
+    "avg_stocks": 8.2,
+    "mean_ret": -3.977,
+    "win_rate": 34.14,
+    "day_exc": -6.6206,
+    "ann_exc": -26.48,
+    "t_stat": -5.54,
+    "day_win": 30.03
+   }
+  },
+  "L1_fb_R60<=3_R10<=5 | liq200 | ex_bear": {
+   "5": {
+    "n_events": 4879,
+    "n_days": 432,
+    "avg_stocks": 11.3,
+    "mean_ret": -0.354,
+    "win_rate": 41.11,
+    "day_exc": -0.2305,
+    "ann_exc": -11.06,
+    "t_stat": -0.44,
+    "day_win": 41.44
+   },
+   "10": {
+    "n_events": 4879,
+    "n_days": 432,
+    "avg_stocks": 11.3,
+    "mean_ret": -2.603,
+    "win_rate": 35.79,
+    "day_exc": -0.2904,
+    "ann_exc": -6.97,
+    "t_stat": -0.39,
+    "day_win": 37.27
+   },
+   "20": {
+    "n_events": 4873,
+    "n_days": 431,
+    "avg_stocks": 11.3,
+    "mean_ret": -4.071,
+    "win_rate": 36.67,
+    "day_exc": -1.3497,
+    "ann_exc": -16.2,
+    "t_stat": -1.42,
+    "day_win": 38.28
+   },
+   "60": {
+    "n_events": 4052,
+    "n_days": 413,
+    "avg_stocks": 9.8,
+    "mean_ret": -5.818,
+    "win_rate": 30.8,
+    "day_exc": -10.1146,
+    "ann_exc": -40.46,
+    "t_stat": -10.33,
+    "day_win": 24.21
+   }
+  },
+  "L1_fb_R60<=3_R10<=5 | liq200 | ex_RSI>70+bear": {
+   "5": {
+    "n_events": 3386,
+    "n_days": 362,
+    "avg_stocks": 9.4,
+    "mean_ret": 0.122,
+    "win_rate": 42.41,
+    "day_exc": 0.8865,
+    "ann_exc": 42.55,
+    "t_stat": 1.52,
+    "day_win": 44.48
+   },
+   "10": {
+    "n_events": 3385,
+    "n_days": 362,
+    "avg_stocks": 9.4,
+    "mean_ret": -2.011,
+    "win_rate": 36.96,
+    "day_exc": 1.3693,
+    "ann_exc": 32.86,
+    "t_stat": 1.53,
+    "day_win": 38.12
+   },
+   "20": {
+    "n_events": 3378,
+    "n_days": 361,
+    "avg_stocks": 9.4,
+    "mean_ret": -3.558,
+    "win_rate": 37.06,
+    "day_exc": 0.5354,
+    "ann_exc": 6.42,
+    "t_stat": 0.51,
+    "day_win": 37.4
+   },
+   "60": {
+    "n_events": 2773,
+    "n_days": 343,
+    "avg_stocks": 8.1,
+    "mean_ret": -4.091,
+    "win_rate": 33.97,
+    "day_exc": -6.5951,
+    "ann_exc": -26.38,
+    "t_stat": -5.49,
+    "day_win": 29.74
+   }
+  },
+  "L1_fb_R60<=3_R10<=5 | liq200 | only_RSI<30": {},
+  "L2_fb_R60<=5_R10<=10 | all | no_filter": {
+   "5": {
+    "n_events": 84054,
+    "n_days": 1215,
+    "avg_stocks": 69.2,
+    "mean_ret": -0.365,
+    "win_rate": 42.02,
+    "day_exc": -0.4846,
+    "ann_exc": -23.26,
+    "t_stat": -2.93,
+    "day_win": 41.89
+   },
+   "10": {
+    "n_events": 83858,
+    "n_days": 1210,
+    "avg_stocks": 69.3,
+    "mean_ret": -0.469,
+    "win_rate": 41.68,
+    "day_exc": -0.9251,
+    "ann_exc": -22.2,
+    "t_stat": -4.24,
+    "day_win": 38.43
+   },
+   "20": {
+    "n_events": 83454,
+    "n_days": 1200,
+    "avg_stocks": 69.5,
+    "mean_ret": -0.942,
+    "win_rate": 39.36,
+    "day_exc": -1.1344,
+    "ann_exc": -13.61,
+    "t_stat": -3.52,
+    "day_win": 36.5
+   },
+   "60": {
+    "n_events": 80133,
+    "n_days": 1170,
+    "avg_stocks": 68.5,
+    "mean_ret": -0.63,
+    "win_rate": 36.91,
+    "day_exc": -2.277,
+    "ann_exc": -9.11,
+    "t_stat": -4.78,
+    "day_win": 34.53
+   }
+  },
+  "L2_fb_R60<=5_R10<=10 | all | ex_RSI>70": {
+   "5": {
+    "n_events": 66933,
+    "n_days": 1213,
+    "avg_stocks": 55.2,
+    "mean_ret": -0.173,
+    "win_rate": 43.01,
+    "day_exc": -0.3341,
+    "ann_exc": -16.04,
+    "t_stat": -2.18,
+    "day_win": 43.69
+   },
+   "10": {
+    "n_events": 66774,
+    "n_days": 1208,
+    "avg_stocks": 55.3,
+    "mean_ret": -0.277,
+    "win_rate": 42.74,
+    "day_exc": -0.6937,
+    "ann_exc": -16.65,
+    "t_stat": -3.34,
+    "day_win": 39.65
+   },
+   "20": {
+    "n_events": 66431,
+    "n_days": 1198,
+    "avg_stocks": 55.5,
+    "mean_ret": -0.937,
+    "win_rate": 39.52,
+    "day_exc": -0.8227,
+    "ann_exc": -9.87,
+    "t_stat": -2.63,
+    "day_win": 37.31
+   },
+   "60": {
+    "n_events": 63645,
+    "n_days": 1168,
+    "avg_stocks": 54.5,
+    "mean_ret": 0.146,
+    "win_rate": 37.91,
+    "day_exc": -1.3475,
+    "ann_exc": -5.39,
+    "t_stat": -2.69,
+    "day_win": 35.19
+   }
+  },
+  "L2_fb_R60<=5_R10<=10 | all | ex_bear": {
+   "5": {
+    "n_events": 81536,
+    "n_days": 1215,
+    "avg_stocks": 67.1,
+    "mean_ret": -0.362,
+    "win_rate": 41.97,
+    "day_exc": -0.497,
+    "ann_exc": -23.86,
+    "t_stat": -2.96,
+    "day_win": 41.56
+   },
+   "10": {
+    "n_events": 81342,
+    "n_days": 1210,
+    "avg_stocks": 67.2,
+    "mean_ret": -0.46,
+    "win_rate": 41.63,
+    "day_exc": -0.9365,
+    "ann_exc": -22.48,
+    "t_stat": -4.21,
+    "day_win": 38.35
+   },
+   "20": {
+    "n_events": 80939,
+    "n_days": 1200,
+    "avg_stocks": 67.4,
+    "mean_ret": -0.931,
+    "win_rate": 39.3,
+    "day_exc": -1.1705,
+    "ann_exc": -14.05,
+    "t_stat": -3.59,
+    "day_win": 36.17
+   },
+   "60": {
+    "n_events": 77686,
+    "n_days": 1170,
+    "avg_stocks": 66.4,
+    "mean_ret": -0.718,
+    "win_rate": 36.77,
+    "day_exc": -2.397,
+    "ann_exc": -9.59,
+    "t_stat": -4.97,
+    "day_win": 34.44
+   }
+  },
+  "L2_fb_R60<=5_R10<=10 | all | ex_RSI>70+bear": {
+   "5": {
+    "n_events": 64415,
+    "n_days": 1213,
+    "avg_stocks": 53.1,
+    "mean_ret": -0.162,
+    "win_rate": 42.99,
+    "day_exc": -0.3407,
+    "ann_exc": -16.35,
+    "t_stat": -2.18,
+    "day_win": 43.69
+   },
+   "10": {
+    "n_events": 64258,
+    "n_days": 1208,
+    "avg_stocks": 53.2,
+    "mean_ret": -0.257,
+    "win_rate": 42.71,
+    "day_exc": -0.6928,
+    "ann_exc": -16.63,
+    "t_stat": -3.26,
+    "day_win": 39.57
+   },
+   "20": {
+    "n_events": 63916,
+    "n_days": 1198,
+    "avg_stocks": 53.4,
+    "mean_ret": -0.923,
+    "win_rate": 39.45,
+    "day_exc": -0.8466,
+    "ann_exc": -10.16,
+    "t_stat": -2.66,
+    "day_win": 36.48
+   },
+   "60": {
+    "n_events": 61198,
+    "n_days": 1168,
+    "avg_stocks": 52.4,
+    "mean_ret": 0.065,
+    "win_rate": 37.77,
+    "day_exc": -1.4455,
+    "ann_exc": -5.78,
+    "t_stat": -2.85,
+    "day_win": 35.27
+   }
+  },
+  "L2_fb_R60<=5_R10<=10 | all | only_RSI<30": {
+   "5": {
+    "n_events": 484,
+    "n_days": 246,
+    "avg_stocks": 2.0,
+    "mean_ret": 1.909,
+    "win_rate": 47.31,
+    "day_exc": 2.3801,
+    "ann_exc": 114.24,
+    "t_stat": 1.57,
+    "day_win": 43.5
+   },
+   "10": {
+    "n_events": 484,
+    "n_days": 245,
+    "avg_stocks": 2.0,
+    "mean_ret": 2.896,
+    "win_rate": 50.41,
+    "day_exc": 3.3344,
+    "ann_exc": 80.03,
+    "t_stat": 2.55,
+    "day_win": 52.24
+   },
+   "20": {
+    "n_events": 469,
+    "n_days": 234,
+    "avg_stocks": 2.0,
+    "mean_ret": 5.738,
+    "win_rate": 55.44,
+    "day_exc": 5.3849,
+    "ann_exc": 64.62,
+    "t_stat": 3.81,
+    "day_win": 56.41
+   },
+   "60": {
+    "n_events": 471,
+    "n_days": 232,
+    "avg_stocks": 2.0,
+    "mean_ret": 32.183,
+    "win_rate": 54.78,
+    "day_exc": 51.0793,
+    "ann_exc": 204.32,
+    "t_stat": 2.68,
+    "day_win": 48.71
+   }
+  },
+  "rev_R60_last3 | all | no_filter": {
+   "5": {
+    "n_events": 105667,
+    "n_days": 1380,
+    "avg_stocks": 76.6,
+    "mean_ret": 1.028,
+    "win_rate": 51.66,
+    "day_exc": 0.3799,
+    "ann_exc": 18.24,
+    "t_stat": 4.68,
+    "day_win": 49.49
+   },
+   "10": {
+    "n_events": 105206,
+    "n_days": 1375,
+    "avg_stocks": 76.5,
+    "mean_ret": 1.738,
+    "win_rate": 52.52,
+    "day_exc": 0.5226,
+    "ann_exc": 12.54,
+    "t_stat": 4.87,
+    "day_win": 51.35
+   },
+   "20": {
+    "n_events": 104092,
+    "n_days": 1365,
+    "avg_stocks": 76.3,
+    "mean_ret": 2.492,
+    "win_rate": 51.07,
+    "day_exc": 0.4654,
+    "ann_exc": 5.58,
+    "t_stat": 2.85,
+    "day_win": 47.25
+   },
+   "60": {
+    "n_events": 101574,
+    "n_days": 1325,
+    "avg_stocks": 76.7,
+    "mean_ret": 5.053,
+    "win_rate": 48.93,
+    "day_exc": 0.1613,
+    "ann_exc": 0.65,
+    "t_stat": 0.5,
+    "day_win": 41.66
+   }
+  },
+  "rev_R60_last3 | all | ex_RSI>70": {
+   "5": {
+    "n_events": 104286,
+    "n_days": 1379,
+    "avg_stocks": 75.6,
+    "mean_ret": 1.06,
+    "win_rate": 51.83,
+    "day_exc": 0.3944,
+    "ann_exc": 18.93,
+    "t_stat": 4.84,
+    "day_win": 49.75
+   },
+   "10": {
+    "n_events": 103829,
+    "n_days": 1374,
+    "avg_stocks": 75.6,
+    "mean_ret": 1.777,
+    "win_rate": 52.71,
+    "day_exc": 0.5361,
+    "ann_exc": 12.87,
+    "t_stat": 4.99,
+    "day_win": 51.97
+   },
+   "20": {
+    "n_events": 102719,
+    "n_days": 1364,
+    "avg_stocks": 75.3,
+    "mean_ret": 2.538,
+    "win_rate": 51.22,
+    "day_exc": 0.4833,
+    "ann_exc": 5.8,
+    "t_stat": 2.95,
+    "day_win": 47.14
+   },
+   "60": {
+    "n_events": 100206,
+    "n_days": 1324,
+    "avg_stocks": 75.7,
+    "mean_ret": 5.139,
+    "win_rate": 49.13,
+    "day_exc": 0.2135,
+    "ann_exc": 0.85,
+    "t_stat": 0.65,
+    "day_win": 41.99
+   }
+  },
+  "rev_R60_last3 | all | ex_bear": {
+   "5": {
+    "n_events": 65270,
+    "n_days": 1380,
+    "avg_stocks": 47.3,
+    "mean_ret": 0.772,
+    "win_rate": 50.96,
+    "day_exc": 0.262,
+    "ann_exc": 12.58,
+    "t_stat": 3.02,
+    "day_win": 47.46
+   },
+   "10": {
+    "n_events": 65082,
+    "n_days": 1375,
+    "avg_stocks": 47.3,
+    "mean_ret": 1.25,
+    "win_rate": 51.77,
+    "day_exc": 0.3237,
+    "ann_exc": 7.77,
+    "t_stat": 2.84,
+    "day_win": 47.85
+   },
+   "20": {
+    "n_events": 64425,
+    "n_days": 1365,
+    "avg_stocks": 47.2,
+    "mean_ret": 1.681,
+    "win_rate": 49.52,
+    "day_exc": 0.1102,
+    "ann_exc": 1.32,
+    "t_stat": 0.63,
+    "day_win": 44.76
+   },
+   "60": {
+    "n_events": 62754,
+    "n_days": 1325,
+    "avg_stocks": 47.4,
+    "mean_ret": 3.715,
+    "win_rate": 47.54,
+    "day_exc": -0.5242,
+    "ann_exc": -2.1,
+    "t_stat": -1.61,
+    "day_win": 38.42
+   }
+  },
+  "rev_R60_last3 | all | ex_RSI>70+bear": {
+   "5": {
+    "n_events": 63889,
+    "n_days": 1379,
+    "avg_stocks": 46.3,
+    "mean_ret": 0.82,
+    "win_rate": 51.22,
+    "day_exc": 0.2743,
+    "ann_exc": 13.17,
+    "t_stat": 3.14,
+    "day_win": 48.3
+   },
+   "10": {
+    "n_events": 63705,
+    "n_days": 1374,
+    "avg_stocks": 46.4,
+    "mean_ret": 1.303,
+    "win_rate": 52.07,
+    "day_exc": 0.3346,
+    "ann_exc": 8.03,
+    "t_stat": 2.93,
+    "day_win": 48.54
+   },
+   "20": {
+    "n_events": 63052,
+    "n_days": 1364,
+    "avg_stocks": 46.2,
+    "mean_ret": 1.737,
+    "win_rate": 49.73,
+    "day_exc": 0.1256,
+    "ann_exc": 1.51,
+    "t_stat": 0.72,
+    "day_win": 44.57
+   },
+   "60": {
+    "n_events": 61386,
+    "n_days": 1324,
+    "avg_stocks": 46.4,
+    "mean_ret": 3.825,
+    "win_rate": 47.84,
+    "day_exc": -0.4852,
+    "ann_exc": -1.94,
+    "t_stat": -1.48,
+    "day_win": 38.14
+   }
+  },
+  "rev_R60_last3 | all | only_RSI<30": {
+   "5": {
+    "n_events": 12494,
+    "n_days": 1019,
+    "avg_stocks": 12.3,
+    "mean_ret": 2.41,
+    "win_rate": 56.97,
+    "day_exc": 0.7808,
+    "ann_exc": 37.48,
+    "t_stat": 4.37,
+    "day_win": 49.17
+   },
+   "10": {
+    "n_events": 12479,
+    "n_days": 1016,
+    "avg_stocks": 12.3,
+    "mean_ret": 4.424,
+    "win_rate": 59.86,
+    "day_exc": 1.0971,
+    "ann_exc": 26.33,
+    "t_stat": 4.95,
+    "day_win": 49.8
+   },
+   "20": {
+    "n_events": 12445,
+    "n_days": 1006,
+    "avg_stocks": 12.4,
+    "mean_ret": 6.971,
+    "win_rate": 60.72,
+    "day_exc": 1.9075,
+    "ann_exc": 22.89,
+    "t_stat": 2.09,
+    "day_win": 46.82
+   },
+   "60": {
+    "n_events": 12199,
+    "n_days": 980,
+    "avg_stocks": 12.4,
+    "mean_ret": 14.002,
+    "win_rate": 59.14,
+    "day_exc": 6.3436,
+    "ann_exc": 25.37,
+    "t_stat": 2.23,
+    "day_win": 44.8
+   }
+  }
+ },
+ "sector_level": {
+  "L0_strict_R60=1_R10<=3": {
+   "5": {
+    "n_days": 532,
+    "day_exc": -0.7067,
+    "ann_exc": -33.92,
+    "day_win": 40.4,
+    "t_stat": -1.99
+   },
+   "10": {
+    "n_days": 528,
+    "day_exc": -0.8975,
+    "ann_exc": -21.54,
+    "day_win": 39.8,
+    "t_stat": -1.82
+   },
+   "20": {
+    "n_days": 525,
+    "day_exc": -1.177,
+    "ann_exc": -14.12,
+    "day_win": 36.8,
+    "t_stat": -1.79
+   },
+   "60": {
+    "n_days": 511,
+    "day_exc": -4.1482,
+    "ann_exc": -16.59,
+    "day_win": 33.9,
+    "t_stat": -5.24
+   }
+  },
+  "L1_fb_R60<=3_R10<=5": {
+   "5": {
+    "n_days": 948,
+    "day_exc": -0.3254,
+    "ann_exc": -15.62,
+    "day_win": 43.1,
+    "t_stat": -1.41
+   },
+   "10": {
+    "n_days": 943,
+    "day_exc": -0.8501,
+    "ann_exc": -20.4,
+    "day_win": 38.1,
+    "t_stat": -2.9
+   },
+   "20": {
+    "n_days": 934,
+    "day_exc": -1.0718,
+    "ann_exc": -12.86,
+    "day_win": 37.3,
+    "t_stat": -2.69
+   },
+   "60": {
+    "n_days": 912,
+    "day_exc": -2.9402,
+    "ann_exc": -11.76,
+    "day_win": 34.0,
+    "t_stat": -6.03
+   }
+  },
+  "L2_fb_R60<=5_R10<=10": {
+   "5": {
+    "n_days": 1215,
+    "day_exc": -0.5534,
+    "ann_exc": -26.56,
+    "day_win": 43.3,
+    "t_stat": -3.45
+   },
+   "10": {
+    "n_days": 1210,
+    "day_exc": -1.0005,
+    "ann_exc": -24.01,
+    "day_win": 38.9,
+    "t_stat": -4.77
+   },
+   "20": {
+    "n_days": 1200,
+    "day_exc": -1.131,
+    "ann_exc": -13.57,
+    "day_win": 36.4,
+    "t_stat": -3.74
+   },
+   "60": {
+    "n_days": 1170,
+    "day_exc": -2.284,
+    "ann_exc": -9.14,
+    "day_win": 36.6,
+    "t_stat": -6.21
+   }
+  },
+  "only_R60=1": {
+   "5": {
+    "n_days": 1380,
+    "day_exc": -0.6437,
+    "ann_exc": -30.9,
+    "day_win": 42.6,
+    "t_stat": -3.3
+   },
+   "10": {
+    "n_days": 1375,
+    "day_exc": -0.9708,
+    "ann_exc": -23.3,
+    "day_win": 39.8,
+    "t_stat": -3.63
+   },
+   "20": {
+    "n_days": 1365,
+    "day_exc": -1.9036,
+    "ann_exc": -22.84,
+    "day_win": 36.1,
+    "t_stat": -5.57
+   },
+   "60": {
+    "n_days": 1325,
+    "day_exc": -3.0273,
+    "ann_exc": -12.11,
+    "day_win": 38.0,
+    "t_stat": -6.81
+   }
+  },
+  "only_R10<=3": {
+   "5": {
+    "n_days": 1380,
+    "day_exc": -0.3543,
+    "ann_exc": -17.0,
+    "day_win": 44.9,
+    "t_stat": -3.05
+   },
+   "10": {
+    "n_days": 1375,
+    "day_exc": -0.6762,
+    "ann_exc": -16.23,
+    "day_win": 41.5,
+    "t_stat": -4.5
+   },
+   "20": {
+    "n_days": 1365,
+    "day_exc": -0.7775,
+    "ann_exc": -9.33,
+    "day_win": 39.3,
+    "t_stat": -3.73
+   },
+   "60": {
+    "n_days": 1325,
+    "day_exc": -1.712,
+    "ann_exc": -6.85,
+    "day_win": 37.5,
+    "t_stat": -6.18
+   }
+  },
+  "rev_R60_last3": {
+   "5": {
+    "n_days": 1380,
+    "day_exc": 0.3311,
+    "ann_exc": 15.89,
+    "day_win": 51.7,
+    "t_stat": 4.57
+   },
+   "10": {
+    "n_days": 1375,
+    "day_exc": 0.4265,
+    "ann_exc": 10.24,
+    "day_win": 51.0,
+    "t_stat": 4.52
+   },
+   "20": {
+    "n_days": 1365,
+    "day_exc": 0.4255,
+    "ann_exc": 5.11,
+    "day_win": 49.5,
+    "t_stat": 3.31
+   },
+   "60": {
+    "n_days": 1325,
+    "day_exc": -0.0139,
+    "ann_exc": -0.06,
+    "day_win": 43.7,
+    "t_stat": -0.06
+   }
+  }
+ },
+ "style_baseline": {
+  "liq200": {
+   "5": {
+    "n_events": 275748,
+    "n_days": 1380,
+    "avg_stocks": 199.8,
+    "mean_ret": 0.26,
+    "win_rate": 45.64,
+    "day_exc": -0.1472,
+    "ann_exc": -7.06,
+    "day_win": 45.65,
+    "t_stat": -1.6
+   },
+   "10": {
+    "n_events": 274659,
+    "n_days": 1375,
+    "avg_stocks": 199.8,
+    "mean_ret": 0.45,
+    "win_rate": 45.29,
+    "day_exc": -0.2645,
+    "ann_exc": -6.35,
+    "day_win": 45.96,
+    "t_stat": -2.1
+   },
+   "20": {
+    "n_events": 272672,
+    "n_days": 1365,
+    "avg_stocks": 199.8,
+    "mean_ret": 0.842,
+    "win_rate": 44.48,
+    "day_exc": -0.4975,
+    "ann_exc": -5.97,
+    "day_win": 44.91,
+    "t_stat": -2.85
+   },
+   "60": {
+    "n_events": 264682,
+    "n_days": 1325,
+    "avg_stocks": 199.8,
+    "mean_ret": 2.706,
+    "win_rate": 43.19,
+    "day_exc": -0.9467,
+    "ann_exc": -3.79,
+    "day_win": 38.26,
+    "t_stat": -3.44
+   }
+  }
+ },
+ "rev_rsi30_by_year": {
+  "2021": {
+   "n_days": 211,
+   "avg_stocks": 11.7,
+   "day_exc": 6.2557,
+   "ann_exc": 75.07,
+   "day_win": 49.8,
+   "t_stat": 1.49
+  },
+  "2022": {
+   "n_days": 188,
+   "avg_stocks": 12.7,
+   "day_exc": 1.745,
+   "ann_exc": 20.94,
+   "day_win": 58.0,
+   "t_stat": 3.38
+  },
+  "2023": {
+   "n_days": 202,
+   "avg_stocks": 14.2,
+   "day_exc": -0.3602,
+   "ann_exc": -4.32,
+   "day_win": 40.1,
+   "t_stat": -0.71
+  },
+  "2024": {
+   "n_days": 146,
+   "avg_stocks": 17.4,
+   "day_exc": 3.3193,
+   "ann_exc": 39.83,
+   "day_win": 52.7,
+   "t_stat": 3.31
+  },
+  "2025": {
+   "n_days": 152,
+   "avg_stocks": 8.2,
+   "day_exc": -1.5576,
+   "ann_exc": -18.69,
+   "day_win": 34.2,
+   "t_stat": -2.84
+  },
+  "2026": {
+   "n_days": 107,
+   "avg_stocks": 8.8,
+   "day_exc": 0.896,
+   "ann_exc": 10.75,
+   "day_win": 43.9,
+   "t_stat": 1.09
+  }
+ },
+ "strict_by_year": {
+  "2021": {
+   "n_days": 98,
+   "avg_stocks": 17.6,
+   "day_exc": -1.9989,
+   "ann_exc": -23.99,
+   "day_win": 46.9,
+   "t_stat": -1.63
+  },
+  "2022": {
+   "n_days": 73,
+   "avg_stocks": 14.5,
+   "day_exc": -2.2018,
+   "ann_exc": -26.42,
+   "day_win": 34.2,
+   "t_stat": -1.44
+  },
+  "2023": {
+   "n_days": 91,
+   "avg_stocks": 23.1,
+   "day_exc": -1.4235,
+   "ann_exc": -17.08,
+   "day_win": 25.3,
+   "t_stat": -0.93
+  },
+  "2024": {
+   "n_days": 80,
+   "avg_stocks": 17.1,
+   "day_exc": -2.3955,
+   "ann_exc": -28.75,
+   "day_win": 38.8,
+   "t_stat": -1.91
+  },
+  "2025": {
+   "n_days": 109,
+   "avg_stocks": 18.3,
+   "day_exc": 1.0038,
+   "ann_exc": 12.05,
+   "day_win": 40.4,
+   "t_stat": 0.55
+  },
+  "2026": {
+   "n_days": 74,
+   "avg_stocks": 32.7,
+   "day_exc": -1.5907,
+   "ann_exc": -19.09,
+   "day_win": 35.1,
+   "t_stat": -0.73
+  }
+ },
+ "r60_bins": {
+  "R60=1 (最强)": {
+   "5": -0.4199,
+   "10": -0.7919,
+   "20": -1.8218,
+   "60": -2.7406
+  },
+  "R60 2-3": {
+   "5": -0.143,
+   "10": -0.4366,
+   "20": -0.6894,
+   "60": -0.9113
+  },
+  "R60 4-5": {
+   "5": -0.6407,
+   "10": -1.0432,
+   "20": -1.459,
+   "60": -0.7655
+  },
+  "R60 6-10": {
+   "5": -0.2365,
+   "10": -0.4702,
+   "20": -0.5784,
+   "60": -0.8776
+  },
+  "R60 11-20": {
+   "5": -0.0145,
+   "10": -0.089,
+   "20": -0.2986,
+   "60": -0.6504
+  },
+  "R60 21-40": {
+   "5": -0.0294,
+   "10": -0.0264,
+   "20": 0.0254,
+   "60": -0.0301
+  },
+  "R60 41-70": {
+   "5": -0.0186,
+   "10": -0.0012,
+   "20": 0.0512,
+   "60": 0.0859
+  },
+  "R60 >70": {
+   "5": 0.0647,
+   "10": 0.1133,
+   "20": 0.1956,
+   "60": 0.2668
+  }
+ },
+ "r10_bins": {
+  "R10<=3 (最强)": {
+   "5": -0.2678,
+   "10": -0.5549,
+   "20": -0.8211,
+   "60": -0.4306
+  },
+  "R10 4-5": {
+   "5": -0.1391,
+   "10": -0.3032,
+   "20": -0.6297,
+   "60": -1.2988
+  },
+  "R10 6-10": {
+   "5": -0.0622,
+   "10": -0.1249,
+   "20": -0.4878,
+   "60": -1.2525
+  },
+  "R10 11-20": {
+   "5": 0.0341,
+   "10": 0.0065,
+   "20": -0.2655,
+   "60": -0.3567
+  },
+  "R10 21-40": {
+   "5": 0.0532,
+   "10": 0.0594,
+   "20": 0.0025,
+   "60": -0.1881
+  },
+  "R10 41-70": {
+   "5": 0.0109,
+   "10": 0.037,
+   "20": 0.0078,
+   "60": 0.0714
+  },
+  "R10 >70": {
+   "5": -0.0579,
+   "10": -0.0828,
+   "20": -0.0017,
+   "60": 0.1478
+  }
+ },
+ "single_factor_ref": {
+  "F1_日线多头排列": {
+   "5": {
+    "n_events": 1129630,
+    "n_days": 1321,
+    "avg_stocks_per_day": 855.1,
+    "mean_ret": 0.142,
+    "med_ret": -0.67,
+    "win_rate": 45.02,
+    "mean_exc": -0.105,
+    "t_cluster": -2.83,
+    "ann_exc": -5.02,
+    "day_exc": -0.3789,
+    "day_exc_t": -6.66,
+    "day_win": 43.38,
+    "ls_spread": -0.3993,
+    "ls_t": -6.28,
+    "ls_ann": -19.17
+   },
+   "10": {
+    "n_events": 1122059,
+    "n_days": 1316,
+    "avg_stocks_per_day": 852.6,
+    "mean_ret": 0.259,
+    "med_ret": -0.926,
+    "win_rate": 45.18,
+    "mean_exc": -0.208,
+    "t_cluster": -4.16,
+    "ann_exc": -5.0,
+    "day_exc": -0.6909,
+    "day_exc_t": -8.85,
+    "day_win": 41.72,
+    "ls_spread": -0.7293,
+    "ls_t": -8.37,
+    "ls_ann": -17.5
+   },
+   "20": {
+    "n_events": 1112025,
+    "n_days": 1306,
+    "avg_stocks_per_day": 851.5,
+    "mean_ret": 0.43,
+    "med_ret": -1.659,
+    "win_rate": 44.18,
+    "mean_exc": -0.332,
+    "t_cluster": -4.2,
+    "ann_exc": -3.98,
+    "day_exc": -1.1303,
+    "day_exc_t": -10.08,
+    "day_win": 39.2,
+    "ls_spread": -1.1805,
+    "ls_t": -9.31,
+    "ls_ann": -14.17
+   },
+   "60": {
+    "n_events": 1098378,
+    "n_days": 1266,
+    "avg_stocks_per_day": 867.6,
+    "mean_ret": 1.219,
+    "med_ret": -3.506,
+    "win_rate": 41.79,
+    "mean_exc": -0.653,
+    "t_cluster": -6.99,
+    "ann_exc": -2.61,
+    "day_exc": -1.7671,
+    "day_exc_t": -12.67,
+    "day_win": 36.57,
+    "ls_spread": -1.8905,
+    "ls_t": -12.05,
+    "ls_ann": -7.56
+   }
+  },
+  "F2_日线周线双多头": {
+   "5": {
+    "n_events": 658168,
+    "n_days": 1321,
+    "avg_stocks_per_day": 498.2,
+    "mean_ret": 0.111,
+    "med_ret": -0.81,
+    "win_rate": 44.6,
+    "mean_exc": -0.112,
+    "t_cluster": -2.16,
+    "ann_exc": -5.37,
+    "day_exc": -0.4239,
+    "day_exc_t": -6.07,
+    "day_win": 43.15,
+    "ls_spread": -0.4389,
+    "ls_t": -5.88,
+    "ls_ann": -21.07
+   },
+   "10": {
+    "n_events": 657144,
+    "n_days": 1316,
+    "avg_stocks_per_day": 499.3,
+    "mean_ret": 0.093,
+    "med_ret": -1.194,
+    "win_rate": 44.34,
+    "mean_exc": -0.289,
+    "t_cluster": -4.07,
+    "ann_exc": -6.94,
+    "day_exc": -0.7844,
+    "day_exc_t": -8.29,
+    "day_win": 41.03,
+    "ls_spread": -0.8214,
+    "ls_t": -8.11,
+    "ls_ann": -19.71
+   },
+   "20": {
+    "n_events": 656333,
+    "n_days": 1306,
+    "avg_stocks_per_day": 502.6,
+    "mean_ret": 0.008,
+    "med_ret": -2.193,
+    "win_rate": 42.83,
+    "mean_exc": -0.523,
+    "t_cluster": -4.79,
+    "ann_exc": -6.27,
+    "day_exc": -1.2972,
+    "day_exc_t": -9.69,
+    "day_win": 38.28,
+    "ls_spread": -1.3586,
+    "ls_t": -9.41,
+    "ls_ann": -16.3
+   },
+   "60": {
+    "n_events": 650992,
+    "n_days": 1266,
+    "avg_stocks_per_day": 514.2,
+    "mean_ret": 1.127,
+    "med_ret": -3.856,
+    "win_rate": 41.11,
+    "mean_exc": -0.863,
+    "t_cluster": -7.25,
+    "ann_exc": -3.45,
+    "day_exc": -2.1853,
+    "day_exc_t": -12.84,
+    "day_win": 34.36,
+    "ls_spread": -2.2878,
+    "ls_t": -12.62,
+    "ls_ann": -9.15
+   }
+  },
+  "F3_板块动量第1": {
+   "5": {
+    "n_events": 208075,
+    "n_days": 1360,
+    "avg_stocks_per_day": 153.0,
+    "mean_ret": 0.362,
+    "med_ret": -0.526,
+    "win_rate": 46.62,
+    "mean_exc": 0.068,
+    "t_cluster": 0.46,
+    "ann_exc": 3.26,
+    "day_exc": -0.1299,
+    "day_exc_t": -0.9,
+    "day_win": 45.51,
+    "ls_spread": -0.1268,
+    "ls_t": -0.85,
+    "ls_ann": -6.09
+   },
+   "10": {
+    "n_events": 207534,
+    "n_days": 1355,
+    "avg_stocks_per_day": 153.2,
+    "mean_ret": 0.592,
+    "med_ret": -0.669,
+    "win_rate": 46.81,
+    "mean_exc": 0.009,
+    "t_cluster": 0.04,
+    "ann_exc": 0.21,
+    "day_exc": -0.1593,
+    "day_exc_t": -0.8,
+    "day_win": 44.87,
+    "ls_spread": -0.1576,
+    "ls_t": -0.77,
+    "ls_ann": -3.78
+   },
+   "20": {
+    "n_events": 205369,
+    "n_days": 1345,
+    "avg_stocks_per_day": 152.7,
+    "mean_ret": 1.297,
+    "med_ret": -0.926,
+    "win_rate": 46.96,
+    "mean_exc": 0.16,
+    "t_cluster": 0.49,
+    "ann_exc": 1.92,
+    "day_exc": -0.0658,
+    "day_exc_t": -0.24,
+    "day_win": 43.72,
+    "ls_spread": -0.0577,
+    "ls_t": -0.21,
+    "ls_ann": -0.69
+   },
+   "60": {
+    "n_events": 195829,
+    "n_days": 1305,
+    "avg_stocks_per_day": 150.1,
+    "mean_ret": -0.001,
+    "med_ret": -4.836,
+    "win_rate": 39.42,
+    "mean_exc": -1.391,
+    "t_cluster": -4.42,
+    "ann_exc": -5.56,
+    "day_exc": -0.6178,
+    "day_exc_t": -1.46,
+    "day_win": 36.63,
+    "ls_spread": -0.6613,
+    "ls_t": -1.54,
+    "ls_ann": -2.65
+   }
+  },
+  "F3b_板块动量前3": {
+   "5": {
+    "n_events": 637173,
+    "n_days": 1360,
+    "avg_stocks_per_day": 468.5,
+    "mean_ret": 0.481,
+    "med_ret": -0.32,
+    "win_rate": 47.54,
+    "mean_exc": 0.033,
+    "t_cluster": 0.47,
+    "ann_exc": 1.59,
+    "day_exc": -0.1035,
+    "day_exc_t": -1.32,
+    "day_win": 47.35,
+    "ls_spread": -0.0968,
+    "ls_t": -1.13,
+    "ls_ann": -4.65
+   },
+   "10": {
+    "n_events": 635978,
+    "n_days": 1355,
+    "avg_stocks_per_day": 469.4,
+    "mean_ret": 0.757,
+    "med_ret": -0.531,
+    "win_rate": 47.26,
+    "mean_exc": -0.029,
+    "t_cluster": -0.28,
+    "ann_exc": -0.69,
+    "day_exc": -0.3507,
+    "day_exc_t": -3.36,
+    "day_win": 44.5,
+    "ls_spread": -0.3497,
+    "ls_t": -3.05,
+    "ls_ann": -8.39
+   },
+   "20": {
+    "n_events": 631718,
+    "n_days": 1345,
+    "avg_stocks_per_day": 469.7,
+    "mean_ret": 1.15,
+    "med_ret": -1.043,
+    "win_rate": 46.34,
+    "mean_exc": -0.17,
+    "t_cluster": -1.09,
+    "ann_exc": -2.05,
+    "day_exc": -0.7533,
+    "day_exc_t": -5.35,
+    "day_win": 41.04,
+    "ls_spread": -0.7662,
+    "ls_t": -4.88,
+    "ls_ann": -9.19
+   },
+   "60": {
+    "n_events": 608176,
+    "n_days": 1305,
+    "avg_stocks_per_day": 466.0,
+    "mean_ret": 0.995,
+    "med_ret": -3.715,
+    "win_rate": 41.59,
+    "mean_exc": -1.192,
+    "t_cluster": -6.13,
+    "ann_exc": -4.77,
+    "day_exc": -1.8119,
+    "day_exc_t": -8.96,
+    "day_win": 34.25,
+    "ls_spread": -1.9443,
+    "ls_t": -8.76,
+    "ls_ann": -7.78
+   }
+  },
+  "F3c_板块动量前5": {
+   "5": {
+    "n_events": 1090961,
+    "n_days": 1360,
+    "avg_stocks_per_day": 802.2,
+    "mean_ret": 0.496,
+    "med_ret": -0.264,
+    "win_rate": 47.82,
+    "mean_exc": 0.033,
+    "t_cluster": 0.64,
+    "ann_exc": 1.6,
+    "day_exc": -0.0423,
+    "day_exc_t": -0.73,
+    "day_win": 49.71,
+    "ls_spread": -0.03,
+    "ls_t": -0.44,
+    "ls_ann": -1.44
+   },
+   "10": {
+    "n_events": 1089043,
+    "n_days": 1355,
+    "avg_stocks_per_day": 803.7,
+    "mean_ret": 0.793,
+    "med_ret": -0.406,
+    "win_rate": 47.8,
+    "mean_exc": -0.013,
+    "t_cluster": -0.18,
+    "ann_exc": -0.32,
+    "day_exc": -0.1823,
+    "day_exc_t": -2.33,
+    "day_win": 47.08,
+    "ls_spread": -0.1767,
+    "ls_t": -1.89,
+    "ls_ann": -4.24
+   },
+   "20": {
+    "n_events": 1080190,
+    "n_days": 1345,
+    "avg_stocks_per_day": 803.1,
+    "mean_ret": 1.063,
+    "med_ret": -0.959,
+    "win_rate": 46.56,
+    "mean_exc": -0.221,
+    "t_cluster": -1.99,
+    "ann_exc": -2.66,
+    "day_exc": -0.5227,
+    "day_exc_t": -5.12,
+    "day_win": 42.3,
+    "ls_spread": -0.5588,
+    "ls_t": -4.48,
+    "ls_ann": -6.71
+   },
+   "60": {
+    "n_events": 1044110,
+    "n_days": 1305,
+    "avg_stocks_per_day": 800.1,
+    "mean_ret": 1.251,
+    "med_ret": -3.339,
+    "win_rate": 42.33,
+    "mean_exc": -1.013,
+    "t_cluster": -7.08,
+    "ann_exc": -4.05,
+    "day_exc": -1.3809,
+    "day_exc_t": -8.95,
+    "day_win": 34.25,
+    "ls_spread": -1.5978,
+    "ls_t": -8.77,
+    "ls_ann": -6.39
+   }
+  },
+  "F4_RSI30": {
+   "5": {
+    "n_events": 303023,
+    "n_days": 1379,
+    "avg_stocks_per_day": 219.7,
+    "mean_ret": 1.373,
+    "med_ret": 0.636,
+    "win_rate": 53.66,
+    "mean_exc": 0.257,
+    "t_cluster": 1.98,
+    "ann_exc": 12.36,
+    "day_exc": -0.3814,
+    "day_exc_t": -5.23,
+    "day_win": 42.64,
+    "ls_spread": -0.3579,
+    "ls_t": -4.65,
+    "ls_ann": -17.18
+   },
+   "10": {
+    "n_events": 302773,
+    "n_days": 1374,
+    "avg_stocks_per_day": 220.4,
+    "mean_ret": 2.024,
+    "med_ret": 1.001,
+    "win_rate": 54.29,
+    "mean_exc": 0.469,
+    "t_cluster": 3.05,
+    "ann_exc": 11.26,
+    "day_exc": -0.5616,
+    "day_exc_t": -5.9,
+    "day_win": 42.29,
+    "ls_spread": -0.5213,
+    "ls_t": -5.22,
+    "ls_ann": -12.51
+   },
+   "20": {
+    "n_events": 302552,
+    "n_days": 1364,
+    "avg_stocks_per_day": 221.8,
+    "mean_ret": 4.185,
+    "med_ret": 2.217,
+    "win_rate": 56.98,
+    "mean_exc": 1.131,
+    "t_cluster": 5.21,
+    "ann_exc": 13.57,
+    "day_exc": -0.524,
+    "day_exc_t": -4.13,
+    "day_win": 44.79,
+    "ls_spread": -0.4341,
+    "ls_t": -3.24,
+    "ls_ann": -5.21
+   },
+   "60": {
+    "n_events": 288029,
+    "n_days": 1324,
+    "avg_stocks_per_day": 217.5,
+    "mean_ret": 7.463,
+    "med_ret": 3.437,
+    "win_rate": 58.18,
+    "mean_exc": 1.23,
+    "t_cluster": 4.61,
+    "ann_exc": 4.92,
+    "day_exc": -1.5791,
+    "day_exc_t": -8.11,
+    "day_win": 43.58,
+    "ls_spread": -1.463,
+    "ls_t": -7.19,
+    "ls_ann": -5.85
+   }
+  },
+  "F5_RSI70": {
+   "5": {
+    "n_events": 264094,
+    "n_days": 1379,
+    "avg_stocks_per_day": 191.5,
+    "mean_ret": -0.497,
+    "med_ret": -1.542,
+    "win_rate": 41.59,
+    "mean_exc": -0.475,
+    "t_cluster": -6.21,
+    "ann_exc": -22.8,
+    "day_exc": -0.9568,
+    "day_exc_t": -11.35,
+    "day_win": 38.14,
+    "ls_spread": -0.9843,
+    "ls_t": -11.35,
+    "ls_ann": -47.25
+   },
+   "10": {
+    "n_events": 263326,
+    "n_days": 1374,
+    "avg_stocks_per_day": 191.6,
+    "mean_ret": -0.341,
+    "med_ret": -2.066,
+    "win_rate": 41.19,
+    "mean_exc": -0.659,
+    "t_cluster": -6.63,
+    "ann_exc": -15.81,
+    "day_exc": -1.4033,
+    "day_exc_t": -12.91,
+    "day_win": 34.86,
+    "ls_spread": -1.4373,
+    "ls_t": -12.85,
+    "ls_ann": -34.5
+   },
+   "20": {
+    "n_events": 262329,
+    "n_days": 1364,
+    "avg_stocks_per_day": 192.3,
+    "mean_ret": 0.017,
+    "med_ret": -2.752,
+    "win_rate": 41.46,
+    "mean_exc": -0.754,
+    "t_cluster": -5.13,
+    "ann_exc": -9.04,
+    "day_exc": -1.8637,
+    "day_exc_t": -12.15,
+    "day_win": 34.53,
+    "ls_spread": -1.9038,
+    "ls_t": -12.03,
+    "ls_ann": -22.85
+   },
+   "60": {
+    "n_events": 259505,
+    "n_days": 1324,
+    "avg_stocks_per_day": 196.0,
+    "mean_ret": 0.577,
+    "med_ret": -5.257,
+    "win_rate": 39.37,
+    "mean_exc": -1.567,
+    "t_cluster": -8.38,
+    "ann_exc": -6.27,
+    "day_exc": -2.7459,
+    "day_exc_t": -13.8,
+    "day_win": 30.97,
+    "ls_spread": -2.8349,
+    "ls_t": -13.83,
+    "ls_ann": -11.34
+   }
+  }
+ }
+}

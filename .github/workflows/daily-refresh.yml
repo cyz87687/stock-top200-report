@@ -99,6 +99,31 @@ jobs:
               echo "[$(date -u '+%H:%M:%S')] ⚠️ Enhancement failed, report will use base scores" >> $LOG
             fi
 
+            # Step 3.7: 板块动量(申万二级) — 抓全市场近90日K线, 自建等权板块指数, 算60/10日动量与排名
+            echo "[$(date -u '+%H:%M:%S')] Running sector_momentum_daily.py ..." >> $LOG
+            if python3 sector_momentum_daily.py >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Sector momentum computed" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ Sector momentum failed, skip sector dimension" >> $LOG
+            fi
+
+            # Step 3.8: 并入第五维 score_sector(权重0.12, 从题材维度切出), 默认 evidence 模式(回测证据方向)
+            echo "[$(date -u '+%H:%M:%S')] Running apply_sector_momentum.py ..." >> $LOG
+            if python3 apply_sector_momentum.py "$SCORED_JSON" --mode evidence >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Sector dimension merged (v2.40)" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ Sector merge failed, report will use v2.30 scores" >> $LOG
+            fi
+
+            # Step 3.9: 每日组合 — 板块60日动量规则(A: 动量 / B: 反转) + 评分选股
+            echo "[$(date -u '+%H:%M:%S')] Running pick_portfolio.py ..." >> $LOG
+            if python3 pick_portfolio.py "$SCORED_JSON" --top 10 --per-sector 3 >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Portfolio generated" >> $LOG
+              python3 gen_portfolio_report.py >> $LOG 2>&1 || echo "⚠️ Portfolio report failed" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ Portfolio generation failed" >> $LOG
+            fi
+
             # Step 4: Generate HTML report
             echo "[$(date -u '+%H:%M:%S')] Running gen_report_top200.py ..." >> $LOG
             if python3 gen_report_top200.py "$SCORED_JSON" >> $LOG 2>&1; then
@@ -133,7 +158,9 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add index.html top200_report_*.html refresh_log.txt
           git add -f top200_scored_*.json top200_all_a.json ai_assessment.json
+          git add -f sector/sw_map.json sector/sector_momentum_latest.json sector/portfolio_*.json
           git add enhance_scores.py gen_report_top200.py generate_ai_assessment.py
+          git add sector_momentum_daily.py apply_sector_momentum.py pick_portfolio.py gen_portfolio_report.py fetch_sw_map.py
           git diff --cached --quiet && echo "No changes to commit" && exit 0
           git commit -m "auto: daily report refresh $(date -u '+%Y-%m-%d')"
           git push

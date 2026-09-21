@@ -1759,6 +1759,8 @@ html_parts.append(f'''
 for stock in sa_stocks:
     html_parts.append(generate_research_analysis(stock))
 
+scores_label = '五维评分' if any(x.get('score_sector') is not None for x in results) else '四项评分'
+
 html_parts.append('''
     </div>
 
@@ -1817,7 +1819,8 @@ html_parts.append('''
         <label><input type="checkbox" class="col-check" data-col="code" checked>代码</label>
         <label><input type="checkbox" class="col-check" data-col="sector" checked>板块</label>
         <label><input type="checkbox" class="col-check" data-col="pct" checked>涨跌幅</label>
-        <label><input type="checkbox" class="col-check" data-col="scores" checked>四项评分</label>
+        <label><input type="checkbox" class="col-check" data-col="mom" checked>板块动量</label>
+        <label><input type="checkbox" class="col-check" data-col="scores" checked>''' + scores_label + '''</label>
         <label><input type="checkbox" class="col-check" data-col="total" checked>总分</label>
         <label><input type="checkbox" class="col-check" data-col="rating" checked>评级</label>
         <label><input type="checkbox" class="col-check" data-col="pe" checked>PE/Fwd</label>
@@ -1836,7 +1839,8 @@ html_parts.append('''
                     <th class="s-sector col-sector">板块</th>
                     <th class="s-pct col-pct" data-sort="pct_chg">涨跌幅 <span class="sort-arrow"></span></th>
                     <th class="s-week col-week" data-sort="week_chg">近一周 <span class="sort-arrow"></span></th>
-                    <th class="s-scores col-scores">四项评分</th>
+                    <th class="s-mom col-mom">板块动量(60/10日)</th>
+                    <th class="s-scores col-scores">''' + scores_label + '''</th>
                     <th class="s-total col-total" data-sort="total">总分 <span class="sort-arrow"></span></th>
                     <th class="s-rating col-rating">评级</th>
                     <th class="s-pe col-pe">PE(TTM)/Fwd/阶梯</th>
@@ -1871,7 +1875,23 @@ for idx, r in enumerate(results):
 
     scores = [r["score_news"], r["score_tech"], r["score_fund"], r.get("score_theme", r.get("score_flow", 0))]
     score_colors = ["#ef4444", "#f97316", "#f59e0b", "#3b82f6", "#22c55e"]
+    # v2.40: 第五维「板块动量」(若 scored json 含该字段)
+    if r.get("score_sector") is not None:
+        scores.append(r["score_sector"])
     scores_html = "".join([f'<div class="s-score" style="background:{score_colors[min(int(v),4)]}">{v}</div>' for v in scores])
+
+    # 板块动量列: 申万二级板块 60/10 日动量排名与涨幅
+    mom_html = "-"
+    if r.get("sector_r60") is not None:
+        _m60 = r.get("sector_mom60")
+        _m10 = r.get("sector_mom10")
+        _c60 = "up" if (_m60 or 0) > 0 else "down" if (_m60 or 0) < 0 else ""
+        _c10 = "up" if (_m10 or 0) > 0 else "down" if (_m10 or 0) < 0 else ""
+        mom_html = (f"<span class='mono'>{r.get('sector_l2','')}</span><br>"
+                    f"<span style='font-size:11px;color:#8899ab'>"
+                    f"R60={r['sector_r60']} R10={r.get('sector_r10','-')} · "
+                    f"<span class='{_c60}'>{_m60:+.1f}%</span>/<span class='{_c10}'>{_m10:+.1f}%</span></span>") \
+            if _m60 is not None and _m10 is not None else f"<span class='mono'>{r.get('sector_l2','')}</span><br><span style='font-size:11px;color:#8899ab'>R60={r['sector_r60']} R10={r.get('sector_r10','-')}</span>"
 
     # 详情数据存到data属性，点击时懒加载
     tech = r.get("tech", {})
@@ -1894,6 +1914,7 @@ for idx, r in enumerate(results):
                     <td class="s-sector col-sector" data-value="{r.get('sector','')}">{r.get('sector','')}</td>
                     <td class="s-pct {pct_cls} col-pct" data-value="{pct}">{pct:+.2f}%</td>
                     <td class="s-week col-week {week_cls}" data-value="{week_chg_val}">{week_chg_str}</td>
+                    <td class="s-mom col-mom">{mom_html}</td>
                     <td class="s-scores col-scores">{scores_html}</td>
                     <td class="s-total col-total" data-value="{r['total']}" style="color:{RATING_COLORS[rating]}">{r['total']:.2f}</td>
                     <td class="s-rating col-rating" style="background:{RATING_BG[rating]};color:{RATING_COLORS[rating]}" data-value="{rating}">{rating}</td>
@@ -1931,7 +1952,11 @@ html_parts.append(ai_model_html)
 html_parts.append('''
     <div class="footer">
         <p>⚠️ 免责声明: 本报告由AI基于stock-scorer极简评分模型自动生成,仅供参考,不构成投资建议。投资有风险,入市需谨慎。</p>
-        <p>评分模型 (v2.30 AI增强版): 题材热度30% + 基本面30%(含业绩一阶导/二阶导) + 消息面20%(AI赋分) + 技术面20%；消息/题材热度由AI基于当日题材资金共识赋分(0.7×AI+0.3×算法)</p>
+        <p>评分模型 (''' + ('v2.40 AI+板块动量版' if any(x.get('score_sector') is not None for x in results) else 'v2.30 AI增强版') + '''): '''
+        + ('基本面30% + 题材热度18% + 消息面20%(AI赋分) + 技术面20% + 板块动量12%(申万二级板块60日/10日动量排名, 按6:4合成)；'
+           if any(x.get('score_sector') is not None for x in results) else
+           '题材热度30% + 基本面30%(含业绩一阶导/二阶导) + 消息面20%(AI赋分) + 技术面20%；')
+        + '''消息/题材热度由AI基于当日题材资金共识赋分(0.7×AI+0.3×算法)</p>
         <p>Generated: ''' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '''</p>
     </div>
 </div>
