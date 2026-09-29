@@ -1957,9 +1957,11 @@ try:
             _pct_s = f"{_pct:+.2f}%" if _pct is not None else "—"
             _pc = "up" if (_pct or 0) > 0 else "down" if (_pct or 0) < 0 else ""
             _amt_yi = (_s.get('amount', 0) or 0) / 1e8
-            _sec = _r.get('sector', '')
+            _sec = _r.get('sector_l2') or _r.get('sector', '') or _s.get('sector', '')
+            _sec_parent = _r.get('sector_parent', '')
+            _sec_txt = html_mod.escape(str(_sec)) + (f" <span style='color:#94a3b8;font-size:11px'>({html_mod.escape(str(_sec_parent))})</span>" if _sec_parent else '')
             _rows += (f"<tr><td>{_i}</td><td><b>{html_mod.escape(_s['name'])}</b></td>"
-                      f"<td class='mono'>{_s['code']}</td><td>{html_mod.escape(str(_sec))}</td>"
+                      f"<td class='mono'>{_s['code']}</td><td>{_sec_txt}</td>"
                       f"<td class='{_pc}'>{_pct_s}</td><td>{_amt_yi:.1f}亿</td>"
                       f"<td>{_rtag} {_ts}</td>"
                       f"<td style='font-size:12px;color:#64748b'>{html_mod.escape(_s.get('reason',''))}</td></tr>")

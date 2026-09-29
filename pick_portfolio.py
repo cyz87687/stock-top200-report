@@ -77,11 +77,13 @@ def select(rows, results, mode, min_cands):
     return chosen
 
 
-def build(cands, mode, per_sector, per_parent, top):
+def build(cands, mode, per_sector, per_parent, top, min_total=12.0):
     """构建组合。约束：
+      - min_total  : 综合评分低于该值的个股不入选(默认12分, 只推 B 级及以上)
       - per_sector : 同一申万二级板块最多 N 只
       - per_parent : 同一申万一级行业(parent)最多 N 只 —— 防行业集中(如多只银行股)
     """
+    cands = [r for r in cands if float(r.get('total') or 0) >= min_total]
     if mode == 'reversal':
         # 回测支持: 弱势板块内 RSI<30 优先
         cands.sort(key=lambda r: (0 if (r.get('tech') or {}).get('rsi') is not None and (r.get('tech') or {}).get('rsi') < 30 else 1,
@@ -116,6 +118,7 @@ def main():
     ap.add_argument('--top', type=int, default=10)
     ap.add_argument('--per-sector', type=int, default=3)
     ap.add_argument('--per-parent', type=int, default=2, help='同一申万一级行业最多N只(防行业集中)')
+    ap.add_argument('--min-total', type=float, default=12.0, help='最低综合评分(默认12, 只推B级及以上)')
     ap.add_argument('--out', default=None)
     args = ap.parse_args()
 
@@ -141,7 +144,7 @@ def main():
     for mode in ('momentum', 'reversal'):
         levels = pick_sectors(rows, mode)
         secs, level, cands, trace = select(rows, results, mode, min_cands)
-        picked = build(cands, mode, args.per_sector, args.per_parent, args.top)
+        picked = build(cands, mode, args.per_sector, args.per_parent, args.top, args.min_total)
         out['portfolios'][mode] = {
             'level_used': level, 'target_rule': levels[0][0], 'level_trace': trace,
             'sectors': sorted(secs), 'n_candidates': len(cands),

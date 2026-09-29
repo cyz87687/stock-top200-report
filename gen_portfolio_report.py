@@ -226,8 +226,8 @@ def main():
   <p style="font-size:13px;margin:4px 0">选中板块：<span class="badge">{'　'.join(pm['sectors'])}</span>　候选 {pm['n_candidates']} 只</p>
   <table><thead><tr><th>#</th><th>名称</th><th>代码</th><th>申万二级</th><th>一级行业</th><th>评级/总分</th><th>现价</th><th>当日</th>
     <th>板块R60/R10</th><th>板块60日/10日</th><th>RSI</th><th>均线</th><th>消/技/基/题/板</th></tr></thead>
-  <tbody>{pick_rows(pm['picks'])}</tbody></table>
-  <div class="note">等权持有；剔除 RSI&gt;70。回测提示：此路线历史超额为负，建议作为对照观察，不宜作为主仓依据。</div>
+  <tbody>{pick_rows(pm['picks']) if pm['picks'] else "<tr><td colspan='13' style='text-align:center;color:#c62828;padding:14px'>今日无综合评分 ≥12 分的合格标的（宁缺毋滥，不强行推荐）</td></tr>"}</tbody></table>
+  <div class="note">等权持有；过滤条件：剔除 RSI&gt;70、剔除综合评分&lt;12 分（只推 B 级及以上）。回测提示：此路线历史超额为负，建议作为对照观察，不宜作为主仓依据。</div>
 </div>
 
 <h2>三、B 路线组合（反转：60日动量末段 + 超跌优先）</h2>
@@ -236,8 +236,8 @@ def main():
   <p style="font-size:13px;margin:4px 0">选中板块：<span class="badge ok">{'　'.join(pr['sectors'])}</span>　候选 {pr['n_candidates']} 只</p>
   <table><thead><tr><th>#</th><th>名称</th><th>代码</th><th>申万二级</th><th>一级行业</th><th>评级/总分</th><th>现价</th><th>当日</th>
     <th>板块R60/R10</th><th>板块60日/10日</th><th>RSI</th><th>均线</th><th>消/技/基/题/板</th></tr></thead>
-  <tbody>{pick_rows(pr['picks'])}</tbody></table>
-  <div class="note">板块内 RSI&lt;30 优先，其次按综合评分降序；剔除 RSI&gt;70。持有期建议 20 个交易日以上（回测中 5 日超额仅 +0.78%，扣成本后薄）。</div>
+  <tbody>{pick_rows(pr['picks']) if pr['picks'] else "<tr><td colspan='13' style='text-align:center;color:#c62828;padding:14px'>今日无综合评分 ≥12 分的合格标的（宁缺毋滥，不强行推荐）</td></tr>"}</tbody></table>
+  <div class="note">板块内 RSI&lt;30 优先，其次按综合评分降序；过滤条件：剔除 RSI&gt;70、剔除综合评分&lt;12 分。持有期建议 20 个交易日以上（回测中 5 日超额仅 +0.78%，扣成本后薄）。</div>
 </div>
 
 <h2>四、两个指标如何并入评分模型</h2>

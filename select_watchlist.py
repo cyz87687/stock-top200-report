@@ -137,6 +137,13 @@ def main():
         print(f"⚠️ 规则兜底: {len(picks)} 只")
 
     # 合并候选信息 + 校验名单(剔除不在观察池的)
+    # 注入申万二级板块: 供 step2 正确标注 sector(否则全落"综合")
+    _sw = {}
+    _swp = os.path.join(HERE, 'sector', 'sw_map.json')
+    if os.path.exists(_swp):
+        _sw = json.load(open(_swp, encoding='utf-8'))
+    _l2 = _sw.get('l2', {})
+    _l2p = _sw.get('l2_parent', {})
     by_name = {s['name']: s for s in cands}
     selected, dedup = [], set()
     for p in picks:
@@ -145,13 +152,16 @@ def main():
             continue
         dedup.add(name)
         s = by_name[name]
+        c6 = ''.join(ch for ch in s.get('code', '') if ch.isdigit())[-6:].zfill(6)
+        sec_l2 = _l2.get(c6, '')
         selected.append({
             'name': name, 'code': s['code'], 'price': s.get('price'),
             'pct_chg': s.get('pct_chg'), 'turnover': s.get('amount', 0),
             'amount': s.get('amount', 0), 'rank': s.get('rank'),
+            'sector': sec_l2 or _l2p.get(sec_l2, ''),   # 申万二级(供 step2 板块标注)
             'reason': p.get('reason', ''),
         })
-    print(f"校验后有效标的: {len(selected)} 只")
+    print(f"校验后有效标的: {len(selected)} 只 (申万二级注入 {sum(1 for s in selected if s['sector'])} 只)")
 
     out = {
         'date': date,

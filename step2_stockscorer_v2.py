@@ -3324,7 +3324,8 @@ def main():
         price = s.get("price", 0) or 0
         turnover = s.get("turnover", 0)
         
-        sector = get_sec(name)
+        # 优先使用输入自带的 sector(观察池由 select_watchlist 用申万二级注入), 否则按名称推断
+        sector = s.get("sector") or get_sec(name)
         kl = klines.get(code, [])
         
         # Fundamental (传入估值阶梯数据)
