@@ -112,6 +112,7 @@ def main():
             out.append(
                 f"<tr><td>{i}</td><td><b>{p['name']}</b></td><td class='mono'>{p['code']}</td>"
                 f"<td>{p.get('sector_l2') or '—'}</td>"
+                f"<td>{p.get('parent') or '—'}</td>"
                 f"<td><span class='tag t-{p.get('rating','B')}'>{p.get('rating','-')}</span> {p['total']:.1f}</td>"
                 f"<td>{p.get('price') if p.get('price') is not None else '—'}</td>"
                 f"<td>{pct(p.get('pct_chg'))}</td>"
@@ -223,7 +224,7 @@ def main():
 <div class="card">
   <div class="sec-hd"><h3 style="margin:0">命中层级</h3><span class="lv">{pm['level_used']}　目标规则：{pm['target_rule']}</span></div>
   <p style="font-size:13px;margin:4px 0">选中板块：<span class="badge">{'　'.join(pm['sectors'])}</span>　候选 {pm['n_candidates']} 只</p>
-  <table><thead><tr><th>#</th><th>名称</th><th>代码</th><th>申万二级</th><th>评级/总分</th><th>现价</th><th>当日</th>
+  <table><thead><tr><th>#</th><th>名称</th><th>代码</th><th>申万二级</th><th>一级行业</th><th>评级/总分</th><th>现价</th><th>当日</th>
     <th>板块R60/R10</th><th>板块60日/10日</th><th>RSI</th><th>均线</th><th>消/技/基/题/板</th></tr></thead>
   <tbody>{pick_rows(pm['picks'])}</tbody></table>
   <div class="note">等权持有；剔除 RSI&gt;70。回测提示：此路线历史超额为负，建议作为对照观察，不宜作为主仓依据。</div>
@@ -233,7 +234,7 @@ def main():
 <div class="card">
   <div class="sec-hd"><h3 style="margin:0">命中层级</h3><span class="lv">{pr['level_used']}　目标规则：{pr['target_rule']}</span></div>
   <p style="font-size:13px;margin:4px 0">选中板块：<span class="badge ok">{'　'.join(pr['sectors'])}</span>　候选 {pr['n_candidates']} 只</p>
-  <table><thead><tr><th>#</th><th>名称</th><th>代码</th><th>申万二级</th><th>评级/总分</th><th>现价</th><th>当日</th>
+  <table><thead><tr><th>#</th><th>名称</th><th>代码</th><th>申万二级</th><th>一级行业</th><th>评级/总分</th><th>现价</th><th>当日</th>
     <th>板块R60/R10</th><th>板块60日/10日</th><th>RSI</th><th>均线</th><th>消/技/基/题/板</th></tr></thead>
   <tbody>{pick_rows(pr['picks'])}</tbody></table>
   <div class="note">板块内 RSI&lt;30 优先，其次按综合评分降序；剔除 RSI&gt;70。持有期建议 20 个交易日以上（回测中 5 日超额仅 +0.78%，扣成本后薄）。</div>

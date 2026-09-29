@@ -77,19 +77,27 @@ def select(rows, results, mode, min_cands):
     return chosen
 
 
-def build(cands, mode, per_sector, top):
+def build(cands, mode, per_sector, per_parent, top):
+    """构建组合。约束：
+      - per_sector : 同一申万二级板块最多 N 只
+      - per_parent : 同一申万一级行业(parent)最多 N 只 —— 防行业集中(如多只银行股)
+    """
     if mode == 'reversal':
         # 回测支持: 弱势板块内 RSI<30 优先
         cands.sort(key=lambda r: (0 if (r.get('tech') or {}).get('rsi') is not None and (r.get('tech') or {}).get('rsi') < 30 else 1,
                                   -float(r.get('total') or 0)))
     else:
         cands.sort(key=lambda r: -float(r.get('total') or 0))
-    per_cnt, picked = {}, []
+    per_cnt, par_cnt, picked = {}, {}, []
     for r in cands:
-        s = r.get('sector_l2')
+        s = r.get('sector_l2') or '未分类'
+        p = r.get('sector_parent') or s
         if per_cnt.get(s, 0) >= per_sector:
             continue
+        if per_parent and par_cnt.get(p, 0) >= per_parent:
+            continue
         per_cnt[s] = per_cnt.get(s, 0) + 1
+        par_cnt[p] = par_cnt.get(p, 0) + 1
         picked.append(r)
         if len(picked) >= top:
             break
@@ -107,6 +115,7 @@ def main():
     ap.add_argument('scored', nargs='?', default=None)
     ap.add_argument('--top', type=int, default=10)
     ap.add_argument('--per-sector', type=int, default=3)
+    ap.add_argument('--per-parent', type=int, default=2, help='同一申万一级行业最多N只(防行业集中)')
     ap.add_argument('--out', default=None)
     args = ap.parse_args()
 
@@ -126,12 +135,13 @@ def main():
     n = len(rows)
     print(f"scored 日期 {sdate} | 板块动量日期 {mdate} | 板块数 {n} | 候选池 {len(results)} 只")
 
-    out = {'date': sdate, 'momentum_date': mdate, 'top': args.top, 'per_sector': args.per_sector, 'portfolios': {}}
-    min_cands = max(5, args.top // 2)
+    out = {'date': sdate, 'momentum_date': mdate, 'top': args.top, 'per_sector': args.per_sector,
+           'per_parent': args.per_parent, 'portfolios': {}}
+    min_cands = max(args.top, 10)   # 候选不足 top 数量时继续放宽板块层级 → 组合更分散
     for mode in ('momentum', 'reversal'):
         levels = pick_sectors(rows, mode)
         secs, level, cands, trace = select(rows, results, mode, min_cands)
-        picked = build(cands, mode, args.per_sector, args.top)
+        picked = build(cands, mode, args.per_sector, args.per_parent, args.top)
         out['portfolios'][mode] = {
             'level_used': level, 'target_rule': levels[0][0], 'level_trace': trace,
             'sectors': sorted(secs), 'n_candidates': len(cands),
