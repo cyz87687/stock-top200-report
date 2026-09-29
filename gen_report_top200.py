@@ -1937,14 +1937,59 @@ html_parts.append('''
 
 ''')
 
+# ===== v2.41 观察池 (成交额 200~1000 名, AI 筛选复盘标的) =====
+watch_html = ""
+try:
+    _wf = os.path.join(_ai_dir, f"watchlist_{date_str}.json")
+    _wsf = os.path.join(_ai_dir, f"top200_scored_watch_{date_str}.json")
+    _wl = json.load(open(_wf, encoding='utf-8')) if os.path.exists(_wf) else {}
+    _ws = {r['name']: r for r in json.load(open(_wsf, encoding='utf-8')).get('results', [])} if os.path.exists(_wsf) else {}
+    _sel = _wl.get('selected', [])
+    if _sel:
+        _rows = ""
+        for _i, _s in enumerate(_sel, 1):
+            _r = _ws.get(_s['name'], {})
+            _total = _r.get('total')
+            _rating = _r.get('rating', '-')
+            _ts = f"{_total:.1f}" if _total is not None else "—"
+            _rtag = f"<span class='tag t-{_rating}'>{_rating}</span>" if _rating != '-' else '-'
+            _pct = _s.get('pct_chg')
+            _pct_s = f"{_pct:+.2f}%" if _pct is not None else "—"
+            _pc = "up" if (_pct or 0) > 0 else "down" if (_pct or 0) < 0 else ""
+            _amt_yi = (_s.get('amount', 0) or 0) / 1e8
+            _sec = _r.get('sector', '')
+            _rows += (f"<tr><td>{_i}</td><td><b>{html_mod.escape(_s['name'])}</b></td>"
+                      f"<td class='mono'>{_s['code']}</td><td>{html_mod.escape(str(_sec))}</td>"
+                      f"<td class='{_pc}'>{_pct_s}</td><td>{_amt_yi:.1f}亿</td>"
+                      f"<td>{_rtag} {_ts}</td>"
+                      f"<td style='font-size:12px;color:#64748b'>{html_mod.escape(_s.get('reason',''))}</td></tr>")
+        _gen_by = _wl.get('generated_by', 'rule-fallback')
+        watch_html = ('''    <!-- 观察池 (v2.41) -->
+    <div class="section-title">🔭 观察池 (成交额 200~1000 名 · AI 筛选)</div>
+    <div class="sub">主力池之外的全市场成交额 200~1000 名区间，每日由 AI 从异动/题材联动中筛选需要复盘的标的。
+    生成方式：''' + _gen_by + '''；评分：stock-scorer v2.40 五维。</div>
+    <div class="table-container">
+        <table class="stock-table" style="font-size:12.5px;">
+            <thead><tr><th>#</th><th>名称</th><th>代码</th><th>板块</th><th>当日</th><th>成交额</th><th>评分</th><th>AI 筛选理由</th></tr></thead>
+            <tbody>''' + _rows + '''</tbody>
+        </table>
+    </div>
+''')
+except Exception as _e:
+    watch_html = ""
+html_parts.append(watch_html)
+
 # ===== v2.30 AI 评分模型总结 (由AI生成) =====
 _ams = data.get("ai_model_summary", "").strip()
+_model_ver = 'v2.40 (五维·含板块动量)' if any(x.get('score_sector') is not None for x in results) else 'v2.30 (四维)'
+# 兼容旧文案中的版本号
+_ams = _ams.replace('v2.30', 'v2.40').replace('四维', '五维') if any(x.get('score_sector') is not None for x in results) else _ams
 ai_model_html = ""
 if _ams:
     ai_model_html = ('    <div class="ai-model-summary" style="margin:24px 0;padding:18px 20px;'
                      'background:linear-gradient(135deg,#1e1b4b,#0f172a);border:1px solid #6d28d9;border-radius:12px;">'
                      '<div style="font-size:15px;font-weight:800;color:#c4b5fd;margin-bottom:10px;">'
-                     '🤖 评分模型总结 (v2.30 AI增强版)</div>'
+                     '🤖 评分模型总结 (' + _model_ver + ')</div>'
                      '<div style="font-size:13px;line-height:1.9;color:#e2e8f0;white-space:pre-wrap;">'
                      + html_mod.escape(_ams) + '</div></div>')
 html_parts.append(ai_model_html)

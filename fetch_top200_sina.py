@@ -85,25 +85,51 @@ def fallback_eastmoney():
         return None, f"东财备源失败: {e}"
 
 
+def normalize(stocks, start_rank=1):
+    """新浪行情条目 → 标准化 dict 列表（含 rank 排名）"""
+    out = []
+    for i, s in enumerate(stocks, start_rank):
+        code_raw = s.get("code", "")
+        symbol = s.get("symbol", "")
+        if symbol.startswith("sh"):
+            code = symbol
+        elif symbol.startswith("sz"):
+            code = symbol
+        else:
+            market = "sh" if code_raw.startswith("6") else "sz"
+            code = f"{market}{code_raw}"
+        out.append({
+            "rank": i,
+            "name": s.get("name", ""),
+            "code": code,
+            "price": float(s.get("trade", 0) or 0),
+            "pct_chg": round(float(s.get("changepercent", 0) or 0), 2),
+            "turnover": float(s.get("amount", 0) or 0),
+            "amount": float(s.get("amount", 0) or 0),
+        })
+    return out
+
+
 def main():
     print("=" * 60)
-    print("  新浪接口获取全A成交额TOP200 (v2.13 带数据质量校验)")
+    print("  新浪接口获取全A成交额TOP1000 (主力池TOP200 + 观察池200~1000)")
     print("=" * 60)
     all_stocks = []
-    for page in range(1, 5):
+    for page in range(1, 11):
         print(f"获取第{page}页...")
-        data = fetch_page(page, num=80)
+        data = fetch_page(page, num=100)
         if not data:
             continue
         all_stocks.extend(data)
         print(f"  累计 {len(all_stocks)} 只")
-        time.sleep(1)
+        time.sleep(0.8)
 
     all_stocks.sort(key=lambda x: -float(x.get("amount", 0)))
-    top200 = all_stocks[:200]
-    print(f"\n✅ 共获取 {len(top200)} 只TOP股票")
+    top1000 = all_stocks[:1000]
+    top200 = top1000[:200]
+    print(f"\n✅ 共获取 {len(top1000)} 只（含 TOP200 主力池）")
 
-    # ===== v2.13: 数据质量校验 =====
+    # ===== 数据质量校验（针对主力池 TOP200）=====
     ok, reason = validate_data(top200)
     if not ok:
         print(f"⚠️ 新浪数据校验失败: {reason}")
@@ -114,58 +140,49 @@ def main():
                                            "trade": s["price"], "amount": s["amount"]} for s in out])
             if ok2:
                 print(f"✅ {fb}, 校验通过 ({reason2})")
-                top200 = out
-                ok = True
+                # 东财备源只给 200 只，观察池暂缺（保底）
+                top200_norm = out
+                top1000_norm = out
             else:
                 print(f"❌ 东财备源校验也失败: {reason2}")
+                sys.exit(1)
         else:
             print(f"❌ {fb}")
+            sys.exit(1)
     else:
-        # 新浪数据正常: 标准化输出
-        out = []
-        for s in top200:
-            code_raw = s.get("code", "")
-            symbol = s.get("symbol", "")
-            if symbol.startswith("sh"):
-                code = symbol
-            elif symbol.startswith("sz"):
-                code = symbol
-            else:
-                market = "sh" if code_raw.startswith("6") else "sz"
-                code = f"{market}{code_raw}"
-            price = float(s.get("trade", 0) or 0)
-            pct = float(s.get("changepercent", 0) or 0)
-            amount = float(s.get("amount", 0) or 0)
-            turnover = amount
-            out.append({
-                "name": s.get("name", ""),
-                "code": code,
-                "price": price,
-                "pct_chg": round(pct, 2),
-                "turnover": turnover,
-                "amount": amount,
-            })
-        top200 = out
+        top200_norm = normalize(top200, 1)
+        top1000_norm = normalize(top1000, 1)
+    # 观察池 = 成交额 200~1000 名（800 只）
+    watch_pool = top1000_norm[200:]
 
-    if not ok:
-        # 双源失败: 保留旧数据, 退出非0让工作流重试/跳过
-        print("❌ 双数据源均不可用, 保留旧数据不覆盖, 本次刷新中止")
-        sys.exit(1)
+    _src = "新浪财经全市场行情接口" if "sh" in (top200_norm[0]["code"] if top200_norm else "") or "sz" in (top200_norm[0]["code"] if top200_norm else "") else "东财备源"
+    _today = datetime.now().strftime("%Y-%m-%d")
 
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump({
-            "top50": top200[:50],
-            "top100": top200[:100],
-            "top200": top200,
+            "top50": top200_norm[:50],
+            "top100": top200_norm[:100],
+            "top200": top200_norm,
             "all_count": len(all_stocks),
-            "date": datetime.now().strftime("%Y-%m-%d"),
-            "source": "新浪财经全市场行情接口" if "sh" in (top200[0]["code"] if top200 else "") or "sz" in (top200[0]["code"] if top200 else "") else "东财备源",
+            "date": _today,
+            "source": _src,
         }, f, ensure_ascii=False, indent=2)
 
-    print(f"\n📊 TOP10:")
-    for i, s in enumerate(top200[:10]):
+    OUT1000 = "top1000_all_a.json"
+    with open(OUT1000, "w", encoding="utf-8") as f:
+        json.dump({
+            "date": _today,
+            "source": _src,
+            "main_pool": top200_norm,          # 主力池 TOP200
+            "watch_pool": watch_pool,          # 观察池 200~1000
+            "stocks": top1000_norm,            # 全量 1000
+            "count": len(top1000_norm),
+        }, f, ensure_ascii=False, indent=2)
+
+    print(f"\n📊 主力池 TOP10:")
+    for i, s in enumerate(top200_norm[:10]):
         print(f"  {i+1}. {s['name']:8s} {s['code']} {s['price']:8.2f} {s['pct_chg']:+.2f}% 成交额{s['turnover']/10000:.0f}万")
-    print(f"\n✅ 数据已保存: {OUT}")
+    print(f"\n✅ 数据已保存: {OUT} (主力池{len(top200_norm)}) + {OUT1000} (观察池{len(watch_pool)})")
 
 
 if __name__ == "__main__":

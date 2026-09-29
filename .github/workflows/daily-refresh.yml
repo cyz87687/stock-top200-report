@@ -76,6 +76,22 @@ jobs:
               break
             fi
 
+            # Step 3.3: 观察池(AI筛选) — 全市场成交额 200~1000 名, LLM 精选需要复盘的标的
+            echo "[$(date -u '+%H:%M:%S')] Running select_watchlist.py (AI watch pool) ..." >> $LOG
+            if python3 select_watchlist.py >> $LOG 2>&1; then
+              WATCH_JSON=$(ls -t watchlist_*.json 2>/dev/null | head -1)
+              echo "[$(date -u '+%H:%M:%S')] ✅ Watchlist generated: ${WATCH_JSON:-none}" >> $LOG
+              if [ -n "$WATCH_JSON" ]; then
+                echo "[$(date -u '+%H:%M:%S')] Scoring watch pool (step2) ..." >> $LOG
+                WATCH_SCORED="top200_scored_watch_$(echo "$WATCH_JSON" | grep -o '[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}' | head -1).json"
+                python3 step2_stockscorer_v2.py "$WATCH_JSON" "$WATCH_SCORED" >> $LOG 2>&1 && \
+                  echo "[$(date -u '+%H:%M:%S')] ✅ Watch pool scored: $WATCH_SCORED" >> $LOG || \
+                  echo "[$(date -u '+%H:%M:%S')] ⚠️ Watch pool scoring failed" >> $LOG
+              fi
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ Watchlist generation failed, skip" >> $LOG
+            fi
+
             # Step 3.5: Generate AI assessment layer (auto by LLM, fallback to rule engine)
             echo "[$(date -u '+%H:%M:%S')] Running generate_ai_assessment.py ..." >> $LOG
             if python3 generate_ai_assessment.py "$SCORED_JSON" >> $LOG 2>&1; then
@@ -115,9 +131,17 @@ jobs:
               echo "[$(date -u '+%H:%M:%S')] ⚠️ Sector merge failed, report will use v2.30 scores" >> $LOG
             fi
 
+            # Step 3.81: 观察池并入板块动量(若有)
+            WATCH_SCORED=$(ls -t top200_scored_watch_*.json 2>/dev/null | head -1)
+            if [ -n "$WATCH_SCORED" ]; then
+              python3 apply_sector_momentum.py "$WATCH_SCORED" --mode evidence >> $LOG 2>&1 && \
+                echo "[$(date -u '+%H:%M:%S')] ✅ Watch sector merged: $WATCH_SCORED" >> $LOG || \
+                echo "[$(date -u '+%H:%M:%S')] ⚠️ Watch sector merge failed" >> $LOG
+            fi
+
             # Step 3.9: 每日组合 — 板块60日动量规则(A: 动量 / B: 反转) + 评分选股
             echo "[$(date -u '+%H:%M:%S')] Running pick_portfolio.py ..." >> $LOG
-            if python3 pick_portfolio.py "$SCORED_JSON" --top 10 --per-sector 3 >> $LOG 2>&1; then
+            if python3 pick_portfolio.py "$SCORED_JSON" --top 10 --per-sector 3 --per-parent 2 >> $LOG 2>&1; then
               echo "[$(date -u '+%H:%M:%S')] ✅ Portfolio generated" >> $LOG
               python3 gen_portfolio_report.py >> $LOG 2>&1 || echo "⚠️ Portfolio report failed" >> $LOG
             else
@@ -158,9 +182,10 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add index.html top200_report_*.html refresh_log.txt
           git add -f top200_scored_*.json top200_all_a.json ai_assessment.json
+          git add -f top1000_all_a.json watchlist_*.json
           git add -f sector/sw_map.json sector/sector_momentum_latest.json sector/portfolio_*.json
           git add enhance_scores.py gen_report_top200.py generate_ai_assessment.py
-          git add sector_momentum_daily.py apply_sector_momentum.py pick_portfolio.py gen_portfolio_report.py fetch_sw_map.py
+          git add sector_momentum_daily.py apply_sector_momentum.py pick_portfolio.py gen_portfolio_report.py fetch_sw_map.py select_watchlist.py
           git diff --cached --quiet && echo "No changes to commit" && exit 0
           git commit -m "auto: daily report refresh $(date -u '+%Y-%m-%d')"
           git push
