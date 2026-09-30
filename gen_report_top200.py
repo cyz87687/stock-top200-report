@@ -1946,8 +1946,11 @@ try:
     _ws = {r['name']: r for r in json.load(open(_wsf, encoding='utf-8')).get('results', [])} if os.path.exists(_wsf) else {}
     _sel = _wl.get('selected', [])
     if _sel:
+        # 按评分降序排序(未评分/无分排最后), 取前3标注"最值得关注"
+        _sel_sorted = sorted(_sel, key=lambda s: -(float(_ws.get(s['name'], {}).get('total') or 0)))
+        _top3 = {s['name'] for s in _sel_sorted[:3]}
         _rows = ""
-        for _i, _s in enumerate(_sel, 1):
+        for _i, _s in enumerate(_sel_sorted, 1):
             _r = _ws.get(_s['name'], {})
             _total = _r.get('total')
             _rating = _r.get('rating', '-')
@@ -1960,15 +1963,18 @@ try:
             _sec = _r.get('sector_l2') or _r.get('sector', '') or _s.get('sector', '')
             _sec_parent = _r.get('sector_parent', '')
             _sec_txt = html_mod.escape(str(_sec)) + (f" <span style='color:#94a3b8;font-size:11px'>({html_mod.escape(str(_sec_parent))})</span>" if _sec_parent else '')
-            _rows += (f"<tr><td>{_i}</td><td><b>{html_mod.escape(_s['name'])}</b></td>"
+            # 最值得关注标注(评分前3)
+            _star = ("<span style='color:#f59e0b;font-weight:700' title='评分最高，最值得关注'>★</span> "
+                     if _s['name'] in _top3 and _total is not None else "")
+            _rows += (f"<tr><td>{_i}</td><td><b>{_star}{html_mod.escape(_s['name'])}</b></td>"
                       f"<td class='mono'>{_s['code']}</td><td>{_sec_txt}</td>"
                       f"<td class='{_pc}'>{_pct_s}</td><td>{_amt_yi:.1f}亿</td>"
                       f"<td>{_rtag} {_ts}</td>"
                       f"<td style='font-size:12px;color:#64748b'>{html_mod.escape(_s.get('reason',''))}</td></tr>")
         _gen_by = _wl.get('generated_by', 'rule-fallback')
         watch_html = ('''    <!-- 观察池 (v2.41) -->
-    <div class="section-title">🔭 观察池 (成交额 200~1000 名 · AI 筛选)</div>
-    <div class="sub">主力池之外的全市场成交额 200~1000 名区间，每日由 AI 从异动/题材联动中筛选需要复盘的标的。
+    <div class="section-title">🔭 观察池 (成交额 200~1000 名 · AI 筛选 · 评分降序)</div>
+    <div class="sub">主力池之外的全市场成交额 200~1000 名区间，每日由 AI 从异动/题材联动中筛选需要复盘的标的，按五维综合评分降序排列，★ 为评分前 3 名（最值得关注）。
     生成方式：''' + _gen_by + '''；评分：stock-scorer v2.40 五维。</div>
     <div class="table-container">
         <table class="stock-table" style="font-size:12.5px;">
