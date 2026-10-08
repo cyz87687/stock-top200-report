@@ -55,7 +55,52 @@ total_stocks = len(results)
 # 颜色配置
 RATING_COLORS = {"S": "#22c55e", "A": "#3b82f6", "B": "#f59e0b", "C": "#f97316", "D": "#dc2626"}
 RATING_BG = {"S": "#dcfce7", "A": "#dbeafe", "B": "#fef3c7", "C": "#ffedd5", "D": "#fee2e2"}
-RATING_FULL = {"S": "强烈推荐 · 可重仓", "A": "重点关注 · 逢低加仓", "B": "波段操作 · 轻仓参与", "C": "观望为主 · 不新开仓", "D": "坚决回避 · 不持有"}
+# 评级语义(相对强弱口径, 不再含仓位暗示, 仓位由市场状态统一决定)
+RATING_FULL = {"S": "当日最强 · 重点关注", "A": "相对强势 · 可跟踪", "B": "中性 · 波段操作", "C": "相对偏弱 · 观望", "D": "当日最弱 · 谨慎"}
+
+# ===== v2.41 P1-1 评级体系: 绝对阈值 → 当日截面分位 =====
+# 原绝对阈值(S≥17)下 S 级长期为空; B级(9-13)吞掉过半样本, 区分度弱。
+# 改为按当日 total 截面排名分位给级, total 绝对值保持不变, 评级仅表"当日相对强弱"。
+RATING_CUTS = [(0.05, "S"), (0.15, "A"), (0.50, "B"), (0.88, "C"), (1.01, "D")]
+
+
+def _quantile_ratings(items):
+    """按 total 降序, 依分位给评级。items=[{code,total}, ...] → {code: rating}"""
+    rows = [x for x in items if x.get("total") is not None]
+    if not rows:
+        return {}
+    srt = sorted(rows, key=lambda x: -float(x.get("total") or 0))
+    n = len(srt)
+    out = {}
+    for i, it in enumerate(srt):
+        q = (i + 0.5) / n
+        rt = "D"
+        for hi, r in RATING_CUTS:
+            if q < hi:
+                rt = r
+                break
+        out[it["code"]] = rt
+    return out
+
+
+# 重算当日评级(保留绝对口径于 _rating_abs 备查)
+_rating_abs_orig = {r["code"]: r["rating"] for r in results}
+_new_rating = _quantile_ratings(results)
+_rating_shift = sum(1 for r in results if _rating_abs_orig.get(r["code"]) != _new_rating.get(r["code"]))
+for r in results:
+    r["_rating_abs"] = _rating_abs_orig.get(r["code"], r["rating"])
+    r["rating"] = _new_rating.get(r["code"], r["rating"])
+
+# 同步评级分布(页头统计卡片)
+from collections import Counter as _Counter
+_dist = _Counter(r["rating"] for r in results)
+stats["rating_dist"] = {k: _dist.get(k, 0) for k in ["S", "A", "B", "C", "D"]}
+
+# 历史评级同步重算(同一分位口径), 保证评级变化追踪口径一致、可比
+if prev_ratings:
+    _prev_new = _quantile_ratings([{"code": c, "total": v.get("total")} for c, v in prev_ratings.items()])
+    for _c, _v in prev_ratings.items():
+        _v["rating"] = _prev_new.get(_c, _v["rating"])
 
 top20 = [r for r in results if r["rating"] in ("S", "A")]
 top20.sort(key=lambda x: -x["total"])
@@ -123,6 +168,159 @@ portfolio_picks = build_portfolio(results)
 # 板块均分TOP5
 sec_avg = stats.get("sector_avg", {})
 sorted_secs = sorted(sec_avg.items(), key=lambda x: -x[1].get("avg", 0))[:5]
+
+# ===== v2.41 P0-2 市场状态 → 仓位纪律 =====
+# 修复"顶部建议空仓 vs 个股逢低加仓"的矛盾: 由赚钱效应分统一决定当日总仓位上限,
+# 个股 advice 不再单独暗示仓位, 而是与市场状态联动降档。
+POSITION_LADDER = [
+    (0,  20, "冰点/退潮", "≤2成", "观察为主，不新开仓", "#dc2626"),
+    (20, 40, "弱势磨底",   "2~4成", "仅轻仓试错，严设止损", "#f97316"),
+    (40, 60, "中性震荡",   "4~6成", "结构性参与，不追高", "#f59e0b"),
+    (60, 80, "情绪回暖",   "6~8成", "可逢回调加仓", "#22c55e"),
+    (80, 101, "亢奋过热",  "8成+警惕", "注意兑现，不追高", "#3b82f6"),
+]
+
+
+def position_rule(score):
+    """赚钱效应分 → (状态, 建议总仓位, 操作纪律, 颜色)"""
+    if score is None:
+        return ("数据暂缺", "—", "以个股信号为主，控制单票仓位", "#94a3b8")
+    for lo, hi, phase, pos, disc, color in POSITION_LADDER:
+        if lo <= score < hi:
+            return (phase, pos, disc, color)
+    return ("—", "—", "—", "#94a3b8")
+
+
+# 市场状态优先取 market_breadth, 回退 market_review
+_mb = market_breadth if (market_breadth and market_breadth.get("available")) else None
+mkt_score = (_mb.get("score") if _mb else market_review.get("money_score"))
+mkt_phase, mkt_pos, mkt_disc, mkt_color = position_rule(mkt_score)
+# 允许追加上限(市场状态为冰点时, 个股最高只能给出"观察"级建议)
+_bearish = (mkt_score is not None and mkt_score < 40)
+
+
+def advice_with_market(r):
+    """个股建议 = 个股信号 × 市场状态。冰点/弱势市场下禁止出现"加仓"字样。"""
+    base = r.get("advice") or RATING_FULL.get(r["rating"], "")
+    if _bearish:
+        if r["rating"] == "S":
+            return "市场冰点·仅观察，等待情绪修复"
+        if r["rating"] == "A":
+            return "市场冰点·暂不加仓，等企稳信号"
+        return "市场冰点·观望为主"
+    return base
+
+
+# ===== v2.41 P0-3 操作建议三件套（买点/止损/目标）+ P1-3 一致性约束 =====
+# 全部基于 scored json 中已有的真实字段(ma5/10/20/60、support/resistance_levels、
+# rsi、position、现价)做规则推导, 不引入任何外部编造数据。
+def build_trade_plan(r):
+    """→ dict(buy_lo, buy_hi, stop, target, risk_reward, pos, tier_note, flags)"""
+    price = r.get("price")
+    tech = r.get("tech") or {}
+    if not price or price <= 0:
+        return None
+    ma5 = tech.get("ma5"); ma10 = tech.get("ma10")
+    ma20 = tech.get("ma20"); ma60 = tech.get("ma60")
+    pos = tech.get("position")
+    rsi = tech.get("rsi")
+    trend = tech.get("trend", "") or ""
+
+    # 支撑/阻力: 基于现价过滤(源数据为历史计算, 可能滞后于现价)
+    sups = [v for _, v in (tech.get("support_levels") or []) if isinstance(v, (int, float)) and 0 < v < price]
+    ress = [v for _, v in (tech.get("resistance_levels") or []) if isinstance(v, (int, float)) and v > price]
+    nearest_sup = max(sups) if sups else None      # 现价下方最近支撑
+    nearest_res = min(ress) if ress else None      # 现价上方最近阻力
+
+    # 买点区间: 强势(多头)以 ma5~ma10 为回踩区; 弱势以 ma10~ma20 为等企稳区
+    bullish = ("多头" in trend)
+    ref_hi = ma5 if bullish else ma10
+    ref_lo = ma10 if bullish else ma20
+    if ref_hi and ref_lo:
+        if ref_hi < ref_lo:
+            ref_lo, ref_hi = ref_hi, ref_lo
+        buy_lo, buy_hi = ref_lo, ref_hi
+    elif nearest_sup:
+        buy_lo, buy_hi = nearest_sup * 0.98, nearest_sup * 1.02
+    else:
+        buy_lo, buy_hi = price * 0.95, price * 0.98
+
+    # 止损: 优先最近支撑下方 1.5%; 否则 ma20; 再否则现价 -8%
+    if nearest_sup:
+        stop = nearest_sup * 0.985
+    elif ma20:
+        stop = ma20 * 0.985
+    else:
+        stop = price * 0.92
+    stop = min(stop, price * 0.97) if stop >= price else stop   # 确保止损在现价下方
+
+    # 目标位: 最近阻力; 无则按 2:1 盈亏比推
+    risk = max(price - stop, price * 0.02)
+    target = nearest_res if nearest_res else price + risk * 2
+    reward = max(target - price, 0)
+    rr = reward / risk if risk > 0 else 0
+
+    # P1-3 一致性约束: 超买/高分位 → 不建议追高
+    flags = []
+    overbought = False
+    if rsi is not None and rsi > 70:
+        overbought = True; flags.append(f"RSI{rsi:.0f}超买")
+    if pos is not None and pos > 85:
+        overbought = True; flags.append(f"价格分位{pos:.0f}%偏高")
+
+    return {
+        "buy_lo": buy_lo, "buy_hi": buy_hi, "stop": stop, "target": target,
+        "rr": rr, "overbought": overbought, "flags": flags,
+        "pos_chg": (price - ma20) / ma20 * 100 if ma20 else None,
+    }
+
+
+def trade_plan_advice(r, plan):
+    """P1-3: 若超买/高位, 操作建议自动降档, 覆盖原'逢低加仓'措辞。"""
+    if not plan:
+        return None, ""
+    if plan["overbought"]:
+        return ("高位·等待回调", "⛔ 当前已" + "、".join(plan["flags"]) + "，不宜追高；等回踩买点区再考虑")
+    if _bearish:
+        return ("冰点·仅观察", "⏸ 市场冰点，暂不新开仓，仅保留观察")
+    return ("可跟踪 · 回踩买点区分批", "")
+
+
+# ===== v2.41 P1-2 板块展示口径 =====
+# 原粗分类 sector 中"综合"占约30%(实为电池/半导体等被归兜底), 无信息量。
+# 展示层统一用申万二级 sector_l2, 兜底 sector_parent, 再兜底原 sector。
+def sector_disp(r):
+    return r.get("sector_l2") or r.get("sector_parent") or r.get("sector", "")
+
+
+# ===== v2.41 P0-1 双引擎组合: 量化组合(pick_portfolio 双路线) + AI 组合, 并统计交集 =====
+quant_json = {}
+try:
+    _here = os.path.dirname(os.path.abspath(__file__))
+    _qfile = os.path.join(_here, "sector", f"portfolio_{date_str}.json")
+    if not os.path.exists(_qfile):
+        _qfile = os.path.join(_here, "sector", "portfolio_latest.json")
+    if os.path.exists(_qfile):
+        with open(_qfile, "r", encoding="utf-8") as _fq:
+            quant_json = json.load(_fq)
+except Exception as _qe:
+    quant_json = {}
+    print(f"⚠️ 量化组合数据加载失败: {_qe}")
+
+QUANT_MODE_LABEL = {"momentum": "📈 动量路线（顺动量做多）", "reversal": "🔄 反转路线（超跌反弹）"}
+
+
+def _quant_picks(mode):
+    pf = (quant_json.get("portfolios") or {}).get(mode) or {}
+    picks = pf.get("picks") if isinstance(pf, dict) else pf
+    return picks or [], (pf.get("target_rule") if isinstance(pf, dict) else None)
+
+
+quant_picks_all = []
+for _m in ("momentum", "reversal"):
+    _ps, _ = _quant_picks(_m)
+    for _p in _ps:
+        quant_picks_all.append(_p.get("name"))
 
 # 开始生成HTML
 html_parts = []
@@ -431,11 +629,29 @@ for r in ["S", "A", "B", "C", "D"]:
 html_parts.append('''
     </div>
     <div style="font-size:11px;color:#94a3b8;margin:8px 0 16px;padding:8px 12px;background:#1e293b;border-radius:8px;">
-        📐 评分等级标准：<span style="color:#22c55e;font-weight:700;">S级 ≥17分</span> ·
-        <span style="color:#3b82f6;font-weight:700;">A级 13~17分</span> ·
-        <span style="color:#f59e0b;font-weight:700;">B级 9~13分</span> ·
-        <span style="color:#f97316;font-weight:700;">C级 5~9分</span> ·
-        <span style="color:#dc2626;font-weight:700;">D级 &lt;5分</span>
+        📐 评级口径(v2.41 · 当日截面相对强弱，绝对总分不变)：<span style="color:#22c55e;font-weight:700;">S级 前5%</span> ·
+        <span style="color:#3b82f6;font-weight:700;">A级 前15%</span> ·
+        <span style="color:#f59e0b;font-weight:700;">B级 前50%</span> ·
+        <span style="color:#f97316;font-weight:700;">C级 前88%</span> ·
+        <span style="color:#dc2626;font-weight:700;">D级 后12%</span>
+        <span style="color:#64748b;">　｜　评级仅表"当日相对强弱"，实际仓位由上方市场状态统一决定</span>
+    </div>''')
+
+# ===== v2.41 P0-2 仓位纪律横幅 =====
+html_parts.append(f'''
+    <div style="margin:0 0 18px;padding:14px 18px;border-radius:12px;background:linear-gradient(135deg,#1e293b,#0f172a);border:1px solid {mkt_color};border-left:5px solid {mkt_color};display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div style="display:flex;flex-direction:column;gap:2px;min-width:150px;">
+            <span style="font-size:11px;color:#94a3b8;">🎯 今日市场状态 → 总仓位纪律</span>
+            <span style="font-size:20px;font-weight:800;color:{mkt_color};">{mkt_phase}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px;padding-left:16px;border-left:1px solid #334155;">
+            <span style="font-size:11px;color:#94a3b8;">建议总仓位上限</span>
+            <span style="font-size:20px;font-weight:800;color:#f8fafc;">{mkt_pos}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px;padding-left:16px;border-left:1px solid #334155;flex:1;min-width:200px;">
+            <span style="font-size:11px;color:#94a3b8;">操作纪律（赚钱效应 {mkt_score if mkt_score is not None else '—'} 分）</span>
+            <span style="font-size:13px;font-weight:600;color:#e2e8f0;">{mkt_disc}</span>
+        </div>
     </div>''')
 
 # 核心结论卡片
@@ -577,6 +793,62 @@ html_parts.append('''
 ''')
 
 # v2.11: 原"大盘赚钱效应"独立卡片已并入上方"📝 盘面复盘点评"卡片(指数/成交/涨跌/赚钱效应速览)
+
+# ===== v2.41 P0-1 双引擎组合区块 =====
+if quant_json:
+    ai_pick_names = [p.get("name") if isinstance(p, dict) else p
+                     for p in (ai_review.get("portfolio") or {}).get("picks", [])]
+    _inter = sorted(set(quant_picks_all) & set(ai_pick_names))
+    _names_map = {r["name"]: r for r in results}
+    _qblocks = ""
+    for _m in ("momentum", "reversal"):
+        _ps, _rule = _quant_picks(_m)
+        _rows = ""
+        for _p in _ps:
+            _nm = _p.get("name")
+            _rr = _names_map.get(_nm, {})
+            _rt = _rr.get("rating", _p.get("rating", "-"))
+            _col = RATING_COLORS.get(_rt, "#94a3b8")
+            _sc = _p.get("total")
+            _sct = f"{_sc:.2f}" if isinstance(_sc, (int, float)) else "—"
+            _sec = _p.get("sector_l2") or _p.get("parent") or ""
+            _in_ai = " ✅与AI重合" if _nm in ai_pick_names else ""
+            _rows += (f'<div style="padding:5px 8px;border-bottom:1px solid #1e293b;font-size:11.5px;">'
+                      f'<span style="font-weight:700;color:#f8fafc;">{html_mod.escape(str(_nm))}</span>'
+                      f'<span style="color:{_col};font-weight:700;margin-left:6px;">{_rt}</span>'
+                      f'<span style="color:#94a3b8;margin-left:6px;">{html_mod.escape(str(_sec))}</span>'
+                      f'<span style="float:right;color:{_col};">{_sct}{_in_ai}</span></div>')
+        if not _rows:
+            _rows = '<div style="padding:6px 8px;font-size:11px;color:#64748b;">当日无符合条件的标的</div>'
+        _qblocks += (f'<div style="background:#0f172a;border-radius:8px;padding:10px;">'
+                     f'<div style="font-size:12px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">{QUANT_MODE_LABEL.get(_m, _m)}</div>'
+                     f'{_rows}'
+                     f'<div style="font-size:9.5px;color:#64748b;margin-top:5px;">规则: {html_mod.escape(str(_rule or "板块动量档位"))}</div></div>')
+
+    _inter_html = ("、".join(_inter) if _inter
+                   else '<span style="color:#f59e0b;">两套逻辑当日无重合标的 —— 分歧较大，宜降低仓位、等待共识</span>')
+    html_parts.append(f'''
+    <!-- v2.41 P0-1 双引擎组合: 量化可复现 vs AI 产业逻辑 -->
+    <div class="chart-card" style="padding:16px;margin:14px 0;">
+        <h3 style="font-size:13px;margin-bottom:10px;">⚙️ 双引擎组合对照 <span style="font-size:10px;color:#64748b;font-weight:400;">（量化=可复现规则 · AI=产业逻辑解读）</span></h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+            <div>
+                <div style="font-size:11px;color:#38bdf8;font-weight:700;margin-bottom:6px;">⚙️ 量化组合（pick_portfolio 双路线）</div>
+                {_qblocks}
+            </div>
+            <div>
+                <div style="font-size:11px;color:#a78bfa;font-weight:700;margin-bottom:6px;">🤖 AI 组合（产业逻辑）</div>
+                <div style="background:#0f172a;border-radius:8px;padding:10px;font-size:11.5px;line-height:1.9;color:#e2e8f0;">
+                    {'、'.join(html_mod.escape(str(x)) for x in ai_pick_names) if ai_pick_names else '当日无 AI 组合'}
+                </div>
+                <div style="font-size:9.5px;color:#64748b;margin-top:5px;">来源: ai_assessment.portfolio（AI 主观，含估值与产业链校验）</div>
+            </div>
+        </div>
+        <div style="font-size:11px;color:#cbd5e1;padding:8px 10px;background:rgba(59,130,246,0.08);border-radius:6px;border-left:3px solid #3b82f6;">
+            🔗 交集标的：{_inter_html}
+        </div>
+        <div style="font-size:9px;color:#475569;margin-top:6px;">说明：量化组合可完全复现、便于回测；AI 组合含产业逻辑但主观性更强。两者重合度越高，信号越可靠。</div>
+    </div>''')
 
 html_parts.append('''
     <!-- 快捷筛选按钮 -->
@@ -831,12 +1103,12 @@ for idx, r in enumerate(top20):
 
     s_class = "s-level" if rating == "S" else ""
     html_parts.append(f'''
-        <div class="stock-detail {s_class}" data-rating="{rating}" data-sector="{r.get('sector','')}" data-code="{r['code']}" data-name="{r['name']}">
+        <div class="stock-detail {s_class}" data-rating="{rating}" data-sector="{sector_disp(r)}" data-code="{r['code']}" data-name="{r['name']}">
             <div class="header-row">
                 <div class="rank" style="background:{rank_color}">#{i}</div>
                 <div>
                     <div class="name">{r['name']}{change_tag}{ai_badge}</div>
-                    <div class="code">{r['code']} · {r.get('sector','')}</div>
+                    <div class="code">{r['code']} · {sector_disp(r)}</div>
                 </div>
                 <span class="s-pct {pct_cls}" style="font-size:13px;font-weight:700;">{pct:+.2f}%</span>
                 <div class="total" style="color:{RATING_COLORS[rating]}">{total:.2f}</div>
@@ -875,10 +1147,32 @@ for idx, r in enumerate(top20):
         html_parts.append(f'''
             <div style="font-size:11px;color:#f97316;margin-top:10px;padding:10px;background:rgba(249,115,22,0.1);border-radius:8px;">⚠️ {risk_html}</div>''')
 
-    html_parts.append(f'''
-            <div style="font-size:11px;color:#38bdf8;margin-top:8px;">💡 评级原因: {', '.join(justification[:4])} → {rating}级 · {r.get('advice',RATING_FULL.get(rating,''))}</div>
-        </div>''')
+    # ===== v2.41 P0-3 操作建议三件套 + P1-3 一致性约束 =====
+    plan = build_trade_plan(r)
+    plan_tag, plan_note = trade_plan_advice(r, plan)
+    if plan:
+        _risk_pct = (plan["buy_hi"] - plan["stop"]) / plan["buy_hi"] * 100 if plan["buy_hi"] else 0
+        _up_pct = (plan["target"] - r.get("price", 0)) / r.get("price", 1) * 100
+        _plan_color = "#ef4444" if plan["overbought"] else ("#f59e0b" if _bearish else "#22c55e")
+        html_parts.append(f'''
+            <div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(56,189,248,0.06);border-left:3px solid {_plan_color};">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px;">
+                    <span style="font-weight:800;color:{_plan_color};">🧭 操作建议</span>
+                    <span style="padding:1px 7px;border-radius:3px;background:{_plan_color}22;color:{_plan_color};font-weight:700;">{plan_tag}</span>
+                    <span style="color:#94a3b8;">{plan_note}</span>
+                </div>
+                <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;font-size:11px;color:#cbd5e1;">
+                    <span>🎯 参考买点 <b style="color:#22c55e;">{plan['buy_lo']:.2f} ~ {plan['buy_hi']:.2f}</b></span>
+                    <span>🛑 止损 <b style="color:#ef4444;">{plan['stop']:.2f}</b>（-{_risk_pct:.1f}%）</span>
+                    <span>🏁 目标 <b style="color:#3b82f6;">{plan['target']:.2f}</b>（+{_up_pct:.1f}%）</span>
+                    <span>⚖️ 盈亏比 <b>{plan['rr']:.1f} : 1</b></span>
+                </div>
+                {f'<div style="font-size:10px;color:#f97316;margin-top:5px;">⚠️ 技术矛盾提示: {"、".join(plan["flags"])}，明细评语与操作建议已按一致性约束对齐</div>' if plan["flags"] else ''}
+            </div>''')
 
+    html_parts.append(f'''
+            <div style="font-size:11px;color:#38bdf8;margin-top:8px;">💡 评级原因: {', '.join(justification[:4])} → {rating}级 · {advice_with_market(r)}</div>
+        </div>''')
 html_parts.append('''
     </div>
 
@@ -1926,13 +2220,13 @@ for idx, r in enumerate(results):
     theme_text = ", ".join([html_mod.escape(x) for x in theme_reasons[:3]]) if theme_reasons else "无"
 
     html_parts.append(f'''
-                <tr class="expandable" data-rating="{rating}" data-sector="{r.get('sector','')}" data-code="{r['code']}" data-name="{r['name']}" data-original-rank="{i}" data-fwd-pe="{r.get('fwd_pe',0) or 0}" data-growth="{r.get('growth',0) or 0}" data-position="{tech.get('position',50) or 50}" data-score-theme="{r.get('score_theme',0)}"
+                <tr class="expandable" data-rating="{rating}" data-sector="{sector_disp(r)}" data-code="{r['code']}" data-name="{r['name']}" data-original-rank="{i}" data-fwd-pe="{r.get('fwd_pe',0) or 0}" data-growth="{r.get('growth',0) or 0}" data-position="{tech.get('position',50) or 50}" data-score-theme="{r.get('score_theme',0)}"
                     data-news="{r['score_news']:.2f}" data-tech-score="{r['score_tech']:.2f}" data-fund-score="{r['score_fund']:.2f}" data-theme-score="{r.get('score_theme',0):.2f}"
                     data-news-text="{html_mod.escape(news_text)}" data-tech-text="{html_mod.escape(tech_text)}" data-fund-text="{html_mod.escape(fund_text)}" data-theme-text="{html_mod.escape(theme_text)}">
                     <td class="s-rank" data-value="{i}">{i}</td>
                     <td class="s-name" data-value="{r['name']}">{r['name']}</td>
                     <td class="s-code col-code" data-value="{r['code']}">{r['code']}</td>
-                    <td class="s-sector col-sector" data-value="{r.get('sector','')}">{r.get('sector','')}</td>
+                    <td class="s-sector col-sector" data-value="{sector_disp(r)}">{sector_disp(r)}</td>
                     <td class="s-pct {pct_cls} col-pct" data-value="{pct}">{pct:+.2f}%</td>
                     <td class="s-week col-week {week_cls}" data-value="{week_chg_val}">{week_chg_str}</td>
                     <td class="s-mom col-mom">{mom_html}</td>
@@ -2022,6 +2316,66 @@ if _ams:
                      '<div style="font-size:13px;line-height:1.9;color:#e2e8f0;white-space:pre-wrap;">'
                      + html_mod.escape(_ams) + '</div></div>')
 html_parts.append(ai_model_html)
+
+# ===== v2.41 P0-4 推荐跟踪与胜率 (真实K线回填) =====
+try:
+    _tf = os.path.join(_ai_dir, "recommendation_track.json")
+    _track = json.load(open(_tf, encoding="utf-8")) if os.path.exists(_tf) else {"records": []}
+    _recs = _track.get("records", [])
+    if _recs:
+        from collections import defaultdict as _dd
+        _agg = _dd(lambda: {h: [] for h in (1, 5, 20)})
+        _cutoff = None
+        for _rc in _recs:
+            for _h in (1, 5, 20):
+                _v = (_rc.get("rets") or {}).get(str(_h))
+                if _v is not None:
+                    _agg[_rc["kind"]][_h].append(_v)
+                    _agg["__ALL__"][_h].append(_v)
+                    _cutoff = max(_cutoff, _rc["date"]) if _cutoff else _rc["date"]
+
+        def _stat_cell(vals):
+            if not vals:
+                return '<td style="padding:5px 8px;color:#475569;">积累中</td>'
+            _avg = sum(vals) / len(vals)
+            _win = sum(1 for x in vals if x > 0) / len(vals) * 100
+            _c = "#ef4444" if _avg > 0 else "#22c55e"   # A股: 红涨绿跌
+            return (f'<td style="padding:5px 8px;color:{_c};font-weight:700;">{_avg:+.2f}%</td>'
+                    f'<td style="padding:5px 8px;color:#94a3b8;">{_win:.0f}%</td>')
+
+        _rows = ""
+        _lbl = {"__ALL__": "全部推荐", "rating": "评级 S/A 级", "ai_portfolio": "AI 组合",
+                "quant_momentum": "量化·动量", "quant_reversal": "量化·反转"}
+        for _k in ["__ALL__", "rating", "ai_portfolio", "quant_momentum", "quant_reversal"]:
+            if _k not in _agg:
+                continue
+            _d = _agg[_k]
+            _n1 = len(_d[1])
+            _rows += (f'<tr style="border-top:1px solid #1e293b;">'
+                      f'<td style="padding:5px 8px;color:#e2e8f0;font-weight:600;">{_lbl.get(_k, _k)}</td>'
+                      f'<td style="padding:5px 8px;color:#94a3b8;">{_n1}</td>'
+                      + _stat_cell(_d[1]) + _stat_cell(_d[5]) + _stat_cell(_d[20]) + '</tr>')
+
+        _has_data = any(_agg[_k][1] or _agg[_k][5] for _k in _agg)
+        html_parts.append(f'''
+    <!-- v2.41 P0-4 推荐跟踪 -->
+    <div class="chart-card" style="padding:16px;margin:14px 0;">
+        <h3 style="font-size:13px;margin-bottom:4px;">📊 推荐跟踪 · 胜率验证 <span style="font-size:10px;color:#64748b;font-weight:400;">（真实K线回填，检验模型准不准）</span></h3>
+        <div style="font-size:10px;color:#64748b;margin-bottom:10px;">自 2026-10-08 起累计记录 {len(_recs)} 条推荐；T+N 收益按推荐日收盘价为基准，用前复权K线回填。</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11.5px;">
+            <thead><tr style="color:#94a3b8;text-align:left;">
+                <th style="padding:4px 8px;">分组</th><th style="padding:4px 8px;">样本</th>
+                <th style="padding:4px 8px;">T+1 均值</th><th style="padding:4px 8px;">胜率</th>
+                <th style="padding:4px 8px;">T+5 均值</th><th style="padding:4px 8px;">胜率</th>
+                <th style="padding:4px 8px;">T+20 均值</th><th style="padding:4px 8px;">胜率</th>
+            </tr></thead>
+            <tbody>{_rows}</tbody>
+        </table>
+        {'' if _has_data else '<div style="font-size:10.5px;color:#f59e0b;margin-top:8px;">⏳ 首日记录已建立，T+1/T+5/T+20 收益将在后续交易日自动回填。</div>'}
+        <div style="font-size:9px;color:#475569;margin-top:6px;">说明：每日运行 track_recommendations.py 记录并回填。胜率=上涨样本占比（红涨绿跌口径）。</div>
+    </div>''')
+except Exception as _e:
+    pass
 
 html_parts.append('''
     <div class="footer">

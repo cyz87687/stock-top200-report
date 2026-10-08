@@ -1,0 +1,409 @@
+{
+ "records": [
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "先导智能",
+   "code": "sz300450",
+   "base_price": 37.59,
+   "total": 16.45,
+   "date": "2026-10-08",
+   "pick_price": 37.59,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "华正新材",
+   "code": "sh603186",
+   "base_price": 224.25,
+   "total": 15.69,
+   "date": "2026-10-08",
+   "pick_price": 224.25,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "当升科技",
+   "code": "sz300073",
+   "base_price": 41.28,
+   "total": 15.62,
+   "date": "2026-10-08",
+   "pick_price": 41.28,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "天赐材料",
+   "code": "sz002709",
+   "base_price": 32.69,
+   "total": 15.02,
+   "date": "2026-10-08",
+   "pick_price": 32.69,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "澜起科技",
+   "code": "sh688008",
+   "base_price": 197.01,
+   "total": 14.91,
+   "date": "2026-10-08",
+   "pick_price": 197.01,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "生益科技",
+   "code": "sh600183",
+   "base_price": 131.86,
+   "total": 14.37,
+   "date": "2026-10-08",
+   "pick_price": 131.86,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "中国巨石",
+   "code": "sh600176",
+   "base_price": 39.55,
+   "total": 14.3,
+   "date": "2026-10-08",
+   "pick_price": 39.55,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "中国船舶",
+   "code": "sh600150",
+   "base_price": 39.81,
+   "total": 14.12,
+   "date": "2026-10-08",
+   "pick_price": 39.81,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "深南电路",
+   "code": "sz002916",
+   "base_price": 368.02,
+   "total": 13.95,
+   "date": "2026-10-08",
+   "pick_price": 368.02,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "东材科技",
+   "code": "sh601208",
+   "base_price": 50.92,
+   "total": 13.9,
+   "date": "2026-10-08",
+   "pick_price": 50.92,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "金安国纪",
+   "code": "sz002636",
+   "base_price": 79.63,
+   "total": 13.78,
+   "date": "2026-10-08",
+   "pick_price": 79.63,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "大金重工",
+   "code": "sz002487",
+   "base_price": 48.61,
+   "total": 13.74,
+   "date": "2026-10-08",
+   "pick_price": 48.61,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "赣锋锂业",
+   "code": "sz002460",
+   "base_price": 44.21,
+   "total": 13.68,
+   "date": "2026-10-08",
+   "pick_price": 44.21,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "国轩高科",
+   "code": "sz002074",
+   "base_price": 31.3,
+   "total": 13.49,
+   "date": "2026-10-08",
+   "pick_price": 31.3,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "立讯精密",
+   "code": "sz002475",
+   "base_price": 48.43,
+   "total": 13.48,
+   "date": "2026-10-08",
+   "pick_price": 48.43,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "多氟多",
+   "code": "sz002407",
+   "base_price": 30.05,
+   "total": 13.44,
+   "date": "2026-10-08",
+   "pick_price": 30.05,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "龙蟠科技",
+   "code": "sh603906",
+   "base_price": 20.94,
+   "total": 13.34,
+   "date": "2026-10-08",
+   "pick_price": 20.94,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "宁德时代",
+   "code": "sz300750",
+   "base_price": 286.75,
+   "total": 13.18,
+   "date": "2026-10-08",
+   "pick_price": 286.75,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "昭衍新药",
+   "code": "sh603127",
+   "base_price": 52.06,
+   "total": 13.1,
+   "date": "2026-10-08",
+   "pick_price": 52.06,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "剑桥科技",
+   "code": "sh603083",
+   "base_price": 193.1,
+   "total": 13.01,
+   "date": "2026-10-08",
+   "pick_price": 193.1,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "ai_portfolio",
+   "label": "AI组合",
+   "name": "招商轮船",
+   "code": "sh601872",
+   "base_price": 22.03,
+   "total": 11.03,
+   "date": "2026-10-08",
+   "pick_price": 22.03,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "ai_portfolio",
+   "label": "AI组合",
+   "name": "先导智能",
+   "code": "sz300450",
+   "base_price": 37.59,
+   "total": 16.45,
+   "date": "2026-10-08",
+   "pick_price": 37.59,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "ai_portfolio",
+   "label": "AI组合",
+   "name": "当升科技",
+   "code": "sz300073",
+   "base_price": 41.28,
+   "total": 15.62,
+   "date": "2026-10-08",
+   "pick_price": 41.28,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "昭衍新药",
+   "code": "sh603127",
+   "base_price": 52.06,
+   "total": 13.1,
+   "date": "2026-10-08",
+   "pick_price": 52.06,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "药明康德",
+   "code": "sh603259",
+   "base_price": 162.0,
+   "total": 12.45,
+   "date": "2026-10-08",
+   "pick_price": 162.0,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_reversal",
+   "label": "量化·reversal",
+   "name": "澜起科技",
+   "code": "sh688008",
+   "base_price": 197.01,
+   "total": 14.91,
+   "date": "2026-10-08",
+   "pick_price": 197.01,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_reversal",
+   "label": "量化·reversal",
+   "name": "兆易创新",
+   "code": "sh603986",
+   "base_price": 334.4,
+   "total": 12.64,
+   "date": "2026-10-08",
+   "pick_price": 334.4,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  }
+ ]
+}
