@@ -488,17 +488,25 @@ breadth_disp = (f"涨{mr_up}/跌{mr_down} · 涨停{mr_zt}/跌停{mr_dt}" if (mr
 me_disp = (f"{mr_score}分 {mr_phase}" if mr_score is not None else "—")
 
 # ===== v2.22 AI 复盘点评(每日由AI生成, 优先于模板文本) =====
+# 数据纪律: 只采纳与当日数据日期一致的点评, 防止陈旧文件(如历史 ai_review_today.json)
+# 在当日 ai_assessment.json 缺失/损坏时冒充当日点评。不匹配则回退到模板文本。
 ai_review = {}
 _ai_dir = os.path.dirname(os.path.abspath(__file__))
 for _cand in ("ai_assessment.json", "ai_review_today.json"):
-    if not ai_review:
-        _p = os.path.join(_ai_dir, _cand)
-        try:
-            if os.path.exists(_p):
-                with open(_p, "r", encoding="utf-8") as _f:
-                    ai_review = json.load(_f)
-        except Exception:
-            ai_review = {}
+    if ai_review:
+        break
+    _p = os.path.join(_ai_dir, _cand)
+    try:
+        if os.path.exists(_p):
+            with open(_p, "r", encoding="utf-8") as _f:
+                _obj = json.load(_f)
+            _odate = str(_obj.get("date", ""))
+            if date_str and date_str not in _odate:
+                print(f"⚠️ 跳过日期不匹配的 AI 点评 {_cand} (文件 date={_odate or '无'} ≠ 数据日期 {date_str})")
+                continue
+            ai_review = _obj
+    except Exception:
+        ai_review = {}
 
 ai_text = (ai_review.get("commentary") or "").strip()
 ai_watch = ai_review.get("watch_directions") or []

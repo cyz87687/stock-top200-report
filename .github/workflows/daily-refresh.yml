@@ -211,7 +211,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html top200_report_*.html refresh_log.txt
+          # refresh_log.txt 不再入库(改由 upload-artifact 保留30天), 避免仓库历史膨胀
+          git add index.html top200_report_*.html
           git add -f top200_scored_*.json top200_all_a.json ai_assessment.json
           git add -f top1000_all_a.json watchlist_*.json
           git add -f sector/sw_map.json sector/sector_momentum_latest.json sector/portfolio_*.json

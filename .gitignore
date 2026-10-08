@@ -10,7 +10,11 @@ update_rating.py
 .env
 .env.local
 llm_env.sh
-# 本地运行日志/备份/临时文件（不入库，仅 refresh_log.txt 由 CI 提交）
+# 本地运行日志/备份/临时文件（不入库；CI 日志走 upload-artifact 工件，保留30天）
+refresh_log.txt
+ai_review_today.json
+# 早期手动上传工具（已被 workflow git push + Pages 自动部署取代）
+upload826.py
 *_run_*.log
 fetch_run_*.log
 sector_momentum_run*.log

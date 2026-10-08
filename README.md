@@ -76,6 +76,7 @@ total = ( 消息面×0.20 + 技术面×0.20 + 基本面×0.30 + 题材热度×0.
 - 所有数字来自真实接口（新浪/腾讯/东财/akshare），**严禁编造**。
 - LLM 输出的 `themes[].stocks` 限定在当日 TOP200 在榜名单内，脚本自动清洗名单外个股。
 - 生成后抽查模型引用的个股涨跌幅与 scored json 实际值一致性。
+- **AI 点评日期校验**：报告只采纳与当日数据日期一致的点评文件（`ai_assessment.json` / 回退文件），日期不匹配则跳过并回退模板文本，防止陈旧点评冒充当日（历史 `ai_review_today.json` 已停用）。
 
 ---
 
@@ -87,6 +88,8 @@ total = ( 消息面×0.20 + 技术面×0.20 + 基本面×0.30 + 题材热度×0.
 - 最新 **2 份**主力池评分 JSON（`gen_report_top200.py` 依赖上一份做评级变化追踪）
 - 最新 1 份观察池评分 / watchlist / 组合 JSON / 组合报告 HTML
 - 最新 1 份板块动量 + `sector_momentum_latest.json` + 静态映射 `sw_map.json` / `backtest_ref.json`
+
+> **不入库文件**：`refresh_log.txt`（CI 日志改由 `upload-artifact` 工件保留 30 天）、`ai_review_today.json`（已停用）、`upload826.py`（早期手动上传工具，已被 workflow `git push` + Pages 自动部署取代）。
 
 ---
 
@@ -103,6 +106,8 @@ pip install -r requirements.txt
 python3 fetch_top200_sina.py && python3 step2_stockscorer_v2.py top200_all_a.json top200_scored_$(date +%F).json
 # ... 详见第二节
 ```
+
+> **云端 LLM 配置**：GitHub 仓库需配置 Secrets `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL`，否则云端自动任务将走规则引擎兜底（`generated_by` 会显示 fallback）。
 
 > **推送提示**：若环境存在不可用代理，推送前需 `unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy ALL_PROXY all_proxy` 走直连。
 
