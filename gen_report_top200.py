@@ -77,6 +77,8 @@ def build_portfolio(results, n=5):
             continue
         score_diversity = 0
         dims = [r["score_news"], r["score_tech"], r["score_fund"], r.get("score_theme", 0)]
+        if r.get("score_sector") is not None:
+            dims.append(r["score_sector"])
         if min(dims) >= 3:
             score_diversity = 1
         if min(dims) >= 4:
@@ -676,6 +678,8 @@ else:
         tech = r.get("tech", {})
         position = tech.get("position", 0)
         dims = [r["score_news"], r["score_tech"], r["score_fund"], r.get("score_theme", 0)]
+        if r.get("score_sector") is not None:
+            dims.append(r["score_sector"])
         min_dim = min(dims)
         growth_str = f"{growth:+.0f}%" if isinstance(growth, (int, float)) else str(growth)
         fwd_str = f"{fwd:.1f}x" if isinstance(fwd, (int, float)) else str(fwd)
@@ -699,7 +703,7 @@ else:
 
     html_parts.append('''
                 <div style="font-size:9px;color:#475569;margin-top:6px;padding:6px 8px;background:rgba(249,115,22,0.1);border-radius:4px;">
-                    ⚠️ 筛选：S/A级 + FwdPE≤60 + 增速≥15% + 分位≤95% + 板块去重 + 四维均衡加分，仅供研究参考
+                    ⚠️ 筛选：S/A级 + FwdPE≤60 + 增速≥15% + 分位≤95% + 板块去重 + ''' + ('五维' if any(x.get('score_sector') is not None for x in results) else '四维') + '''均衡加分，仅供研究参考
                 </div>
         </div>
     </div>''')

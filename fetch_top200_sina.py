@@ -12,6 +12,10 @@ import sys
 import os
 from datetime import datetime
 
+# 清除代理环境变量: 本地代理可能不通(HTTP 502), 行情接口需直连
+for _k in ('HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy', 'ALL_PROXY', 'all_proxy'):
+    os.environ.pop(_k, None)
+
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
 OUT = "top200_all_a.json"
 

@@ -68,8 +68,8 @@ jobs:
               break
             fi
 
-            # Step 3: Locate scored JSON
-            SCORED_JSON=$(ls -t top200_scored_*.json 2>/dev/null | head -1)
+            # Step 3: Locate scored JSON (显式排除观察池 _watch_ 文件, 防止误取)
+            SCORED_JSON=$(ls -t top200_scored_*.json 2>/dev/null | grep -v "_watch_" | head -1)
             if [ -z "$SCORED_JSON" ]; then
               echo "[$(date -u '+%H:%M:%S')] ❌ No scored JSON found" >> $LOG
               [ $ATTEMPT -lt $MAX_RETRIES ] && sleep $RETRY_DELAY && continue
