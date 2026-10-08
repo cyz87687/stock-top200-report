@@ -9,9 +9,15 @@ on:
 permissions:
   contents: write
 
+# 防止并发运行：同一时间仅保留一个刷新任务（后触发的排队等待，不取消正在进行的）
+concurrency:
+  group: daily-refresh
+  cancel-in-progress: false
+
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -224,8 +230,9 @@ jobs:
           git diff --cached --quiet && echo "No changes to commit" && exit 0
           git commit -m "auto: daily report refresh $(date -u '+%Y-%m-%d')"
           # 推送重试: 远端可能被并发写入 → 先 rebase 再重试, 最多 5 次
+          # 注意: 用退出码判断(避免管道 tail 吞掉 git push 的返回码造成假成功)
           for i in 1 2 3 4 5; do
-            if git push; then
+            if git push origin main; then
               echo "✅ push succeeded (attempt $i)"
               break
             fi
