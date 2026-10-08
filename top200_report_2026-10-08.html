@@ -18,6 +18,9 @@ body {
 .header h1 {font-size:24px;color:#f8fafc;margin-bottom:8px;}
 .header .sub {color:#94a3b8;font-size:13px;margin-bottom:4px;}
 .header .meta {color:#64748b;font-size:11px;}
+.header .ver-badge {display:inline-flex;align-items:center;gap:8px;margin:10px 0 6px;padding:5px 14px;border-radius:999px;background:linear-gradient(135deg,#1e3a8a,#4c1d95);border:1px solid #6d28d9;color:#e9d5ff;font-size:12.5px;font-weight:600;letter-spacing:.3px;}
+.header .ver-badge .vtag {background:#f59e0b;color:#1e293b;border-radius:999px;padding:1px 9px;font-size:11.5px;font-weight:700;}
+.header .ver-badge .vdate {color:#c4b5fd;font-weight:500;}
 
 /* 核心结论卡片 */
 .core-conclusion {
@@ -279,6 +282,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
 <div class="container">
     <div class="header">
         <h1>📊 A股成交额TOP195 极简公司评分</h1>
+        <div class="ver-badge"><span class="vtag">v2.40 · 五维</span><span>stock-scorer v2.40 (AI + 板块动量)</span><span class="vdate">· 数据日期 2026-10-08</span></div>
         <div class="sub">stock-scorer v2.40 (AI + sector-momentum[evidence]) | 题材动量 · 大盘赚钱效应 · 基本面含行业前景 · 五维加权(含板块动量)</div>
         <div class="meta">2026-10-08 | 数据源：东方财富 + 腾讯K线 + 同花顺 + 新浪/乐股</div>
     </div>
@@ -330,7 +334,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
             <span style="background:#1e293b;padding:6px 10px;border-radius:6px;"><b style="color:#94a3b8;">涨跌</b> 涨1634/跌3466 · 涨停39/跌停13</span>
             <span style="background:#1e293b;padding:6px 10px;border-radius:6px;"><b style="color:#94a3b8;">赚钱效应</b> 0分 冰点/退潮(亏钱效应)</span>
         </div>
-        <div class="main-line">今日S级0只、A级20只，主线板块：交通运输(均分12.50) · 大盘赚钱效应0分 冰点/退潮(亏钱效应), 建议空仓 · 评级上调: 先导智能, 华正新材, 生益科技, 中国巨石, 中国船舶 · 评级下调: 紫金矿业, 沪电股份, 阳光电源, 拓荆科技, 光智科技 · 新晋上榜: 当升科技, 天赐材料, 赣锋锂业, 多氟多, 龙蟠科技</div>
+        <div class="main-line">今日S级0只、A级20只，主线板块：交通运输(均分12.50) · 大盘赚钱效应0分 冰点/退潮(亏钱效应), 建议空仓 · 评级上调: 生益科技, 中国巨石, 深南电路, 东材科技, 金安国纪 · 评级下调: 紫金矿业, 药明康德, 新易盛, C力勤, 瑞芯微 · 新晋上榜: 当升科技, 天赐材料, 赣锋锂业, 多氟多, 龙蟠科技</div>
         <div class="top3">
 
             <div class="top3-item" style="border-left:3px solid #3b82f6;">
@@ -492,7 +496,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
             <div class="header-row">
                 <div class="rank" style="background:#f59e0b">#1</div>
                 <div>
-                    <div class="name">先导智能<span class="rating-change rating-up">↑B→A</span><span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:#ede9fe;color:#7c3aed;margin-left:6px;">🤖AI增强</span></div>
+                    <div class="name">先导智能<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:#ede9fe;color:#7c3aed;margin-left:6px;">🤖AI增强</span></div>
                     <div class="code">sz300450 · 新能源</div>
                 </div>
                 <span class="s-pct up" style="font-size:13px;font-weight:700;">+7.58%</span>
@@ -535,7 +539,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
             <div class="header-row">
                 <div class="rank" style="background:#94a3b8">#2</div>
                 <div>
-                    <div class="name">华正新材<span class="rating-change rating-up">↑B→A</span><span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:#ede9fe;color:#7c3aed;margin-left:6px;">🤖AI增强</span></div>
+                    <div class="name">华正新材<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:#ede9fe;color:#7c3aed;margin-left:6px;">🤖AI增强</span></div>
                     <div class="code">sh603186 · 电子材料</div>
                 </div>
                 <span class="s-pct up" style="font-size:13px;font-weight:700;">+5.45%</span>
@@ -803,7 +807,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
             <div class="header-row">
                 <div class="rank" style="background:#64748b">#8</div>
                 <div>
-                    <div class="name">中国船舶<span class="rating-change rating-up">↑B→A</span><span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:#ede9fe;color:#7c3aed;margin-left:6px;">🤖AI增强</span></div>
+                    <div class="name">中国船舶<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:#ede9fe;color:#7c3aed;margin-left:6px;">🤖AI增强</span></div>
                     <div class="code">sh600150 · 航天军工</div>
                 </div>
                 <span class="s-pct up" style="font-size:13px;font-weight:700;">+1.82%</span>
@@ -893,7 +897,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
             <div class="header-row">
                 <div class="rank" style="background:#64748b">#10</div>
                 <div>
-                    <div class="name">东材科技<span class="rating-change rating-up">↑C→A</span></div>
+                    <div class="name">东材科技<span class="rating-change rating-up">↑B→A</span></div>
                     <div class="code">sh601208 · 基础材料</div>
                 </div>
                 <span class="s-pct up" style="font-size:13px;font-weight:700;">+5.60%</span>
@@ -5536,7 +5540,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
     <div class="footer">
         <p>⚠️ 免责声明: 本报告由AI基于stock-scorer极简评分模型自动生成,仅供参考,不构成投资建议。投资有风险,入市需谨慎。</p>
         <p>评分模型 (v2.40 AI+板块动量版): 基本面30% + 题材热度18% + 消息面20%(AI赋分) + 技术面20% + 板块动量12%(申万二级板块60日/10日动量排名, 按6:4合成)；消息/题材热度由AI基于当日题材资金共识赋分(0.7×AI+0.3×算法)</p>
-        <p>Generated: 2026-10-08 16:15:16</p>
+        <p>Generated: 2026-10-08 16:37:17</p>
     </div>
 </div>
 

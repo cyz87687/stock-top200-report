@@ -46,6 +46,10 @@ for pf in prev_files:
         pass
 date_str = data.get("date", datetime.now().strftime("%Y-%m-%d"))
 model_str = data.get("model", "stock-scorer")
+# 版本号展示(线上报告页头徽章): v2.40 五维 / v2.30 四维
+_has_sector = any(x.get('score_sector') is not None for x in results)
+_ver_tag = "v2.40 · 五维" if _has_sector else "v2.30 · 四维"
+_ver_short = "v2.40 (AI + 板块动量)" if _has_sector else "v2.30 (AI 增强)"
 total_stocks = len(results)
 
 # 颜色配置
@@ -141,6 +145,9 @@ body {
 .header h1 {font-size:24px;color:#f8fafc;margin-bottom:8px;}
 .header .sub {color:#94a3b8;font-size:13px;margin-bottom:4px;}
 .header .meta {color:#64748b;font-size:11px;}
+.header .ver-badge {display:inline-flex;align-items:center;gap:8px;margin:10px 0 6px;padding:5px 14px;border-radius:999px;background:linear-gradient(135deg,#1e3a8a,#4c1d95);border:1px solid #6d28d9;color:#e9d5ff;font-size:12.5px;font-weight:600;letter-spacing:.3px;}
+.header .ver-badge .vtag {background:#f59e0b;color:#1e293b;border-radius:999px;padding:1px 9px;font-size:11.5px;font-weight:700;}
+.header .ver-badge .vdate {color:#c4b5fd;font-weight:500;}
 
 /* 核心结论卡片 */
 .core-conclusion {
@@ -402,6 +409,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
 <div class="container">
     <div class="header">
         <h1>📊 A股成交额TOP''' + str(total_stocks) + ''' 极简公司评分</h1>
+        <div class="ver-badge"><span class="vtag">''' + _ver_tag + '''</span><span>stock-scorer ''' + _ver_short + '''</span><span class="vdate">· 数据日期 ''' + date_str + '''</span></div>
         <div class="sub">''' + model_str + ''' | 题材动量 · 大盘赚钱效应 · 基本面含行业前景 · ''' + ('五维加权(含板块动量)' if any(x.get('score_sector') is not None for x in results) else '四维加权') + '''</div>
         <div class="meta">''' + date_str + ''' | 数据源：东方财富 + 腾讯K线 + 同花顺 + 新浪/乐股</div>
     </div>

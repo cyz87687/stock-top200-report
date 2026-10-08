@@ -175,6 +175,37 @@ jobs:
             exit 1
           fi
 
+      - name: Prune old files (keep only latest)
+        if: steps.build.outputs.result == 'success'
+        run: |
+          # 保留策略: 报告HTML/观察池/组合/板块动量 各留最新1份; 主力池scored 留最新2份(评级变化追踪依赖上一份)
+          KEEP_SCORED=2
+          KEEP_OTHER=1
+          prune_keep() {  # $1=glob  $2=保留份数
+            local i=0 f
+            while IFS= read -r f; do
+              [ -z "$f" ] && continue
+              i=$((i+1))
+              if [ $i -gt $2 ]; then rm -f "$f" && echo "prune: $f"; fi
+            done < <(ls -1 $1 2>/dev/null | sort -r)
+          }
+          # 1) 主报告 HTML (保留最新1)
+          prune_keep "top200_report_*.html" $KEEP_OTHER
+          # 2) 主力池 scored (保留最新2, 排除 watch/bak)
+          ls -1 top200_scored_[0-9]*.json 2>/dev/null | grep -v "_watch_" | sort -r | awk -v k=$KEEP_SCORED 'NR>k' | xargs -r rm -f
+          # 3) 观察池 scored / watchlist (各保留最新1)
+          prune_keep "top200_scored_watch_*.json" $KEEP_OTHER
+          prune_keep "watchlist_*.json" $KEEP_OTHER
+          # 4) 组合 json / 组合报告 / 板块动量 (各保留最新1)
+          prune_keep "sector/portfolio_[0-9]*.json" $KEEP_OTHER
+          prune_keep "sector/portfolio_report_*.html" $KEEP_OTHER
+          prune_keep "sector/sector_momentum_[0-9]*.json" $KEEP_OTHER
+          # 5) 清理备份/临时文件
+          rm -f *.bak *.bak_* *.prebak 2>/dev/null || true
+          echo "--- 保留后清单 ---"
+          ls -1 top200_report_*.html top200_scored_[0-9]*.json 2>/dev/null
+          du -sh .
+
       - name: Commit & Push updated report
         if: steps.build.outputs.result == 'success'
         run: |
@@ -186,6 +217,9 @@ jobs:
           git add -f sector/sw_map.json sector/sector_momentum_latest.json sector/portfolio_*.json
           git add enhance_scores.py gen_report_top200.py generate_ai_assessment.py
           git add sector_momentum_daily.py apply_sector_momentum.py pick_portfolio.py gen_portfolio_report.py fetch_sw_map.py select_watchlist.py
+          # 记录 prune 产生的删除(仅限已跟踪的历史报告/评分/组合文件)
+          git add -u top200_report_2026-*.html 2>/dev/null || true
+          git add -Au -- top200_scored_*.json watchlist_*.json sector/portfolio_*.json sector/sector_momentum_*.json 2>/dev/null || true
           git diff --cached --quiet && echo "No changes to commit" && exit 0
           git commit -m "auto: daily report refresh $(date -u '+%Y-%m-%d')"
           # 推送重试: 远端可能被并发写入 → 先 rebase 再重试, 最多 5 次
