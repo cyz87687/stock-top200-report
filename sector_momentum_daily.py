@@ -33,6 +33,9 @@ MIN_VALID_RATIO = 0.3
 MIN_SECTORS = 20
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
 
+# 腾讯前复权K线可用域名(web. 前缀域名会被 WAF 拦截, 需轮询), 以及新浪日线兜底
+TENCENT_HOSTS = ["https://ifzq.gtimg.cn", "https://web.ifzq.gtimg.cn", "https://proxy.finance.qq.com/ifzqgtimg"]
+
 
 def to_symbol(code6):
     c = str(code6).zfill(6)
@@ -45,23 +48,53 @@ def to_symbol(code6):
     return None
 
 
+def _fetch_tencent(sym):
+    """腾讯前复权日线(多域名轮询) → [(date, close)] 或 None"""
+    for host in TENCENT_HOSTS:
+        url = f"{host}/appstock/app/fqkline/get?param={sym},day,,,{NEED_BARS},qfq"
+        req = urllib.request.Request(url, headers={"User-Agent": UA})
+        try:
+            with urllib.request.urlopen(req, timeout=15) as r:
+                txt = r.read().decode('utf-8')
+            if txt.lstrip().startswith('<'):
+                continue  # WAF 拦截页
+            j = json.loads(txt)
+            d = j.get('data', {}).get(sym, {})
+            kl = d.get('qfqday') or d.get('day') or []
+            if kl:
+                return [(x[0], float(x[2])) for x in kl]
+        except Exception:
+            continue
+    return None
+
+
+def _fetch_sina(sym):
+    """新浪日线兜底(不复权) → [(date, close)] 或 None"""
+    url = ("https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/"
+           f"CN_MarketData.getKLineData?symbol={sym}&scale=240&ma=no&datalen={NEED_BARS}")
+    req = urllib.request.Request(url, headers={"User-Agent": UA, "Referer": "https://finance.sina.com.cn"})
+    try:
+        with urllib.request.urlopen(req, timeout=15) as r:
+            j = json.loads(r.read().decode('utf-8'))
+        if j:
+            return [(x['day'], float(x['close'])) for x in j]
+    except Exception:
+        pass
+    return None
+
+
 def fetch_one(code6):
     sym = to_symbol(code6)
     if not sym:
         return code6, None
-    url = (f"https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={sym},day,,,{NEED_BARS},qfq")
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    for _ in range(3):
-        try:
-            with urllib.request.urlopen(req, timeout=15) as r:
-                j = json.loads(r.read().decode('utf-8'))
-            d = j.get('data', {}).get(sym, {})
-            kl = d.get('qfqday') or d.get('day') or []
-            if not kl:
-                return code6, None
-            return code6, [(x[0], float(x[2])) for x in kl]   # (date, close)
-        except Exception:
-            time.sleep(0.6)
+    for _ in range(2):
+        kl = _fetch_tencent(sym)
+        if kl:
+            return code6, kl
+        kl = _fetch_sina(sym)
+        if kl:
+            return code6, kl
+        time.sleep(0.4)
     return code6, None
 
 

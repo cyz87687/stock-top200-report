@@ -31,7 +31,8 @@ market_review = data.get("market_review") or {}  # v2.11 盘面复盘点评(数�
 
 # 加载历史报告用于评级变化追踪
 prev_ratings = {}
-prev_files = sorted(glob.glob("top200_scored_*.json"), reverse=True)
+prev_files = [f for f in sorted(glob.glob("top200_scored_*.json"), reverse=True)
+              if "_watch_" not in f and ".bak" not in f]
 for pf in prev_files:
     if os.path.basename(pf) == os.path.basename(inp):
         continue
@@ -401,7 +402,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
 <div class="container">
     <div class="header">
         <h1>📊 A股成交额TOP''' + str(total_stocks) + ''' 极简公司评分</h1>
-        <div class="sub">''' + model_str + ''' | 题材动量 · 大盘赚钱效应 · 基本面含行业前景 · 四维加权</div>
+        <div class="sub">''' + model_str + ''' | 题材动量 · 大盘赚钱效应 · 基本面含行业前景 · ''' + ('五维加权(含板块动量)' if any(x.get('score_sector') is not None for x in results) else '四维加权') + '''</div>
         <div class="meta">''' + date_str + ''' | 数据源：东方财富 + 腾讯K线 + 同花顺 + 新浪/乐股</div>
     </div>
 

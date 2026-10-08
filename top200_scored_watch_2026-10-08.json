@@ -1,0 +1,3914 @@
+{
+  "date": "2026-10-08",
+  "model": "stock-scorer v2.40 (AI + sector-momentum[evidence])",
+  "weights": {
+    "news": 0.2,
+    "tech": 0.2,
+    "fund": 0.3,
+    "theme": 0.18,
+    "sector": 0.12
+  },
+  "results": [
+    {
+      "name": "领湃科技",
+      "code": "sz300530",
+      "sector": "电池",
+      "price": 24.08,
+      "pct_chg": 19.98,
+      "pe": 0,
+      "turnover": 400319985.0,
+      "score_news": 4.5,
+      "score_tech": 3.76,
+      "score_fund": 3,
+      "score_theme": 2.42,
+      "total": 13.45,
+      "rating": "A",
+      "advice": "逢低加仓，重点关注",
+      "tech": {
+        "ma5": 20.2,
+        "ma10": 19.8,
+        "ma20": 20.2,
+        "ma60": 18.9,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "偏多",
+        "bull_level": 0,
+        "position": 89.0,
+        "vol_ratio": 1.37,
+        "amount_ratio": 1.43,
+        "amount_today_yi": 4.3,
+        "macd_dif": 0.302,
+        "macd_dea": 0.078,
+        "macd_hist": 0.447,
+        "ma_factor": 3.4,
+        "macd_factor": 4.8,
+        "vol_factor": 3.8,
+        "rsi_factor": 2.8,
+        "rsi": 71.8,
+        "rsi_state": "超买",
+        "mom5": 26.1,
+        "mom10": 20.7,
+        "mom20": 13.5,
+        "momentum_score": 3.76,
+        "reason": "; 结构3.8/动量3.8(权重40%); 均线3.4(偏多)·MACD4.8·量能3.8·RSI时机2.8(RSI72)",
+        "overall": "震荡",
+        "explanations": [
+          "RSI=72 进入超买区(>70)，短线回调概率上升"
+        ],
+        "support_levels": [
+          [
+            "MA20均线",
+            20.22
+          ],
+          [
+            "MA60均线",
+            18.92
+          ],
+          [
+            "BOLL下轨",
+            17.6
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            22.84
+          ],
+          [
+            "120日高点",
+            25.31
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "中速增长(+67%)"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 0.00/5 (成交额位于全市场前100%)",
+        "个股近20日+13.5%强于题材,超额明显",
+        "涨停确认强度",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "iFinD确认:偏利好",
+        "消息时效:近7日有新闻",
+        "涨停+20.0%(股价确认利好)"
+      ],
+      "news_items": [
+        {
+          "source": "财经媒体(iFinD)",
+          "time": "",
+          "sentiment": "利好",
+          "content": "iFinD新闻偏利好(4个关键词)",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有新闻",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "数据不足,未评估持续性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": null,
+      "growth": 66.7,
+      "pe_ladder": null,
+      "cagr3": null,
+      "week_chg": 26.07,
+      "sector_l2": "电池",
+      "sector_parent": "电力设备",
+      "sector_mom60": -5.99,
+      "sector_mom10": 2.65,
+      "sector_r60": 109,
+      "sector_r10": 22,
+      "sector_mom_score": 0.9,
+      "sector_rev_score": 3.12,
+      "score_sector": 3.12
+    },
+    {
+      "name": "金银河",
+      "code": "sz300619",
+      "sector": "电池",
+      "price": 28.17,
+      "pct_chg": 17.57,
+      "pe": 83.42,
+      "turnover": 698192837.0,
+      "score_news": 1.5,
+      "score_tech": 2.51,
+      "score_fund": 5,
+      "score_theme": 2.56,
+      "total": 12.55,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 25.3,
+        "ma10": 25.8,
+        "ma20": 26.2,
+        "ma60": 25.8,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线空头",
+        "bull_level": 0,
+        "position": 23.0,
+        "vol_ratio": 1.58,
+        "amount_ratio": 1.56,
+        "amount_today_yi": 7.1,
+        "macd_dif": -0.251,
+        "macd_dea": -0.241,
+        "macd_hist": -0.02,
+        "ma_factor": 1.4,
+        "macd_factor": 1.0,
+        "vol_factor": 4.6,
+        "rsi_factor": 3.6,
+        "rsi": 58.6,
+        "rsi_state": "中性",
+        "mom5": 3.5,
+        "mom10": 6.3,
+        "mom20": 3.3,
+        "momentum_score": 2.62,
+        "reason": "; 结构2.4/动量2.6(权重40%); 均线1.4(日线空头)·MACD1.0·量能4.6·RSI时机3.6(RSI59)",
+        "overall": "偏弱",
+        "explanations": [],
+        "support_levels": [
+          [
+            "MA20均线",
+            26.21
+          ],
+          [
+            "MA60均线",
+            25.76
+          ],
+          [
+            "BOLL下轨",
+            23.81
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            28.61
+          ],
+          [
+            "120日高点",
+            49.07
+          ]
+        ],
+        "vol_price_analysis": "放量上涨，资金积极买入，多头量价配合"
+      },
+      "fund_reasons": [
+        "低估值(FwdPE=9.1)+高增长(+116%)",
+        "估值阶梯强收缩(9.1→4.8→2.7),3年收缩70%",
+        "PEG=0.08(严重低估,增速远超估值)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 1.21/5 (成交额位于全市场前75%)",
+        "涨停确认强度",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "iFinD确认:多重利好",
+        "消息时效:近7日有新闻",
+        "涨停+17.6%(股价确认利好)"
+      ],
+      "news_items": [
+        {
+          "source": "财经媒体(iFinD)",
+          "time": "",
+          "sentiment": "利好",
+          "content": "iFinD新闻检测到14个利好关键词",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有新闻",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 9.1,
+      "growth": 115.8,
+      "pe_ladder": {
+        "2026": 9.1,
+        "2027": 4.8,
+        "2028": 2.7
+      },
+      "cagr3": -40.7,
+      "week_chg": 3.45,
+      "sector_l2": "电池",
+      "sector_parent": "电力设备",
+      "sector_mom60": -5.99,
+      "sector_mom10": 2.65,
+      "sector_r60": 109,
+      "sector_r10": 22,
+      "sector_mom_score": 0.9,
+      "sector_rev_score": 3.12,
+      "score_sector": 3.12
+    },
+    {
+      "name": "贝特利",
+      "code": "sz301697",
+      "sector": "光伏设备",
+      "price": 31.51,
+      "pct_chg": 19.99,
+      "pe": 50.23,
+      "turnover": 620816467.0,
+      "score_news": 4.5,
+      "score_tech": 2,
+      "score_fund": 3.0,
+      "score_theme": 2.53,
+      "total": 12.2,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "note": "K线不足60日"
+      },
+      "fund_reasons": [
+        "估值偏高(FwdPE=50.2)+适度增长(+38%)",
+        "PEG=1.32(合理估值)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 1.03/5 (成交额位于全市场前79%)",
+        "涨停确认强度",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "iFinD确认:偏利好",
+        "消息时效:近7日有新闻",
+        "涨停+20.0%(股价确认利好)"
+      ],
+      "news_items": [
+        {
+          "source": "财经媒体(iFinD)",
+          "time": "",
+          "sentiment": "利好",
+          "content": "iFinD新闻偏利好(2个关键词)",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有新闻",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 50.2,
+      "growth": 38.2,
+      "pe_ladder": null,
+      "cagr3": 115.9,
+      "week_chg": 11.46,
+      "sector_l2": "光伏设备",
+      "sector_parent": "电力设备",
+      "sector_mom60": -11.48,
+      "sector_mom10": -2.54,
+      "sector_r60": 115,
+      "sector_r10": 97,
+      "sector_mom_score": 0.38,
+      "sector_rev_score": 3.28,
+      "score_sector": 3.28
+    },
+    {
+      "name": "德方纳米",
+      "code": "sz300769",
+      "sector": "电池",
+      "price": 42.45,
+      "pct_chg": 7.2,
+      "pe": 470.72,
+      "turnover": 1102164536.0,
+      "score_news": 1,
+      "score_tech": 2.38,
+      "score_fund": 5,
+      "score_theme": 2.74,
+      "total": 12.17,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 39.9,
+        "ma10": 40.7,
+        "ma20": 41.0,
+        "ma60": 44.2,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线空头",
+        "bull_level": 0,
+        "position": 10.0,
+        "vol_ratio": 1.36,
+        "amount_ratio": 1.34,
+        "amount_today_yi": 11.1,
+        "macd_dif": -1.258,
+        "macd_dea": -1.462,
+        "macd_hist": 0.407,
+        "ma_factor": 1.0,
+        "macd_factor": 2.5,
+        "vol_factor": 3.8,
+        "rsi_factor": 3.6,
+        "rsi": 51.1,
+        "rsi_state": "中性",
+        "mom5": 3.4,
+        "mom10": 2.2,
+        "mom20": -1.1,
+        "momentum_score": 2.26,
+        "reason": "; 结构2.5/动量2.3(权重40%); 均线1.0(日线空头)·MACD2.5·量能3.8·RSI时机3.6(RSI51)",
+        "overall": "偏弱",
+        "explanations": [],
+        "support_levels": [
+          [
+            "MA60均线",
+            44.17
+          ],
+          [
+            "MA20均线",
+            41.03
+          ],
+          [
+            "BOLL下轨",
+            38.76
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            43.3
+          ],
+          [
+            "MA60均线",
+            44.17
+          ],
+          [
+            "120日高点",
+            80.75
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "合理估值(FwdPE=12.7)+高增长(+43%)",
+        "估值阶梯明显收缩(12.7→9.8→8.4),3年收缩34%",
+        "PEG=0.29(严重低估,增速远超估值)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 2.76/5 (成交额位于全市场前44%)",
+        "大涨+7.2%验证",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "无真实新闻/催化剂",
+        "消息时效:近7日无消息",
+        "大涨+7.2%"
+      ],
+      "news_items": [],
+      "news_recency": "近7日无消息",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 12.7,
+      "growth": 43.2,
+      "pe_ladder": {
+        "2026": 12.7,
+        "2027": 9.8,
+        "2028": 8.4
+      },
+      "cagr3": null,
+      "week_chg": 3.39,
+      "sector_l2": "电池",
+      "sector_parent": "电力设备",
+      "sector_mom60": -5.99,
+      "sector_mom10": 2.65,
+      "sector_r60": 109,
+      "sector_r10": 22,
+      "sector_mom_score": 0.9,
+      "sector_rev_score": 3.12,
+      "score_sector": 3.12
+    },
+    {
+      "name": "尚水智能",
+      "code": "sz301513",
+      "sector": "电池",
+      "price": 67.81,
+      "pct_chg": 19.98,
+      "pe": 79.89,
+      "turnover": 597216216.0,
+      "score_news": 4.5,
+      "score_tech": 4.15,
+      "score_fund": 1.0,
+      "score_theme": 2.53,
+      "total": 11.44,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 52.6,
+        "ma10": 49.0,
+        "ma20": 46.4,
+        "ma60": 48.1,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线多头",
+        "bull_level": 1,
+        "position": 43.0,
+        "vol_ratio": 2.21,
+        "amount_ratio": 2.49,
+        "amount_today_yi": 6.6,
+        "macd_dif": 2.114,
+        "macd_dea": -0.156,
+        "macd_hist": 4.539,
+        "ma_factor": 3.8,
+        "macd_factor": 4.8,
+        "vol_factor": 5.0,
+        "rsi_factor": 1.8,
+        "rsi": 80.5,
+        "rsi_state": "超买",
+        "mom5": 49.8,
+        "mom10": 50.5,
+        "mom20": 48.4,
+        "momentum_score": 4.3,
+        "reason": "; 结构4.1/动量4.3(权重40%); 均线3.8(日线多头)·MACD4.8·量能5.0·RSI时机1.8(RSI81)",
+        "overall": "偏强",
+        "explanations": [
+          "日线多头排列但周线未确认，短线偏强",
+          "RSI=81 进入超买区(>70)，短线回调概率上升"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            48.07
+          ],
+          [
+            "MA20均线",
+            46.41
+          ],
+          [
+            "120日低点",
+            41.06
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            58.21
+          ],
+          [
+            "120日高点",
+            103.1
+          ]
+        ],
+        "vol_price_analysis": "放量上涨，资金积极买入，多头量价配合"
+      },
+      "fund_reasons": [
+        "估值偏高(FwdPE=79.9)+增长一般(+5%)",
+        "PEG=15.28(严重高估)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 0.69/5 (成交额位于全市场前86%)",
+        "个股近20日+48.4%强于题材,超额明显",
+        "涨停确认强度",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "iFinD确认:偏利好",
+        "消息时效:近7日有新闻",
+        "涨停+20.0%(股价确认利好)"
+      ],
+      "news_items": [
+        {
+          "source": "财经媒体(iFinD)",
+          "time": "",
+          "sentiment": "利好",
+          "content": "iFinD新闻偏利好(4个关键词)",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有新闻",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 79.9,
+      "growth": 5.2,
+      "pe_ladder": null,
+      "cagr3": 22.2,
+      "week_chg": 49.76,
+      "sector_l2": "电池",
+      "sector_parent": "电力设备",
+      "sector_mom60": -5.99,
+      "sector_mom10": 2.65,
+      "sector_r60": 109,
+      "sector_r10": 22,
+      "sector_mom_score": 0.9,
+      "sector_rev_score": 3.12,
+      "score_sector": 3.12
+    },
+    {
+      "name": "福瑞医科",
+      "code": "sz300049",
+      "sector": "医疗器械",
+      "price": 41.05,
+      "pct_chg": -12.86,
+      "pe": 65.24,
+      "turnover": 714402994.0,
+      "score_news": 2.5,
+      "score_tech": 2.42,
+      "score_fund": 3.0,
+      "score_theme": 2.38,
+      "total": 10.31,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 45.4,
+        "ma10": 47.0,
+        "ma20": 45.7,
+        "ma60": 44.0,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "死叉",
+        "bull_level": 0,
+        "position": 18.0,
+        "vol_ratio": 0.97,
+        "amount_ratio": 0.95,
+        "amount_today_yi": 6.9,
+        "macd_dif": 0.55,
+        "macd_dea": 1.009,
+        "macd_hist": -0.919,
+        "ma_factor": 1.6,
+        "macd_factor": 3.0,
+        "vol_factor": 3.0,
+        "rsi_factor": 4.2,
+        "rsi": 39.4,
+        "rsi_state": "中性",
+        "mom5": -17.2,
+        "mom10": -14.1,
+        "mom20": 0.1,
+        "momentum_score": 2.02,
+        "reason": "; 结构2.7/动量2.0(权重40%); 均线1.6(死叉)·MACD3.0·量能3.0·RSI时机4.2(RSI39)",
+        "overall": "震荡",
+        "explanations": [
+          "MA5下穿MA20，短线卖点信号"
+        ],
+        "support_levels": [
+          [
+            "MA20均线",
+            45.68
+          ],
+          [
+            "MA60均线",
+            44.04
+          ],
+          [
+            "BOLL下轨",
+            40.38
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "MA60均线",
+            44.04
+          ],
+          [
+            "MA5均线",
+            45.43
+          ],
+          [
+            "BOLL上轨",
+            50.97
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "估值偏高(FwdPE=44.6)+适度增长(+14%)",
+        "估值阶梯明显收缩(44.6→33.7→25.9),3年收缩42%,高PE起始,阶梯加分受限",
+        "PEG=3.11(严重高估)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 1.38/5 (成交额位于全市场前72%)",
+        "大跌-12.9%,短期降温",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "iFinD确认:偏利好",
+        "消息时效:近7日有新闻",
+        "跌停-12.9%(需关注是否有利空未覆盖)"
+      ],
+      "news_items": [
+        {
+          "source": "财经媒体(iFinD)",
+          "time": "",
+          "sentiment": "利好",
+          "content": "iFinD新闻偏利好(5个关键词)",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有新闻",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 44.6,
+      "growth": 14.3,
+      "pe_ladder": {
+        "2026": 44.6,
+        "2027": 33.7,
+        "2028": 25.9
+      },
+      "cagr3": 10.6,
+      "week_chg": -17.24,
+      "sector_l2": "医疗器械",
+      "sector_parent": "医药生物",
+      "sector_mom60": 7.61,
+      "sector_mom10": 4.16,
+      "sector_r60": 44,
+      "sector_r10": 10,
+      "sector_mom_score": 1.82,
+      "sector_rev_score": 2.2,
+      "score_sector": 2.2
+    },
+    {
+      "name": "善水科技",
+      "code": "sz301190",
+      "sector": "化学原料",
+      "price": 39.52,
+      "pct_chg": 9.99,
+      "pe": 77.63,
+      "turnover": 1366481916.0,
+      "score_news": 1,
+      "score_tech": 4.15,
+      "score_fund": 2.0,
+      "score_theme": 3.02,
+      "total": 9.96,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 30.2,
+        "ma10": 25.0,
+        "ma20": 21.6,
+        "ma60": 19.4,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线多头",
+        "bull_level": 1,
+        "position": 100.0,
+        "vol_ratio": 1.97,
+        "amount_ratio": 2.52,
+        "amount_today_yi": 13.8,
+        "macd_dif": 3.525,
+        "macd_dea": 1.41,
+        "macd_hist": 4.23,
+        "ma_factor": 3.8,
+        "macd_factor": 4.8,
+        "vol_factor": 5.0,
+        "rsi_factor": 1.8,
+        "rsi": 88.6,
+        "rsi_state": "超买",
+        "mom5": 84.7,
+        "mom10": 114.1,
+        "mom20": 101.7,
+        "momentum_score": 4.3,
+        "reason": "; 结构4.1/动量4.3(权重40%); 均线3.8(日线多头)·MACD4.8·量能5.0·RSI时机1.8(RSI89)",
+        "overall": "震荡",
+        "explanations": [
+          "日线多头排列但周线未确认，短线偏强",
+          "价格处于120日100%分位，接近区间高点",
+          "RSI=89 进入超买区(>70)，短线回调概率上升"
+        ],
+        "support_levels": [
+          [
+            "MA20均线",
+            21.64
+          ],
+          [
+            "MA60均线",
+            19.39
+          ],
+          [
+            "120日低点",
+            14.52
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            33.84
+          ],
+          [
+            "120日高点",
+            39.52
+          ]
+        ],
+        "vol_price_analysis": "放量上涨，资金积极买入，多头量价配合"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=77.6)但有增长(+117%)",
+        "PEG=0.66(低估,增速覆盖估值)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 3.97/5 (成交额位于全市场前20%)",
+        "个股近20日+101.7%强于题材,超额明显",
+        "涨停确认强度",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "无真实新闻/催化剂",
+        "消息时效:近7日无消息",
+        "涨停+10.0%(股价确认利好)"
+      ],
+      "news_items": [],
+      "news_recency": "近7日无消息",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 77.6,
+      "growth": 117.0,
+      "pe_ladder": null,
+      "cagr3": 17.3,
+      "week_chg": 84.67,
+      "sector_l2": "化学原料",
+      "sector_parent": "基础化工",
+      "sector_mom60": 7.96,
+      "sector_mom10": 1.54,
+      "sector_r60": 39,
+      "sector_r10": 41,
+      "sector_mom_score": 1.18,
+      "sector_rev_score": 2.64,
+      "score_sector": 2.64
+    },
+    {
+      "name": "艾力斯",
+      "code": "sh688578",
+      "sector": "化学制药",
+      "price": 89.26,
+      "pct_chg": -20.0,
+      "pe": 15.0,
+      "turnover": 598347316.0,
+      "score_news": 0,
+      "score_tech": 2.07,
+      "score_fund": 4.5,
+      "score_theme": 2.25,
+      "total": 9.85,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 103.5,
+        "ma10": 103.3,
+        "ma20": 103.8,
+        "ma60": 112.9,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "死叉",
+        "bull_level": 0,
+        "position": 17.0,
+        "vol_ratio": 1.36,
+        "amount_ratio": 1.36,
+        "amount_today_yi": 5.9,
+        "macd_dif": -2.396,
+        "macd_dea": -2.403,
+        "macd_hist": 0.014,
+        "ma_factor": 1.6,
+        "macd_factor": 2.3,
+        "vol_factor": 3.8,
+        "rsi_factor": 4.8,
+        "rsi": 35.0,
+        "rsi_state": "中性",
+        "mom5": -20.6,
+        "mom10": -10.3,
+        "mom20": -18.9,
+        "momentum_score": 0.97,
+        "reason": "; 结构2.8/动量1.0(权重40%); 均线1.6(死叉)·MACD2.3·量能3.8·RSI时机4.8(RSI35)",
+        "overall": "震荡",
+        "explanations": [
+          "MA5下穿MA20，短线卖点信号"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            112.89
+          ],
+          [
+            "MA20均线",
+            103.82
+          ],
+          [
+            "BOLL下轨",
+            92.86
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "MA5均线",
+            103.46
+          ],
+          [
+            "MA60均线",
+            112.89
+          ],
+          [
+            "BOLL上轨",
+            114.78
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "合理估值(FwdPE=14.3)+高增长(+49%)",
+        "估值阶梯合理收缩(14.3→12.3→10.6),3年收缩26%",
+        "PEG=0.29(严重低估,增速远超估值)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 0.86/5 (成交额位于全市场前82%)",
+        "个股近20日-18.9%弱于题材",
+        "大跌-20.0%,短期降温",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "公告确认:利好事件",
+        "消息时效:近7日有新闻/公告",
+        "跌停-20.0%(价量确认利空)"
+      ],
+      "news_items": [
+        {
+          "source": "交易所公告(akshare)",
+          "time": "",
+          "sentiment": "利好",
+          "content": "公告检测到利好关键词×1",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有新闻/公告",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 14.3,
+      "growth": 48.5,
+      "pe_ladder": {
+        "2026": 14.3,
+        "2027": 12.3,
+        "2028": 10.6
+      },
+      "cagr3": 194.2,
+      "week_chg": -20.6,
+      "sector_l2": "化学制药",
+      "sector_parent": "医药生物",
+      "sector_mom60": 5.53,
+      "sector_mom10": 3.7,
+      "sector_r60": 59,
+      "sector_r10": 13,
+      "sector_mom_score": 1.46,
+      "sector_rev_score": 2.44,
+      "score_sector": 2.44
+    },
+    {
+      "name": "华能蒙电",
+      "code": "sh600863",
+      "sector": "电力",
+      "price": 5.1,
+      "pct_chg": 8.05,
+      "pe": 19.35,
+      "turnover": 1413796771.0,
+      "score_news": 1,
+      "score_tech": 3.5,
+      "score_fund": 2,
+      "score_theme": 3.02,
+      "total": 9.58,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 4.8,
+        "ma10": 4.7,
+        "ma20": 4.8,
+        "ma60": 4.8,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "偏多",
+        "bull_level": 0,
+        "position": 22.0,
+        "vol_ratio": 1.09,
+        "amount_ratio": 1.11,
+        "amount_today_yi": 14.5,
+        "macd_dif": 0.003,
+        "macd_dea": -0.02,
+        "macd_hist": 0.047,
+        "ma_factor": 3.4,
+        "macd_factor": 4.8,
+        "vol_factor": 3.8,
+        "rsi_factor": 3.6,
+        "rsi": 64.0,
+        "rsi_state": "中性",
+        "mom5": 10.6,
+        "mom10": 6.5,
+        "mom20": 9.2,
+        "momentum_score": 2.94,
+        "reason": "; 结构3.9/动量2.9(权重40%); 均线3.4(偏多)·MACD4.8·量能3.8·RSI时机3.6(RSI64)",
+        "overall": "震荡",
+        "explanations": [],
+        "support_levels": [
+          [
+            "MA60均线",
+            4.81
+          ],
+          [
+            "MA20均线",
+            4.77
+          ],
+          [
+            "BOLL下轨",
+            4.55
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            4.99
+          ],
+          [
+            "120日高点",
+            7.92
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "估值偏高(FwdPE=16.3)+增长一般(+-18%)",
+        "估值阶梯合理收缩(16.3→14.4→13.6),3年收缩17%",
+        "周期股低PE陷阱,基本面分封顶3.5",
+        "持续性:周期/存储链低PE或处盈利高峰,警惕低PE陷阱(盈利不可持续)"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 4.31/5 (成交额位于全市场前13%)",
+        "个股近20日+9.2%强于题材,超额明显",
+        "大涨+8.1%验证",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "无真实新闻/催化剂",
+        "消息时效:近7日无消息",
+        "大涨+8.1%"
+      ],
+      "news_items": [],
+      "news_recency": "近7日无消息",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 2.0,
+      "sustain_note": "周期/存储链低PE或处盈利高峰,警惕低PE陷阱(盈利不可持续)",
+      "is_cyclic": true,
+      "is_storage_mod": false,
+      "fwd_pe": 16.3,
+      "growth": -17.5,
+      "pe_ladder": {
+        "2026": 16.3,
+        "2027": 14.4,
+        "2028": 13.6
+      },
+      "cagr3": 2.1,
+      "week_chg": 10.63,
+      "sector_l2": "电力",
+      "sector_parent": "公用事业",
+      "sector_mom60": 7.52,
+      "sector_mom10": -1.55,
+      "sector_r60": 47,
+      "sector_r10": 86,
+      "sector_mom_score": 0.62,
+      "sector_rev_score": 2.92,
+      "score_sector": 2.92
+    },
+    {
+      "name": "丽珠集团",
+      "code": "sz000513",
+      "sector": "化学制药",
+      "price": 29.61,
+      "pct_chg": -10.0,
+      "pe": 15.7,
+      "turnover": 1064992550.0,
+      "score_news": 2.5,
+      "score_tech": 3.97,
+      "score_fund": 1.0,
+      "score_theme": 2.59,
+      "total": 9.41,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 30.5,
+        "ma10": 28.6,
+        "ma20": 27.8,
+        "ma60": 29.1,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线多头",
+        "bull_level": 1,
+        "position": 43.0,
+        "vol_ratio": 2.81,
+        "amount_ratio": 2.94,
+        "amount_today_yi": 10.3,
+        "macd_dif": 0.64,
+        "macd_dea": 0.001,
+        "macd_hist": 1.279,
+        "ma_factor": 3.8,
+        "macd_factor": 4.8,
+        "vol_factor": 4.7,
+        "rsi_factor": 3.6,
+        "rsi": 55.7,
+        "rsi_state": "中性",
+        "mom5": 6.8,
+        "mom10": 12.9,
+        "mom20": 11.5,
+        "momentum_score": 3.56,
+        "reason": "; 结构4.2/动量3.6(权重40%); 均线3.8(日线多头)·MACD4.8·量能4.7·RSI时机3.6(RSI56)",
+        "overall": "偏强",
+        "explanations": [
+          "日线多头排列但周线未确认，短线偏强"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            29.08
+          ],
+          [
+            "MA20均线",
+            27.76
+          ],
+          [
+            "120日低点",
+            25.97
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            31.56
+          ],
+          [
+            "120日高点",
+            34.46
+          ]
+        ],
+        "vol_price_analysis": "放量下跌，抛压较大，空头量价配合"
+      },
+      "fund_reasons": [
+        "估值偏高(FwdPE=13.2)+增长一般(+2%)",
+        "估值阶梯合理收缩(13.2→11.9→10.8),3年收缩18%",
+        "PEG=8.74(严重高估)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 2.41/5 (成交额位于全市场前51%)",
+        "个股近20日+11.5%强于题材,超额明显",
+        "大跌-10.0%,短期降温",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "iFinD确认:偏利好",
+        "消息时效:近7日有新闻",
+        "跌停-10.0%(需关注是否有利空未覆盖)"
+      ],
+      "news_items": [
+        {
+          "source": "财经媒体(iFinD)",
+          "time": "",
+          "sentiment": "利好",
+          "content": "iFinD新闻偏利好(5个关键词)",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有新闻",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 13.2,
+      "growth": 1.5,
+      "pe_ladder": {
+        "2026": 13.2,
+        "2027": 11.9,
+        "2028": 10.8
+      },
+      "cagr3": 2.2,
+      "week_chg": 6.78,
+      "sector_l2": "化学制药",
+      "sector_parent": "医药生物",
+      "sector_mom60": 5.53,
+      "sector_mom10": 3.7,
+      "sector_r60": 59,
+      "sector_r10": 13,
+      "sector_mom_score": 1.46,
+      "sector_rev_score": 2.44,
+      "score_sector": 2.44
+    },
+    {
+      "name": "拓普集团",
+      "code": "sh601689",
+      "sector": "汽车零部件",
+      "price": 42.88,
+      "pct_chg": -7.83,
+      "pe": 29.73,
+      "turnover": 1230197110.0,
+      "score_news": 0,
+      "score_tech": 2.81,
+      "score_fund": 2.8,
+      "score_theme": 2.69,
+      "total": 9.16,
+      "rating": "B",
+      "advice": "波段操作，轻仓参与",
+      "tech": {
+        "ma5": 45.9,
+        "ma10": 45.6,
+        "ma20": 45.2,
+        "ma60": 47.8,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线多头",
+        "bull_level": 1,
+        "position": 3.0,
+        "vol_ratio": 1.27,
+        "amount_ratio": 1.29,
+        "amount_today_yi": 12.0,
+        "macd_dif": -0.515,
+        "macd_dea": -0.743,
+        "macd_hist": 0.457,
+        "ma_factor": 3.4,
+        "macd_factor": 2.5,
+        "vol_factor": 3.8,
+        "rsi_factor": 4.2,
+        "rsi": 37.9,
+        "rsi_state": "中性",
+        "mom5": -6.6,
+        "mom10": 2.3,
+        "mom20": -7.8,
+        "momentum_score": 1.94,
+        "reason": "; 结构3.4/动量1.9(权重40%); 均线3.4(日线多头)·MACD2.5·量能3.8·RSI时机4.2(RSI38)",
+        "overall": "偏强",
+        "explanations": [
+          "日线多头排列但周线未确认，短线偏强",
+          "价格处于120日3%分位，接近区间低点"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            47.8
+          ],
+          [
+            "MA20均线",
+            45.15
+          ],
+          [
+            "120日低点",
+            41.93
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "MA60均线",
+            47.8
+          ],
+          [
+            "BOLL上轨",
+            48.65
+          ],
+          [
+            "120日高点",
+            72.61
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "估值偏高(FwdPE=24.7)+增长一般(+-4%)",
+        "估值阶梯明显收缩(24.7→20.2→17.2),3年收缩30%",
+        "持续性:盈利下滑,持续性偏弱"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 3.45/5 (成交额位于全市场前31%)",
+        "大跌-7.8%,短期降温",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "无真实新闻/催化剂",
+        "消息时效:近7日无消息",
+        "大跌-7.8%(价格确认利空信号)"
+      ],
+      "news_items": [],
+      "news_recency": "近7日无消息",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 2.0,
+      "sustain_note": "盈利下滑,持续性偏弱",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 24.7,
+      "growth": -4.3,
+      "pe_ladder": {
+        "2026": 24.7,
+        "2027": 20.2,
+        "2028": 17.2
+      },
+      "cagr3": 16.4,
+      "week_chg": -6.56,
+      "sector_l2": "汽车零部件",
+      "sector_parent": "汽车",
+      "sector_mom60": -2.05,
+      "sector_mom10": 1.09,
+      "sector_r60": 97,
+      "sector_r10": 47,
+      "sector_mom_score": 0.58,
+      "sector_rev_score": 3.36,
+      "score_sector": 3.36
+    },
+    {
+      "name": "招商南油",
+      "code": "sh601975",
+      "sector": "航运港口",
+      "price": 4.97,
+      "pct_chg": 9.96,
+      "pe": 14.98,
+      "turnover": 1466802817.0,
+      "score_news": 1,
+      "score_tech": 3.11,
+      "score_fund": 1.8,
+      "score_theme": 3.12,
+      "total": 8.62,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 4.6,
+        "ma10": 4.6,
+        "ma20": 4.6,
+        "ma60": 4.0,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "偏空",
+        "bull_level": 0,
+        "position": 67.0,
+        "vol_ratio": 0.78,
+        "amount_ratio": 0.79,
+        "amount_today_yi": 14.8,
+        "macd_dif": 0.143,
+        "macd_dea": 0.157,
+        "macd_hist": -0.028,
+        "ma_factor": 2.0,
+        "macd_factor": 3.0,
+        "vol_factor": 3.0,
+        "rsi_factor": 2.8,
+        "rsi": 65.4,
+        "rsi_state": "中性",
+        "mom5": 12.4,
+        "mom10": 11.9,
+        "mom20": 21.8,
+        "momentum_score": 3.84,
+        "reason": "; 结构2.6/动量3.8(权重40%); 均线2.0(偏空)·MACD3.0·量能3.0·RSI时机2.8(RSI65)",
+        "overall": "震荡",
+        "explanations": [],
+        "support_levels": [
+          [
+            "MA20均线",
+            4.59
+          ],
+          [
+            "BOLL下轨",
+            4.26
+          ],
+          [
+            "MA60均线",
+            3.99
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            4.92
+          ],
+          [
+            "120日高点",
+            5.8
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "估值偏高(FwdPE=12.8)+增长一般(+-22%)",
+        "估值阶梯合理收缩(12.8→11.4→10.7),3年收缩16%",
+        "持续性:盈利下滑,持续性偏弱"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 4.66/5 (成交额位于全市场前6%)",
+        "个股近20日+21.8%强于题材,超额明显",
+        "涨停确认强度",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "无真实新闻/催化剂",
+        "消息时效:近7日无消息",
+        "涨停+10.0%(股价确认利好)"
+      ],
+      "news_items": [],
+      "news_recency": "近7日无消息",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 2.0,
+      "sustain_note": "盈利下滑,持续性偏弱",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 12.8,
+      "growth": -22.3,
+      "pe_ladder": {
+        "2026": 12.8,
+        "2027": 11.4,
+        "2028": 10.7
+      },
+      "cagr3": -2.8,
+      "week_chg": 12.44,
+      "sector_l2": "航运港口",
+      "sector_parent": "交通运输",
+      "sector_mom60": 15.44,
+      "sector_mom10": 1.8,
+      "sector_r60": 11,
+      "sector_r10": 36,
+      "sector_mom_score": 1.92,
+      "sector_rev_score": 1.92,
+      "score_sector": 1.92
+    },
+    {
+      "name": "网宿科技",
+      "code": "sz300017",
+      "sector": "IT服务Ⅱ",
+      "price": 13.84,
+      "pct_chg": -7.11,
+      "pe": 44.57,
+      "turnover": 1500067295.0,
+      "score_news": 0,
+      "score_tech": 1.62,
+      "score_fund": 2.8,
+      "score_theme": 2.88,
+      "total": 8.3,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 14.7,
+        "ma10": 15.0,
+        "ma20": 15.1,
+        "ma60": 14.9,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线空头",
+        "bull_level": 0,
+        "position": 24.0,
+        "vol_ratio": 0.79,
+        "amount_ratio": 0.76,
+        "amount_today_yi": 14.5,
+        "macd_dif": -0.175,
+        "macd_dea": -0.058,
+        "macd_hist": -0.235,
+        "ma_factor": 1.0,
+        "macd_factor": 0.8,
+        "vol_factor": 3.0,
+        "rsi_factor": 4.2,
+        "rsi": 37.4,
+        "rsi_state": "中性",
+        "mom5": -9.7,
+        "mom10": -5.9,
+        "mom20": -14.3,
+        "momentum_score": 1.16,
+        "reason": "; 结构1.9/动量1.2(权重40%); 均线1.0(日线空头)·MACD0.8·量能3.0·RSI时机4.2(RSI37)",
+        "overall": "偏弱",
+        "explanations": [],
+        "support_levels": [
+          [
+            "MA20均线",
+            15.09
+          ],
+          [
+            "MA60均线",
+            14.92
+          ],
+          [
+            "BOLL下轨",
+            14.11
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "MA5均线",
+            14.67
+          ],
+          [
+            "MA60均线",
+            14.92
+          ],
+          [
+            "BOLL上轨",
+            16.06
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "估值偏高(FwdPE=39.9)+增长一般(+-10%)",
+        "估值阶梯明显收缩(39.9→32.1→25.4),3年收缩36%,中PE起始,阶梯加分适度",
+        "持续性:盈利下滑,持续性偏弱"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 5.00/5 (成交额位于全市场前0%)",
+        "个股近20日-14.3%弱于题材",
+        "大跌-7.1%,短期降温",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "无真实新闻/催化剂",
+        "消息时效:近7日无消息",
+        "大跌-7.1%(价格确认利空信号)"
+      ],
+      "news_items": [],
+      "news_recency": "近7日无消息",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 2.0,
+      "sustain_note": "盈利下滑,持续性偏弱",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 39.9,
+      "growth": -9.7,
+      "pe_ladder": {
+        "2026": 39.9,
+        "2027": 32.1,
+        "2028": 25.4
+      },
+      "cagr3": 38.6,
+      "week_chg": -9.66,
+      "sector_l2": "IT服务Ⅱ",
+      "sector_parent": "计算机",
+      "sector_mom60": -1.49,
+      "sector_mom10": -2.19,
+      "sector_r60": 93,
+      "sector_r10": 95,
+      "sector_mom_score": 0.38,
+      "sector_rev_score": 3.28,
+      "score_sector": 3.28
+    },
+    {
+      "name": "传音控股",
+      "code": "sh688036",
+      "sector": "消费电子",
+      "price": 46.1,
+      "pct_chg": -14.31,
+      "pe": 16.89,
+      "turnover": 1300439787.0,
+      "score_news": 0,
+      "score_tech": 1.73,
+      "score_fund": 2.8,
+      "score_theme": 2.67,
+      "total": 8.24,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 52.4,
+        "ma10": 53.4,
+        "ma20": 53.5,
+        "ma60": 57.8,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线空头",
+        "bull_level": 0,
+        "position": 0.0,
+        "vol_ratio": 1.18,
+        "amount_ratio": 1.12,
+        "amount_today_yi": 12.7,
+        "macd_dif": -1.339,
+        "macd_dea": -1.053,
+        "macd_hist": -0.571,
+        "ma_factor": 1.0,
+        "macd_factor": 0.8,
+        "vol_factor": 3.8,
+        "rsi_factor": 4.8,
+        "rsi": 27.2,
+        "rsi_state": "超卖",
+        "mom5": -17.2,
+        "mom10": -12.0,
+        "mom20": -18.0,
+        "momentum_score": 1.0,
+        "reason": "; 结构2.2/动量1.0(权重40%); 均线1.0(日线空头)·MACD0.8·量能3.8·RSI时机4.8(RSI27)",
+        "overall": "偏弱",
+        "explanations": [
+          "价格处于120日0%分位，接近区间低点",
+          "RSI=27 进入超卖区(<30)，存在技术性反弹机会"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            57.81
+          ],
+          [
+            "MA20均线",
+            53.53
+          ],
+          [
+            "BOLL下轨",
+            48.93
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "MA5均线",
+            52.41
+          ],
+          [
+            "MA60均线",
+            57.81
+          ],
+          [
+            "BOLL上轨",
+            58.12
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "估值偏高(FwdPE=14.6)+增长一般(+-57%)",
+        "估值阶梯明显收缩(14.6→11.2→8.7),3年收缩40%",
+        "持续性:盈利下滑,持续性偏弱"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 3.62/5 (成交额位于全市场前27%)",
+        "个股近20日-18.0%弱于题材",
+        "大跌-14.3%,短期降温",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "iFinD确认:多重利好",
+        "消息时效:近7日有新闻",
+        "跌停-14.3%(价量确认利空)"
+      ],
+      "news_items": [
+        {
+          "source": "财经媒体(iFinD)",
+          "time": "",
+          "sentiment": "利好",
+          "content": "iFinD新闻检测到7个利好关键词",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有新闻",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 2.0,
+      "sustain_note": "盈利下滑,持续性偏弱",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 14.6,
+      "growth": -56.6,
+      "pe_ladder": {
+        "2026": 14.6,
+        "2027": 11.2,
+        "2028": 8.7
+      },
+      "cagr3": -3.7,
+      "week_chg": -17.16,
+      "sector_l2": "消费电子",
+      "sector_parent": "电子",
+      "sector_mom60": -8.02,
+      "sector_mom10": -5.67,
+      "sector_r60": 110,
+      "sector_r10": 114,
+      "sector_mom_score": 0.38,
+      "sector_rev_score": 3.28,
+      "score_sector": 3.28
+    },
+    {
+      "name": "国博电子",
+      "code": "sh688375",
+      "sector": "军工电子Ⅱ",
+      "price": 69.2,
+      "pct_chg": 8.09,
+      "pe": 102.01,
+      "turnover": 538746038.0,
+      "score_news": 1,
+      "score_tech": 2.05,
+      "score_fund": 2.0,
+      "score_theme": 2.38,
+      "total": 8.13,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 66.6,
+        "ma10": 68.7,
+        "ma20": 70.2,
+        "ma60": 76.8,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线空头",
+        "bull_level": 0,
+        "position": 7.0,
+        "vol_ratio": 1.22,
+        "amount_ratio": 1.17,
+        "amount_today_yi": 5.5,
+        "macd_dif": -2.781,
+        "macd_dea": -2.691,
+        "macd_hist": -0.18,
+        "ma_factor": 1.0,
+        "macd_factor": 1.0,
+        "vol_factor": 3.8,
+        "rsi_factor": 4.2,
+        "rsi": 44.4,
+        "rsi_state": "中性",
+        "mom5": -1.3,
+        "mom10": -2.5,
+        "mom20": -6.2,
+        "momentum_score": 1.86,
+        "reason": "; 结构2.2/动量1.9(权重40%); 均线1.0(日线空头)·MACD1.0·量能3.8·RSI时机4.2(RSI44)",
+        "overall": "偏弱",
+        "explanations": [
+          "价格处于120日7%分位，接近区间低点"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            76.75
+          ],
+          [
+            "MA20均线",
+            70.2
+          ],
+          [
+            "BOLL下轨",
+            65.08
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            75.32
+          ],
+          [
+            "MA60均线",
+            76.75
+          ],
+          [
+            "120日高点",
+            140.2
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "估值偏高(FwdPE=73.0)+增长一般(+4%)",
+        "估值阶梯明显收缩(73.0→56.5→44.1),3年收缩40%,高PE起始,阶梯加分受限",
+        "PEG=20.86(严重高估)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 0.34/5 (成交额位于全市场前93%)",
+        "大涨+8.1%验证",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "无真实新闻/催化剂",
+        "消息时效:近7日无消息",
+        "大涨+8.1%"
+      ],
+      "news_items": [],
+      "news_recency": "近7日无消息",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 73.0,
+      "growth": 3.5,
+      "pe_ladder": {
+        "2026": 73.0,
+        "2027": 56.5,
+        "2028": 44.1
+      },
+      "cagr3": -0.1,
+      "week_chg": -1.26,
+      "sector_l2": "军工电子Ⅱ",
+      "sector_parent": "国防军工",
+      "sector_mom60": -14.35,
+      "sector_mom10": -4.49,
+      "sector_r60": 120,
+      "sector_r10": 107,
+      "sector_mom_score": 0.38,
+      "sector_rev_score": 3.28,
+      "score_sector": 3.28
+    },
+    {
+      "name": "中远海能",
+      "code": "sh600026",
+      "sector": "航运港口",
+      "price": 22.62,
+      "pct_chg": 10.02,
+      "pe": 18.43,
+      "turnover": 870079410.0,
+      "score_news": 1.5,
+      "score_tech": 3.26,
+      "score_fund": 0.8,
+      "score_theme": 3.35,
+      "total": 8.1,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 21.2,
+        "ma10": 21.6,
+        "ma20": 21.2,
+        "ma60": 18.4,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "金叉",
+        "bull_level": 0,
+        "position": 85.0,
+        "vol_ratio": 0.69,
+        "amount_ratio": 0.69,
+        "amount_today_yi": 8.8,
+        "macd_dif": 0.683,
+        "macd_dea": 0.797,
+        "macd_hist": -0.229,
+        "ma_factor": 3.4,
+        "macd_factor": 3.0,
+        "vol_factor": 2.0,
+        "rsi_factor": 3.6,
+        "rsi": 62.7,
+        "rsi_state": "中性",
+        "mom5": 7.3,
+        "mom10": 9.2,
+        "mom20": 21.0,
+        "momentum_score": 3.68,
+        "reason": "; 结构3.0/动量3.7(权重40%); 均线3.4(金叉)·MACD3.0·量能2.0·RSI时机3.6(RSI63)",
+        "overall": "震荡",
+        "explanations": [
+          "MA5上穿MA20，短线买点信号"
+        ],
+        "support_levels": [
+          [
+            "MA20均线",
+            21.15
+          ],
+          [
+            "BOLL下轨",
+            19.52
+          ],
+          [
+            "MA60均线",
+            18.38
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            22.79
+          ],
+          [
+            "120日高点",
+            24.11
+          ]
+        ],
+        "vol_price_analysis": "缩量上涨，上涨动力不足"
+      },
+      "fund_reasons": [
+        "估值偏高(FwdPE=10.3)+增长一般(+-16%)",
+        "估值阶梯收缩不足(10.3→9.2→9.2),3年仅收缩11%",
+        "持续性:盈利下滑,持续性偏弱"
+      ],
+      "theme_reasons": [
+        "细分题材:油运(内禀3)",
+        "板块动量因子 4.40/5 (近20日中位+21.0%, 上涨占比100%, 1只样本)",
+        "成交额排名因子 2.07/5 (成交额位于全市场前58%)",
+        "涨停确认强度",
+        "⚠️题材高潮期,注意追高"
+      ],
+      "news_reasons": [
+        "近7日研报覆盖×1篇(机构关注度高)",
+        "消息时效:近7日有研报×1",
+        "涨停+10.0%(股价确认利好)"
+      ],
+      "news_items": [
+        {
+          "source": "券商研报(东财)",
+          "time": "",
+          "sentiment": "机构关注",
+          "content": "近7日研报1篇",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有研报×1",
+      "report_count": 1,
+      "sub_theme": "油运",
+      "lifecycle": "高潮期",
+      "score_sustain": 2.0,
+      "sustain_note": "盈利下滑,持续性偏弱",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 10.3,
+      "growth": -16.0,
+      "pe_ladder": {
+        "2026": 10.3,
+        "2027": 9.2,
+        "2028": 9.2
+      },
+      "cagr3": 33.9,
+      "week_chg": 7.31,
+      "sector_l2": "航运港口",
+      "sector_parent": "交通运输",
+      "sector_mom60": 15.44,
+      "sector_mom10": 1.8,
+      "sector_r60": 11,
+      "sector_r10": 36,
+      "sector_mom_score": 1.92,
+      "sector_rev_score": 1.92,
+      "score_sector": 1.92
+    },
+    {
+      "name": "瑞松科技",
+      "code": "sh688090",
+      "sector": "自动化设备",
+      "price": 67.13,
+      "pct_chg": -13.13,
+      "pe": 194.86,
+      "turnover": 863222412.0,
+      "score_news": 0,
+      "score_tech": 2.7,
+      "score_fund": 2.0,
+      "score_theme": 2.46,
+      "total": 7.91,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 76.9,
+        "ma10": 80.9,
+        "ma20": 76.5,
+        "ma60": 71.2,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "偏多",
+        "bull_level": 0,
+        "position": 21.0,
+        "vol_ratio": 0.79,
+        "amount_ratio": 0.77,
+        "amount_today_yi": 8.2,
+        "macd_dif": 1.476,
+        "macd_dea": 2.516,
+        "macd_hist": -2.08,
+        "ma_factor": 3.0,
+        "macd_factor": 3.0,
+        "vol_factor": 3.0,
+        "rsi_factor": 4.2,
+        "rsi": 39.2,
+        "rsi_state": "中性",
+        "mom5": -20.8,
+        "mom10": -15.2,
+        "mom20": 0.6,
+        "momentum_score": 1.99,
+        "reason": "; 结构3.2/动量2.0(权重40%); 均线3.0(偏多)·MACD3.0·量能3.0·RSI时机4.2(RSI39)",
+        "overall": "震荡",
+        "explanations": [],
+        "support_levels": [
+          [
+            "MA20均线",
+            76.51
+          ],
+          [
+            "MA60均线",
+            71.22
+          ],
+          [
+            "BOLL下轨",
+            63.26
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "MA60均线",
+            71.22
+          ],
+          [
+            "BOLL上轨",
+            89.76
+          ],
+          [
+            "120日高点",
+            146.6
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=154.4)",
+        "估值阶梯强收缩(154.4→103.4→61.2),3年收缩60%,高PE起始,阶梯加分受限",
+        "PEG=0.56(低估,增速覆盖估值)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 1.90/5 (成交额位于全市场前62%)",
+        "大跌-13.1%,短期降温",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "iFinD确认:多重利好",
+        "消息时效:近7日有新闻",
+        "跌停-13.1%(价量确认利空)"
+      ],
+      "news_items": [
+        {
+          "source": "财经媒体(iFinD)",
+          "time": "",
+          "sentiment": "利好",
+          "content": "iFinD新闻检测到7个利好关键词",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有新闻",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 154.4,
+      "growth": 273.7,
+      "pe_ladder": {
+        "2026": 154.4,
+        "2027": 103.4,
+        "2028": 61.2
+      },
+      "cagr3": null,
+      "week_chg": -20.84,
+      "sector_l2": "自动化设备",
+      "sector_parent": "机械设备",
+      "sector_mom60": -9.28,
+      "sector_mom10": -4.91,
+      "sector_r60": 113,
+      "sector_r10": 110,
+      "sector_mom_score": 0.38,
+      "sector_rev_score": 3.28,
+      "score_sector": 3.28
+    },
+    {
+      "name": "盛美上海",
+      "code": "sh688082",
+      "sector": "半导体",
+      "price": 273.22,
+      "pct_chg": -7.16,
+      "pe": 78.49,
+      "turnover": 1473495132.0,
+      "score_news": 1,
+      "score_tech": 2.89,
+      "score_fund": 1.0,
+      "score_theme": 2.78,
+      "total": 7.89,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 292.2,
+        "ma10": 291.0,
+        "ma20": 284.3,
+        "ma60": 300.2,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线多头",
+        "bull_level": 1,
+        "position": 42.0,
+        "vol_ratio": 1.49,
+        "amount_ratio": 1.53,
+        "amount_today_yi": 14.5,
+        "macd_dif": -1.182,
+        "macd_dea": -2.086,
+        "macd_hist": 1.807,
+        "ma_factor": 3.4,
+        "macd_factor": 2.5,
+        "vol_factor": 4.0,
+        "rsi_factor": 4.2,
+        "rsi": 43.4,
+        "rsi_state": "中性",
+        "mom5": -6.2,
+        "mom10": -4.5,
+        "mom20": -3.5,
+        "momentum_score": 2.06,
+        "reason": "; 结构3.4/动量2.1(权重40%); 均线3.4(日线多头)·MACD2.5·量能4.0·RSI时机4.2(RSI43)",
+        "overall": "偏强",
+        "explanations": [
+          "日线多头排列但周线未确认，短线偏强"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            300.2
+          ],
+          [
+            "MA20均线",
+            284.33
+          ],
+          [
+            "BOLL下轨",
+            264.93
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "MA60均线",
+            300.2
+          ],
+          [
+            "BOLL上轨",
+            303.72
+          ],
+          [
+            "120日高点",
+            447.95
+          ]
+        ],
+        "vol_price_analysis": "放量下跌，抛压较大，空头量价配合"
+      },
+      "fund_reasons": [
+        "估值偏高(FwdPE=72.7)+增长一般(+10%)",
+        "估值阶梯合理收缩(72.7→60.8→51.8),3年收缩29%",
+        "PEG=7.26(严重高估)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "细分题材:半导体设备(内禀4)",
+        "板块动量因子 1.30/5 (近20日中位-3.5%, 上涨占比0%, 1只样本)",
+        "成交额排名因子 4.83/5 (成交额位于全市场前3%)",
+        "大跌-7.2%,短期降温",
+        "题材退潮期,短期回避"
+      ],
+      "news_reasons": [
+        "半导体清洗设备国产替代+单片清洗设备",
+        "⚠️设备验证周期长+技术迭代",
+        "近7日无新增消息/公告/研报,已验证催化剂时效性减弱,消息面评分下调",
+        "消息时效:近7日无消息",
+        "大跌-7.2%"
+      ],
+      "news_items": [
+        {
+          "source": "券商研报",
+          "time": "",
+          "sentiment": "中性",
+          "content": "半导体清洗设备国产替代+单片清洗设备",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日无消息",
+      "report_count": 0,
+      "sub_theme": "半导体设备",
+      "lifecycle": "退潮期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 72.7,
+      "growth": 10.0,
+      "pe_ladder": {
+        "2026": 72.7,
+        "2027": 60.8,
+        "2028": 51.8
+      },
+      "cagr3": 20.9,
+      "week_chg": -6.22,
+      "sector_l2": "半导体",
+      "sector_parent": "电子",
+      "sector_mom60": -26.64,
+      "sector_mom10": -8.25,
+      "sector_r60": 123,
+      "sector_r10": 119,
+      "sector_mom_score": 0.38,
+      "sector_rev_score": 3.28,
+      "score_sector": 3.28
+    },
+    {
+      "name": "石头科技",
+      "code": "sh688169",
+      "sector": "小家电",
+      "price": 107.15,
+      "pct_chg": -9.78,
+      "pe": 16.63,
+      "turnover": 1227824209.0,
+      "score_news": 0,
+      "score_tech": 1.69,
+      "score_fund": 2.8,
+      "score_theme": 2.62,
+      "total": 7.48,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 114.3,
+        "ma10": 116.3,
+        "ma20": 120.8,
+        "ma60": 114.5,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线空头",
+        "bull_level": 0,
+        "position": 36.0,
+        "vol_ratio": 1.11,
+        "amount_ratio": 1.04,
+        "amount_today_yi": 12.2,
+        "macd_dif": -1.757,
+        "macd_dea": -0.199,
+        "macd_hist": -3.118,
+        "ma_factor": 1.0,
+        "macd_factor": 0.8,
+        "vol_factor": 3.8,
+        "rsi_factor": 4.2,
+        "rsi": 35.9,
+        "rsi_state": "中性",
+        "mom5": -7.9,
+        "mom10": -10.7,
+        "mom20": -17.0,
+        "momentum_score": 1.04,
+        "reason": "; 结构2.1/动量1.0(权重40%); 均线1.0(日线空头)·MACD0.8·量能3.8·RSI时机4.2(RSI36)",
+        "overall": "偏弱",
+        "explanations": [],
+        "support_levels": [
+          [
+            "MA20均线",
+            120.77
+          ],
+          [
+            "MA60均线",
+            114.46
+          ],
+          [
+            "BOLL下轨",
+            108.69
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "MA5均线",
+            114.33
+          ],
+          [
+            "MA60均线",
+            114.46
+          ],
+          [
+            "BOLL上轨",
+            132.84
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "估值偏高(FwdPE=14.1)+增长一般(+-33%)",
+        "估值阶梯明显收缩(14.1→11.0→9.2),3年收缩35%",
+        "持续性:盈利下滑,持续性偏弱"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 3.28/5 (成交额位于全市场前34%)",
+        "个股近20日-17.0%弱于题材",
+        "大跌-9.8%,短期降温",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "iFinD确认:多重利好",
+        "消息时效:近7日有新闻",
+        "大跌-9.8%(价格确认利空信号)"
+      ],
+      "news_items": [
+        {
+          "source": "财经媒体(iFinD)",
+          "time": "",
+          "sentiment": "利好",
+          "content": "iFinD新闻检测到10个利好关键词",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有新闻",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 2.0,
+      "sustain_note": "盈利下滑,持续性偏弱",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 14.1,
+      "growth": -32.6,
+      "pe_ladder": {
+        "2026": 14.1,
+        "2027": 11.0,
+        "2028": 9.2
+      },
+      "cagr3": -3.0,
+      "week_chg": -7.93,
+      "sector_l2": "小家电",
+      "sector_parent": "家用电器",
+      "sector_mom60": 9.66,
+      "sector_mom10": 6.78,
+      "sector_r60": 32,
+      "sector_r10": 6,
+      "sector_mom_score": 2.18,
+      "sector_rev_score": 1.84,
+      "score_sector": 1.84
+    },
+    {
+      "name": "世名科技",
+      "code": "sz300522",
+      "sector": "化学制品",
+      "price": 16.56,
+      "pct_chg": 20.0,
+      "pe": 796.92,
+      "turnover": 419527375.0,
+      "score_news": 1.5,
+      "score_tech": 3.54,
+      "score_fund": 0,
+      "score_theme": 2.45,
+      "total": 7.41,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 15.0,
+        "ma10": 15.0,
+        "ma20": 14.5,
+        "ma60": 13.9,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "偏多",
+        "bull_level": 0,
+        "position": 41.0,
+        "vol_ratio": 1.02,
+        "amount_ratio": 1.04,
+        "amount_today_yi": 4.3,
+        "macd_dif": 0.309,
+        "macd_dea": 0.229,
+        "macd_hist": 0.159,
+        "ma_factor": 3.4,
+        "macd_factor": 4.8,
+        "vol_factor": 3.8,
+        "rsi_factor": 3.6,
+        "rsi": 60.6,
+        "rsi_state": "中性",
+        "mom5": 5.7,
+        "mom10": 4.5,
+        "mom20": 19.7,
+        "momentum_score": 3.02,
+        "reason": "; 结构3.9/动量3.0(权重40%); 均线3.4(偏多)·MACD4.8·量能3.8·RSI时机3.6(RSI61)",
+        "overall": "震荡",
+        "explanations": [],
+        "support_levels": [
+          [
+            "MA20均线",
+            14.51
+          ],
+          [
+            "MA60均线",
+            13.91
+          ],
+          [
+            "BOLL下轨",
+            12.74
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            16.27
+          ],
+          [
+            "120日高点",
+            25.04
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=796.9)+负增长(-37%)",
+        "持续性:盈利下滑,持续性偏弱"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 0.17/5 (成交额位于全市场前96%)",
+        "个股近20日+19.7%强于题材,超额明显",
+        "涨停确认强度",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "iFinD确认:多重利好",
+        "消息时效:近7日有新闻",
+        "涨停+20.0%(股价确认利好)"
+      ],
+      "news_items": [
+        {
+          "source": "财经媒体(iFinD)",
+          "time": "",
+          "sentiment": "利好",
+          "content": "iFinD新闻检测到14个利好关键词",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有新闻",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 2.0,
+      "sustain_note": "盈利下滑,持续性偏弱",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 796.9,
+      "growth": -36.7,
+      "pe_ladder": null,
+      "cagr3": -24.3,
+      "week_chg": 5.68,
+      "sector_l2": "化学制品",
+      "sector_parent": "基础化工",
+      "sector_mom60": 0.01,
+      "sector_mom10": 0.87,
+      "sector_r60": 87,
+      "sector_r10": 51,
+      "sector_mom_score": 0.58,
+      "sector_rev_score": 3.36,
+      "score_sector": 3.36
+    },
+    {
+      "name": "维科技术",
+      "code": "sh600152",
+      "sector": "电池",
+      "price": 9.18,
+      "pct_chg": 8.26,
+      "pe": 0,
+      "turnover": 1012445571.0,
+      "score_news": 1,
+      "score_tech": 3.88,
+      "score_fund": 0,
+      "score_theme": 2.71,
+      "total": 7.35,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 8.2,
+        "ma10": 8.1,
+        "ma20": 8.1,
+        "ma60": 8.0,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "金叉",
+        "bull_level": 0,
+        "position": 25.0,
+        "vol_ratio": 2.44,
+        "amount_ratio": 2.52,
+        "amount_today_yi": 10.5,
+        "macd_dif": 0.063,
+        "macd_dea": -0.044,
+        "macd_hist": 0.213,
+        "ma_factor": 3.4,
+        "macd_factor": 4.8,
+        "vol_factor": 5.0,
+        "rsi_factor": 2.8,
+        "rsi": 70.9,
+        "rsi_state": "超买",
+        "mom5": 18.5,
+        "mom10": 13.5,
+        "mom20": 11.3,
+        "momentum_score": 3.6,
+        "reason": "; 结构4.1/动量3.6(权重40%); 均线3.4(金叉)·MACD4.8·量能5.0·RSI时机2.8(RSI71)",
+        "overall": "震荡",
+        "explanations": [
+          "MA5上穿MA20，短线买点信号",
+          "RSI=71 进入超买区(>70)，短线回调概率上升"
+        ],
+        "support_levels": [
+          [
+            "MA20均线",
+            8.07
+          ],
+          [
+            "MA60均线",
+            7.97
+          ],
+          [
+            "BOLL下轨",
+            7.42
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            8.73
+          ],
+          [
+            "120日高点",
+            15.69
+          ]
+        ],
+        "vol_price_analysis": "放量上涨，资金积极买入，多头量价配合"
+      },
+      "fund_reasons": [
+        "负增长(-31%)"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 2.24/5 (成交额位于全市场前55%)",
+        "个股近20日+11.3%强于题材,超额明显",
+        "大涨+8.3%验证",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "无真实新闻/催化剂",
+        "消息时效:近7日无消息",
+        "大涨+8.3%"
+      ],
+      "news_items": [],
+      "news_recency": "近7日无消息",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "数据不足,未评估持续性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": null,
+      "growth": -30.6,
+      "pe_ladder": null,
+      "cagr3": null,
+      "week_chg": 18.45,
+      "sector_l2": "电池",
+      "sector_parent": "电力设备",
+      "sector_mom60": -5.99,
+      "sector_mom10": 2.65,
+      "sector_r60": 109,
+      "sector_r10": 22,
+      "sector_mom_score": 0.9,
+      "sector_rev_score": 3.12,
+      "score_sector": 3.12
+    },
+    {
+      "name": "微导纳米",
+      "code": "sh688147",
+      "sector": "光伏设备",
+      "price": 89.25,
+      "pct_chg": -11.99,
+      "pe": 320.2,
+      "turnover": 1396061464.0,
+      "score_news": 0,
+      "score_tech": 1.65,
+      "score_fund": 1.8,
+      "score_theme": 2.75,
+      "total": 7.03,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 102.9,
+        "ma10": 109.9,
+        "ma20": 106.4,
+        "ma60": 112.0,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "死叉",
+        "bull_level": 0,
+        "position": 26.0,
+        "vol_ratio": 0.89,
+        "amount_ratio": 0.83,
+        "amount_today_yi": 13.6,
+        "macd_dif": -2.577,
+        "macd_dea": -1.042,
+        "macd_hist": -3.071,
+        "ma_factor": 1.6,
+        "macd_factor": 0.8,
+        "vol_factor": 3.0,
+        "rsi_factor": 4.8,
+        "rsi": 34.1,
+        "rsi_state": "中性",
+        "mom5": -22.7,
+        "mom10": -16.4,
+        "mom20": -22.6,
+        "momentum_score": 0.79,
+        "reason": "; 结构2.2/动量0.8(权重40%); 均线1.6(死叉)·MACD0.8·量能3.0·RSI时机4.8(RSI34)",
+        "overall": "震荡",
+        "explanations": [
+          "MA5下穿MA20，短线卖点信号"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            112.03
+          ],
+          [
+            "MA20均线",
+            106.38
+          ],
+          [
+            "BOLL下轨",
+            91.29
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "MA5均线",
+            102.92
+          ],
+          [
+            "MA60均线",
+            112.03
+          ],
+          [
+            "BOLL上轨",
+            121.47
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=115.2)+负增长(-15%)",
+        "估值阶梯强收缩(115.2→77.6→55.2),3年收缩52%,高PE起始,阶梯加分受限",
+        "持续性:盈利下滑,持续性偏弱"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 4.14/5 (成交额位于全市场前17%)",
+        "个股近20日-22.6%弱于题材",
+        "大跌-12.0%,短期降温",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "无真实新闻/催化剂",
+        "消息时效:近7日有新闻",
+        "跌停-12.0%(价量确认利空)"
+      ],
+      "news_items": [],
+      "news_recency": "近7日有新闻",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 2.0,
+      "sustain_note": "盈利下滑,持续性偏弱",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 115.2,
+      "growth": -14.5,
+      "pe_ladder": {
+        "2026": 115.2,
+        "2027": 77.6,
+        "2028": 55.2
+      },
+      "cagr3": 100.6,
+      "week_chg": -22.66,
+      "sector_l2": "光伏设备",
+      "sector_parent": "电力设备",
+      "sector_mom60": -11.48,
+      "sector_mom10": -2.54,
+      "sector_r60": 115,
+      "sector_r10": 97,
+      "sector_mom_score": 0.38,
+      "sector_rev_score": 3.28,
+      "score_sector": 3.28
+    },
+    {
+      "name": "金牛化工",
+      "code": "sh600722",
+      "sector": "化学原料",
+      "price": 16.19,
+      "pct_chg": 9.99,
+      "pe": 195.57,
+      "turnover": 1317375290.0,
+      "score_news": 1,
+      "score_tech": 2.06,
+      "score_fund": 0.8,
+      "score_theme": 2.89,
+      "total": 6.76,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 15.1,
+        "ma10": 15.9,
+        "ma20": 16.8,
+        "ma60": 13.3,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线空头",
+        "bull_level": 0,
+        "position": 69.0,
+        "vol_ratio": 0.71,
+        "amount_ratio": 0.63,
+        "amount_today_yi": 13.4,
+        "macd_dif": 0.171,
+        "macd_dea": 0.564,
+        "macd_hist": -0.786,
+        "ma_factor": 1.4,
+        "macd_factor": 3.0,
+        "vol_factor": 2.0,
+        "rsi_factor": 3.6,
+        "rsi": 52.5,
+        "rsi_state": "中性",
+        "mom5": -0.6,
+        "mom10": 1.0,
+        "mom20": -15.9,
+        "momentum_score": 1.74,
+        "reason": "; 结构2.3/动量1.7(权重40%); 均线1.4(日线空头)·MACD3.0·量能2.0·RSI时机3.6(RSI53)",
+        "overall": "弱势",
+        "explanations": [],
+        "support_levels": [
+          [
+            "MA20均线",
+            16.76
+          ],
+          [
+            "BOLL下轨",
+            13.8
+          ],
+          [
+            "MA60均线",
+            13.33
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            19.71
+          ],
+          [
+            "120日高点",
+            20.0
+          ]
+        ],
+        "vol_price_analysis": "缩量上涨，上涨动力不足"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=195.6)+负增长(-8%)",
+        "持续性:盈利下滑,持续性偏弱"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 3.79/5 (成交额位于全市场前24%)",
+        "个股近20日-15.9%弱于题材",
+        "涨停确认强度",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "无真实新闻/催化剂",
+        "消息时效:近7日无消息",
+        "涨停+10.0%(股价确认利好)"
+      ],
+      "news_items": [],
+      "news_recency": "近7日无消息",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 2.0,
+      "sustain_note": "盈利下滑,持续性偏弱",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 195.6,
+      "growth": -8.2,
+      "pe_ladder": null,
+      "cagr3": -5.7,
+      "week_chg": -0.61,
+      "sector_l2": "化学原料",
+      "sector_parent": "基础化工",
+      "sector_mom60": 7.96,
+      "sector_mom10": 1.54,
+      "sector_r60": 39,
+      "sector_r10": 41,
+      "sector_mom_score": 1.18,
+      "sector_rev_score": 2.64,
+      "score_sector": 2.64
+    },
+    {
+      "name": "晶合集成",
+      "code": "sh688249",
+      "sector": "半导体",
+      "price": 30.01,
+      "pct_chg": -8.53,
+      "pe": 108.62,
+      "turnover": 1103306073.0,
+      "score_news": 1,
+      "score_tech": 1.73,
+      "score_fund": 0.8,
+      "score_theme": 2.25,
+      "total": 6.34,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 33.0,
+        "ma10": 34.6,
+        "ma20": 35.0,
+        "ma60": 40.0,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线空头",
+        "bull_level": 0,
+        "position": 1.0,
+        "vol_ratio": 1.16,
+        "amount_ratio": 1.08,
+        "amount_today_yi": 10.7,
+        "macd_dif": -1.651,
+        "macd_dea": -1.411,
+        "macd_hist": -0.48,
+        "ma_factor": 1.0,
+        "macd_factor": 0.8,
+        "vol_factor": 3.8,
+        "rsi_factor": 4.8,
+        "rsi": 29.7,
+        "rsi_state": "超卖",
+        "mom5": -17.5,
+        "mom10": -15.9,
+        "mom20": -16.7,
+        "momentum_score": 1.0,
+        "reason": "; 结构2.2/动量1.0(权重40%); 均线1.0(日线空头)·MACD0.8·量能3.8·RSI时机4.8(RSI30)",
+        "overall": "偏弱",
+        "explanations": [
+          "价格处于120日1%分位，接近区间低点",
+          "RSI=30 进入超卖区(<30)，存在技术性反弹机会"
+        ],
+        "support_levels": [
+          [
+            "MA60均线",
+            40.0
+          ],
+          [
+            "MA20均线",
+            34.97
+          ],
+          [
+            "BOLL下轨",
+            31.84
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "MA5均线",
+            32.99
+          ],
+          [
+            "BOLL上轨",
+            38.09
+          ],
+          [
+            "MA60均线",
+            40.0
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=81.5)+负增长(-49%)",
+        "估值阶梯强收缩(81.5→53.3→36.4),3年收缩55%,高PE起始,阶梯加分受限",
+        "持续性:盈利下滑,持续性偏弱"
+      ],
+      "theme_reasons": [
+        "细分题材:晶圆代工(内禀4)",
+        "板块动量因子 0.60/5 (近20日中位-16.7%, 上涨占比0%, 1只样本)",
+        "成交额排名因子 2.93/5 (成交额位于全市场前41%)",
+        "大跌-8.5%,短期降温",
+        "题材退潮期,短期回避"
+      ],
+      "news_reasons": [
+        "晶圆代工特色工艺+DDIC/CIS/MCU代工",
+        "⚠️晶圆代工竞争激烈+产能利用率波动",
+        "近7日无新增消息/公告/研报,已验证催化剂时效性减弱,消息面评分下调",
+        "消息时效:近7日无消息",
+        "大跌-8.5%"
+      ],
+      "news_items": [
+        {
+          "source": "券商研报",
+          "time": "",
+          "sentiment": "中性",
+          "content": "晶圆代工特色工艺+DDIC/CIS/MCU代工",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日无消息",
+      "report_count": 0,
+      "sub_theme": "晶圆代工",
+      "lifecycle": "退潮期",
+      "score_sustain": 2.0,
+      "sustain_note": "盈利下滑,持续性偏弱",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 81.5,
+      "growth": -48.8,
+      "pe_ladder": {
+        "2026": 81.5,
+        "2027": 53.3,
+        "2028": 36.4
+      },
+      "cagr3": -58.8,
+      "week_chg": -17.46,
+      "sector_l2": "半导体",
+      "sector_parent": "电子",
+      "sector_mom60": -26.64,
+      "sector_mom10": -8.25,
+      "sector_r60": 123,
+      "sector_r10": 119,
+      "sector_mom_score": 0.38,
+      "sector_rev_score": 3.28,
+      "score_sector": 3.28
+    },
+    {
+      "name": "联合光电",
+      "code": "sz300691",
+      "sector": "计算机设备",
+      "price": 17.66,
+      "pct_chg": -14.06,
+      "pe": 127.33,
+      "turnover": 542582795.0,
+      "score_news": 0,
+      "score_tech": 3.85,
+      "score_fund": 0,
+      "score_theme": 2.3,
+      "total": 6.31,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 20.1,
+        "ma10": 18.8,
+        "ma20": 16.7,
+        "ma60": 14.6,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线多头",
+        "bull_level": 1,
+        "position": 59.0,
+        "vol_ratio": 1.88,
+        "amount_ratio": 1.99,
+        "amount_today_yi": 5.2,
+        "macd_dif": 1.495,
+        "macd_dea": 1.192,
+        "macd_hist": 0.605,
+        "ma_factor": 3.8,
+        "macd_factor": 4.8,
+        "vol_factor": 4.0,
+        "rsi_factor": 3.6,
+        "rsi": 54.2,
+        "rsi_state": "中性",
+        "mom5": -15.7,
+        "mom10": 21.7,
+        "mom20": 17.9,
+        "momentum_score": 3.52,
+        "reason": "; 结构4.1/动量3.5(权重40%); 均线3.8(日线多头)·MACD4.8·量能4.0·RSI时机3.6(RSI54)",
+        "overall": "偏强",
+        "explanations": [
+          "日线多头排列但周线未确认，短线偏强"
+        ],
+        "support_levels": [
+          [
+            "MA20均线",
+            16.66
+          ],
+          [
+            "MA60均线",
+            14.58
+          ],
+          [
+            "120日低点",
+            11.78
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "120日高点",
+            21.68
+          ],
+          [
+            "BOLL上轨",
+            22.14
+          ]
+        ],
+        "vol_price_analysis": "放量下跌，抛压较大，空头量价配合"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=127.3)+负增长(-266%)",
+        "持续性:盈利下滑,持续性偏弱"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 0.52/5 (成交额位于全市场前89%)",
+        "个股近20日+17.9%强于题材,超额明显",
+        "大跌-14.1%,短期降温",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "iFinD确认:多重利好",
+        "消息时效:近7日有新闻",
+        "跌停-14.1%(价量确认利空)"
+      ],
+      "news_items": [
+        {
+          "source": "财经媒体(iFinD)",
+          "time": "",
+          "sentiment": "利好",
+          "content": "iFinD新闻检测到10个利好关键词",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有新闻",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 2.0,
+      "sustain_note": "盈利下滑,持续性偏弱",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 127.3,
+      "growth": -266.3,
+      "pe_ladder": null,
+      "cagr3": null,
+      "week_chg": -15.74,
+      "sector_l2": "计算机设备",
+      "sector_parent": "计算机",
+      "sector_mom60": -1.52,
+      "sector_mom10": -1.03,
+      "sector_r60": 94,
+      "sector_r10": 82,
+      "sector_mom_score": 0.38,
+      "sector_rev_score": 3.28,
+      "score_sector": 3.28
+    },
+    {
+      "name": "纳芯微",
+      "code": "sh688052",
+      "sector": "半导体",
+      "price": 209.77,
+      "pct_chg": -11.23,
+      "pe": 0,
+      "turnover": 843041181.0,
+      "score_news": 0,
+      "score_tech": 2.19,
+      "score_fund": 1.0,
+      "score_theme": 2.38,
+      "total": 6.24,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 237.1,
+        "ma10": 243.6,
+        "ma20": 239.3,
+        "ma60": 227.4,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "死叉",
+        "bull_level": 0,
+        "position": 40.0,
+        "vol_ratio": 1.09,
+        "amount_ratio": 1.07,
+        "amount_today_yi": 8.1,
+        "macd_dif": 0.285,
+        "macd_dea": 3.144,
+        "macd_hist": -5.719,
+        "ma_factor": 1.6,
+        "macd_factor": 3.0,
+        "vol_factor": 3.8,
+        "rsi_factor": 4.8,
+        "rsi": 33.8,
+        "rsi_state": "中性",
+        "mom5": -17.5,
+        "mom10": -10.9,
+        "mom20": -13.4,
+        "momentum_score": 1.0,
+        "reason": "; 结构3.0/动量1.0(权重40%); 均线1.6(死叉)·MACD3.0·量能3.8·RSI时机4.8(RSI34)",
+        "overall": "震荡",
+        "explanations": [
+          "MA5下穿MA20，短线卖点信号"
+        ],
+        "support_levels": [
+          [
+            "MA20均线",
+            239.29
+          ],
+          [
+            "MA60均线",
+            227.41
+          ],
+          [
+            "BOLL下轨",
+            216.67
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "MA60均线",
+            227.41
+          ],
+          [
+            "MA5均线",
+            237.12
+          ],
+          [
+            "BOLL上轨",
+            261.92
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=323.6)",
+        "估值阶梯强收缩(323.6→82.1→44.6),3年收缩86%,高PE起始,阶梯加分受限",
+        "PEG=8.67(严重高估)",
+        "持续性:盈利持续性中性"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 1.72/5 (成交额位于全市场前65%)",
+        "个股近20日-13.4%弱于题材",
+        "大跌-11.2%,短期降温",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "iFinD确认:多重利好",
+        "消息时效:近7日有新闻",
+        "跌停-11.2%(价量确认利空)"
+      ],
+      "news_items": [
+        {
+          "source": "财经媒体(iFinD)",
+          "time": "",
+          "sentiment": "利好",
+          "content": "iFinD新闻检测到8个利好关键词",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有新闻",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "盈利持续性中性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 323.6,
+      "growth": 37.3,
+      "pe_ladder": {
+        "2026": 323.6,
+        "2027": 82.1,
+        "2028": 44.6
+      },
+      "cagr3": null,
+      "week_chg": -17.51,
+      "sector_l2": "半导体",
+      "sector_parent": "电子",
+      "sector_mom60": -26.64,
+      "sector_mom10": -8.25,
+      "sector_r60": 123,
+      "sector_r10": 119,
+      "sector_mom_score": 0.38,
+      "sector_rev_score": 3.28,
+      "score_sector": 3.28
+    },
+    {
+      "name": "广汽集团",
+      "code": "sh601238",
+      "sector": "乘用车",
+      "price": 5.36,
+      "pct_chg": -8.22,
+      "pe": 0,
+      "turnover": 715741052.0,
+      "score_news": 0,
+      "score_tech": 3.54,
+      "score_fund": 0,
+      "score_theme": 2.41,
+      "total": 6.14,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 5.4,
+        "ma10": 5.3,
+        "ma20": 5.3,
+        "ma60": 5.2,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线多头",
+        "bull_level": 1,
+        "position": 19.0,
+        "vol_ratio": 1.64,
+        "amount_ratio": 1.7,
+        "amount_today_yi": 7.0,
+        "macd_dif": 0.052,
+        "macd_dea": 0.005,
+        "macd_hist": 0.094,
+        "ma_factor": 3.8,
+        "macd_factor": 4.8,
+        "vol_factor": 4.0,
+        "rsi_factor": 3.6,
+        "rsi": 52.2,
+        "rsi_state": "中性",
+        "mom5": 3.5,
+        "mom10": 4.7,
+        "mom20": 7.0,
+        "momentum_score": 2.74,
+        "reason": "; 结构4.1/动量2.7(权重40%); 均线3.8(日线多头)·MACD4.8·量能4.0·RSI时机3.6(RSI52)",
+        "overall": "偏强",
+        "explanations": [
+          "日线多头排列但周线未确认，短线偏强"
+        ],
+        "support_levels": [
+          [
+            "MA20均线",
+            5.25
+          ],
+          [
+            "MA60均线",
+            5.21
+          ],
+          [
+            "BOLL下轨",
+            4.89
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            5.62
+          ],
+          [
+            "120日高点",
+            7.33
+          ]
+        ],
+        "vol_price_analysis": "放量下跌，抛压较大，空头量价配合"
+      },
+      "fund_reasons": [
+        "负增长(-127%)"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 1.55/5 (成交额位于全市场前68%)",
+        "大跌-8.2%,短期降温",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "无真实新闻/催化剂",
+        "消息时效:近7日无消息",
+        "大跌-8.2%(价格确认利空信号)"
+      ],
+      "news_items": [],
+      "news_recency": "近7日无消息",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "数据不足,未评估持续性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": null,
+      "growth": -126.7,
+      "pe_ladder": null,
+      "cagr3": null,
+      "week_chg": 3.47,
+      "sector_l2": "乘用车",
+      "sector_parent": "汽车",
+      "sector_mom60": -0.6,
+      "sector_mom10": -0.61,
+      "sector_r60": 88,
+      "sector_r10": 72,
+      "sector_mom_score": 0.38,
+      "sector_rev_score": 3.28,
+      "score_sector": 3.28
+    },
+    {
+      "name": "沪硅产业",
+      "code": "sh688126",
+      "sector": "半导体",
+      "price": 21.57,
+      "pct_chg": -7.74,
+      "pe": 0,
+      "turnover": 1166924764.0,
+      "score_news": 1,
+      "score_tech": 2.64,
+      "score_fund": 0,
+      "score_theme": 2.27,
+      "total": 6.12,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 23.4,
+        "ma10": 24.0,
+        "ma20": 23.3,
+        "ma60": 25.5,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "偏多",
+        "bull_level": 0,
+        "position": 17.0,
+        "vol_ratio": 1.04,
+        "amount_ratio": 1.05,
+        "amount_today_yi": 11.3,
+        "macd_dif": -0.397,
+        "macd_dea": -0.398,
+        "macd_hist": 0.003,
+        "ma_factor": 3.0,
+        "macd_factor": 2.3,
+        "vol_factor": 3.8,
+        "rsi_factor": 4.8,
+        "rsi": 34.3,
+        "rsi_state": "中性",
+        "mom5": -13.3,
+        "mom10": -9.4,
+        "mom20": -8.0,
+        "momentum_score": 1.66,
+        "reason": "; 结构3.3/动量1.7(权重40%); 均线3.0(偏多)·MACD2.3·量能3.8·RSI时机4.8(RSI34)",
+        "overall": "震荡",
+        "explanations": [],
+        "support_levels": [
+          [
+            "MA60均线",
+            25.5
+          ],
+          [
+            "MA20均线",
+            23.32
+          ],
+          [
+            "BOLL下轨",
+            21.27
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "BOLL上轨",
+            25.37
+          ],
+          [
+            "MA60均线",
+            25.5
+          ],
+          [
+            "120日高点",
+            41.06
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=80.0)+负增长(-43%)",
+        "持续性:盈利下滑,持续性偏弱"
+      ],
+      "theme_reasons": [
+        "细分题材:硅片(内禀4)",
+        "板块动量因子 0.60/5 (近20日中位-8.0%, 上涨占比0%, 1只样本)",
+        "成交额排名因子 3.10/5 (成交额位于全市场前37%)",
+        "大跌-7.7%,短期降温",
+        "题材退潮期,短期回避"
+      ],
+      "news_reasons": [
+        "大硅片国产替代龙头+300mm硅片量产",
+        "⚠️硅片价格周期+产能释放压力",
+        "近7日无新增消息/公告/研报,已验证催化剂时效性减弱,消息面评分下调",
+        "消息时效:近7日无消息",
+        "大跌-7.7%"
+      ],
+      "news_items": [
+        {
+          "source": "券商研报",
+          "time": "",
+          "sentiment": "一般利好",
+          "content": "大硅片国产替代龙头+300mm硅片量产",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日无消息",
+      "report_count": 0,
+      "sub_theme": "硅片",
+      "lifecycle": "退潮期",
+      "score_sustain": 2.0,
+      "sustain_note": "盈利下滑,持续性偏弱",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 80.0,
+      "growth": -42.7,
+      "pe_ladder": null,
+      "cagr3": null,
+      "week_chg": -13.3,
+      "sector_l2": "半导体",
+      "sector_parent": "电子",
+      "sector_mom60": -26.64,
+      "sector_mom10": -8.25,
+      "sector_r60": 123,
+      "sector_r10": 119,
+      "sector_mom_score": 0.38,
+      "sector_rev_score": 3.28,
+      "score_sector": 3.28
+    },
+    {
+      "name": "中文在线",
+      "code": "sz300364",
+      "sector": "出版",
+      "price": 20.39,
+      "pct_chg": -12.75,
+      "pe": 0,
+      "turnover": 1453543474.0,
+      "score_news": 1,
+      "score_tech": 1.54,
+      "score_fund": 0.8,
+      "score_theme": 2.8,
+      "total": 5.49,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 23.1,
+        "ma10": 23.9,
+        "ma20": 24.4,
+        "ma60": 23.8,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线空头",
+        "bull_level": 0,
+        "position": 14.0,
+        "vol_ratio": 0.82,
+        "amount_ratio": 0.76,
+        "amount_today_yi": 14.2,
+        "macd_dif": -0.441,
+        "macd_dea": -0.055,
+        "macd_hist": -0.773,
+        "ma_factor": 1.0,
+        "macd_factor": 0.8,
+        "vol_factor": 3.0,
+        "rsi_factor": 4.8,
+        "rsi": 34.3,
+        "rsi_state": "中性",
+        "mom5": -16.6,
+        "mom10": -14.9,
+        "mom20": -22.4,
+        "momentum_score": 0.82,
+        "reason": "; 结构2.0/动量0.8(权重40%); 均线1.0(日线空头)·MACD0.8·量能3.0·RSI时机4.8(RSI34)",
+        "overall": "偏弱",
+        "explanations": [],
+        "support_levels": [
+          [
+            "MA20均线",
+            24.44
+          ],
+          [
+            "MA60均线",
+            23.81
+          ],
+          [
+            "BOLL下轨",
+            21.91
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "MA5均线",
+            23.07
+          ],
+          [
+            "MA60均线",
+            23.81
+          ],
+          [
+            "BOLL上轨",
+            26.96
+          ]
+        ],
+        "vol_price_analysis": "量价基本平衡"
+      },
+      "fund_reasons": [
+        "高估值(FwdPE=675.2)+负增长(-135%)",
+        "估值阶梯强收缩(675.2→115.1→62.9),3年收缩91%,高PE起始,阶梯加分受限",
+        "持续性:盈利下滑,持续性偏弱"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 4.48/5 (成交额位于全市场前10%)",
+        "个股近20日-22.4%弱于题材",
+        "大跌-12.8%,短期降温",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "公告确认:偏利空事件",
+        "消息时效:近7日有新闻/公告",
+        "跌停-12.8%(价量确认利空)"
+      ],
+      "news_items": [
+        {
+          "source": "交易所公告(akshare)",
+          "time": "",
+          "sentiment": "利空",
+          "content": "公告检测到利空关键词×1",
+          "url": ""
+        }
+      ],
+      "news_recency": "近7日有新闻/公告",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 2.0,
+      "sustain_note": "盈利下滑,持续性偏弱",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": 675.2,
+      "growth": -135.4,
+      "pe_ladder": {
+        "2026": 675.2,
+        "2027": 115.1,
+        "2028": 62.9
+      },
+      "cagr3": null,
+      "week_chg": -16.64,
+      "sector_l2": "出版",
+      "sector_parent": "传媒",
+      "sector_mom60": 19.05,
+      "sector_mom10": 5.12,
+      "sector_r60": 8,
+      "sector_r10": 9,
+      "sector_mom_score": 3.08,
+      "sector_rev_score": 1.0,
+      "score_sector": 1.0
+    },
+    {
+      "name": "通源石油",
+      "code": "sz300164",
+      "sector": "油服工程",
+      "price": 9.31,
+      "pct_chg": 7.26,
+      "pe": 0,
+      "turnover": 1065329924.0,
+      "score_news": 1,
+      "score_tech": 1.67,
+      "score_fund": 0,
+      "score_theme": 2.66,
+      "total": 5.32,
+      "rating": "C",
+      "advice": "观望，不新开仓",
+      "tech": {
+        "ma5": 8.9,
+        "ma10": 9.1,
+        "ma20": 9.7,
+        "ma60": 10.4,
+        "wma5": null,
+        "wma10": null,
+        "wma20": null,
+        "trend": "日线空头",
+        "bull_level": 0,
+        "position": 23.0,
+        "vol_ratio": 0.66,
+        "amount_ratio": 0.6,
+        "amount_today_yi": 10.8,
+        "macd_dif": -0.411,
+        "macd_dea": -0.343,
+        "macd_hist": -0.136,
+        "ma_factor": 1.0,
+        "macd_factor": 0.8,
+        "vol_factor": 2.0,
+        "rsi_factor": 4.2,
+        "rsi": 44.9,
+        "rsi_state": "中性",
+        "mom5": 4.4,
+        "mom10": -4.9,
+        "mom20": -13.4,
+        "momentum_score": 1.66,
+        "reason": "; 结构1.7/动量1.7(权重40%); 均线1.0(日线空头)·MACD0.8·量能2.0·RSI时机4.2(RSI45)",
+        "overall": "偏弱",
+        "explanations": [],
+        "support_levels": [
+          [
+            "MA60均线",
+            10.41
+          ],
+          [
+            "MA20均线",
+            9.74
+          ],
+          [
+            "BOLL下轨",
+            8.24
+          ]
+        ],
+        "resistance_levels": [
+          [
+            "MA60均线",
+            10.41
+          ],
+          [
+            "BOLL上轨",
+            11.23
+          ],
+          [
+            "120日高点",
+            15.09
+          ]
+        ],
+        "vol_price_analysis": "缩量上涨，上涨动力不足"
+      },
+      "fund_reasons": [
+        "负增长(-73%)"
+      ],
+      "theme_reasons": [
+        "板块:综合/其他(内禀3)",
+        "板块动量样本不足, 因子取中性2.50",
+        "成交额排名因子 2.59/5 (成交额位于全市场前48%)",
+        "个股近20日-13.4%弱于题材",
+        "大涨+7.3%验证",
+        "题材处于震荡期(动量样本不足)"
+      ],
+      "news_reasons": [
+        "无真实新闻/催化剂",
+        "消息时效:近7日无消息",
+        "大涨+7.3%"
+      ],
+      "news_items": [],
+      "news_recency": "近7日无消息",
+      "report_count": 0,
+      "sub_theme": "综合/其他",
+      "lifecycle": "震荡期",
+      "score_sustain": 3.0,
+      "sustain_note": "数据不足,未评估持续性",
+      "is_cyclic": false,
+      "is_storage_mod": false,
+      "fwd_pe": null,
+      "growth": -72.7,
+      "pe_ladder": null,
+      "cagr3": 63.3,
+      "week_chg": 4.37,
+      "sector_l2": "油服工程",
+      "sector_parent": "石油石化",
+      "sector_mom60": 10.78,
+      "sector_mom10": 1.26,
+      "sector_r60": 28,
+      "sector_r10": 45,
+      "sector_mom_score": 1.18,
+      "sector_rev_score": 2.64,
+      "score_sector": 2.64
+    }
+  ],
+  "stats": {
+    "rating_dist": {
+      "S": 0,
+      "A": 1,
+      "B": 10,
+      "C": 19,
+      "D": 0
+    },
+    "sector_avg": {
+      "电池": {
+        "count": 5,
+        "avg": 11.1
+      },
+      "医疗器械": {
+        "count": 1,
+        "avg": 10.4
+      },
+      "电力": {
+        "count": 1,
+        "avg": 9.6
+      },
+      "化学制药": {
+        "count": 2,
+        "avg": 9.6
+      },
+      "光伏设备": {
+        "count": 2,
+        "avg": 9.3
+      },
+      "航运港口": {
+        "count": 2,
+        "avg": 9.0
+      },
+      "汽车零部件": {
+        "count": 1,
+        "avg": 8.8
+      },
+      "化学原料": {
+        "count": 2,
+        "avg": 8.5
+      },
+      "IT服务Ⅱ": {
+        "count": 1,
+        "avg": 8.1
+      },
+      "消费电子": {
+        "count": 1,
+        "avg": 8.0
+      },
+      "小家电": {
+        "count": 1,
+        "avg": 7.9
+      },
+      "军工电子Ⅱ": {
+        "count": 1,
+        "avg": 7.7
+      },
+      "自动化设备": {
+        "count": 1,
+        "avg": 7.5
+      },
+      "化学制品": {
+        "count": 1,
+        "avg": 7.0
+      },
+      "出版": {
+        "count": 1,
+        "avg": 6.3
+      },
+      "半导体": {
+        "count": 4,
+        "avg": 6.2
+      },
+      "计算机设备": {
+        "count": 1,
+        "avg": 5.8
+      },
+      "乘用车": {
+        "count": 1,
+        "avg": 5.7
+      },
+      "油服工程": {
+        "count": 1,
+        "avg": 5.3
+      }
+    },
+    "market_breadth": {
+      "available": true,
+      "score": 0,
+      "phase": "冰点/退潮(亏钱效应)",
+      "advice": "冰点/亏钱效应,空仓观望为宜",
+      "position": "建议空仓",
+      "components": {
+        "广度(涨跌家数占比)": 2.0,
+        "涨停净额(涨停-跌停)": 9.1,
+        "指数强度(三大指数均值)": -15,
+        "中位涨幅(剔除权重扭曲)": 0.0
+      },
+      "active_rate": null,
+      "raw": {
+        "total": 5209,
+        "up": 1634,
+        "down": 3466,
+        "flat": 109,
+        "suspended": 15,
+        "zt": 39,
+        "dt": 13,
+        "up5": null,
+        "up3": null,
+        "down5": null,
+        "avg_pct": null,
+        "median_pct": null,
+        "amount_yi": 16940.0,
+        "index": {
+          "上证": -0.79,
+          "科创": -4.82,
+          "深证": -2.07,
+          "创业板": -3.15
+        },
+        "index_level": {
+          "上证": 3812.0,
+          "科创": 1456.0,
+          "深证": 12621.0,
+          "创业板": 3037.0
+        },
+        "source": "legu",
+        "active_rate": null
+      }
+    },
+    "sector_l2_avg": {
+      "电池": {
+        "count": 5,
+        "avg": 11.4
+      },
+      "医疗器械": {
+        "count": 1,
+        "avg": 10.3
+      },
+      "化学制药": {
+        "count": 2,
+        "avg": 9.6
+      },
+      "光伏设备": {
+        "count": 2,
+        "avg": 9.6
+      },
+      "电力": {
+        "count": 1,
+        "avg": 9.6
+      },
+      "汽车零部件": {
+        "count": 1,
+        "avg": 9.2
+      },
+      "化学原料": {
+        "count": 2,
+        "avg": 8.4
+      },
+      "航运港口": {
+        "count": 2,
+        "avg": 8.4
+      },
+      "IT服务Ⅱ": {
+        "count": 1,
+        "avg": 8.3
+      },
+      "消费电子": {
+        "count": 1,
+        "avg": 8.2
+      },
+      "军工电子Ⅱ": {
+        "count": 1,
+        "avg": 8.1
+      },
+      "自动化设备": {
+        "count": 1,
+        "avg": 7.9
+      },
+      "小家电": {
+        "count": 1,
+        "avg": 7.5
+      },
+      "化学制品": {
+        "count": 1,
+        "avg": 7.4
+      },
+      "半导体": {
+        "count": 4,
+        "avg": 6.6
+      },
+      "计算机设备": {
+        "count": 1,
+        "avg": 6.3
+      },
+      "乘用车": {
+        "count": 1,
+        "avg": 6.1
+      },
+      "出版": {
+        "count": 1,
+        "avg": 5.5
+      },
+      "油服工程": {
+        "count": 1,
+        "avg": 5.3
+      }
+    }
+  },
+  "market_review": {
+    "available": true,
+    "text": "大盘上证-0.79%、深证-2.07%、创业板-3.15%、科创-4.82%（上证领涨），全市场成交1.69万亿，亏钱效应显现。资金集中进攻综合/其他等方向，带动产业链走强。综合/其他等题材冲高回落，资金出现明显高低切换。当前市场风格趋于均衡，硬件制造与景气兑现并重的方向更受资金青睐。沪指报3812点，三季报预告陆续披露，聚焦业绩边际变化与全年指引。",
+    "indices": {
+      "上证": -0.79,
+      "深证": -2.07,
+      "创业板": -3.15,
+      "科创": -4.82
+    },
+    "index_level": {
+      "上证": 3812.0,
+      "深证": 12621.0,
+      "创业板": 3037.0,
+      "科创": 1456.0
+    },
+    "amount_yi": 16940.0,
+    "up": 1634,
+    "down": 3466,
+    "zt": 39,
+    "dt": 13,
+    "money_score": 0,
+    "money_phase": "冰点/退潮(亏钱效应)",
+    "hot": [
+      "综合/其他"
+    ],
+    "weak": [
+      "综合/其他"
+    ],
+    "hw_ratio": null,
+    "total_news": 0,
+    "hot_news": 0
+  },
+  "sector_momentum": {
+    "date": "2026-10-08",
+    "mode": "evidence",
+    "mom_long_days": 60,
+    "mom_short_days": 10,
+    "n_sectors": 124
+  }
+}

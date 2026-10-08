@@ -74,7 +74,8 @@ def main():
     ai_arg = sys.argv[2] if len(sys.argv) > 2 else os.path.join(here, "ai_assessment.json")
 
     if scored_arg is None:
-        fs = sorted(glob.glob(os.path.join(here, "top200_scored_*.json")), reverse=True)
+        fs = [f for f in sorted(glob.glob(os.path.join(here, "top200_scored_*.json")), reverse=True)
+              if "_watch_" not in f and ".bak" not in f]
         scored_arg = fs[0] if fs else None
     if not scored_arg or not os.path.exists(scored_arg):
         print("❌ 未找到 scored json")

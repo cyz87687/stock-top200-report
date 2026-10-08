@@ -131,6 +131,7 @@ def main():
 
     # ===== 数据质量校验（针对主力池 TOP200）=====
     ok, reason = validate_data(top200)
+    used_fallback = False
     if not ok:
         print(f"⚠️ 新浪数据校验失败: {reason}")
         print("🔄 尝试东财备源...")
@@ -143,6 +144,7 @@ def main():
                 # 东财备源只给 200 只，观察池暂缺（保底）
                 top200_norm = out
                 top1000_norm = out
+                used_fallback = True
             else:
                 print(f"❌ 东财备源校验也失败: {reason2}")
                 sys.exit(1)
@@ -155,7 +157,7 @@ def main():
     # 观察池 = 成交额 200~1000 名（800 只）
     watch_pool = top1000_norm[200:]
 
-    _src = "新浪财经全市场行情接口" if "sh" in (top200_norm[0]["code"] if top200_norm else "") or "sz" in (top200_norm[0]["code"] if top200_norm else "") else "东财备源"
+    _src = "东财备源(akshare)" if used_fallback else "新浪财经全市场行情接口"
     _today = datetime.now().strftime("%Y-%m-%d")
 
     with open(OUT, "w", encoding="utf-8") as f:

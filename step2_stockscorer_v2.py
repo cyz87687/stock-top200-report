@@ -208,27 +208,31 @@ def fetch_weekly_klines(code, n=30):
     """前复权周线K线 → [{date,open,close,high,low,vol,amount}]"""
     raw = code[2:]
     market = "sh" if code.startswith("sh") else "sz"
-    try:
-        url = f"https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={market}{raw},week,,,{n},qfq"
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=10) as r:
-            data = json.loads(r.read().decode("utf-8"))
-        key = f"{market}{raw}"
-        kdata = data.get("data", {}).get(key, {})
-        raw_kl = kdata.get("qfqweek") or kdata.get("week")
-        if raw_kl and len(raw_kl) >= 10:
-            out = []
-            for k in raw_kl:
-                close = float(k[2])
-                vol_shares = float(k[5]) * 100
-                out.append({
-                    "date": k[0], "open": float(k[1]), "close": close,
-                    "high": float(k[3]), "low": float(k[4]),
-                    "vol": vol_shares,
-                })
-            return out
-    except:
-        pass
+    for _host in ["https://ifzq.gtimg.cn", "https://web.ifzq.gtimg.cn", "https://proxy.finance.qq.com/ifzqgtimg"]:
+        try:
+            url = f"{_host}/appstock/app/fqkline/get?param={market}{raw},week,,,{n},qfq"
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=10) as r:
+                txt = r.read().decode("utf-8")
+            if txt.lstrip().startswith("<"):
+                continue  # WAF 拦截页, 换域名
+            data = json.loads(txt)
+            key = f"{market}{raw}"
+            kdata = data.get("data", {}).get(key, {})
+            raw_kl = kdata.get("qfqweek") or kdata.get("week")
+            if raw_kl and len(raw_kl) >= 10:
+                out = []
+                for k in raw_kl:
+                    close = float(k[2])
+                    vol_shares = float(k[5]) * 100
+                    out.append({
+                        "date": k[0], "open": float(k[1]), "close": close,
+                        "high": float(k[3]), "low": float(k[4]),
+                        "vol": vol_shares,
+                    })
+                return out
+        except:
+            continue
     return None
 
 def fetch_klines(code):
@@ -238,17 +242,28 @@ def fetch_klines(code):
     raw = code[2:]
     market = "sh" if code.startswith("sh") else "sz"
     
-    # 方案1: 腾讯前复权K线 (qfqday, 重试3次)
+    # 方案1: 腾讯前复权K线 (qfqday, 多域名轮询; web.ifzq 域名会被 WAF 拦截)
     tencent_result = None
+    _tq_hosts = ["https://ifzq.gtimg.cn", "https://web.ifzq.gtimg.cn", "https://proxy.finance.qq.com/ifzqgtimg"]
     for attempt in range(3):
         try:
-            url = f"https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={market}{raw},day,,,{KLINES_N},qfq"
-            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-            with urllib.request.urlopen(req, timeout=10) as r:
-                data = json.loads(r.read().decode("utf-8"))
-            key = f"{market}{raw}"
-            kdata = data.get("data", {}).get(key, {})
-            raw_kl = kdata.get("qfqday")
+            raw_kl = None
+            for _host in _tq_hosts:
+                url = f"{_host}/appstock/app/fqkline/get?param={market}{raw},day,,,{KLINES_N},qfq"
+                req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+                try:
+                    with urllib.request.urlopen(req, timeout=10) as r:
+                        txt = r.read().decode("utf-8")
+                except Exception:
+                    continue
+                if txt.lstrip().startswith("<"):
+                    continue  # WAF 拦截页, 换域名
+                data = json.loads(txt)
+                key = f"{market}{raw}"
+                kdata = data.get("data", {}).get(key, {})
+                raw_kl = kdata.get("qfqday")
+                if raw_kl:
+                    break
             if raw_kl and len(raw_kl) >= 60:
                 out = []
                 for k in raw_kl:

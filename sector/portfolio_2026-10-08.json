@@ -1,0 +1,208 @@
+{
+ "date": "2026-10-08",
+ "momentum_date": "2026-10-08",
+ "top": 10,
+ "per_sector": 3,
+ "per_parent": 2,
+ "portfolios": {
+  "momentum": {
+   "level_used": "L4 最终兜底: 60日动量前20",
+   "target_rule": "L0 严格: 60日动量第1 ∩ 10日动量前3",
+   "level_trace": [
+    {
+     "level": "L0 严格: 60日动量第1 ∩ 10日动量前3",
+     "n_sectors": 1,
+     "n_cands": 1,
+     "sectors": [
+      "房地产服务"
+     ]
+    },
+    {
+     "level": "L1 放宽: 60日动量前3 ∩ 10日前5",
+     "n_sectors": 2,
+     "n_cands": 4,
+     "sectors": [
+      "医疗服务",
+      "房地产服务"
+     ]
+    },
+    {
+     "level": "L2 再放宽: 60日前5 ∩ 10日前10",
+     "n_sectors": 2,
+     "n_cands": 4,
+     "sectors": [
+      "医疗服务",
+      "房地产服务"
+     ]
+    },
+    {
+     "level": "L3 兜底: 60日动量前10",
+     "n_sectors": 10,
+     "n_cands": 9,
+     "sectors": [
+      "农产品加工",
+      "出版",
+      "医疗服务",
+      "房地产服务",
+      "教育",
+      "渔业",
+      "焦炭Ⅱ",
+      "生物制品",
+      "种植业",
+      "非白酒"
+     ]
+    },
+    {
+     "level": "L4 最终兜底: 60日动量前20",
+     "n_sectors": 20,
+     "n_cands": 14,
+     "sectors": [
+      "个护用品",
+      "农产品加工",
+      "出版",
+      "医疗服务",
+      "国有大型银行Ⅱ",
+      "城商行Ⅱ",
+      "影视院线",
+      "房地产开发",
+      "房地产服务",
+      "摩托车及其他",
+      "教育",
+      "渔业"
+     ]
+    }
+   ],
+   "sectors": [
+    "个护用品",
+    "农产品加工",
+    "出版",
+    "医疗服务",
+    "国有大型银行Ⅱ",
+    "城商行Ⅱ",
+    "影视院线",
+    "房地产开发",
+    "房地产服务",
+    "摩托车及其他",
+    "教育",
+    "渔业",
+    "焦炭Ⅱ",
+    "煤炭开采",
+    "燃气Ⅱ",
+    "生物制品",
+    "种植业",
+    "航运港口",
+    "非白酒",
+    "饮料乳品"
+   ],
+   "n_candidates": 14,
+   "picks": [
+    {
+     "name": "昭衍新药",
+     "code": "sh603127",
+     "sector_l2": "医疗服务",
+     "parent": "医药生物",
+     "total": 13.1,
+     "rating": "A",
+     "price": 52.06,
+     "pct_chg": 5.6,
+     "rsi": 65.1,
+     "trend": "日线多头",
+     "sector_r60": 2,
+     "sector_r10": 3,
+     "sector_mom60": 28.16,
+     "sector_mom10": 7.74,
+     "score_sector": 0.6,
+     "score_news": 3.5,
+     "score_tech": 3.76,
+     "score_fund": 3.5,
+     "score_theme": 3.9
+    },
+    {
+     "name": "药明康德",
+     "code": "sh603259",
+     "sector_l2": "医疗服务",
+     "parent": "医药生物",
+     "total": 12.45,
+     "rating": "B",
+     "price": 162.0,
+     "pct_chg": -3.19,
+     "rsi": 54.0,
+     "trend": "周线多头",
+     "sector_r60": 2,
+     "sector_r10": 3,
+     "sector_mom60": 28.16,
+     "sector_mom10": 7.74,
+     "score_sector": 0.6,
+     "score_news": 2.5,
+     "score_tech": 3.3,
+     "score_fund": 4.6,
+     "score_theme": 2.78
+    }
+   ]
+  },
+  "reversal": {
+   "level_used": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+   "target_rule": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+   "level_trace": [
+    {
+     "level": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+     "n_sectors": 2,
+     "n_cands": 44,
+     "sectors": [
+      "半导体",
+      "电子化学品Ⅱ"
+     ]
+    }
+   ],
+   "sectors": [
+    "半导体",
+    "电子化学品Ⅱ"
+   ],
+   "n_candidates": 44,
+   "picks": [
+    {
+     "name": "澜起科技",
+     "code": "sh688008",
+     "sector_l2": "半导体",
+     "parent": "电子",
+     "total": 14.91,
+     "rating": "A",
+     "price": 197.01,
+     "pct_chg": -2.62,
+     "rsi": 45.5,
+     "trend": "周线空头",
+     "sector_r60": 123,
+     "sector_r10": 119,
+     "sector_mom60": -26.64,
+     "sector_mom10": -8.25,
+     "score_sector": 3.28,
+     "score_news": 4.5,
+     "score_tech": 3.56,
+     "score_fund": 3.8,
+     "score_theme": 3.23
+    },
+    {
+     "name": "兆易创新",
+     "code": "sh603986",
+     "sector_l2": "半导体",
+     "parent": "电子",
+     "total": 12.64,
+     "rating": "B",
+     "price": 334.4,
+     "pct_chg": -5.51,
+     "rsi": 34.9,
+     "trend": "双线空头",
+     "sector_r60": 123,
+     "sector_r10": 119,
+     "sector_mom60": -26.64,
+     "sector_mom10": -8.25,
+     "score_sector": 3.28,
+     "score_news": 3.5,
+     "score_tech": 1.92,
+     "score_fund": 4.2,
+     "score_theme": 2.35
+    }
+   ]
+  }
+ }
+}

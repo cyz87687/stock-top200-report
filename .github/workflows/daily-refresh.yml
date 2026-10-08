@@ -188,7 +188,17 @@ jobs:
           git add sector_momentum_daily.py apply_sector_momentum.py pick_portfolio.py gen_portfolio_report.py fetch_sw_map.py select_watchlist.py
           git diff --cached --quiet && echo "No changes to commit" && exit 0
           git commit -m "auto: daily report refresh $(date -u '+%Y-%m-%d')"
-          git push
+          # 推送重试: 远端可能被并发写入 → 先 rebase 再重试, 最多 5 次
+          for i in 1 2 3 4 5; do
+            if git push; then
+              echo "✅ push succeeded (attempt $i)"
+              break
+            fi
+            echo "⚠️ push failed (attempt $i), rebasing on origin/main..."
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort; echo "rebase failed"; }
+            sleep 5
+          done
 
       - name: Upload refresh log
         if: always()

@@ -8,8 +8,8 @@
   4) 若 LLM 调用失败或环境变量缺失，自动 fallback 到规则化生成，确保流水线不中断。
 环境变量（GitHub Actions secrets 中设置）：
   LLM_API_KEY   : API Key（不会硬编码到代码）
-  LLM_BASE_URL  : 默认 https://ark.cn-beijing.volces.com/api/v3/
-  LLM_MODEL     : 默认 kimi-k2.7-code
+  LLM_BASE_URL  : 默认 https://ark.cn-beijing.volces.com/api/plan/v3（Agent Plan 专属通道）
+  LLM_MODEL     : 默认 deepseek-v4-pro
 数据纪律：所有数据来自 scored json 真实字段，不编造行情。
 """
 import json
@@ -18,6 +18,10 @@ import sys
 import glob
 from collections import defaultdict
 from datetime import datetime
+
+# 清除代理环境变量: HTTP(S)_PROXY 会干扰火山方舟 API 直连(本地/CI 通用)
+for _k in ('HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy', 'ALL_PROXY', 'all_proxy'):
+    os.environ.pop(_k, None)
 
 # ---------- 配置 ----------
 # 已验证可用的默认通道（火山方舟 plan 通道，OpenAI 兼容）：
@@ -36,7 +40,8 @@ def _pct_fmt(x):
 
 
 def _find_latest_scored(here):
-    fs = sorted(glob.glob(os.path.join(here, "top200_scored_*.json")), reverse=True)
+    fs = [f for f in sorted(glob.glob(os.path.join(here, "top200_scored_*.json")), reverse=True)
+          if "_watch_" not in f]
     if not fs:
         return None
     # 优先选不含 .bak 的
@@ -224,7 +229,7 @@ def _fallback_ai_assessment(s):
     ]
 
     model_summary = (
-        f"模型 v2.30（AI增强）基于{date}真实行情：四大指数{idx_str}，"
+        f"模型 {s['data'].get('model', 'stock-scorer')} 基于{date}真实行情：四大指数{idx_str}，"
         f"全市场{up}/{down}，成交{amount}亿，赚钱效应{money_phase}。"
         "自动识别强势/弱势题材并赋分，基本面叠加业绩导数，最终生成关注方向与组合建议。"
     )
@@ -343,10 +348,11 @@ def main():
         ai = _fallback_ai_assessment(summary)
         ai["fallback"] = True
     else:
-        # 校验并补齐必要字段
+        # 校验并补齐必要字段（fallback 只计算一次）
+        _fb = _fallback_ai_assessment(summary)
         for key in ["date", "generated_by", "generated_at", "commentary", "watch_directions", "model_summary", "themes", "portfolio"]:
             if key not in ai:
-                ai[key] = _fallback_ai_assessment(summary)[key]
+                ai[key] = _fb[key]
         ai["fallback"] = False
         ai["date"] = summary["date"]
         ai["generated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

@@ -124,7 +124,8 @@ def main():
 
     scored = args.scored
     if scored is None:
-        fs = sorted(glob.glob(os.path.join(HERE, 'top200_scored_*.json')), reverse=True)
+        fs = [f for f in sorted(glob.glob(os.path.join(HERE, 'top200_scored_*.json')), reverse=True)
+              if '_watch_' not in f and '.bak' not in f]
         scored = fs[0] if fs else None
     if not scored or not os.path.exists(scored):
         print("❌ 未找到 scored json")
