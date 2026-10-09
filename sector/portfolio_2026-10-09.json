@@ -1,0 +1,224 @@
+{
+ "date": "2026-10-09",
+ "momentum_date": "2026-10-09",
+ "top": 10,
+ "per_sector": 3,
+ "per_parent": 2,
+ "portfolios": {
+  "momentum": {
+   "level_used": "L4 最终兜底: 60日动量前20",
+   "target_rule": "L0 严格: 60日动量第1 ∩ 10日动量前3",
+   "level_trace": [
+    {
+     "level": "L0 严格: 60日动量第1 ∩ 10日动量前3",
+     "n_sectors": 0,
+     "n_cands": 0,
+     "sectors": []
+    },
+    {
+     "level": "L1 放宽: 60日动量前3 ∩ 10日前5",
+     "n_sectors": 0,
+     "n_cands": 0,
+     "sectors": []
+    },
+    {
+     "level": "L2 再放宽: 60日前5 ∩ 10日前10",
+     "n_sectors": 2,
+     "n_cands": 4,
+     "sectors": [
+      "医疗服务",
+      "房地产服务"
+     ]
+    },
+    {
+     "level": "L3 兜底: 60日动量前10",
+     "n_sectors": 10,
+     "n_cands": 9,
+     "sectors": [
+      "农产品加工",
+      "出版",
+      "医疗服务",
+      "房地产服务",
+      "教育",
+      "渔业",
+      "焦炭Ⅱ",
+      "煤炭开采",
+      "种植业",
+      "非白酒"
+     ]
+    },
+    {
+     "level": "L4 最终兜底: 60日动量前20",
+     "n_sectors": 20,
+     "n_cands": 23,
+     "sectors": [
+      "一般零售",
+      "个护用品",
+      "农产品加工",
+      "出版",
+      "医疗服务",
+      "国有大型银行Ⅱ",
+      "影视院线",
+      "房地产服务",
+      "教育",
+      "数字媒体",
+      "渔业",
+      "焦炭Ⅱ"
+     ]
+    }
+   ],
+   "sectors": [
+    "一般零售",
+    "个护用品",
+    "农产品加工",
+    "出版",
+    "医疗服务",
+    "国有大型银行Ⅱ",
+    "影视院线",
+    "房地产服务",
+    "教育",
+    "数字媒体",
+    "渔业",
+    "焦炭Ⅱ",
+    "煤炭开采",
+    "生物制品",
+    "电视广播Ⅱ",
+    "种植业",
+    "航运港口",
+    "贵金属",
+    "非白酒",
+    "饮料乳品"
+   ],
+   "n_candidates": 23,
+   "picks": [
+    {
+     "name": "药明康德",
+     "code": "sh603259",
+     "sector_l2": "医疗服务",
+     "parent": "医药生物",
+     "total": 12.9,
+     "rating": "B",
+     "price": 157.8,
+     "pct_chg": -2.59,
+     "rsi": 48.8,
+     "trend": "周线多头",
+     "sector_r60": 2,
+     "sector_r10": 7,
+     "sector_mom60": 28.69,
+     "sector_mom10": 7.0,
+     "score_sector": 0.88,
+     "score_news": 3.0,
+     "score_tech": 3.28,
+     "score_fund": 4.6,
+     "score_theme": 2.69
+    },
+    {
+     "name": "中金黄金",
+     "code": "sh600489",
+     "sector_l2": "贵金属",
+     "parent": "有色金属",
+     "total": 12.7,
+     "rating": "B",
+     "price": 22.95,
+     "pct_chg": 6.84,
+     "rsi": 46.2,
+     "trend": "日线空头",
+     "sector_r60": 15,
+     "sector_r10": 116,
+     "sector_mom60": 16.99,
+     "sector_mom10": -6.87,
+     "score_sector": 2.08,
+     "score_news": 2.37,
+     "score_tech": 1.82,
+     "score_fund": 4.7,
+     "score_theme": 3.76
+    },
+    {
+     "name": "山东黄金",
+     "code": "sh600547",
+     "sector_l2": "贵金属",
+     "parent": "有色金属",
+     "total": 12.1,
+     "rating": "B",
+     "price": 27.17,
+     "pct_chg": 2.8,
+     "rsi": 33.7,
+     "trend": "日线空头",
+     "sector_r60": 15,
+     "sector_r10": 116,
+     "sector_mom60": 16.99,
+     "sector_mom10": -6.87,
+     "score_sector": 2.08,
+     "score_news": 2.37,
+     "score_tech": 1.68,
+     "score_fund": 4.5,
+     "score_theme": 3.42
+    }
+   ]
+  },
+  "reversal": {
+   "level_used": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+   "target_rule": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+   "level_trace": [
+    {
+     "level": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+     "n_sectors": 2,
+     "n_cands": 42,
+     "sectors": [
+      "半导体",
+      "电子化学品Ⅱ"
+     ]
+    }
+   ],
+   "sectors": [
+    "半导体",
+    "电子化学品Ⅱ"
+   ],
+   "n_candidates": 42,
+   "picks": [
+    {
+     "name": "兆易创新",
+     "code": "sh603986",
+     "sector_l2": "半导体",
+     "parent": "电子",
+     "total": 13.72,
+     "rating": "A",
+     "price": 326.46,
+     "pct_chg": -2.37,
+     "rsi": 33.2,
+     "trend": "双线空头",
+     "sector_r60": 123,
+     "sector_r10": 119,
+     "sector_mom60": -32.1,
+     "sector_mom10": -9.32,
+     "score_sector": 3.28,
+     "score_news": 4.5,
+     "score_tech": 1.92,
+     "score_fund": 4.2,
+     "score_theme": 2.73
+    },
+    {
+     "name": "有研新材",
+     "code": "sh600206",
+     "sector_l2": "半导体",
+     "parent": "电子",
+     "total": 13.6,
+     "rating": "A",
+     "price": 47.95,
+     "pct_chg": 7.42,
+     "rsi": 48.1,
+     "trend": "死叉",
+     "sector_r60": 123,
+     "sector_r10": 119,
+     "sector_mom60": -32.1,
+     "sector_mom10": -9.32,
+     "score_sector": 3.28,
+     "score_news": 3.21,
+     "score_tech": 2.38,
+     "score_fund": 3.8,
+     "score_theme": 4.16
+    }
+   ]
+  }
+ }
+}
