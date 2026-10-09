@@ -46,10 +46,15 @@ for pf in prev_files:
         pass
 date_str = data.get("date", datetime.now().strftime("%Y-%m-%d"))
 model_str = data.get("model", "stock-scorer")
-# 版本号展示(线上报告页头徽章): v2.40 五维 / v2.30 四维
+# 版本号展示: 报告层 v2.43 / 底层评分 v2.40(五维) 或 v2.30(四维)
+# R6: 此前页头显示底层评分版本(v2.40)而评级口径区显示报告层版本(v2.41), 同页两版本打架。
+#     现统一: 报告层版本 REPORT_VER 单独常量化, 页头同时标明"报告层 + 评分层"两个版本号。
+# v2.43: 「组合区块三合一」——消除 AI 组合 3 处重复、修复"说降仓却给满额金额"的逻辑矛盾。
+REPORT_VER = "v2.43"
 _has_sector = any(x.get('score_sector') is not None for x in results)
-_ver_tag = "v2.40 · 五维" if _has_sector else "v2.30 · 四维"
+_ver_tag = f"{REPORT_VER} · 五维" if _has_sector else f"{REPORT_VER} · 四维"
 _ver_short = "v2.40 (AI + 板块动量)" if _has_sector else "v2.30 (AI 增强)"
+_SCORER_VER = "v2.40 (AI + sector-momentum)" if _has_sector else "v2.30 (AI 增强)"
 total_stocks = len(results)
 
 # 颜色配置
@@ -293,6 +298,100 @@ def sector_disp(r):
     return r.get("sector_l2") or r.get("sector_parent") or r.get("sector", "")
 
 
+# ===== v2.42 R5 估值分位参照 =====
+# FwdPE 孤立数字无参照系(26x 是贵还是便宜?)。用当日样本自身分布算分位,
+# 语义: "本票 FwdPE 低于当日 N% 的样本" —— 相对便宜度高。
+def _compute_fwdpe_pctile(results):
+    vals = sorted(v for v in (r.get("fwd_pe") for r in results)
+                  if isinstance(v, (int, float)) and 0 < v < 500)
+    n = len(vals)
+    if n < 10:
+        return {}
+    out = {}
+    for r in results:
+        v = r.get("fwd_pe")
+        if not isinstance(v, (int, float)) or not (0 < v < 500):
+            continue
+        import bisect
+        rank = bisect.bisect_right(vals, v)
+        out[r["code"]] = rank / n * 100        # v 低于 pct% 的样本
+    return out
+
+
+_fwdpe_pct = _compute_fwdpe_pctile(results)
+
+
+def valu_note(r):
+    """→ (相对便宜度文案, 颜色) ；以当日截面 FwdPE 分位表述, 无数据返回空。"""
+    p = _fwdpe_pct.get(r["code"])
+    if p is None:
+        return "", "#94a3b8"
+    if p <= 20:
+        return f"FwdPE低估·低于{p:.0f}%样本", "#22c55e"
+    if p <= 45:
+        return f"FwdPE偏低·低于{p:.0f}%样本", "#4ade80"
+    if p <= 70:
+        return f"FwdPE居中·{p:.0f}%分位", "#94a3b8"
+    if p <= 88:
+        return f"FwdPE偏高·高于{p:.0f}%样本", "#f59e0b"
+    return f"FwdPE偏贵·高于{p:.0f}%样本", "#ef4444"
+
+
+# ===== v2.42 R1 盈亏比可信度 + R4 持有周期 =====
+# R1: 盈亏比是纯技术推导, 超买/高波动/弱动量下可靠性骤降, 需给使用者一个可信度标签。
+#     由 RSI + 价格分位 + 量能因子 + 板块动量档位 合成 0~100 置信分。
+# R4: 按技术趋势给出建议持有周期(动量路线偏短、趋势路线偏中), 补齐"持有多久"。
+def trade_confidence(r, plan):
+    """→ (等级 高/中/低, 置信分 0~100, 说明)"""
+    if not plan:
+        return ("—", 0, "")
+    tech = r.get("tech") or {}
+    rsi = tech.get("rsi")
+    pos = tech.get("position")
+    vol_f = tech.get("vol_factor")
+    r60 = r.get("sector_r60")
+    score = 100
+    notes = []
+    if rsi is not None:
+        if rsi > 70:
+            score -= 30; notes.append(f"RSI{rsi:.0f}超买")
+        elif rsi > 65:
+            score -= 15; notes.append(f"RSI{rsi:.0f}偏高")
+        elif rsi < 30:
+            score -= 10; notes.append(f"RSI{rsi:.0f}超卖")
+    if pos is not None:
+        if pos > 85:
+            score -= 25; notes.append("分位高位")
+        elif pos > 70:
+            score -= 12
+    if vol_f is not None and vol_f < 2.5:
+        score -= 10; notes.append("量能不足")
+    if r60 is not None and r60 > 90:
+        score -= 10; notes.append("板块动量末段")
+    score = max(0, min(100, score))
+    if score >= 75:
+        return ("高", score, "技术形态健康，盈亏比参考性较强")
+    if score >= 50:
+        return ("中", score, "存在个别不利因子，盈亏比需打折看待")
+    return ("低", score, "多重不利因子叠加，盈亏比参考性弱，勿据此重仓")
+
+
+def holding_period(r, plan):
+    """R4: 按趋势/路线给出建议持有周期。"""
+    if not plan:
+        return ""
+    tech = r.get("tech") or {}
+    trend = tech.get("trend", "") or ""
+    r60 = r.get("sector_r60")
+    if plan.get("overbought"):
+        return "等待回调后再定，暂不建仓"
+    if "多头" in trend and isinstance(r60, int) and r60 <= 30:
+        return "动量路线 · 持有至跌破 ma10（约 5~15 日）"
+    if "多头" in trend:
+        return "趋势跟涨 · 持有至跌破 ma20（约 10~30 日）"
+    return "反转路线 · 反弹 8% 或 5~10 日止盈，破止损即离场"
+
+
 # ===== v2.41 P0-1 双引擎组合: 量化组合(pick_portfolio 双路线) + AI 组合, 并统计交集 =====
 quant_json = {}
 try:
@@ -339,14 +438,42 @@ body {
     background:#0f172a;color:#e2e8f0;padding:16px;line-height:1.5;
 }
 .container {max-width:1400px;margin:0 auto;}
+a {color:inherit;}
 
-/* 头部 */
-.header {text-align:center;padding:24px 0;border-bottom:1px solid #334155;margin-bottom:24px;}
-.header h1 {font-size:24px;color:#f8fafc;margin-bottom:8px;}
-.header .sub {color:#94a3b8;font-size:13px;margin-bottom:4px;}
+/* A4 锚点导航条 */
+.nav-bar {position:sticky;top:0;z-index:60;display:flex;gap:6px;justify-content:center;align-items:center;
+    background:rgba(15,23,42,0.96);backdrop-filter:blur(6px);padding:8px 10px;margin-bottom:14px;
+    border-bottom:1px solid #334155;flex-wrap:wrap;}
+.nav-bar a {font-size:12px;font-weight:500;color:#94a3b8;text-decoration:none;padding:5px 12px;
+    border-radius:8px;border:1px solid transparent;transition:all .15s;}
+.nav-bar a:hover {color:#e2e8f0;background:#1e293b;border-color:#334155;}
+.nav-bar .nav-date {font-size:11px;color:#64748b;margin-left:6px;padding-left:10px;border-left:1px solid #334155;}
+
+/* A1 首屏 Hero 决策区 */
+.hero {margin:0 0 18px;padding:20px 22px;border-radius:16px;
+    background:linear-gradient(135deg,#1e293b,#0f172a);border:1px solid #334155;}
+.hero h1 {font-size:20px;font-weight:500;color:#f8fafc;margin-bottom:12px;font-weight:600;}
+.hero .hero-ver {font-size:11px;font-weight:400;color:#64748b;margin-left:8px;}
+.hero .hero-verdict {font-size:32px;font-weight:800;line-height:1.2;margin:4px 0 2px;letter-spacing:-.5px;}
+.hero .hero-kpis {display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0 0;}
+.hero .hero-kpi {background:#0f172a;border-radius:12px;padding:12px 14px;border:1px solid #1e293b;border-left:3px solid #334155;}
+.hero .hero-kpi .k-lbl {font-size:11px;color:#94a3b8;}
+.hero .hero-kpi .k-val {font-size:20px;font-weight:700;color:#f8fafc;margin-top:2px;}
+.hero .hero-kpi .k-sub {font-size:11px;color:#64748b;margin-top:3px;line-height:1.5;}
+.hero .hero-top3 {display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px;}
+.hero .ht-item {background:#0f172a;border-radius:10px;padding:11px 13px;border:1px solid #1e293b;}
+.hero .ht-item .ht-name {font-size:13px;font-weight:700;color:#f8fafc;}
+.hero .ht-item .ht-sc {font-size:15px;font-weight:800;margin-top:2px;}
+.hero .ht-item .ht-note {font-size:11px;color:#94a3b8;margin-top:3px;}
+.hero .hero-meta {font-size:11px;color:#64748b;margin-top:12px;line-height:1.7;}
+
+/* 头部(已下沉, 仅在无 Hero 时的回退) */
+.header {text-align:center;padding:20px 0;border-bottom:1px solid #334155;margin-bottom:18px;}
+.header h1 {font-size:20px;color:#f8fafc;margin-bottom:8px;}
+.header .sub {color:#94a3b8;font-size:12px;margin-bottom:4px;}
 .header .meta {color:#64748b;font-size:11px;}
-.header .ver-badge {display:inline-flex;align-items:center;gap:8px;margin:10px 0 6px;padding:5px 14px;border-radius:999px;background:linear-gradient(135deg,#1e3a8a,#4c1d95);border:1px solid #6d28d9;color:#e9d5ff;font-size:12.5px;font-weight:600;letter-spacing:.3px;}
-.header .ver-badge .vtag {background:#f59e0b;color:#1e293b;border-radius:999px;padding:1px 9px;font-size:11.5px;font-weight:700;}
+.header .ver-badge {display:inline-flex;align-items:center;gap:8px;margin:10px 0 6px;padding:5px 14px;border-radius:999px;background:linear-gradient(135deg,#1e3a8a,#4c1d95);border:1px solid #6d28d9;color:#e9d5ff;font-size:12px;font-weight:600;letter-spacing:.3px;}
+.header .ver-badge .vtag {background:#f59e0b;color:#1e293b;border-radius:999px;padding:1px 9px;font-size:11px;font-weight:700;}
 .header .ver-badge .vdate {color:#c4b5fd;font-weight:500;}
 
 /* 核心结论卡片 */
@@ -355,15 +482,15 @@ body {
     border-radius:16px;padding:24px;margin:20px 0;
     border:1px solid #334155;border-left:4px solid #22c55e;
 }
-.core-conclusion h2 {font-size:18px;color:#f8fafc;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
-.core-conclusion .main-line {font-size:14px;color:#e2e8f0;margin-bottom:12px;line-height:1.8;}
+.core-conclusion h2 {font-size:15px;color:#f8fafc;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.core-conclusion .main-line {font-size:13px;color:#e2e8f0;margin-bottom:12px;line-height:1.8;}
 .core-conclusion .top3 {display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px;}
 .core-conclusion .top3-item {
     background:#0f172a;border-radius:10px;padding:14px;border:1px solid #334155;
     display:flex;flex-direction:column;gap:6px;
 }
 .core-conclusion .top3-item .t-name {font-size:15px;font-weight:800;color:#f8fafc;}
-.core-conclusion .top3-item .t-score {font-size:22px;font-weight:800;}
+.core-conclusion .top3-item .t-score {font-size:20px;font-weight:800;}
 .core-conclusion .top3-item .t-reason {font-size:11px;color:#94a3b8;line-height:1.5;}
 
 /* 快捷筛选按钮 */
@@ -388,7 +515,7 @@ body {
 
 /* 评级变化标签 */
 .rating-change {
-    font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:4px;
+    font-size:11px;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:4px;
 }
 .rating-up {background:#dcfce7;color:#16a34a;}
 .rating-down {background:#fee2e2;color:#dc2626;}
@@ -419,7 +546,7 @@ body {
 .stock-table tr.detail-row.show td {padding:16px;}
 
 /* 排序箭头 */
-.sort-arrow {font-size:10px;color:#64748b;margin-left:2px;}
+.sort-arrow {font-size:11px;color:#64748b;margin-left:2px;}
 th.sorted-asc .sort-arrow {color:#22c55e;}
 th.sorted-desc .sort-arrow {color:#ef4444;}
 
@@ -443,7 +570,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
     border:1px solid #334155;transition:transform 0.2s;
 }
 .card:hover {transform:translateY(-2px);border-color:#475569;}
-.card .count {font-size:28px;font-weight:800;margin:4px 0;}
+.card .count {font-size:20px;font-weight:800;margin:4px 0;}
 .card .label {font-size:11px;color:#94a3b8;}
 
 /* 图表区域 */
@@ -451,17 +578,17 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
 .chart-card {
     background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155;
 }
-.chart-card h3 {font-size:14px;color:#f8fafc;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.chart-card h3 {font-size:13px;color:#f8fafc;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
 .chart-container {height:200px;position:relative;}
 .bar-chart {display:flex;align-items:flex-end;gap:8px;height:160px;padding:10px 0;}
 .bar-item {flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
 .bar {width:100%;background:linear-gradient(180deg,#3b82f6,#22c55e);border-radius:4px 4px 0 0;transition:height 0.3s;}
-.bar-label {font-size:10px;color:#94a3b8;text-align:center;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bar-label {font-size:11px;color:#94a3b8;text-align:center;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .bar-value {font-size:11px;color:#e2e8f0;font-weight:700;}
 
 /* 详情卡片 */
 .section-title {
-    font-size:16px;font-weight:700;color:#f8fafc;
+    font-size:15px;font-weight:700;color:#f8fafc;
     margin:28px 0 16px;padding-bottom:10px;border-bottom:2px solid #334155;
     display:flex;align-items:center;gap:8px;
 }
@@ -476,11 +603,11 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
 }
 .stock-detail .rank {
     width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-    font-size:14px;font-weight:800;color:#fff;flex-shrink:0;
+    font-size:13px;font-weight:800;color:#fff;flex-shrink:0;
 }
-.stock-detail .name {font-size:16px;font-weight:700;color:#f8fafc;}
+.stock-detail .name {font-size:15px;font-weight:700;color:#f8fafc;}
 .stock-detail .code {font-size:11px;color:#94a3b8;}
-.stock-detail .total {font-size:28px;font-weight:800;margin-left:auto;}
+.stock-detail .total {font-size:20px;font-weight:800;margin-left:auto;}
 .stock-detail .rating {
     font-size:12px;font-weight:700;padding:4px 12px;border-radius:8px;text-align:center;
 }
@@ -491,9 +618,33 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
 .stock-detail .dim-card {
     background:#0f172a;border-radius:8px;padding:12px;border:1px solid #334155;
 }
-.stock-detail .dim-card .dim-title {font-size:10px;color:#94a3b8;margin-bottom:6px;}
-.stock-detail .dim-card .dim-score {font-size:18px;font-weight:700;margin-right:8px;}
-.stock-detail .dim-card .dim-detail {font-size:10px;color:#94a3b8;line-height:1.6;margin-top:6px;}
+.stock-detail .dim-card .dim-title {font-size:11px;color:#94a3b8;margin-bottom:6px;}
+.stock-detail .dim-card .dim-score {font-size:15px;font-weight:700;margin-right:8px;}
+.stock-detail .dim-card .dim-detail {font-size:11px;color:#94a3b8;line-height:1.6;margin-top:6px;}
+
+/* A5 深度卡片折叠: A级默认收起明细, 点击展开 */
+.stock-detail.collapsed .sd-body {display:none;}
+.stock-detail .expand-hint {font-size:11px;color:#38bdf8;cursor:pointer;margin-left:auto;padding:2px 8px;border:1px solid #334155;border-radius:6px;user-select:none;}
+.stock-detail .expand-hint:hover {background:#1e293b;border-color:#38bdf8;}
+.stock-detail:not(.collapsed) .expand-hint {display:none;}
+
+/* A7 视图预设按钮 */
+.preset-btn {background:#0f172a;border:1px solid #334155;color:#94a3b8;padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;transition:all .15s;}
+.preset-btn:hover {border-color:#3b82f6;color:#e2e8f0;}
+.preset-btn.active {background:#3b82f6;border-color:#3b82f6;color:#fff;}
+.col-toggle-wrap summary {list-style:none;}
+.col-toggle-wrap summary::-webkit-details-marker {display:none;}
+
+/* A8 表格首屏固定列: 名称/涨跌/总分/评级 */
+.stock-table th.sticky-col, .stock-table td.sticky-col {
+    position:sticky;background:#1e293b;z-index:5;
+}
+.stock-table th.sticky-col {z-index:11;background:#0f172a;}
+.stock-table td.col-name-sticky {left:0;min-width:90px;}
+.stock-table th.col-name-sticky {left:0;min-width:90px;}
+.stock-table td.col-pct-sticky, .stock-table th.col-pct-sticky {left:90px;min-width:72px;}
+.stock-table td.col-total-sticky, .stock-table th.col-total-sticky {left:162px;min-width:60px;}
+.stock-table tr:hover td.sticky-col {background:#273449;}
 
 /* 完整表格 */
 .table-container {overflow-x:auto;background:#1e293b;border-radius:12px;border:1px solid #334155;}
@@ -519,7 +670,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
     width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;
     font-size:11px;font-weight:700;color:#fff;
 }
-.s-total {font-size:14px;font-weight:800;text-align:center;min-width:50px;}
+.s-total {font-size:13px;font-weight:800;text-align:center;min-width:50px;}
 .s-rating {
     font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;text-align:center;display:inline-block;
 }
@@ -547,10 +698,10 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
     .controls .control-group {width:100%;}
     .controls select, .controls input {width:100%;}
     .stock-detail .rank {width:32px;height:32px;font-size:12px;}
-    .stock-detail .name {font-size:14px;}
+    .stock-detail .name {font-size:13px;}
     .stock-detail .total {font-size:20px;}
     .stock-detail .dim-row {grid-template-columns:1fr;}
-    .header h1 {font-size:18px;}
+    .header h1 {font-size:15px;}
 }
 @media (max-width:480px) {
     .summary {grid-template-columns:1fr;}
@@ -572,13 +723,13 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
     display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;
     padding-bottom:12px;border-bottom:1px solid #334155;
 }
-.research-card .rc-name {font-size:17px;font-weight:800;color:#f8fafc;}
+.research-card .rc-name {font-size:15px;font-weight:800;color:#f8fafc;}
 .research-card .rc-code {font-size:11px;color:#94a3b8;}
 .research-card .rc-rating {
     font-size:11px;font-weight:800;padding:3px 10px;border-radius:6px;
 }
 .research-card .rc-score {font-size:13px;color:#94a3b8;margin-left:auto;}
-.research-card .rc-score b {font-size:18px;}
+.research-card .rc-score b {font-size:15px;}
 .research-module {margin-bottom:14px;}
 .research-module .rm-title {
     font-size:12px;font-weight:700;color:#38bdf8;margin-bottom:6px;
@@ -592,7 +743,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
 .research-module.value .rm-title {color:#22c55e;}
 .research-module .rm-content b {color:#f8fafc;}
 .research-module .rm-content .tag {
-    display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;
+    display:inline-block;font-size:11px;padding:1px 6px;border-radius:3px;
     background:#334155;color:#94a3b8;margin:2px 4px 2px 0;
 }
 .research-module .rm-content .tag.pos {background:#dcfce7;color:#16a34a;}
@@ -607,52 +758,16 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
 </head>
 <body>
 <div class="container">
-    <div class="header">
-        <h1>📊 A股成交额TOP''' + str(total_stocks) + ''' 极简公司评分</h1>
-        <div class="ver-badge"><span class="vtag">''' + _ver_tag + '''</span><span>stock-scorer ''' + _ver_short + '''</span><span class="vdate">· 数据日期 ''' + date_str + '''</span></div>
-        <div class="sub">''' + model_str + ''' | 题材动量 · 大盘赚钱效应 · 基本面含行业前景 · ''' + ('五维加权(含板块动量)' if any(x.get('score_sector') is not None for x in results) else '四维加权') + '''</div>
-        <div class="meta">''' + date_str + ''' | 数据源：东方财富 + 腾讯K线 + 同花顺 + 新浪/乐股</div>
-    </div>
-
-    <!-- 统计卡片 -->
-    <div class="summary">''')
-
-# 添加统计卡片
-for r in ["S", "A", "B", "C", "D"]:
-    count = stats.get("rating_dist", {}).get(r, 0)
-    html_parts.append(f'''
-        <div class="card">
-            <div class="count" style="color:{RATING_COLORS[r]}">{count}</div>
-            <div class="label">{r}级 · {RATING_FULL[r]}</div>
-        </div>''')
-
-html_parts.append('''
-    </div>
-    <div style="font-size:11px;color:#94a3b8;margin:8px 0 16px;padding:8px 12px;background:#1e293b;border-radius:8px;">
-        📐 评级口径(v2.41 · 当日截面相对强弱，绝对总分不变)：<span style="color:#22c55e;font-weight:700;">S级 前5%</span> ·
-        <span style="color:#3b82f6;font-weight:700;">A级 前15%</span> ·
-        <span style="color:#f59e0b;font-weight:700;">B级 前50%</span> ·
-        <span style="color:#f97316;font-weight:700;">C级 前88%</span> ·
-        <span style="color:#dc2626;font-weight:700;">D级 后12%</span>
-        <span style="color:#64748b;">　｜　评级仅表"当日相对强弱"，实际仓位由上方市场状态统一决定</span>
-    </div>''')
-
-# ===== v2.41 P0-2 仓位纪律横幅 =====
-html_parts.append(f'''
-    <div style="margin:0 0 18px;padding:14px 18px;border-radius:12px;background:linear-gradient(135deg,#1e293b,#0f172a);border:1px solid {mkt_color};border-left:5px solid {mkt_color};display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-        <div style="display:flex;flex-direction:column;gap:2px;min-width:150px;">
-            <span style="font-size:11px;color:#94a3b8;">🎯 今日市场状态 → 总仓位纪律</span>
-            <span style="font-size:20px;font-weight:800;color:{mkt_color};">{mkt_phase}</span>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:2px;padding-left:16px;border-left:1px solid #334155;">
-            <span style="font-size:11px;color:#94a3b8;">建议总仓位上限</span>
-            <span style="font-size:20px;font-weight:800;color:#f8fafc;">{mkt_pos}</span>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:2px;padding-left:16px;border-left:1px solid #334155;flex:1;min-width:200px;">
-            <span style="font-size:11px;color:#94a3b8;">操作纪律（赚钱效应 {mkt_score if mkt_score is not None else '—'} 分）</span>
-            <span style="font-size:13px;font-weight:600;color:#e2e8f0;">{mkt_disc}</span>
-        </div>
-    </div>''')
+    <!-- A4 锚点导航: 12 区块 → 4 组跳转 -->
+    <nav class="nav-bar">
+        <a href="#sec-decision">① 今日决策</a>
+        <a href="#sec-list">② 选股清单</a>
+        <a href="#sec-research">③ 深度研究</a>
+        <a href="#sec-watch">④ 观察池</a>
+        <a href="#sec-notes">ⓘ 说明</a>
+        <span class="nav-date">数据日期 ''' + date_str + '''</span>
+    </nav>
+''')
 
 # 核心结论卡片
 top3_stocks = sorted(results, key=lambda x: -x["total"])[:3]
@@ -703,6 +818,57 @@ amt_disp = (f"{mr_amt/10000:.2f}万亿" if (mr_amt and mr_amt >= 10000) else (f"
 breadth_disp = (f"涨{mr_up}/跌{mr_down} · 涨停{mr_zt}/跌停{mr_dt}" if (mr_up is not None and mr_down is not None) else "—")
 me_disp = (f"{mr_score}分 {mr_phase}" if mr_score is not None else "—")
 
+# ===== v2.42 A1 首屏 Hero: 决策信息上提(原统计卡+口径说明+仓位横幅合并) =====
+# 原页面: 标题→版本→副标题→数据源→5统计卡→口径说明→仓位横幅 共约900px才见决策内容。
+# 现: Hero 一屏内给出 [仓位纪律 + S/A计数 + 主线板块 + 核心3只], 元信息全部下沉页脚。
+_hero_gap = '''</div>'''
+html_parts.append(f'''
+    <!-- A1 首屏 Hero 决策区 -->
+    <div class="hero" id="sec-decision">
+        <h1>📊 A股成交额 TOP{total_stocks} 评分<span class="hero-ver">报告层 {REPORT_VER} · 评分层 {_SCORER_VER}</span></h1>
+        <div style="font-size:11px;color:#94a3b8;">🎯 今日市场状态 → 总仓位纪律（赚钱效应 {mkt_score if mkt_score is not None else '—'} 分）</div>
+        <div class="hero-verdict" style="color:{mkt_color};">{mkt_phase} · 建议仓位 {mkt_pos}</div>
+        <div style="font-size:13px;color:#cbd5e1;">{mkt_disc}</div>
+        <div class="hero-kpis">
+            <div class="hero-kpi" style="border-left-color:#22c55e;">
+                <div class="k-lbl">⭐ S + A 级（重点跟踪）</div>
+                <div class="k-val">{s_count} + {a_count}</div>
+                <div class="k-sub">S级前5% / A级前15%（当日截面）</div>
+            </div>
+            <div class="hero-kpi" style="border-left-color:#3b82f6;">
+                <div class="k-lbl">📈 主线板块</div>
+                <div class="k-val">{top_sector[0] if top_sector else '—'}</div>
+                <div class="k-sub">均分 {top_sector[1].get('avg',0):.2f} · {len([s for s,v in sec_avg.items() if v.get("count",0)>=5])} 个板块≥5只</div>
+            </div>
+            <div class="hero-kpi" style="border-left-color:#f59e0b;">
+                <div class="k-lbl">💰 大盘赚钱效应</div>
+                <div class="k-val">{mkt_score if mkt_score is not None else '—'}<span style="font-size:12px;color:#94a3b8;"> / 100</span></div>
+                <div class="k-sub">{breadth_disp}</div>
+            </div>
+        </div>
+        <div class="hero-top3">''')
+
+for _hi, _r in enumerate(top3_stocks):
+    _rt = _r["rating"]; _tc = RATING_COLORS[_rt]
+    _sub_ = _r.get("sub_theme", ""); _sec_ = sector_disp(_r)
+    html_parts.append(f'''
+            <div class="ht-item" style="border-left:3px solid {_tc};">
+                <div class="ht-name">#{_hi+1} {html_mod.escape(_r["name"])}</div>
+                <div class="ht-sc" style="color:{_tc};">{_r["total"]:.2f}<span style="font-size:11px;color:#94a3b8;"> / 20</span></div>
+                <div class="ht-note">{html_mod.escape(_sec_)}{' · ' + html_mod.escape(_sub_) if _sub_ else ''}</div>
+            </div>''')
+
+html_parts.append(f'''
+        </div>
+        <div class="hero-meta">
+            评级口径（{REPORT_VER} · 当日截面相对强弱，绝对总分不变）：
+            <b style="color:#22c55e;">S级 前5%</b> · <b style="color:#3b82f6;">A级 前15%</b> ·
+            <b style="color:#f59e0b;">B级 前50%</b> · <b style="color:#f97316;">C级 前88%</b> ·
+            <b style="color:#dc2626;">D级 后12%</b>　｜　评级仅表"当日相对强弱"，实际仓位由上方市场状态统一决定
+        </div>
+    </div>
+''')
+
 # ===== v2.22 AI 复盘点评(每日由AI生成, 优先于模板文本) =====
 # 数据纪律: 只采纳与当日数据日期一致的点评, 防止陈旧文件(如历史 ai_review_today.json)
 # 在当日 ai_assessment.json 缺失/损坏时冒充当日点评。不匹配则回退到模板文本。
@@ -737,12 +903,12 @@ if ai_text:
         watch_html = (f'<div style="margin:12px 0;padding:10px 14px;background:#0f172a;'
                       f'border-left:3px solid #f59e0b;border-radius:8px;">'
                       f'<b style="color:#f59e0b;font-size:13px;">📌 需要关注的方向</b>'
-                      f'<ol style="margin:8px 0 0 18px;padding:0;font-size:12.5px;line-height:1.7;color:#e2e8f0;">{_items}</ol></div>')
+                      f'<ol style="margin:8px 0 0 18px;padding:0;font-size:12px;line-height:1.7;color:#e2e8f0;">{_items}</ol></div>')
     else:
         watch_html = ""
     risk_html = (f'<div style="margin:10px 0;padding:8px 14px;background:#1a1208;'
                  f'border-left:3px solid #ef4444;border-radius:8px;'
-                 f'font-size:12.5px;color:#fca5a5;">⚠️ {html_mod.escape(ai_risk)}</div>') if ai_risk else ""
+                 f'font-size:12px;color:#fca5a5;">⚠️ {html_mod.escape(ai_risk)}</div>') if ai_risk else ""
     review_body = (f'<div class="review-text" style="font-size:13px;line-height:1.9;color:#e2e8f0;'
                    f'background:#0f172a;border-left:3px solid #3b82f6;padding:12px 14px;border-radius:8px;margin:10px 0;">'
                    f'{html_mod.escape(ai_text)}</div>{watch_html}{risk_html}')
@@ -753,54 +919,40 @@ else:
                    f'{html_mod.escape(mr_text)}</div>')
 
 html_parts.append(f'''
-    <!-- 复盘点评 (v2.22 AI生成优先) -->
-    <div class="core-conclusion review-card">
+    <!-- 复盘点评 (v2.22 AI生成优先; v2.42 A5 长文折叠) -->
+    <div class="core-conclusion review-card" id="sec-summary">
         <h2>{review_title}</h2>
-        {review_body}
-        <div class="review-metrics" style="display:flex;flex-wrap:wrap;gap:10px;margin:12px 0;font-size:12px;color:#cbd5e1;">
+        <div class="review-metrics" style="display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 4px;font-size:12px;color:#cbd5e1;">
             <span style="background:#1e293b;padding:6px 10px;border-radius:6px;"><b style="color:#94a3b8;">指数</b> {idx_chips}</span>
             <span style="background:#1e293b;padding:6px 10px;border-radius:6px;"><b style="color:#94a3b8;">成交</b> {amt_disp}</span>
             <span style="background:#1e293b;padding:6px 10px;border-radius:6px;"><b style="color:#94a3b8;">涨跌</b> {breadth_disp}</span>
             <span style="background:#1e293b;padding:6px 10px;border-radius:6px;"><b style="color:#94a3b8;">赚钱效应</b> {me_disp}</span>
         </div>
         <div class="main-line">{main_line}{change_text}</div>
-        <div class="top3">''')
-
-for i, r in enumerate(top3_stocks):
-    rating = r["rating"]
-    total = r["total"]
-    sector = r.get("sector", "")
-    sub = r.get("sub_theme", "")
-    dims = [r["score_news"], r["score_tech"], r["score_fund"], r.get("score_theme", 0)]
-    best_dim = max(dims)
-    dim_names = ["消息", "技术", "基本", "热度"]
-    best_name = dim_names[dims.index(best_dim)]
-    reason = f"{sector} · {sub}" if sub else sector
-    reason += f" · {best_name}面最强({best_dim:.2f}/5)"
-
-    html_parts.append(f'''
-            <div class="top3-item" style="border-left:3px solid {RATING_COLORS[rating]};">
-                <div class="t-name">#{i+1} {r["name"]}</div>
-                <div class="t-score" style="color:{RATING_COLORS[rating]}">{total:.2f} <span style="font-size:12px;color:#94a3b8;">/ 20</span></div>
-                <div class="t-reason">{reason}</div>
-            </div>''')
-
-html_parts.append('''
-        </div>
+        <details style="margin-top:6px;">
+            <summary style="cursor:pointer;font-size:12px;color:#38bdf8;padding:8px 0;">📖 展开完整盘面复盘与关注方向</summary>
+            {review_body}
+        </details>
     </div>
-
-    <!-- 大盘赚钱效应 -->
 ''')
 
 # v2.11: 原"大盘赚钱效应"独立卡片已并入上方"📝 盘面复盘点评"卡片(指数/成交/涨跌/赚钱效应速览)
 
-# ===== v2.41 P0-1 双引擎组合区块 =====
-if quant_json:
-    ai_pick_names = [p.get("name") if isinstance(p, dict) else p
-                     for p in (ai_review.get("portfolio") or {}).get("picks", [])]
+# ===== v2.43 三合一「今日候选组合」: 动量线/反转线/AI主观线 并列 + 交集门控资金表 =====
+# 修复 v2.41/v2.42 的结构重复: 原「双引擎组合对照」与「🎯组合推荐」展示同一批 AI 标的
+# (各 1 遍, 加资金表共 3 遍), 且无交集时回退用 AI 组合做满额资金分配 —— 与"分歧宜降仓"
+# 结论自相矛盾。现合并为单一区块: 三条逻辑线并列 + 交集门控资金表(有交集→交集等权;
+# 无交集→不给满额表, 仅量化线试探仓)。
+_ai_port = (ai_review.get("portfolio") or {})
+_ai_picks_raw = _ai_port.get("picks") or []
+ai_pick_names = [p.get("name") if isinstance(p, dict) else p for p in _ai_picks_raw]
+_names_map = {r["name"]: r for r in results}
+
+if quant_json or ai_pick_names:
     _inter = sorted(set(quant_picks_all) & set(ai_pick_names))
-    _names_map = {r["name"]: r for r in results}
-    _qblocks = ""
+
+    # --- 列 1/2: 量化双路线(可复现规则) ---
+    _qcols = ""
     for _m in ("momentum", "reversal"):
         _ps, _rule = _quant_picks(_m)
         _rows = ""
@@ -812,75 +964,153 @@ if quant_json:
             _sc = _p.get("total")
             _sct = f"{_sc:.2f}" if isinstance(_sc, (int, float)) else "—"
             _sec = _p.get("sector_l2") or _p.get("parent") or ""
-            _in_ai = " ✅与AI重合" if _nm in ai_pick_names else ""
-            _rows += (f'<div style="padding:5px 8px;border-bottom:1px solid #1e293b;font-size:11.5px;">'
+            _in_ai = ' <span style="color:#22c55e;">🤝共识</span>' if _nm in ai_pick_names else ""
+            _rows += (f'<div style="padding:5px 0;border-bottom:1px solid #1e293b;font-size:11px;">'
                       f'<span style="font-weight:700;color:#f8fafc;">{html_mod.escape(str(_nm))}</span>'
                       f'<span style="color:{_col};font-weight:700;margin-left:6px;">{_rt}</span>'
                       f'<span style="color:#94a3b8;margin-left:6px;">{html_mod.escape(str(_sec))}</span>'
-                      f'<span style="float:right;color:{_col};">{_sct}{_in_ai}</span></div>')
+                      f'<span style="float:right;color:#38bdf8;font-weight:700;">{_sct}</span>{_in_ai}</div>')
         if not _rows:
-            _rows = '<div style="padding:6px 8px;font-size:11px;color:#64748b;">当日无符合条件的标的</div>'
-        _qblocks += (f'<div style="background:#0f172a;border-radius:8px;padding:10px;">'
-                     f'<div style="font-size:12px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">{QUANT_MODE_LABEL.get(_m, _m)}</div>'
-                     f'{_rows}'
-                     f'<div style="font-size:9.5px;color:#64748b;margin-top:5px;">规则: {html_mod.escape(str(_rule or "板块动量档位"))}</div></div>')
+            _rows = '<div style="padding:6px 0;font-size:11px;color:#64748b;">当日无符合条件的标的</div>'
+        _qcols += (f'<div style="background:#0f172a;border-radius:8px;padding:10px;">'
+                   f'<div style="font-size:12px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">{QUANT_MODE_LABEL.get(_m, _m)}</div>'
+                   f'{_rows}'
+                   f'<div style="font-size:11px;color:#64748b;margin-top:5px;">规则: {html_mod.escape(str(_rule or "板块动量档位"))}</div></div>')
 
-    _inter_html = ("、".join(_inter) if _inter
-                   else '<span style="color:#f59e0b;">两套逻辑当日无重合标的 —— 分歧较大，宜降低仓位、等待共识</span>')
+    # --- 列 3: AI 主观线(合并原「🎯组合推荐」的估值/增速/理由, 消除重复) ---
+    _ai_rows = ""
+    for _pk in _ai_picks_raw:
+        _nm = _pk.get("name") if isinstance(_pk, dict) else _pk
+        _rr = _names_map.get(_nm)
+        if not _rr:
+            continue
+        _rt = _rr["rating"]; _acol = RATING_COLORS[_rt]
+        _fwd = _rr.get("fwd_pe"); _gw = _rr.get("growth")
+        _pos = (_rr.get("tech") or {}).get("position", 0)
+        _fwd_s = f"{_fwd:.1f}x" if isinstance(_fwd, (int, float)) else "—"
+        _gw_s = f"{_gw:+.0f}%" if isinstance(_gw, (int, float)) else "—"
+        _vlab = (_pk.get("valuation") or "") if isinstance(_pk, dict) else ""
+        _note = (_pk.get("note") or "") if isinstance(_pk, dict) else ""
+        _vcol = "#22c55e" if "合理" in _vlab else ("#ef4444" if ("偏贵" in _vlab or "陷阱" in _vlab) else "#94a3b8")
+        _ai_rows += (f'<div style="padding:5px 0;border-bottom:1px solid #1e293b;font-size:11px;">'
+                     f'<span style="font-weight:700;color:#f8fafc;">{html_mod.escape(str(_nm))}</span>'
+                     f'<span style="color:{_acol};font-weight:700;margin-left:6px;">{_rt}</span>'
+                     f'<span style="float:right;color:#38bdf8;font-weight:700;">{_rr["total"]:.2f}</span></div>'
+                     f'<div style="font-size:11px;color:#94a3b8;margin-top:2px;">FwdPE {_fwd_s} · 增速 {_gw_s} · 分位{_pos:.0f}%</div>'
+                     + (f'<div style="font-size:11px;color:{_vcol};margin-top:2px;">{html_mod.escape(str(_vlab))}</div>' if _vlab else "")
+                     + (f'<div style="font-size:11px;color:#94a3b8;margin-top:2px;">{html_mod.escape(str(_note))}</div>' if _note else ""))
+    if not _ai_rows:
+        _ai_rows = '<div style="padding:6px 0;font-size:11px;color:#64748b;">当日无 AI 组合</div>'
+    _ai_verdict = html_mod.escape(str(_ai_port.get("verdict") or ""))
+    _ai_col = (f'<div style="background:#0f172a;border-radius:8px;padding:10px;">'
+               f'<div style="font-size:12px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">🤖 AI 主观线（产业逻辑）</div>'
+               f'{_ai_rows}'
+               + (f'<div style="font-size:11px;color:#cbd5e1;margin-top:5px;">📌 {_ai_verdict}</div>' if _ai_verdict else "")
+               + '<div style="font-size:11px;color:#64748b;margin-top:5px;">来源: ai_assessment.portfolio（AI 主观，含估值与产业链校验）</div></div>')
+
+    # --- 结论行: 交集门控 ---
+    if _inter:
+        _concl = (f'<span style="color:#22c55e;font-weight:700;">✅ 交集 {len(_inter)} 只：'
+                  f'{"、".join(html_mod.escape(str(x)) for x in _inter)}</span>'
+                  ' —— 量化与 AI 形成共识，信号可靠性较高')
+    else:
+        _concl = ('<span style="color:#f59e0b;font-weight:700;">⚠️ 两套逻辑当日零交集</span> —— '
+                  '量化(规则)与 AI(产业逻辑)方向分歧，建议降低仓位、等待共识，仅可用量化线小仓试探')
+
+    # --- 资金分配表: 量化优先, 交集为准 ---
+    if _inter:
+        _cap_pool = [n for n in _inter if _names_map.get(n, {}).get("price")]
+        _total_cap = 100000
+        _cap_head = "💰 资金分配示例（基准：10万本金 · 交集等权 · 100股取整）"
+        _cap_desc = f'分配对象：<b>双引擎交集（共识标的）</b>。仓位再按上方总仓位纪律（当前 {mkt_pos}）等比缩放。'
+        _cap_bar = "#22c55e"
+    else:
+        _cap_pool = [n for n in dict.fromkeys(quant_picks_all) if _names_map.get(n, {}).get("price")]
+        _ratio = 0.2 if _bearish else 0.4
+        _total_cap = int(100000 * _ratio)
+        _cap_head = f"⚠️ 试探仓示例（分歧市场 · 仅量化线 · 总仓 {_total_cap/10000:.0f}万 · 100股取整）"
+        _cap_desc = ('当前两套逻辑零交集 → <b>不输出满额分配</b>。如需参与，仅用量化线（可复现规则）'
+                     '小仓试探，单票不超过总资金 1/4。')
+        _cap_bar = "#f59e0b"
+    _cap_rows = ""
+    if _cap_pool:
+        _per = _total_cap / len(_cap_pool)
+        for _cn in _cap_pool:
+            _cr = _names_map[_cn]; _cp = _cr.get("price") or 0
+            _shares = int(_per / _cp / 100) * 100 if _cp > 0 else 0
+            _amt = _shares * _cp
+            _rt = _cr.get("rating", "-")
+            _cap_rows += (f'<tr style="border-top:1px solid #1e293b;">'
+                          f'<td style="padding:4px 8px;color:#e2e8f0;">{html_mod.escape(str(_cn))}</td>'
+                          f'<td style="padding:4px 8px;color:{RATING_COLORS.get(_rt, "#94a3b8")};">{_rt}</td>'
+                          f'<td style="padding:4px 8px;color:#94a3b8;">{_cp:.2f}</td>'
+                          f'<td style="padding:4px 8px;color:#e2e8f0;">{_shares}股</td>'
+                          f'<td style="padding:4px 8px;color:#38bdf8;">¥{_amt:,.0f}</td></tr>')
+    if _cap_rows:
+        _cap_html = (f'''
+        <div style="margin-top:10px;padding:10px 12px;background:rgba(34,197,94,0.06);border-radius:8px;border-left:3px solid {_cap_bar};">
+            <div style="font-size:11px;font-weight:700;color:{_cap_bar};margin-bottom:6px;">{_cap_head}</div>
+            <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">{_cap_desc}</div>
+            <table style="width:100%;border-collapse:collapse;font-size:11px;">
+                <thead><tr style="color:#94a3b8;text-align:left;">
+                    <th style="padding:3px 8px;">标的</th><th style="padding:3px 8px;">评级</th>
+                    <th style="padding:3px 8px;">现价</th><th style="padding:3px 8px;">建议股数</th><th style="padding:3px 8px;">金额</th>
+                </tr></thead>
+                <tbody>{_cap_rows}</tbody>
+            </table>
+        </div>''')
+    else:
+        _cap_html = ""
+
     html_parts.append(f'''
-    <!-- v2.41 P0-1 双引擎组合: 量化可复现 vs AI 产业逻辑 -->
-    <div class="chart-card" style="padding:16px;margin:14px 0;">
-        <h3 style="font-size:13px;margin-bottom:10px;">⚙️ 双引擎组合对照 <span style="font-size:10px;color:#64748b;font-weight:400;">（量化=可复现规则 · AI=产业逻辑解读）</span></h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-            <div>
-                <div style="font-size:11px;color:#38bdf8;font-weight:700;margin-bottom:6px;">⚙️ 量化组合（pick_portfolio 双路线）</div>
-                {_qblocks}
-            </div>
-            <div>
-                <div style="font-size:11px;color:#a78bfa;font-weight:700;margin-bottom:6px;">🤖 AI 组合（产业逻辑）</div>
-                <div style="background:#0f172a;border-radius:8px;padding:10px;font-size:11.5px;line-height:1.9;color:#e2e8f0;">
-                    {'、'.join(html_mod.escape(str(x)) for x in ai_pick_names) if ai_pick_names else '当日无 AI 组合'}
-                </div>
-                <div style="font-size:9.5px;color:#64748b;margin-top:5px;">来源: ai_assessment.portfolio（AI 主观，含估值与产业链校验）</div>
-            </div>
+    <!-- v2.43 三合一「今日候选组合」: 消除 v2.41/v2.42 的组合区块重复与资金分配矛盾 -->
+    <div class="chart-card" id="sec-today-pick" style="padding:16px;margin:14px 0;">
+        <h3 style="font-size:13px;margin-bottom:10px;">🎯 今日候选组合 <span style="font-size:11px;color:#64748b;font-weight:400;">（三条独立逻辑线 · 量化=可复现规则 / AI=产业逻辑解读）</span></h3>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+            {_qcols}
+            {_ai_col}
         </div>
-        <div style="font-size:11px;color:#cbd5e1;padding:8px 10px;background:rgba(59,130,246,0.08);border-radius:6px;border-left:3px solid #3b82f6;">
-            🔗 交集标的：{_inter_html}
+        <div style="font-size:11px;color:#cbd5e1;padding:8px 10px;margin-top:10px;background:rgba(59,130,246,0.08);border-radius:6px;border-left:3px solid #3b82f6;">
+            🔗 {_concl}
         </div>
-        <div style="font-size:9px;color:#475569;margin-top:6px;">说明：量化组合可完全复现、便于回测；AI 组合含产业逻辑但主观性更强。两者重合度越高，信号越可靠。</div>
+        {_cap_html}
+        <div style="font-size:11px;color:#475569;margin-top:6px;">说明：量化组合可完全复现、便于回测；AI 组合含产业逻辑但主观性更强。<b>两者交集是唯一的共识信号</b>，无交集时应视为分歧而非机会。</div>
     </div>''')
 
 html_parts.append('''
-    <!-- 快捷筛选按钮 -->
+    <!-- A6 快捷筛选: 9 按钮 → 4 高频 + 「更多」折叠 -->
     <div class="quick-filters">
         <button class="quick-btn active" data-quick="all">全部</button>
         <button class="quick-btn" data-quick="SA">⭐ 只看S/A级</button>
-        <button class="quick-btn" data-quick="S">🥇 只看S级</button>
-        <button class="quick-btn" data-quick="undervalued">💰 只看低估(FwdPE&lt;30)</button>
-        <button class="quick-btn" data-quick="growth">🚀 高增长(增速≥30%)</button>
-        <button class="quick-btn" data-quick="low_pos">📉 低位股(分位&lt;30%)</button>
-        <button class="quick-btn" data-quick="hot">🔥 热门(热度≥4)</button>
-        <button class="quick-btn" data-quick="up">📈 评级上调</button>
-        <button class="quick-btn" data-quick="new">🆕 新晋上榜</button>
+        <button class="quick-btn" data-quick="growth">🚀 高增长(≥30%)</button>
+        <button class="quick-btn" data-quick="undervalued">💰 低估(FwdPE&lt;30)</button>
+        <button class="quick-btn" id="quickMoreBtn" onclick="document.getElementById('quickMore').style.display=(document.getElementById('quickMore').style.display==='none'?'flex':'none');this.classList.toggle('active');">⋯ 更多筛选</button>
+        <span id="quickMore" style="display:none;gap:8px;flex-wrap:wrap;">
+            <button class="quick-btn" data-quick="S">🥇 只看S级</button>
+            <button class="quick-btn" data-quick="low_pos">📉 低位股(&lt;30%)</button>
+            <button class="quick-btn" data-quick="hot">🔥 热门(热度≥4)</button>
+            <button class="quick-btn" data-quick="up">📈 评级上调</button>
+            <button class="quick-btn" data-quick="new">🆕 新晋上榜</button>
+        </span>
     </div>
 
-    <!-- 今日市场总结与组合推荐 (合并) -->
+    <!-- 今日市场概览 (v2.43: 原「市场总结+组合推荐」，组合部分已上移至「今日候选组合」) -->
     <div class="charts">
-        <!-- 合并卡片：今日市场总结 + 组合推荐 -->
+        <!-- 合并卡片：今日市场概览(覆盖数/S+A占比/主线板块/板块均分TOP5) -->
         <div class="chart-card" style="padding:16px;grid-column:1 / -1;">
-            <h3 style="font-size:13px;margin-bottom:10px;">📋 今日市场总结与组合推荐</h3>
+            <h3 style="font-size:13px;margin-bottom:10px;">📋 今日市场概览 <span style="font-size:11px;color:#64748b;font-weight:400;">（板块均分 TOP5 · 组合标的已上移至「今日候选组合」）</span></h3>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
                 <div style="background:#0f172a;border-radius:6px;padding:8px;text-align:center;">
-                    <div style="font-size:10px;color:#94a3b8;">覆盖个股</div>
-                    <div style="font-size:18px;font-weight:800;color:#f8fafc;">''' + str(total_stocks) + '''只</div>
+                    <div style="font-size:11px;color:#94a3b8;">覆盖个股</div>
+                    <div style="font-size:15px;font-weight:800;color:#f8fafc;">''' + str(total_stocks) + '''只</div>
                 </div>
                 <div style="background:#0f172a;border-radius:6px;padding:8px;text-align:center;">
-                    <div style="font-size:10px;color:#94a3b8;">S+A级占比</div>
-                    <div style="font-size:18px;font-weight:800;color:#22c55e;">''' + f"{(stats.get('rating_dist',{}).get('S',0)+stats.get('rating_dist',{}).get('A',0))/max(total_stocks,1)*100:.0f}" + '''%</div>
+                    <div style="font-size:11px;color:#94a3b8;">S+A级占比</div>
+                    <div style="font-size:15px;font-weight:800;color:#22c55e;">''' + f"{(stats.get('rating_dist',{}).get('S',0)+stats.get('rating_dist',{}).get('A',0))/max(total_stocks,1)*100:.0f}" + '''%</div>
                 </div>
                 <div style="background:#0f172a;border-radius:6px;padding:8px;text-align:center;">
-                    <div style="font-size:10px;color:#94a3b8;">主线板块</div>
-                    <div style="font-size:18px;font-weight:800;color:#3b82f6;">''' + str(len([s for s,v in sec_avg.items() if v.get("count",0)>=5])) + '''个</div>
+                    <div style="font-size:11px;color:#94a3b8;">主线板块</div>
+                    <div style="font-size:15px;font-weight:800;color:#3b82f6;">''' + str(len([s for s,v in sec_avg.items() if v.get("count",0)>=5])) + '''个</div>
                 </div>
             </div>
             <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">板块均分TOP5</div>''')
@@ -895,96 +1125,10 @@ for s, v in sorted_secs:
                     <div style="flex:1;background:#0f172a;border-radius:3px;height:12px;overflow:hidden;">
                         <div style="width:{bar_w}%;height:100%;background:linear-gradient(90deg,#3b82f6,#22c55e);border-radius:3px;"></div>
                     </div>
-                    <span style="color:#94a3b8;font-size:10px;min-width:55px;text-align:right;">{avg:.2f} ({cnt}只)</span>
+                    <span style="color:#94a3b8;font-size:11px;min-width:55px;text-align:right;">{avg:.2f} ({cnt}只)</span>
                 </div>''')
 
 html_parts.append('''
-            <hr style="border:none;border-top:1px solid #1e293b;margin:14px 0;" />
-''')
-results_by_name = {r["name"]: r for r in results}
-ai_port = (ai_review.get("portfolio") or {})
-ai_picks = ai_port.get("picks") or []
-use_ai_port = bool(ai_picks)
-
-if use_ai_port:
-    ptitle = ai_port.get("title") or "组合推荐"
-    html_parts.append(f'            <h3 style="font-size:13px;margin-bottom:10px;">🎯 {html_mod.escape(ptitle)}</h3>')
-    for i, pk in enumerate(ai_picks):
-        name = pk.get("name") if isinstance(pk, dict) else pk
-        r = results_by_name.get(name)
-        if not r:
-            continue
-        rating = r["rating"]; total = r["total"]
-        fwd = r.get("fwd_pe"); growth = r.get("growth")
-        tech = r.get("tech", {}); position = tech.get("position", 0)
-        fwd_str = f"{fwd:.1f}x" if isinstance(fwd, (int, float)) else "—"
-        growth_str = f"{growth:+.0f}%" if isinstance(growth, (int, float)) else "—"
-        pos_str = f"分位{position:.0f}%" if position else ""
-        vlabel = pk.get("valuation", "") if isinstance(pk, dict) else ""
-        note = pk.get("note", "") if isinstance(pk, dict) else ""
-        extra = " · ".join([x for x in [pos_str, note] if x])
-        vcolor = "#22c55e" if "合理" in vlabel else ("#ef4444" if ("偏贵" in vlabel or "陷阱" in vlabel) else "#94a3b8")
-        html_parts.append(f'''
-                    <div style="background:#0f172a;border-radius:6px;padding:8px 10px;margin-bottom:6px;border-left:3px solid {RATING_COLORS[rating]};">
-                        <div style="display:flex;align-items:center;gap:6px;">
-                            <span style="font-size:13px;font-weight:800;color:#f8fafc;">{i+1}. {html_mod.escape(str(name))}</span>
-                            <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:{RATING_BG[rating]};color:{RATING_COLORS[rating]};">{rating}</span>
-                            <span style="font-size:11px;color:{vcolor};margin-left:4px;">{html_mod.escape(str(vlabel))}</span>
-                            <span style="font-size:14px;font-weight:800;color:{RATING_COLORS[rating]};margin-left:auto;">{total:.2f}</span>
-                        </div>
-                        <div style="display:flex;gap:8px;font-size:10px;color:#94a3b8;margin-top:3px;flex-wrap:wrap;">
-                            <span>FwdPE {fwd_str}</span>
-                            <span>增速 {growth_str}</span>
-                            <span>{html_mod.escape(extra)}</span>
-                        </div>
-                    </div>''')
-    verdict = ai_port.get("verdict", "")
-    if verdict:
-        html_parts.append(f'''            <div style="font-size:11px;color:#cbd5e1;margin-top:6px;padding:6px 8px;background:rgba(59,130,246,0.1);border-radius:4px;">📌 {html_mod.escape(verdict)}</div>''')
-    html_parts.append('''
-                <div style="font-size:9px;color:#475569;margin-top:6px;padding:6px 8px;background:rgba(249,115,22,0.1);border-radius:4px;">
-                    ⚠️ AI基于真实产业链联动与估值分位校验生成，仅供研究参考，非投资建议
-                </div>
-        </div>
-    </div>''')
-else:
-    html_parts.append('''            <h3 style="font-size:13px;margin-bottom:10px;">🎯 组合推荐</h3>''')
-    for i, r in enumerate(portfolio_picks):
-        rating = r["rating"]
-        total = r["total"]
-        fwd = r.get("fwd_pe", "-")
-        growth = r.get("growth", "-")
-        sub = r.get("sub_theme", r["sector"])
-        tech = r.get("tech", {})
-        position = tech.get("position", 0)
-        dims = [r["score_news"], r["score_tech"], r["score_fund"], r.get("score_theme", 0)]
-        if r.get("score_sector") is not None:
-            dims.append(r["score_sector"])
-        min_dim = min(dims)
-        growth_str = f"{growth:+.0f}%" if isinstance(growth, (int, float)) else str(growth)
-        fwd_str = f"{fwd:.1f}x" if isinstance(fwd, (int, float)) else str(fwd)
-        pos_str = f"分位{position:.0f}%" if position else ""
-        balance_tag = "均衡" if min_dim >= 3 else ""
-        tags = [t for t in [sub, pos_str, balance_tag] if t]
-
-        html_parts.append(f'''
-                    <div style="background:#0f172a;border-radius:6px;padding:8px 10px;margin-bottom:6px;border-left:3px solid {RATING_COLORS[rating]};">
-                        <div style="display:flex;align-items:center;gap:6px;">
-                            <span style="font-size:13px;font-weight:800;color:#f8fafc;">{i+1}. {r["name"]}</span>
-                            <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:{RATING_BG[rating]};color:{RATING_COLORS[rating]};">{rating}</span>
-                            <span style="font-size:14px;font-weight:800;color:{RATING_COLORS[rating]};margin-left:auto;">{total:.2f}</span>
-                        </div>
-                        <div style="display:flex;gap:8px;font-size:10px;color:#94a3b8;margin-top:3px;flex-wrap:wrap;">
-                            <span>FwdPE {fwd_str}</span>
-                            <span>增速 {growth_str}</span>
-                            <span>{' · '.join(tags)}</span>
-                        </div>
-                    </div>''')
-
-    html_parts.append('''
-                <div style="font-size:9px;color:#475569;margin-top:6px;padding:6px 8px;background:rgba(249,115,22,0.1);border-radius:4px;">
-                    ⚠️ 筛选：S/A级 + FwdPE≤60 + 增速≥15% + 分位≤95% + 板块去重 + ''' + ('五维' if any(x.get('score_sector') is not None for x in results) else '四维') + '''均衡加分，仅供研究参考
-                </div>
         </div>
     </div>''')
 
@@ -1066,7 +1210,7 @@ for idx, r in enumerate(top20):
                 deriv_str += f" · 二阶导(加速度{_d2:+.0f}pt) {_s2:.1f}分"
     ai_badge = ""
     if r.get("ai_applied"):
-        ai_badge = ('<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;'
+        ai_badge = ('<span style="font-size:11px;font-weight:700;padding:1px 6px;border-radius:3px;'
                     'background:#ede9fe;color:#7c3aed;margin-left:6px;">🤖AI增强</span>')
 
     # v2.10: 消息面7日时效
@@ -1102,21 +1246,28 @@ for idx, r in enumerate(top20):
         change_tag = '<span class="rating-change rating-new">NEW</span>'
 
     s_class = "s-level" if rating == "S" else ""
+    # A5: S级默认展开; A级折叠(仅留头部, 点击展开明细) —— 29张卡片全展开占12,500px
+    a_collapse = "" if rating == "S" else " collapsed"
+    _toggle = ("" if rating == "S" else
+               '<span class="expand-hint" onclick="this.closest(\'.stock-detail\').classList.toggle(\'collapsed\');">▾ 展开明细</span>')
     html_parts.append(f'''
-        <div class="stock-detail {s_class}" data-rating="{rating}" data-sector="{sector_disp(r)}" data-code="{r['code']}" data-name="{r['name']}">
+        <div class="stock-detail {s_class}{a_collapse}" data-rating="{rating}" data-sector="{sector_disp(r)}" data-code="{r['code']}" data-name="{r['name']}">
             <div class="header-row">
                 <div class="rank" style="background:{rank_color}">#{i}</div>
                 <div>
                     <div class="name">{r['name']}{change_tag}{ai_badge}</div>
                     <div class="code">{r['code']} · {sector_disp(r)}</div>
                 </div>
+                {_toggle}
                 <span class="s-pct {pct_cls}" style="font-size:13px;font-weight:700;">{pct:+.2f}%</span>
                 <div class="total" style="color:{RATING_COLORS[rating]}">{total:.2f}</div>
                 <div class="rating" style="background:{RATING_BG[rating]};color:{RATING_COLORS[rating]}">{rating}</div>
             </div>
+            <div class="sd-body">
             <div class="meta-row">
                 <span>💰 成交额: {turnover_yi:.0f}亿</span>
                 <span>📊 {pe_str}{fwd_str}{g_str}{peg_str}</span>
+                {f'<span style="color:{valu_note(r)[1]};">🧭 {valu_note(r)[0]}</span>' if valu_note(r)[0] else ''}
                 <span class="s-pct {week_chg_cls}" style="font-weight:700;">📅 近一周 {week_chg_str}</span>
                 <span>🏷️ {r['score_news']:.2f}/5消息 · {r['score_tech']:.2f}/5技术 · {r['score_fund']:.2f}/5基本 · {r.get('score_theme',0):.2f}/5热度</span>
             </div>
@@ -1147,13 +1298,23 @@ for idx, r in enumerate(top20):
         html_parts.append(f'''
             <div style="font-size:11px;color:#f97316;margin-top:10px;padding:10px;background:rgba(249,115,22,0.1);border-radius:8px;">⚠️ {risk_html}</div>''')
 
-    # ===== v2.41 P0-3 操作建议三件套 + P1-3 一致性约束 =====
+    # A5: 关闭折叠区(meta-row + 四维明细 + 风险提示 被折叠; 操作建议/评级原因常驻可见)
+    html_parts.append('''
+            </div>''')
+
+    # ===== v2.41 P0-3 操作建议三件套 + P1-3 一致性约束 + v2.42 R1可信度/R4持有周期 =====
     plan = build_trade_plan(r)
     plan_tag, plan_note = trade_plan_advice(r, plan)
     if plan:
         _risk_pct = (plan["buy_hi"] - plan["stop"]) / plan["buy_hi"] * 100 if plan["buy_hi"] else 0
         _up_pct = (plan["target"] - r.get("price", 0)) / r.get("price", 1) * 100
         _plan_color = "#ef4444" if plan["overbought"] else ("#f59e0b" if _bearish else "#22c55e")
+        # R1 盈亏比可信度
+        _conf_lv, _conf_sc, _conf_note = trade_confidence(r, plan)
+        _conf_color = "#22c55e" if _conf_lv == "高" else ("#f59e0b" if _conf_lv == "中" else "#ef4444")
+        _rr_disp = f"{plan['rr']:.1f} : 1" if _conf_lv != "低" else f"{plan['rr']:.1f} : 1 (打折)"
+        # R4 持有周期
+        _hold = holding_period(r, plan)
         html_parts.append(f'''
             <div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(56,189,248,0.06);border-left:3px solid {_plan_color};">
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px;">
@@ -1165,14 +1326,18 @@ for idx, r in enumerate(top20):
                     <span>🎯 参考买点 <b style="color:#22c55e;">{plan['buy_lo']:.2f} ~ {plan['buy_hi']:.2f}</b></span>
                     <span>🛑 止损 <b style="color:#ef4444;">{plan['stop']:.2f}</b>（-{_risk_pct:.1f}%）</span>
                     <span>🏁 目标 <b style="color:#3b82f6;">{plan['target']:.2f}</b>（+{_up_pct:.1f}%）</span>
-                    <span>⚖️ 盈亏比 <b>{plan['rr']:.1f} : 1</b></span>
+                    <span>⚖️ 盈亏比 <b>{_rr_disp}</b>
+                        <span style="font-size:11px;font-weight:700;padding:1px 5px;border-radius:3px;background:{_conf_color}22;color:{_conf_color};margin-left:2px;">可信度{_conf_lv}</span>
+                    </span>
                 </div>
-                {f'<div style="font-size:10px;color:#f97316;margin-top:5px;">⚠️ 技术矛盾提示: {"、".join(plan["flags"])}，明细评语与操作建议已按一致性约束对齐</div>' if plan["flags"] else ''}
+                {f'<div style="font-size:11px;color:{_conf_color};margin-top:4px;">🔎 可信度说明（{_conf_sc}分）：{_conf_note}</div>' if _conf_note else ''}
+                {f'<div style="font-size:11px;color:#38bdf8;margin-top:4px;">⏳ 持有周期：{_hold}</div>' if _hold else ''}
+                {f'<div style="font-size:11px;color:#f97316;margin-top:5px;">⚠️ 技术矛盾提示: {"、".join(plan["flags"])}，明细评语与操作建议已按一致性约束对齐</div>' if plan["flags"] else ''}
             </div>''')
 
     html_parts.append(f'''
             <div style="font-size:11px;color:#38bdf8;margin-top:8px;">💡 评级原因: {', '.join(justification[:4])} → {rating}级 · {advice_with_market(r)}</div>
-        </div>''')
+            </div>''')
 html_parts.append('''
     </div>
 
@@ -2080,7 +2245,16 @@ html_parts.append('''
     </div>
 
     <!-- 完整表格 -->
-    <div class="section-title">📋 完整排名 (可排序/筛选/分页)</div>
+    <div class="section-title" id="sec-list">📋 完整排名 (可排序/筛选/分页)</div>
+
+    <!-- A7 视图预设: 12 列开关 → 3 套一键预设 -->
+    <div class="view-preset" style="display:flex;gap:8px;align-items:center;margin:10px 0;padding:10px 12px;background:#1e293b;border-radius:8px;flex-wrap:wrap;">
+        <span style="color:#64748b;font-size:11px;">📐 视图预设:</span>
+        <button class="preset-btn" data-preset="simple">简洁 (5列)</button>
+        <button class="preset-btn active" data-preset="standard">标准 (9列)</button>
+        <button class="preset-btn" data-preset="full">完整 (12列)</button>
+        <span style="color:#475569;font-size:11px;margin-left:6px;">切换即调整下方列显示</span>
+    </div>
 
     <!-- 筛选控制 -->
     <div class="controls">
@@ -2128,7 +2302,9 @@ html_parts.append('''
         </div>
     </div>
 
-    <!-- 列显示控制 -->
+    <!-- 列显示控制 (默认收起; 由视图预设驱动) -->
+    <details class="col-toggle-wrap" style="margin:8px 0;">
+        <summary style="cursor:pointer;font-size:11px;color:#64748b;padding:6px 0;">⚙️ 自定义列显示</summary>
     <div class="col-toggle">
         <span style="color:#64748b;font-size:11px;margin-right:8px;">列显示:</span>
         <label><input type="checkbox" class="col-check" data-col="code" checked>代码</label>
@@ -2143,20 +2319,21 @@ html_parts.append('''
         <label><input type="checkbox" class="col-check" data-col="week" checked>近一周</label>
         <label><input type="checkbox" class="col-check" data-col="turnover" checked>成交额</label>
     </div>
+    </details>
 
     <div class="table-container">
         <table class="stock-table" id="stockTable">
             <thead>
                 <tr>
                     <th class="s-rank" data-sort="rank"># <span class="sort-arrow"></span></th>
-                    <th class="s-name" data-sort="name">名称 <span class="sort-arrow"></span></th>
+                    <th class="s-name sticky-col col-name-sticky" data-sort="name">名称 <span class="sort-arrow"></span></th>
                     <th class="s-code col-code">代码</th>
                     <th class="s-sector col-sector">板块</th>
-                    <th class="s-pct col-pct" data-sort="pct_chg">涨跌幅 <span class="sort-arrow"></span></th>
+                    <th class="s-pct sticky-col col-pct-sticky" data-sort="pct_chg">涨跌幅 <span class="sort-arrow"></span></th>
                     <th class="s-week col-week" data-sort="week_chg">近一周 <span class="sort-arrow"></span></th>
                     <th class="s-mom col-mom">板块动量(60/10日)</th>
                     <th class="s-scores col-scores">''' + scores_label + '''</th>
-                    <th class="s-total col-total" data-sort="total">总分 <span class="sort-arrow"></span></th>
+                    <th class="s-total sticky-col col-total-sticky" data-sort="total">总分 <span class="sort-arrow"></span></th>
                     <th class="s-rating col-rating">评级</th>
                     <th class="s-pe col-pe">PE(TTM)/Fwd/阶梯</th>
                     <th class="s-sector col-sub">细分题材</th>
@@ -2224,14 +2401,14 @@ for idx, r in enumerate(results):
                     data-news="{r['score_news']:.2f}" data-tech-score="{r['score_tech']:.2f}" data-fund-score="{r['score_fund']:.2f}" data-theme-score="{r.get('score_theme',0):.2f}"
                     data-news-text="{html_mod.escape(news_text)}" data-tech-text="{html_mod.escape(tech_text)}" data-fund-text="{html_mod.escape(fund_text)}" data-theme-text="{html_mod.escape(theme_text)}">
                     <td class="s-rank" data-value="{i}">{i}</td>
-                    <td class="s-name" data-value="{r['name']}">{r['name']}</td>
+                    <td class="s-name sticky-col col-name-sticky" data-value="{r['name']}">{r['name']}</td>
                     <td class="s-code col-code" data-value="{r['code']}">{r['code']}</td>
                     <td class="s-sector col-sector" data-value="{sector_disp(r)}">{sector_disp(r)}</td>
-                    <td class="s-pct {pct_cls} col-pct" data-value="{pct}">{pct:+.2f}%</td>
+                    <td class="s-pct {pct_cls} col-pct sticky-col col-pct-sticky" data-value="{pct}">{pct:+.2f}%</td>
                     <td class="s-week col-week {week_cls}" data-value="{week_chg_val}">{week_chg_str}</td>
                     <td class="s-mom col-mom">{mom_html}</td>
                     <td class="s-scores col-scores">{scores_html}</td>
-                    <td class="s-total col-total" data-value="{r['total']}" style="color:{RATING_COLORS[rating]}">{r['total']:.2f}</td>
+                    <td class="s-total col-total sticky-col col-total-sticky" data-value="{r['total']}" style="color:{RATING_COLORS[rating]}">{r['total']:.2f}</td>
                     <td class="s-rating col-rating" style="background:{RATING_BG[rating]};color:{RATING_COLORS[rating]}" data-value="{rating}">{rating}</td>
                     <td class="s-pe col-pe" data-value="{r.get('pe',0)}">{pe}/{fwd} {ladder_t} {growth}</td>
                     <td class="s-sector col-sub">{sub_theme_t if sub_theme_t else '-'}</td>
@@ -2287,16 +2464,19 @@ try:
                       f"<td>{_rtag} {_ts}</td>"
                       f"<td style='font-size:12px;color:#64748b'>{html_mod.escape(_s.get('reason',''))}</td></tr>")
         _gen_by = _wl.get('generated_by', 'rule-fallback')
-        watch_html = ('''    <!-- 观察池 (v2.41) -->
-    <div class="section-title">🔭 观察池 (成交额 200~1000 名 · AI 筛选 · 评分降序)</div>
-    <div class="sub">主力池之外的全市场成交额 200~1000 名区间，每日由 AI 从异动/题材联动中筛选需要复盘的标的，按五维综合评分降序排列，★ 为评分前 3 名（最值得关注）。
-    生成方式：''' + _gen_by + '''；评分：stock-scorer v2.40 五维。</div>
-    <div class="table-container">
-        <table class="stock-table" style="font-size:12.5px;">
-            <thead><tr><th>#</th><th>名称</th><th>代码</th><th>板块</th><th>当日</th><th>成交额</th><th>评分</th><th>AI 筛选理由</th></tr></thead>
-            <tbody>''' + _rows + '''</tbody>
-        </table>
-    </div>
+        watch_html = ('''    <!-- 观察池 (v2.41; v2.42 默认折叠) -->
+    <div class="section-title" id="sec-watch">🔭 观察池 (成交额 200~1000 名 · AI 筛选 · 评分降序)</div>
+    <details style="margin-bottom:20px;">
+        <summary style="cursor:pointer;font-size:12px;color:#38bdf8;padding:10px 12px;background:#1e293b;border-radius:8px;">📂 展开观察池 ''' + str(len(_sel)) + ''' 只标的（主力池之外的机会，默认收起）</summary>
+        <div class="sub" style="margin-top:10px;">主力池之外的全市场成交额 200~1000 名区间，每日由 AI 从异动/题材联动中筛选需要复盘的标的，按五维综合评分降序排列，★ 为评分前 3 名（最值得关注）。
+        生成方式：''' + _gen_by + '''；评分：stock-scorer v2.40 五维。</div>
+        <div class="table-container">
+            <table class="stock-table" style="font-size:12px;">
+                <thead><tr><th>#</th><th>名称</th><th>代码</th><th>板块</th><th>当日</th><th>成交额</th><th>评分</th><th>AI 筛选理由</th></tr></thead>
+                <tbody>''' + _rows + '''</tbody>
+            </table>
+        </div>
+    </details>
 ''')
 except Exception as _e:
     watch_html = ""
@@ -2357,12 +2537,18 @@ try:
                       + _stat_cell(_d[1]) + _stat_cell(_d[5]) + _stat_cell(_d[20]) + '</tr>')
 
         _has_data = any(_agg[_k][1] or _agg[_k][5] for _k in _agg)
-        html_parts.append(f'''
-    <!-- v2.41 P0-4 推荐跟踪 -->
-    <div class="chart-card" style="padding:16px;margin:14px 0;">
-        <h3 style="font-size:13px;margin-bottom:4px;">📊 推荐跟踪 · 胜率验证 <span style="font-size:10px;color:#64748b;font-weight:400;">（真实K线回填，检验模型准不准）</span></h3>
-        <div style="font-size:10px;color:#64748b;margin-bottom:10px;">自 2026-10-08 起累计记录 {len(_recs)} 条推荐；T+N 收益按推荐日收盘价为基准，用前复权K线回填。</div>
-        <table style="width:100%;border-collapse:collapse;font-size:11.5px;">
+        # R3: 样本量 < 30 时, 跟踪表无统计意义 —— 折叠为进度提示, 不占版面
+        _MIN_SAMPLE = 30
+        _n_all = len(_agg.get("__ALL__", {}).get(1, []))
+        if not _has_data:
+            _track_inner = (f'''<div style="font-size:11px;color:#f59e0b;padding:10px 12px;background:rgba(245,158,11,0.08);border-radius:8px;">'''
+                            f'''⏳ 样本积累中（{len(_recs)} 条记录 / 建议 ≥{_MIN_SAMPLE} 条）：首日已建立推荐快照，'''
+                            f'''T+1 次日起、T+5/T+20 后续交易日自动回填，届时本区块自动展开胜率表。</div>''')
+            _track_summary = f"📊 推荐跟踪 · 胜率验证（样本积累中 {len(_recs)}/{_MIN_SAMPLE}）"
+            _track_open = ""
+        else:
+            _track_inner = f'''
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
             <thead><tr style="color:#94a3b8;text-align:left;">
                 <th style="padding:4px 8px;">分组</th><th style="padding:4px 8px;">样本</th>
                 <th style="padding:4px 8px;">T+1 均值</th><th style="padding:4px 8px;">胜率</th>
@@ -2370,22 +2556,33 @@ try:
                 <th style="padding:4px 8px;">T+20 均值</th><th style="padding:4px 8px;">胜率</th>
             </tr></thead>
             <tbody>{_rows}</tbody>
-        </table>
-        {'' if _has_data else '<div style="font-size:10.5px;color:#f59e0b;margin-top:8px;">⏳ 首日记录已建立，T+1/T+5/T+20 收益将在后续交易日自动回填。</div>'}
-        <div style="font-size:9px;color:#475569;margin-top:6px;">说明：每日运行 track_recommendations.py 记录并回填。胜率=上涨样本占比（红涨绿跌口径）。</div>
-    </div>''')
+        </table>'''
+            _track_summary = f"📊 推荐跟踪 · 胜率验证（已回填 {_n_all} 条样本）"
+            _track_open = " open"
+        html_parts.append(f'''
+    <!-- v2.41 P0-4 推荐跟踪 (v2.42 R3 空态折叠) -->
+    <details class="track-block" style="margin:14px 0;"{_track_open}>
+        <summary style="cursor:pointer;font-size:12px;color:#38bdf8;padding:10px 12px;background:#1e293b;border-radius:8px;">{_track_summary}</summary>
+        <div style="padding:12px 14px;background:#1e293b;border-radius:0 0 8px 8px;">
+        <div style="font-size:11px;color:#64748b;margin-bottom:10px;">自 2026-10-08 起累计记录 {len(_recs)} 条推荐；T+N 收益按推荐日收盘价为基准，用前复权K线回填。</div>
+        {_track_inner}
+        <div style="font-size:11px;color:#475569;margin-top:6px;">说明：每日运行 track_recommendations.py 记录并回填。胜率=上涨样本占比（红涨绿跌口径）。</div>
+        </div>
+    </details>''')
 except Exception as _e:
     pass
 
 html_parts.append('''
-    <div class="footer">
+    <!-- A2 元信息下沉: 版本号/数据源/口径说明全部收进页脚 -->
+    <div class="footer" id="sec-notes">
+        <p style="color:#64748b;">📄 ''' + REPORT_VER + ''' 报告层 · ''' + _SCORER_VER + ''' 评分层 · 数据日期 ''' + date_str + ''' · 更新时间 ''' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '''</p>
+        <p>📚 数据源：东方财富 + 腾讯K线 + 同花顺 + 新浪/乐股 · 全市场成交额排名</p>
         <p>⚠️ 免责声明: 本报告由AI基于stock-scorer极简评分模型自动生成,仅供参考,不构成投资建议。投资有风险,入市需谨慎。</p>
         <p>评分模型 (''' + ('v2.40 AI+板块动量版' if any(x.get('score_sector') is not None for x in results) else 'v2.30 AI增强版') + '''): '''
         + ('基本面30% + 题材热度18% + 消息面20%(AI赋分) + 技术面20% + 板块动量12%(申万二级板块60日/10日动量排名, 按6:4合成)；'
            if any(x.get('score_sector') is not None for x in results) else
            '题材热度30% + 基本面30%(含业绩一阶导/二阶导) + 消息面20%(AI赋分) + 技术面20%；')
         + '''消息/题材热度由AI基于当日题材资金共识赋分(0.7×AI+0.3×算法)</p>
-        <p>Generated: ''' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '''</p>
     </div>
 </div>
 
@@ -2402,11 +2599,40 @@ document.addEventListener('DOMContentLoaded', function() {
     initSorting();
     initQuickFilters();
     initColToggle();
+    initViewPresets();
     initExpandableRows();
     initPagination();
     collectSectors();
+    initViewPresetsApply();
     applyFilters();
 });
+
+// A7 视图预设: 简洁(5) / 标准(9) / 完整(12)
+const PRESETS = {
+    simple:   ['pct', 'scores', 'total', 'rating'],
+    standard: ['code', 'sector', 'pct', 'mom', 'scores', 'total', 'rating', 'pe', 'turnover'],
+    full:     ['code', 'sector', 'pct', 'mom', 'scores', 'total', 'rating', 'pe', 'sub', 'week', 'turnover']
+};
+function applyPreset(name, syncCheckboxes) {
+    const cols = PRESETS[name] || PRESETS.standard;
+    document.querySelectorAll('.col-check').forEach(cb => {
+        const on = cols.includes(cb.dataset.col);
+        cb.checked = on;
+        document.querySelectorAll('.col-' + cb.dataset.col).forEach(el => {
+            el.style.display = on ? '' : 'none';
+        });
+    });
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.toggle('active', b.dataset.preset === name));
+}
+function initViewPresets() {
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => applyPreset(btn.dataset.preset, true));
+    });
+}
+function initViewPresetsApply() {
+    // 首屏按"标准"预设收敛列(减少横向滚动负担)
+    applyPreset('standard', true);
+}
 
 function collectSectors() {
     const rows = document.querySelectorAll('#stockTable tbody tr.expandable');
