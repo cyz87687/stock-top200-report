@@ -18,11 +18,16 @@ from datetime import datetime
 
 # 输入输出配置
 inp = sys.argv[1] if len(sys.argv) > 1 else f"top200_scored_{datetime.now().strftime('%Y-%m-%d')}.json"
-out = sys.argv[2] if len(sys.argv) > 2 else f"top200_report_{datetime.now().strftime('%Y-%m-%d')}.html"
 
 # 加载数据
 with open(inp, "r", encoding="utf-8") as f:
     data = json.load(f)
+
+# 输出文件名以【数据日期】为准, 而非脚本运行日期。
+# 修复: 盘中/延迟运行(如 10-12 补跑 10-09 数据)时, 旧实现用 datetime.now() 命名,
+#       会产出「内容=10-09 数据, 文件名=2026-10-12」的错位文件, 污染日期语义。
+_data_date = str(data.get("date") or datetime.now().strftime('%Y-%m-%d'))[:10]
+out = sys.argv[2] if len(sys.argv) > 2 else f"top200_report_{_data_date}.html"
 
 results = data["results"]
 stats = data.get("stats", {})
@@ -2559,12 +2564,16 @@ try:
         </table>'''
             _track_summary = f"📊 推荐跟踪 · 胜率验证（已回填 {_n_all} 条样本）"
             _track_open = " open"
+        # 首日/覆盖天数动态计算(修复硬编码 2026-10-08 文案)
+        _track_dates = sorted({_r.get("date") for _r in _recs if _r.get("date")})
+        _track_first_date = _track_dates[0] if _track_dates else "首日"
+        _track_n_days = len(_track_dates)
         html_parts.append(f'''
     <!-- v2.41 P0-4 推荐跟踪 (v2.42 R3 空态折叠) -->
     <details class="track-block" style="margin:14px 0;"{_track_open}>
         <summary style="cursor:pointer;font-size:12px;color:#38bdf8;padding:10px 12px;background:#1e293b;border-radius:8px;">{_track_summary}</summary>
         <div style="padding:12px 14px;background:#1e293b;border-radius:0 0 8px 8px;">
-        <div style="font-size:11px;color:#64748b;margin-bottom:10px;">自 2026-10-08 起累计记录 {len(_recs)} 条推荐；T+N 收益按推荐日收盘价为基准，用前复权K线回填。</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:10px;">自 {_track_first_date} 起累计记录 {len(_recs)} 条推荐（覆盖 {_track_n_days} 个交易日）；T+N 收益按推荐日收盘价为基准，用前复权K线回填。</div>
         {_track_inner}
         <div style="font-size:11px;color:#475569;margin-top:6px;">说明：每日运行 track_recommendations.py 记录并回填。胜率=上涨样本占比（红涨绿跌口径）。</div>
         </div>

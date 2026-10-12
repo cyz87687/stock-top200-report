@@ -10,7 +10,7 @@
    "date": "2026-10-08",
    "pick_price": 37.59,
    "rets": {
-    "1": null,
+    "1": -2.29,
     "5": null,
     "20": null
    }
@@ -25,7 +25,7 @@
    "date": "2026-10-08",
    "pick_price": 224.25,
    "rets": {
-    "1": null,
+    "1": -7.93,
     "5": null,
     "20": null
    }
@@ -40,7 +40,7 @@
    "date": "2026-10-08",
    "pick_price": 41.28,
    "rets": {
-    "1": null,
+    "1": 1.72,
     "5": null,
     "20": null
    }
@@ -55,7 +55,7 @@
    "date": "2026-10-08",
    "pick_price": 32.69,
    "rets": {
-    "1": null,
+    "1": 9.15,
     "5": null,
     "20": null
    }
@@ -70,7 +70,7 @@
    "date": "2026-10-08",
    "pick_price": 197.01,
    "rets": {
-    "1": null,
+    "1": 0.3,
     "5": null,
     "20": null
    }
@@ -85,7 +85,7 @@
    "date": "2026-10-08",
    "pick_price": 131.86,
    "rets": {
-    "1": null,
+    "1": -5.85,
     "5": null,
     "20": null
    }
@@ -100,7 +100,7 @@
    "date": "2026-10-08",
    "pick_price": 39.55,
    "rets": {
-    "1": null,
+    "1": -2.48,
     "5": null,
     "20": null
    }
@@ -115,7 +115,7 @@
    "date": "2026-10-08",
    "pick_price": 39.81,
    "rets": {
-    "1": null,
+    "1": -3.19,
     "5": null,
     "20": null
    }
@@ -130,7 +130,7 @@
    "date": "2026-10-08",
    "pick_price": 368.02,
    "rets": {
-    "1": null,
+    "1": -5.64,
     "5": null,
     "20": null
    }
@@ -145,7 +145,7 @@
    "date": "2026-10-08",
    "pick_price": 50.92,
    "rets": {
-    "1": null,
+    "1": -4.81,
     "5": null,
     "20": null
    }
@@ -160,7 +160,7 @@
    "date": "2026-10-08",
    "pick_price": 79.63,
    "rets": {
-    "1": null,
+    "1": -10.0,
     "5": null,
     "20": null
    }
@@ -175,7 +175,7 @@
    "date": "2026-10-08",
    "pick_price": 48.61,
    "rets": {
-    "1": null,
+    "1": -10.0,
     "5": null,
     "20": null
    }
@@ -190,7 +190,7 @@
    "date": "2026-10-08",
    "pick_price": 44.21,
    "rets": {
-    "1": null,
+    "1": 2.85,
     "5": null,
     "20": null
    }
@@ -205,7 +205,7 @@
    "date": "2026-10-08",
    "pick_price": 31.3,
    "rets": {
-    "1": null,
+    "1": -2.84,
     "5": null,
     "20": null
    }
@@ -220,7 +220,7 @@
    "date": "2026-10-08",
    "pick_price": 48.43,
    "rets": {
-    "1": null,
+    "1": -1.73,
     "5": null,
     "20": null
    }
@@ -235,7 +235,7 @@
    "date": "2026-10-08",
    "pick_price": 30.05,
    "rets": {
-    "1": null,
+    "1": 6.12,
     "5": null,
     "20": null
    }
@@ -250,7 +250,7 @@
    "date": "2026-10-08",
    "pick_price": 20.94,
    "rets": {
-    "1": null,
+    "1": 2.05,
     "5": null,
     "20": null
    }
@@ -265,7 +265,7 @@
    "date": "2026-10-08",
    "pick_price": 286.75,
    "rets": {
-    "1": null,
+    "1": 3.84,
     "5": null,
     "20": null
    }
@@ -280,7 +280,7 @@
    "date": "2026-10-08",
    "pick_price": 52.06,
    "rets": {
-    "1": null,
+    "1": 1.04,
     "5": null,
     "20": null
    }
@@ -295,7 +295,7 @@
    "date": "2026-10-08",
    "pick_price": 193.1,
    "rets": {
-    "1": null,
+    "1": -0.05,
     "5": null,
     "20": null
    }
@@ -310,7 +310,7 @@
    "date": "2026-10-08",
    "pick_price": 22.03,
    "rets": {
-    "1": null,
+    "1": 0.18,
     "5": null,
     "20": null
    }
@@ -325,7 +325,7 @@
    "date": "2026-10-08",
    "pick_price": 37.59,
    "rets": {
-    "1": null,
+    "1": -2.29,
     "5": null,
     "20": null
    }
@@ -340,7 +340,7 @@
    "date": "2026-10-08",
    "pick_price": 41.28,
    "rets": {
-    "1": null,
+    "1": 1.72,
     "5": null,
     "20": null
    }
@@ -355,7 +355,7 @@
    "date": "2026-10-08",
    "pick_price": 52.06,
    "rets": {
-    "1": null,
+    "1": 1.04,
     "5": null,
     "20": null
    }
@@ -370,7 +370,7 @@
    "date": "2026-10-08",
    "pick_price": 162.0,
    "rets": {
-    "1": null,
+    "1": -2.59,
     "5": null,
     "20": null
    }
@@ -385,7 +385,7 @@
    "date": "2026-10-08",
    "pick_price": 197.01,
    "rets": {
-    "1": null,
+    "1": 0.3,
     "5": null,
     "20": null
    }
@@ -399,6 +399,411 @@
    "total": 12.64,
    "date": "2026-10-08",
    "pick_price": 334.4,
+   "rets": {
+    "1": -2.37,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "天赐材料",
+   "code": "sz002709",
+   "base_price": 35.68,
+   "total": 16.17,
+   "date": "2026-10-09",
+   "pick_price": 35.68,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "宁德时代",
+   "code": "sz300750",
+   "base_price": 297.75,
+   "total": 15.97,
+   "date": "2026-10-09",
+   "pick_price": 297.75,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "紫金矿业",
+   "code": "sh601899",
+   "base_price": 30.8,
+   "total": 14.69,
+   "date": "2026-10-09",
+   "pick_price": 30.8,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "多氟多",
+   "code": "sz002407",
+   "base_price": 31.89,
+   "total": 14.64,
+   "date": "2026-10-09",
+   "pick_price": 31.89,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "赣锋锂业",
+   "code": "sz002460",
+   "base_price": 45.47,
+   "total": 14.23,
+   "date": "2026-10-09",
+   "pick_price": 45.47,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "天齐锂业",
+   "code": "sz002466",
+   "base_price": 41.37,
+   "total": 14.03,
+   "date": "2026-10-09",
+   "pick_price": 41.37,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "立讯精密",
+   "code": "sz002475",
+   "base_price": 47.59,
+   "total": 13.96,
+   "date": "2026-10-09",
+   "pick_price": 47.59,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "胜宏科技",
+   "code": "sz300476",
+   "base_price": 202.69,
+   "total": 13.94,
+   "date": "2026-10-09",
+   "pick_price": 202.69,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "中国船舶",
+   "code": "sh600150",
+   "base_price": 38.54,
+   "total": 13.92,
+   "date": "2026-10-09",
+   "pick_price": 38.54,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "剑桥科技",
+   "code": "sh603083",
+   "base_price": 193.0,
+   "total": 13.91,
+   "date": "2026-10-09",
+   "pick_price": 193.0,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "兆易创新",
+   "code": "sh603986",
+   "base_price": 326.46,
+   "total": 13.72,
+   "date": "2026-10-09",
+   "pick_price": 326.46,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "恩捷股份",
+   "code": "sz002812",
+   "base_price": 47.85,
+   "total": 13.62,
+   "date": "2026-10-09",
+   "pick_price": 47.85,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "有研新材",
+   "code": "sh600206",
+   "base_price": 47.95,
+   "total": 13.6,
+   "date": "2026-10-09",
+   "pick_price": 47.95,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "佰维存储",
+   "code": "sh688525",
+   "base_price": 181.01,
+   "total": 13.56,
+   "date": "2026-10-09",
+   "pick_price": 181.01,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "中材科技",
+   "code": "sz002080",
+   "base_price": 51.8,
+   "total": 13.56,
+   "date": "2026-10-09",
+   "pick_price": 51.8,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "新易盛",
+   "code": "sz300502",
+   "base_price": 370.2,
+   "total": 13.22,
+   "date": "2026-10-09",
+   "pick_price": 370.2,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "先导智能",
+   "code": "sz300450",
+   "base_price": 36.73,
+   "total": 13.14,
+   "date": "2026-10-09",
+   "pick_price": 36.73,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "阳光电源",
+   "code": "sz300274",
+   "base_price": 80.68,
+   "total": 13.0,
+   "date": "2026-10-09",
+   "pick_price": 80.68,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "ai_portfolio",
+   "label": "AI组合",
+   "name": "东岳硅材",
+   "code": "sz300821",
+   "base_price": 17.15,
+   "total": 12.68,
+   "date": "2026-10-09",
+   "pick_price": 17.15,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "ai_portfolio",
+   "label": "AI组合",
+   "name": "天赐材料",
+   "code": "sz002709",
+   "base_price": 35.68,
+   "total": 16.17,
+   "date": "2026-10-09",
+   "pick_price": 35.68,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "ai_portfolio",
+   "label": "AI组合",
+   "name": "有研新材",
+   "code": "sh600206",
+   "base_price": 47.95,
+   "total": 13.6,
+   "date": "2026-10-09",
+   "pick_price": 47.95,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "ai_portfolio",
+   "label": "AI组合",
+   "name": "多氟多",
+   "code": "sz002407",
+   "base_price": 31.89,
+   "total": 14.64,
+   "date": "2026-10-09",
+   "pick_price": 31.89,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "药明康德",
+   "code": "sh603259",
+   "base_price": 157.8,
+   "total": 12.9,
+   "date": "2026-10-09",
+   "pick_price": 157.8,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "中金黄金",
+   "code": "sh600489",
+   "base_price": 22.95,
+   "total": 12.7,
+   "date": "2026-10-09",
+   "pick_price": 22.95,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "山东黄金",
+   "code": "sh600547",
+   "base_price": 27.17,
+   "total": 12.1,
+   "date": "2026-10-09",
+   "pick_price": 27.17,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_reversal",
+   "label": "量化·reversal",
+   "name": "兆易创新",
+   "code": "sh603986",
+   "base_price": 326.46,
+   "total": 13.72,
+   "date": "2026-10-09",
+   "pick_price": 326.46,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_reversal",
+   "label": "量化·reversal",
+   "name": "有研新材",
+   "code": "sh600206",
+   "base_price": 47.95,
+   "total": 13.6,
+   "date": "2026-10-09",
+   "pick_price": 47.95,
    "rets": {
     "1": null,
     "5": null,

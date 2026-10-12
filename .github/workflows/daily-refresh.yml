@@ -2,14 +2,22 @@ name: Daily Stock Report Refresh
 
 on:
   schedule:
-    # 每天15:30北京时间 (UTC+8 = 07:30 UTC), 仅工作日
+    # 【主触发】每天 15:30 北京时间 (UTC+8 = 07:30 UTC), 仅工作日
+    # ⚠️ 实测 GitHub Actions schedule 存在 4.8~8.8 小时系统性排队延迟(289~528 分钟, 20/20 超过 4h),
+    #    实际在 北京 20:19~00:18 才启动。故本 cron 定位为「晚场兜底」, 准点性由下述补偿 cron + WorkBuddy 定时任务保证。
     - cron: '30 7 * * 1-5'
+    # 【补偿触发】每天 17:30 北京时间 (09:30 UTC), 与原 cron 错开 2 小时形成时间阶梯。
+    #    若主 cron 因排队延迟/失败未产出当日数据, 本触发补上; 已产出则被「幂等守卫」跳过(不重复跑)。
+    - cron: '30 9 * * 1-5'
   workflow_dispatch:
 
 permissions:
   contents: write
 
-# 防止并发运行：同一时间仅保留一个刷新任务（后触发的排队等待，不取消正在进行的）
+# 防并发: 同一时间仅保留一个刷新任务, 后触发的「排队等待」而非取消正在进行的。
+# v2.44 保留 cancel-in-progress: false —— 配合双 cron + 幂等守卫使用:
+#   触发 A 跑完并提交当日文件 → 触发 B 排队启动 → 守卫发现文件已存在 → 秒退(不重复跑)。
+#   若改成 true 反而更差: A 被中途取消, B 从头重跑 40 分钟。故此处刻意保持 false。
 concurrency:
   group: daily-refresh
   cancel-in-progress: false
@@ -43,6 +51,19 @@ jobs:
           MAX_RETRIES=3
           RETRY_DELAY=30
           SUCCESS=0
+
+          # --- 幂等守卫 (防重复跑) ---
+          # 背景: GitHub Actions schedule 存在 4.8~8.8 小时系统性排队延迟(实测 289~528 分钟),
+          #       故改为「WorkBuddy 定时任务准点触发 workflow_dispatch」为主 + 原 schedule 兜底。
+          #       两条触发路径可能同日先后到达 → 用当日数据文件是否已存在做去重:
+          #       若当日 scored json 已提交(说明今日已刷新成功), 则本次直接跳过, 不再重复跑 15 分钟。
+          BJ_TODAY=$(date -u -d '+8 hours' '+%Y-%m-%d')
+          if [ -f "top200_scored_${BJ_TODAY}.json" ]; then
+            echo "=== 今日($BJ_TODAY)数据已存在, 跳过重复刷新 ===" >> $LOG
+            echo "skip=already_refreshed_today" >> $GITHUB_OUTPUT
+            echo "result=skip" >> $GITHUB_OUTPUT
+            exit 0
+          fi
 
           for ATTEMPT in $(seq 1 $MAX_RETRIES); do
             echo "--- Attempt $ATTEMPT/$MAX_RETRIES ---" >> $LOG
@@ -154,6 +175,16 @@ jobs:
               echo "[$(date -u '+%H:%M:%S')] ⚠️ Portfolio generation failed" >> $LOG
             fi
 
+            # Step 3.95: 推荐跟踪快照 + T+N 收益回填 (P0-4)
+            # ⚠️ 必须在 gen_report_top200.py 之前运行: 报告层会读取 recommendation_track.json
+            #    渲染「📊 推荐跟踪 · 胜率验证」区块, 故需先记录当日快照并回填历史 T+N。
+            echo "[$(date -u '+%H:%M:%S')] Running track_recommendations.py (snapshot + T+N backfill) ..." >> $LOG
+            if python3 track_recommendations.py "$SCORED_JSON" >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Recommendation tracking updated" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ Recommendation tracking failed, report will show last snapshot" >> $LOG
+            fi
+
             # Step 4: Generate HTML report
             echo "[$(date -u '+%H:%M:%S')] Running gen_report_top200.py ..." >> $LOG
             if python3 gen_report_top200.py "$SCORED_JSON" >> $LOG 2>&1; then
@@ -221,6 +252,7 @@ jobs:
           git add index.html top200_report_*.html
           git add -f top200_scored_*.json top200_all_a.json ai_assessment.json
           git add -f top1000_all_a.json watchlist_*.json
+          git add -f recommendation_track.json
           git add -f sector/sw_map.json sector/sector_momentum_latest.json sector/portfolio_*.json
           git add enhance_scores.py gen_report_top200.py generate_ai_assessment.py
           git add sector_momentum_daily.py apply_sector_momentum.py pick_portfolio.py gen_portfolio_report.py fetch_sw_map.py select_watchlist.py

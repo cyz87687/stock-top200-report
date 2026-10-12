@@ -36,7 +36,19 @@ HORIZONS = [1, 5, 20]
 
 
 def _sym(code):
-    c = str(code).zfill(6)
+    """归一化为腾讯/新浪 K线所需的符号格式 (sh600519 / sz300450 / bj430047)。
+
+    兼容两种输入:
+      - 带市场前缀: 'sz300450' / 'SH600519'  → 直接归一化前缀大小写后返回
+      - 纯数字:    '300450' / '600519'      → 按首位数字推断市场
+    历史 bug: scored json 的 code 已是 'sz300450' 形式, 旧实现对其 zfill 后
+    用 startswith 判断数字前缀, 全部失配返回 None, 导致回填恒为 0 个收益点。
+    """
+    c = str(code).strip().lower()
+    # 情况1: 已带前缀 (sh/sz/bj)
+    if len(c) > 2 and c[:2] in ("sh", "sz", "bj") and c[2:].isdigit():
+        return c
+    c = str(code).strip().zfill(6)
     if c.startswith(('60', '68', '9', '51', '58')):
         return 'sh' + c
     if c.startswith(('00', '30', '20', '1', '15', '16')):
@@ -47,10 +59,14 @@ def _sym(code):
 
 
 def fetch_kline(code, need=60):
-    """→ {date: close} 前复权日线 (腾讯多域名 + 新浪兜底)"""
+    """→ {date: close} 前复权日线 (腾讯多域名轮询 + 新浪兜底)
+
+    数据纪律: 全部来自真实接口; 任一源失败则尝试下一个; 全失败返回 {} (留空不编造)。
+    """
     sym = _sym(code)
     if not sym:
         return {}
+    # --- 源1: 腾讯 (多域名轮询, ifzq.gtimg.cn 为准) ---
     for host in TENCENT_HOSTS:
         url = f"{host}/appstock/app/fqkline/get?param={sym},day,,,{need},qfq"
         try:
@@ -62,10 +78,36 @@ def fetch_kline(code, need=60):
             j = json.loads(txt)
             d = j.get('data', {}).get(sym, {})
             kl = d.get('qfqday') or d.get('day') or []
-            if kl:
-                return {x[0]: float(x[2]) for x in kl}
+            out = {}
+            for x in kl:
+                if len(x) >= 3:
+                    try:
+                        out[str(x[0])] = float(x[2])
+                    except (ValueError, TypeError):
+                        continue
+            if out:
+                return out
         except Exception:
             continue
+    # --- 源2: 新浪 (不复权, 最后手段) ---
+    try:
+        url = ("https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/"
+               f"CN_MarketData.getKLineData?symbol={sym}&scale=240&ma=no&datalen={max(need, 60)}")
+        req = urllib.request.Request(url, headers={"User-Agent": UA})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            txt = r.read().decode('utf-8')
+        arr = json.loads(txt)
+        out = {}
+        for x in (arr or []):
+            if isinstance(x, dict) and x.get('day') and x.get('close') is not None:
+                try:
+                    out[str(x['day'])] = float(x['close'])
+                except (ValueError, TypeError):
+                    continue
+        if out:
+            return out
+    except Exception:
+        pass
     return {}
 
 
@@ -152,12 +194,31 @@ def record_snapshot(scored_path):
     return track
 
 
+def _last_closed_trade_date():
+    """返回「已收盘的最新交易日」(北京时间为准), 格式 YYYY-MM-DD。
+
+    数据纪律要点: 腾讯/新浪 K 线在盘中会返回当日实时价(未收盘), 若直接用作 T+N
+    收盘价会把盘中波动误当收盘收益。故:
+      - 北京时间 15:00 前 → 当日未收盘, 截止日回退到前一日;
+      - 再回退跳过周末(节假日无法在此精确判断, 由 K 线实际存在的日期兜底过滤)。
+    """
+    from datetime import datetime as _dt, timedelta as _td, timezone as _tz
+    bj = _dt.now(_tz.utc) + _td(hours=8)
+    d = bj.date()
+    if bj.hour < 15:
+        d = d - _td(days=1)
+    while d.weekday() >= 5:
+        d = d - _td(days=1)
+    return d.strftime('%Y-%m-%d')
+
+
 def backfill(track):
-    """用真实K线回填 T+N 收益"""
+    """用真实K线回填 T+N 收益 (仅使用已收盘交易日数据)"""
     # 按 code 聚合, 每 code 只抓一次K线
     codes = {x["code"] for x in track["records"]}
     kl_cache = {}
-    print(f"📈 回填收益: 涉及 {len(codes)} 只个股 ...")
+    cutoff = _last_closed_trade_date()
+    print(f"📈 回填收益: 涉及 {len(codes)} 只个股 (数据截止 {cutoff}, 盘中不回填当日) ...")
     for i, c in enumerate(sorted(codes), 1):
         kl_cache[c] = fetch_kline(c)
         if i % 20 == 0:
@@ -169,9 +230,11 @@ def backfill(track):
         kl = kl_cache.get(rec["code"]) or {}
         if not kl:
             continue
-        dates = sorted(kl.keys())
+        rec.setdefault("rets", {str(h): None for h in HORIZONS})
+        # 关键: 剔除尚未收盘的当日K线(盘中价), 只保留 <= cutoff 的已收盘交易日
+        dates = sorted(d for d in kl.keys() if d <= cutoff)
         base_d = rec["date"]
-        # 找推荐日或之后首个交易日
+        # 找推荐日或之后首个已收盘交易日
         try:
             idx = next(i for i, d in enumerate(dates) if d >= base_d)
         except StopIteration:
@@ -183,6 +246,8 @@ def backfill(track):
                 ret = (kl[dates[j]] - base_close) / base_close * 100 if base_close else None
                 rec["rets"][str(h)] = round(ret, 2) if ret is not None else None
                 filled += 1
+            else:
+                rec["rets"][str(h)] = None
     save_track(track)
     print(f"✅ 回填完成: {filled} 个收益点")
     return track
