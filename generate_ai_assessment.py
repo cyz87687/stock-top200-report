@@ -6,7 +6,14 @@
   2) 构造结构化 prompt，调用 OpenAI-compatible LLM（默认火山方舟 / Moonshot）；
   3) 要求模型输出严格 JSON，与 enhance_scores.py 期望的 ai_assessment.json schema 一致；
   4) 若 LLM 调用失败或环境变量缺失，自动 fallback 到规则化生成，确保流水线不中断。
-环境变量（GitHub Actions secrets 中设置）：
+
+三种生成来源（优先级由调用方式决定）：
+  A. --from-review <review_research_merged_*.json>   【本地复盘】WorkBuddy 逐公司联网核查后的结论文档
+     —— 不依赖任何 LLM 密钥，由本地复盘产物直接驱动页面，标注 source="local-review"
+  B. 默认（配置了 LLM_API_KEY）                      【云端/本地 LLM】
+  C. 默认（无密钥 / 调用失败）                        【规则引擎 fallback】
+
+环境变量：
   LLM_API_KEY   : API Key（不会硬编码到代码）
   LLM_BASE_URL  : 默认 https://ark.cn-beijing.volces.com/api/plan/v3（Agent Plan 专属通道）
   LLM_MODEL     : 默认 deepseek-v4-pro
@@ -16,7 +23,8 @@ import json
 import os
 import sys
 import glob
-from collections import defaultdict
+import argparse
+from collections import defaultdict, Counter
 from datetime import datetime
 
 # 清除代理环境变量: HTTP(S)_PROXY 会干扰火山方舟 API 直连(本地/CI 通用)
@@ -347,10 +355,221 @@ def _fallback_ai_assessment(s):
     }
 
 
+# ============================================================================
+# 本地复盘接入层（阶段3 核心）
+# ============================================================================
+# 数据来源: review_research_merged_<date>.json（由 export_review_input.py +
+#           merge_review_research.py 两阶段产出，含逐公司联网核查结论）。
+# 与 LLM 路径的根本区别: 不走任何在线模型，结论来自"本地逐公司查资料"，
+#   故页面来源标注必须是"本地复盘"，不得冒充 AI/LLM 生成（数据纪律）。
+#
+# 映射策略（本地复盘 → ai_assessment schema）:
+#   market_commentary   → commentary            (全局复盘结论文本)
+#   watch_directions    → watch_directions      (明日关注方向)
+#   companies[].verdict → themes[].heat 修正    (逐公司结论直接调制题材热度)
+#   companies[].findings→ themes[].consensus / model_summary (事实性描述)
+#   companies 中 verdict=上调/维持 且 tier=deep → portfolio.picks
+#
+# 题材热度算法（本地复盘路径）:
+#   以算法层题材均涨幅得到的 base_heat 为基准，
+#   再按该题材下"有本地结论"的个股 verdict 平均修正量调整:
+#     上调 +0.6 / 维持 +0.1 / 观察 0.0 / 中性 0.0 / 下调 -0.6 / 规避 -1.0
+#   最终 clamp 到 [0,5]。既保留市场真实涨跌信息，又体现逐公司核查的独立判断。
+
+_VERDICT_DELTA = {
+    "上调": 0.6, "维持": 0.1, "观察": 0.0, "中性": 0.0,
+    "下调": -0.6, "规避": -1.0,
+}
+# 参与组合推荐的 verdict（仅正向结论入选）
+_VERDICT_POSITIVE = ("上调", "维持")
+
+
+def _review_themes(summary, merged):
+    """本地复盘路径：按 sub_theme 直接聚合题材，并叠加逐公司 verdict 修正。
+
+    ⚠️ 与 LLM/fallback 路径的关键差异：不走 theme_templates 白名单。
+       原因：白名单只覆盖 13 个预设细分题材，导致「宁德时代/中国巨石」等
+       被深度核查的个股落不进任何题材 → 本地结论无法传导到评分层。
+       改为直接用 scored json 的 sub_theme 分组，保证每只被核查个股都被覆盖。
+    """
+    name2verdict = {}
+    for c in (merged.get("companies") or []):
+        nm = c.get("name")
+        if nm:
+            name2verdict[nm] = c.get("verdict")
+
+    groups = defaultdict(list)
+    for r in summary.get("results", []):
+        st = r.get("sub_theme") or r.get("sector") or "其他"
+        groups[st].append(r)
+
+    themes = {}
+    for st, rows in groups.items():
+        avg = sum((float(x.get("pct_chg") or 0)) for x in rows) / len(rows)
+        # base: 由当日真实均涨幅推导（+10% → 满 5 分；-10% → 0 分）
+        base = max(0.0, min(5.0, 3.0 + avg / 10.0 * 2.0))
+        deltas = [_VERDICT_DELTA.get(name2verdict.get(x.get("name")), 0.0) for x in rows
+                  if name2verdict.get(x.get("name"))]
+        n_checked = len(deltas)
+        heat = base + (sum(deltas) / n_checked if n_checked else 0.0)
+        heat = round(max(0.0, min(5.0, heat)), 2)
+        news = round(max(0.0, min(5.0, base + (sum(deltas) / n_checked * 0.8 if n_checked else 0.0))), 2)
+
+        # 题材内个股：核查过的优先，其次按涨幅
+        top = sorted(rows, key=lambda x: (
+            0 if name2verdict.get(x.get("name")) else 1,
+            -(float(x.get("pct_chg") or 0))))[:7]
+        consensus = f"{st}（{len(rows)}只）平均{avg:+.2f}%，{'资金活跃' if avg > 0 else '弱势调整'}"
+        if n_checked:
+            consensus += f"｜本地核查 {n_checked}/{len(rows)} 只"
+        themes[st] = {
+            "news": news,
+            "heat": heat,
+            "consensus": consensus,
+            "stocks": [x["name"] for x in top],
+            "_n_checked": n_checked,
+        }
+
+    # 排序与截断 —— 关键：保证「含本地核查个股」的题材 100% 保留，
+    #   否则被深度核查的公司落不进 themes → enhance_scores 无法命中 → 本地结论白做。
+    #   规则：① 有核查的题材全部保留（按核查数降序）② 其余按热度补齐到上限。
+    checked = {k: v for k, v in themes.items() if v["_n_checked"] > 0}
+    unchecked = {k: v for k, v in themes.items() if v["_n_checked"] == 0}
+    checked = dict(sorted(checked.items(), key=lambda kv: (-kv[1]["_n_checked"], -kv[1]["heat"])))
+    unchecked = dict(sorted(unchecked.items(), key=lambda kv: -kv[1]["heat"]))
+
+    MAX_THEMES = 20
+    out = dict(checked)
+    for k, v in unchecked.items():
+        if len(out) >= MAX_THEMES:
+            break
+        out[k] = v
+    for v in out.values():
+        v.pop("_n_checked", None)
+    return out
+
+
+def _review_portfolio(summary, merged):
+    """本地复盘路径：组合标的取自"深度复盘且结论正面"的公司。"""
+    by_code = {_norm_symbol(r.get("code")): r for r in summary.get("results", [])}
+    picks = []
+    for c in (merged.get("companies") or []):
+        if c.get("tier") != "deep":
+            continue
+        if c.get("verdict") not in _VERDICT_POSITIVE:
+            continue
+        r = by_code.get(_norm_symbol(c.get("code")))
+        if not r:
+            continue
+        _note_parts = []
+        if c.get("findings"):
+            _note_parts.append(str(c["findings"])[:110])
+        if c.get("target_price") is not None:
+            _note_parts.append(f"机构目标价 {c['target_price']}")
+        picks.append({
+            "name": r.get("name"),
+            "code": _norm_symbol(r.get("code")),
+            "valuation": (f"fwdPE={r.get('fwd_pe') if r.get('fwd_pe') is not None else 'N/A'}, "
+                          f"growth={r.get('growth') if r.get('growth') is not None else 'N/A'}"),
+            "note": "；".join(_note_parts) or f"本地复盘结论：{c.get('verdict')}",
+            "verdict": c.get("verdict"),
+            "confidence": c.get("confidence"),
+        })
+    # 按算法总分降序，取前 6（组合不做满额，交由报告层门控）
+    picks.sort(key=lambda x: -(by_code.get(x["code"], {}).get("total") or 0))
+    return {
+        "title": "本地复盘组合（逐公司核查后）",
+        "picks": picks[:6],
+        "verdict": (merged.get("market_commentary") or "")[:160],
+    }
+
+
+def _review_watch_directions(merged, summary):
+    """关注方向：优先用本地复盘给出的，缺失则回退规则引擎版本。"""
+    wd = [w for w in (merged.get("watch_directions") or []) if str(w).strip()]
+    if wd:
+        return wd
+    return _fallback_ai_assessment(summary).get("watch_directions") or []
+
+
+def _from_local_review(summary, merged):
+    """把本地复盘产物装配为 ai_assessment.json（不经过任何在线模型）。"""
+    date = merged.get("date") or summary.get("date")
+    companies = merged.get("companies") or []
+    v = merged.get("validation") or {}
+    n_deep = sum(1 for c in companies if c.get("tier") == "deep")
+    n_light = sum(1 for c in companies if c.get("tier") == "light")
+    vc = Counter(c.get("verdict") for c in companies)
+
+    commentary = (merged.get("market_commentary") or "").strip()
+    if not commentary:
+        # 未写全局点评 → 用规则引擎文本打底，并注明
+        commentary = _fallback_ai_assessment(summary).get("commentary", "")
+
+    _val_txt = "通过" if v.get("passed") else f"有 {v.get('n_error', 0)} 项错误"
+    model_summary = (
+        f"模型 {summary['data'].get('model', 'stock-scorer')} 基于 {date} 真实行情打分，"
+        f"其后由本地复盘逐公司联网核查（深度 {n_deep} 只 / 轻量 {n_light} 只），"
+        f"核查结论分布 {dict(vc)}；"
+        f"题材热度已按逐公司结论修正。"
+        f"校验：{_val_txt}。"
+    )
+
+    return {
+        "date": date,
+        "generated_by": f"WorkBuddy 本地复盘（逐公司联网核查 {len(companies)} 只，研究员：{merged.get('researcher') or 'WorkBuddy'}）",
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "source": "local-review",
+        "commentary": commentary,
+        "watch_directions": _review_watch_directions(merged, summary),
+        "model_summary": model_summary,
+        "themes": _review_themes(summary, merged),
+        "portfolio": _review_portfolio(summary, merged),
+        "risk_note": "；".join(
+            sorted({r for c in companies for r in (c.get("risks") or [])})
+        )[:300],
+        "review_meta": {
+            "tier_deep": n_deep, "tier_light": n_light,
+            "verdict_dist": dict(vc),
+            "validation_passed": bool(v.get("passed")),
+            "validation_error": v.get("n_error", 0),
+            "validation_warn": v.get("n_warn", 0),
+        },
+        # fallback=False: 本条确由"大模型/本地核查"链路产出，非规则引擎拼接
+        "fallback": False,
+    }
+
+
+def _norm_symbol(code):
+    """code 归一（兼容 sz300750 / 300750 两种写法）。"""
+    if not code:
+        return ""
+    c = str(code).strip().lower()
+    if c[:2] in ("sh", "sz", "bj"):
+        return c
+    d = "".join(ch for ch in c if ch.isdigit())
+    if len(d) != 6:
+        return c
+    if d[0] == "6":
+        return "sh" + d
+    if d[0] in ("0", "3"):
+        return "sz" + d
+    if d[0] in ("4", "8"):
+        return "bj" + d
+    return c
+
+
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
-    scored_path = sys.argv[1] if len(sys.argv) > 1 else _find_latest_scored(here)
-    out_path = sys.argv[2] if len(sys.argv) > 2 else os.path.join(here, "ai_assessment.json")
+    ap = argparse.ArgumentParser(add_help=True)
+    ap.add_argument("scored", nargs="?", help="scored json（默认取最新）")
+    ap.add_argument("out", nargs="?", help="输出路径（默认 ai_assessment.json）")
+    ap.add_argument("--from-review", dest="from_review",
+                    help="本地复盘产物 review_research_merged_*.json（指定则走本地复盘路径）")
+    args = ap.parse_args()
+
+    scored_path = args.scored or _find_latest_scored(here)
+    out_path = args.out or os.path.join(here, "ai_assessment.json")
 
     if not scored_path or not os.path.exists(scored_path):
         print("❌ 未找到 scored json")
@@ -360,6 +579,33 @@ def main():
     summary = _build_summary(scored_path)
     print(f"   个股数: {len(summary['results'])}, 日期: {summary['date']}")
 
+    # ---------- 路径 A：本地复盘（无需 LLM 密钥）----------
+    if args.from_review:
+        if not os.path.exists(args.from_review):
+            print(f"❌ 本地复盘产物不存在: {args.from_review}")
+            return 1
+        with open(args.from_review, "r", encoding="utf-8") as f:
+            merged = json.load(f)
+        if str(merged.get("date")) != str(summary["date"]):
+            print(f"❌ 日期不一致：复盘产物={merged.get('date')}，scored={summary['date']}")
+            return 1
+        _v = merged.get("validation") or {}
+        if not _v.get("passed"):
+            print(f"⚠️ 复盘产物校验未通过（error {_v.get('n_error', 0)}）；"
+                  f"页面仍将采用，但来源标注会含校验提示。")
+        ai = _from_local_review(summary, merged)
+        _clean_themes(ai, summary)
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump(ai, f, ensure_ascii=False, indent=2)
+        print(f"✅ 已生成（本地复盘路径）: {out_path}")
+        print(f"   来源: {ai['generated_by']}")
+        print(f"   review_meta: {ai.get('review_meta')}")
+        print(f"   themes {len(ai.get('themes', {}))} 个 / "
+              f"watch_directions {len(ai.get('watch_directions', []))} 条 / "
+              f"组合 {len((ai.get('portfolio') or {}).get('picks', []))} 只")
+        return 0
+
+    # ---------- 路径 B/C：在线 LLM → 失败回退规则引擎 ----------
     prompt = _build_prompt(summary)
     ai = _call_llm(prompt)
 
@@ -367,6 +613,7 @@ def main():
         print("⚠️ 使用 fallback 规则生成 ai_assessment.json")
         ai = _fallback_ai_assessment(summary)
         ai["fallback"] = True
+        ai["source"] = "rule-fallback"
     else:
         # 校验并补齐必要字段（fallback 只计算一次）
         _fb = _fallback_ai_assessment(summary)
@@ -374,25 +621,11 @@ def main():
             if key not in ai:
                 ai[key] = _fb[key]
         ai["fallback"] = False
+        ai["source"] = "llm"
         ai["date"] = summary["date"]
         ai["generated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         ai["generated_by"] = f"WorkBuddy LLM ({MODEL})，基于当日真实行情数据"
-
-        # 清洗 themes[].stocks：剔除不在当日 TOP200 名单内的名称，否则 enhance_scores 无法命中赋分
-        _valid = {r["name"] for r in summary["results"]}
-        _cleaned = {}
-        for _k, _t in (ai.get("themes") or {}).items():
-            if not isinstance(_t, dict):
-                continue
-            _stocks = [x for x in (_t.get("stocks") or []) if x in _valid]
-            _dropped = [x for x in (_t.get("stocks") or []) if x not in _valid]
-            if _dropped:
-                print(f"   ⚠️ [{_k}] 剔除名单外个股: {_dropped}")
-            if _stocks:
-                _t["stocks"] = _stocks
-                _cleaned[_k] = _t
-        ai["themes"] = _cleaned
-        print(f"   主题清洗后: {len(_cleaned)} 个，命中个股 {sum(len(v['stocks']) for v in _cleaned.values())} 只")
+        _clean_themes(ai, summary)
 
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(ai, f, ensure_ascii=False, indent=2)
@@ -402,6 +635,25 @@ def main():
     print(f"   watch_directions 数量: {len(ai.get('watch_directions', []))}")
     print(f"   fallback: {ai.get('fallback')}")
     return 0
+
+
+def _clean_themes(ai, summary):
+    """清洗 themes[].stocks：剔除不在当日 TOP200 名单内的名称，否则 enhance_scores 无法命中赋分。"""
+    _valid = {r["name"] for r in summary["results"]}
+    _cleaned = {}
+    for _k, _t in (ai.get("themes") or {}).items():
+        if not isinstance(_t, dict):
+            continue
+        _stocks = [x for x in (_t.get("stocks") or []) if x in _valid]
+        _dropped = [x for x in (_t.get("stocks") or []) if x not in _valid]
+        if _dropped:
+            print(f"   ⚠️ [{_k}] 剔除名单外个股: {_dropped}")
+        if _stocks:
+            _t["stocks"] = _stocks
+            _cleaned[_k] = _t
+    ai["themes"] = _cleaned
+    print(f"   主题清洗后: {len(_cleaned)} 个，命中个股 "
+          f"{sum(len(v['stocks']) for v in _cleaned.values())} 只")
 
 
 if __name__ == "__main__":

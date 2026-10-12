@@ -137,8 +137,18 @@ def _find_latest_scored(explicit=None):
     return fs[0] if fs else None
 
 
-def record_snapshot(scored_path):
-    """从 scored json 抽取当日推荐快照"""
+def record_snapshot(scored_path, replace_day=False):
+    """从 scored json 抽取当日推荐快照
+
+    v2.45: 新增 replace_day —— 本地复盘链路专用。
+      背景: GitHub Actions 于 15:30 先用「规则引擎兜底评级」记录一次当日快照;
+            本地复盘(逐公司核查)会改变评级分布(实测 S:0→S:10), 再跑本脚本时
+            按 (date,kind,code) 去重 → 只会「追加」新入选的标的, 而旧的那批
+            (已被本地复盘的评级淘汰)仍留在表里 → 当日样本虚增、胜率被污染。
+      故本地复盘时传 replace_day=True: 先删除当日全部快照, 再按最终评级重建,
+      保证「当日推荐集 = 本地复盘后的最终结论」, 一个交易日只有一套推荐。
+      注: 同日记录此时尚未回填 T+N(T+N 需未来K线), 故删除不损失已有收益数据。
+    """
     data = json.load(open(scored_path, encoding="utf-8"))
     date = data.get("date") or datetime.now().strftime("%Y-%m-%d")
     results = data.get("results", [])
@@ -183,6 +193,18 @@ def record_snapshot(scored_path):
         pass
 
     track = load_track()
+    # v2.45: 本地复盘 → 先清空当日快照再重建(避免同日双套推荐)
+    replaced = 0
+    if replace_day:
+        _before = len(track["records"])
+        _dropped = [x for x in track["records"] if x.get("date") == date]
+        track["records"] = [x for x in track["records"] if x.get("date") != date]
+        replaced = _before - len(track["records"])
+        if replaced:
+            _filled = sum(1 for x in _dropped
+                          if any(v is not None for v in (x.get("rets") or {}).values()))
+            print(f"♻️  replace-day: 移除当日旧快照 {replaced} 条"
+                  f"（其中已回填收益 {_filled} 条）")
     # 去重: 同 date + kind + code 只记一次
     exist = {(x["date"], x["kind"], x["code"]) for x in track["records"]}
     added = 0
@@ -196,7 +218,8 @@ def record_snapshot(scored_path):
         track["records"].append(rc)
         added += 1
     save_track(track)
-    print(f"📝 记录 {date} 推荐快照: 新增 {added} 条 (共 {len(track['records'])} 条)")
+    _tag = f"（replace-day 替换 {replaced} 条）" if replace_day else ""
+    print(f"📝 记录 {date} 推荐快照: 新增 {added} 条 (共 {len(track['records'])} 条){_tag}")
     return track
 
 
@@ -316,13 +339,14 @@ def summarize(track):
 def main():
     args = sys.argv[1:]
     report_only = "--report" in args
+    replace_day = "--replace-day" in args
     explicit = next((a for a in args if not a.startswith("--")), None)
 
     track = load_track()
     if not report_only:
         sp = _find_latest_scored(explicit)
         if sp:
-            track = record_snapshot(sp)
+            track = record_snapshot(sp, replace_day=replace_day)
             track = backfill(track)
     summarize(track)
 

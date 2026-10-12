@@ -63,7 +63,10 @@ model_str = data.get("model", "stock-scorer")
 #   P1-2 跟踪表增列超额收益(相对沪深300)
 #   P1-3 板块集中度提示
 #   P1-4 生存者偏差披露
-REPORT_VER = "v2.44"
+# v2.45: 本地复盘链路接入 ——
+#   P0-2 点评来源升级为三态(本地复盘/在线LLM/规则引擎), 消除"本地核查冒充AI生成"
+#   review_meta 落地(AI 复盘区显示深度/轻量核查只数与校验状态)
+REPORT_VER = "v2.45"
 _has_sector = any(x.get('score_sector') is not None for x in results)
 _ver_tag = f"{REPORT_VER} · 五维" if _has_sector else f"{REPORT_VER} · 四维"
 _ver_short = "v2.40 (AI + 板块动量)" if _has_sector else "v2.30 (AI 增强)"
@@ -992,23 +995,38 @@ ai_watch = ai_review.get("watch_directions") or []
 ai_risk = (ai_review.get("risk_note") or "").strip()
 ai_date = ai_review.get("date", "")
 
-# ===== v2.44 P0-2 点评来源如实标注（修复"AI 生成"标注失实）=====
+# ===== v2.45 P0-2 点评来源如实标注（三态：本地复盘 / 在线LLM / 规则引擎）=====
 # 历史 bug: 页面固定写"每日AI生成", 但 ai_assessment.json 实际为
 #   generated_by="...LLM fallback rule engine...", fallback=True（规则引擎拼接模板）,
 #   且 GitHub repo secrets 未配置(云端无法调 LLM) → 构成来源标注失实, 违反数据纪律。
-# 现依 fallback / generated_by 字段动态判定来源, 如实标注;
-#   仅在确为 LLM 生成时才写"AI 生成"。同时把原始生成者串附在 title 中可追溯。
+# v2.45: 新増「本地复盘」来源 —— 由 export_review_input.py + merge_review_research.py
+#   两阶段产出（WorkBuddy 逐公司联网核查），source="local-review"、fallback=False。
+#   该来源必须与"AI生成"区分：它是逐公司人工级核查，不是模型一次性生成。
+_ai_src_raw = str(ai_review.get("source") or "")
 _ai_is_fallback = bool(ai_review.get("fallback"))
 _ai_genby = str(ai_review.get("generated_by") or "")
-if _ai_is_fallback or ("fallback" in _ai_genby.lower()) or ("rule engine" in _ai_genby.lower()):
+_review_meta = ai_review.get("review_meta") or {}
+if _ai_src_raw == "local-review" or ("本地复盘" in _ai_genby):
+    _rm_deep = _review_meta.get("tier_deep")
+    _rm_light = _review_meta.get("tier_light")
+    _rm_ok = _review_meta.get("validation_passed")
+    _ai_src_label = "本地复盘（逐公司联网核查）"
+    _ai_src_color = "#a78bfa"
+    _ai_src_tip = (f"本条点评来自本地复盘链路：先由 export_review_input.py 理出当日需复盘公司，"
+                   f"再由 WorkBuddy 逐公司联网查阅资料（深度 {_rm_deep if _rm_deep is not None else '?'} 只 / "
+                   f"轻量 {_rm_light if _rm_light is not None else '?'} 只），"
+                   f"经 merge_review_research.py 校验后注入页面。"
+                   f"校验结果：{'通过' if _rm_ok else '存在待修正项'}。"
+                   f"该来源非在线大模型一次性生成，结论基于逐公司可核验资料。")
+elif _ai_is_fallback or ("fallback" in _ai_genby.lower()) or ("rule engine" in _ai_genby.lower()):
     _ai_src_label = "规则引擎生成"
     _ai_src_color = "#f59e0b"
     _ai_src_tip = ("本条点评由本地规则引擎按当日真实行情数据拼接生成，"
-                   "非大模型生成；配置 LLM 密钥后自动切换为大模型生成。")
+                   "非大模型生成；配置 LLM 密钥或启用本地复盘后自动切换。")
 else:
     _ai_src_label = "AI 生成"
     _ai_src_color = "#38bdf8"
-    _ai_src_tip = "本条点评由大模型基于当日真实行情数据生成。"
+    _ai_src_tip = f"本条点评由大模型基于当日真实行情数据生成。生成者：{_ai_genby or '未知'}"
 
 if ai_text:
     review_title = (f'🤖 盘面复盘点评 <span title="{html_mod.escape(_ai_src_tip)}" '
@@ -1025,9 +1043,33 @@ if ai_text:
     risk_html = (f'<div style="margin:10px 0;padding:8px 14px;background:#1a1208;'
                  f'border-left:3px solid #ef4444;border-radius:8px;'
                  f'font-size:12px;color:#fca5a5;">⚠️ {html_mod.escape(ai_risk)}</div>') if ai_risk else ""
+    # ===== v2.45 本地复盘元信息（核查规模 + 校验状态，机构视角：可追溯/可复核）=====
+    # 仅本地复盘来源显示：让读者知道这条结论背后"查了多少家公司、校验是否通过"，
+    # 与"模型一次性生成"形成可辨识的差异。
+    meta_html = ""
+    if _ai_src_raw == "local-review" and _review_meta:
+        _md_deep = _review_meta.get("tier_deep")
+        _md_light = _review_meta.get("tier_light")
+        _md_ok = _review_meta.get("validation_passed")
+        _md_e = _review_meta.get("validation_error") or 0
+        _md_w = _review_meta.get("validation_warn") or 0
+        _md_vd = _review_meta.get("verdict_dist") or {}
+        _vd_str = " · ".join(f"{k} {v}" for k, v in _md_vd.items()) if _md_vd else "—"
+        _md_color = "#22c55e" if _md_ok else "#f59e0b"
+        _md_icon = "✅" if _md_ok else "⚠️"
+        meta_html = (
+            f'<div style="margin:10px 0;padding:9px 13px;background:rgba(167,139,250,0.08);'
+            f'border-left:3px solid #a78bfa;border-radius:8px;font-size:12px;color:#c4b5fd;line-height:1.75;">'
+            f'🔍 <b>本地复盘过程</b>：深度核查 <b>{_md_deep}</b> 只（决策相关标的）+ '
+            f'轻量核查 <b>{_md_light}</b> 只（异动解释）　｜　'
+            f'核查结论分布：<b>{html_mod.escape(_vd_str)}</b>　｜　'
+            f'<span style="color:{_md_color};">{_md_icon} 数据校验 '
+            f'{"通过" if _md_ok else "存在待修正项"}</span>'
+            f'（error {_md_e} / warn {_md_w}）'
+            f'</div>')
     review_body = (f'<div class="review-text" style="font-size:13px;line-height:1.9;color:#e2e8f0;'
                    f'background:#0f172a;border-left:3px solid #3b82f6;padding:12px 14px;border-radius:8px;margin:10px 0;">'
-                   f'{html_mod.escape(ai_text)}</div>{watch_html}{risk_html}')
+                   f'{html_mod.escape(ai_text)}</div>{watch_html}{risk_html}{meta_html}')
 else:
     review_title = "📝 盘面复盘点评"
     review_body = (f'<div class="review-text" style="font-size:13px;line-height:1.9;color:#e2e8f0;'
