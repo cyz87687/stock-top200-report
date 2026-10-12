@@ -44,9 +44,10 @@ if [ "${BJ_HM}" -lt "1455" ]; then
 fi
 
 # ---- 2. 查远程是否已有当日 scored json ----
+# 注: HTTP_PROXY 已 export, curl 会自动使用, 无需显式 -x (避免参数展开歧义)
 CHECK_URL="https://api.github.com/repos/${REPO}/contents/top200_scored_${BJ_TODAY}.json"
 HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-    ${PROXY:+-x "$PROXY"} --connect-timeout 20 --max-time 40 \
+    --connect-timeout 20 --max-time 40 \
     -H "Accept: application/vnd.github+json" \
     "${CHECK_URL}" 2>/dev/null || echo "000")
 
