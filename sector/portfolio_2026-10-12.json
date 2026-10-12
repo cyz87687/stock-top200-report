@@ -1,0 +1,157 @@
+{
+ "date": "2026-10-12",
+ "momentum_date": "2026-10-12",
+ "top": 10,
+ "per_sector": 3,
+ "per_parent": 2,
+ "portfolios": {
+  "momentum": {
+   "level_used": "L3 兜底: 60日动量前10",
+   "target_rule": "L0 严格: 60日动量第1 ∩ 10日动量前3",
+   "level_trace": [
+    {
+     "level": "L0 严格: 60日动量第1 ∩ 10日动量前3",
+     "n_sectors": 1,
+     "n_cands": 2,
+     "sectors": [
+      "出版"
+     ]
+    },
+    {
+     "level": "L1 放宽: 60日动量前3 ∩ 10日前5",
+     "n_sectors": 1,
+     "n_cands": 2,
+     "sectors": [
+      "出版"
+     ]
+    },
+    {
+     "level": "L2 再放宽: 60日前5 ∩ 10日前10",
+     "n_sectors": 2,
+     "n_cands": 3,
+     "sectors": [
+      "出版",
+      "房地产服务"
+     ]
+    },
+    {
+     "level": "L3 兜底: 60日动量前10",
+     "n_sectors": 10,
+     "n_cands": 14,
+     "sectors": [
+      "个护用品",
+      "农产品加工",
+      "出版",
+      "医疗服务",
+      "影视院线",
+      "房地产服务",
+      "教育",
+      "渔业",
+      "焦炭Ⅱ",
+      "种植业"
+     ]
+    }
+   ],
+   "sectors": [
+    "个护用品",
+    "农产品加工",
+    "出版",
+    "医疗服务",
+    "影视院线",
+    "房地产服务",
+    "教育",
+    "渔业",
+    "焦炭Ⅱ",
+    "种植业"
+   ],
+   "n_candidates": 14,
+   "picks": [
+    {
+     "name": "药明康德",
+     "code": "sh603259",
+     "sector_l2": "医疗服务",
+     "parent": "医药生物",
+     "total": 13.23,
+     "rating": "A",
+     "price": 157.85,
+     "pct_chg": 0.03,
+     "rsi": 48.9,
+     "trend": "周线多头",
+     "sector_r60": 6,
+     "sector_r10": 17,
+     "sector_mom60": 18.82,
+     "sector_mom10": 1.84,
+     "score_sector": 1.24,
+     "score_news": 3.0,
+     "score_tech": 3.28,
+     "score_fund": 4.6,
+     "score_theme": 2.91
+    }
+   ]
+  },
+  "reversal": {
+   "level_used": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+   "target_rule": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+   "level_trace": [
+    {
+     "level": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+     "n_sectors": 2,
+     "n_cands": 37,
+     "sectors": [
+      "半导体",
+      "电子化学品Ⅱ"
+     ]
+    }
+   ],
+   "sectors": [
+    "半导体",
+    "电子化学品Ⅱ"
+   ],
+   "n_candidates": 37,
+   "picks": [
+    {
+     "name": "佰维存储",
+     "code": "sh688525",
+     "sector_l2": "半导体",
+     "parent": "电子",
+     "total": 12.34,
+     "rating": "B",
+     "price": 172.8,
+     "pct_chg": -4.54,
+     "rsi": 27.3,
+     "trend": "双线空头",
+     "sector_r60": 122,
+     "sector_r10": 122,
+     "sector_mom60": -30.29,
+     "sector_mom10": -15.5,
+     "score_sector": 3.28,
+     "score_news": 3.5,
+     "score_tech": 2.39,
+     "score_fund": 3.8,
+     "score_theme": 2.07
+    },
+    {
+     "name": "XD拓荆科",
+     "code": "sh688072",
+     "sector_l2": "半导体",
+     "parent": "电子",
+     "total": 13.91,
+     "rating": "A",
+     "price": 633.0,
+     "pct_chg": 2.78,
+     "rsi": 43.8,
+     "trend": "偏空",
+     "sector_r60": 122,
+     "sector_r10": 122,
+     "sector_mom60": -30.29,
+     "sector_mom10": -15.5,
+     "score_sector": 3.28,
+     "score_news": 3.43,
+     "score_tech": 3.12,
+     "score_fund": 3.8,
+     "score_theme": 3.52
+    }
+   ]
+  }
+ }
+}
