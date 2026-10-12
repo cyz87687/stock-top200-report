@@ -474,6 +474,9 @@ def _review_portfolio(summary, merged):
             "note": "；".join(_note_parts) or f"本地复盘结论：{c.get('verdict')}",
             "verdict": c.get("verdict"),
             "confidence": c.get("confidence"),
+            # v2.46: 结构化机构目标价(查不到为 None), 供报告层"现价 vs 目标价"对比; 严禁编造
+            "target_price": c.get("target_price"),
+            "price": r.get("price"),
         })
     # 按算法总分降序，取前 6（组合不做满额，交由报告层门控）
     picks.sort(key=lambda x: -(by_code.get(x["code"], {}).get("total") or 0))

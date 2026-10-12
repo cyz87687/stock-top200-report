@@ -51,7 +51,7 @@ for pf in prev_files:
         pass
 date_str = data.get("date", datetime.now().strftime("%Y-%m-%d"))
 model_str = data.get("model", "stock-scorer")
-# 版本号展示: 报告层 v2.43 / 底层评分 v2.40(五维) 或 v2.30(四维)
+# 版本号展示: 报告层 REPORT_VER / 底层评分 v2.40(五维) 或 v2.30(四维)
 # R6: 此前页头显示底层评分版本(v2.40)而评级口径区显示报告层版本(v2.41), 同页两版本打架。
 #     现统一: 报告层版本 REPORT_VER 单独常量化, 页头同时标明"报告层 + 评分层"两个版本号。
 # v2.43: 「组合区块三合一」——消除 AI 组合 3 处重复、修复"说降仓却给满额金额"的逻辑矛盾。
@@ -66,7 +66,11 @@ model_str = data.get("model", "stock-scorer")
 # v2.45: 本地复盘链路接入 ——
 #   P0-2 点评来源升级为三态(本地复盘/在线LLM/规则引擎), 消除"本地核查冒充AI生成"
 #   review_meta 落地(AI 复盘区显示深度/轻量核查只数与校验状态)
-REPORT_VER = "v2.45"
+# v2.46: 个股展示与因子评估增强 ——
+#   1) 个股信息旁增加现价, 与技术目标价/机构目标价并列对比(价差 + 预期涨跌幅)
+#   2) 新增「📐 因子有效性评估(Rank IC)」区块(评分层 factor_eval.py 产出 factor_ic.json)
+#   3) 行业数据有效性: 展示口径改为申万二级优先, 不再出现"综合/其他"滥用
+REPORT_VER = "v2.46"
 _has_sector = any(x.get('score_sector') is not None for x in results)
 _ver_tag = f"{REPORT_VER} · 五维" if _has_sector else f"{REPORT_VER} · 四维"
 _ver_short = "v2.40 (AI + 板块动量)" if _has_sector else "v2.30 (AI 增强)"
@@ -992,6 +996,52 @@ for _cand in ("ai_assessment.json", "ai_review_today.json"):
 
 ai_text = (ai_review.get("commentary") or "").strip()
 ai_watch = ai_review.get("watch_directions") or []
+
+# ===== v2.46 本地复盘机构目标价映射 =====
+# 来源: run_local_review.sh finalize 产出的 review_research_merged_<date>.json
+#   (阶段1 逐公司联网核查所得; target_price 查不到为 null, 严禁编造)
+# 用途: 个股卡片"现价 vs 目标价"并列对比中的机构目标价一列。
+_target_px = {}   # name → {"target": float, "verdict": str, "confidence": str}
+try:
+    _mp = os.path.join(_ai_dir, f"review_research_merged_{date_str}.json")
+    if os.path.exists(_mp):
+        with open(_mp, "r", encoding="utf-8") as _f:
+            _mobj = json.load(_f)
+        for _c in (_mobj.get("companies") or []):
+            _tp = _c.get("target_price")
+            if isinstance(_tp, (int, float)) and _tp > 0 and _c.get("name"):
+                _target_px[_c["name"]] = {"target": float(_tp),
+                                          "verdict": _c.get("verdict"),
+                                          "confidence": _c.get("confidence")}
+        print(f"📌 本地复盘目标价映射: {len(_target_px)} 只 (来源 {os.path.basename(_mp)})")
+except Exception as _e:
+    print(f"⚠️ 读取本地复盘目标价失败: {_e}")
+
+
+def _px_cmp_html(cur, tech_target, inst=None):
+    """现价 vs 目标价并列对比(v2.46): 现价 → 技术目标 [+ 机构目标], 带价差与预期涨跌幅。
+    A股配色惯例: 涨红跌绿。inst=None 时只展示技术目标。"""
+    def _c(v):
+        return "#ef4444" if v > 0 else ("#22c55e" if v < 0 else "#94a3b8")
+
+    parts = [f'<span style="color:#94a3b8;">💰 现价 <b style="color:#e2e8f0;font-size:13px;">{cur:.2f}</b></span>']
+    if tech_target:
+        _d = tech_target - cur
+        _p = _d / cur * 100 if cur else 0
+        parts.append(f'<span style="color:#64748b;">→</span>'
+                     f'<span style="color:#94a3b8;">🎯 技术目标 <b style="color:#3b82f6;">{tech_target:.2f}</b></span>'
+                     f'<span style="color:#94a3b8;">📐 价差 <b style="color:{_c(_d)};">{_d:+.2f}</b></span>'
+                     f'<span style="color:#94a3b8;">📈 预期 <b style="color:{_c(_p)};">{_p:+.2f}%</b></span>')
+    if inst:
+        _t = inst["target"]
+        _d2 = _t - cur
+        _p2 = _d2 / cur * 100 if cur else 0
+        _vd = f'（{html_mod.escape(str(inst.get("verdict") or ""))}）' if inst.get("verdict") else ""
+        parts.append(f'<span style="color:#94a3b8;">🏦 机构目标 <b style="color:#a855f7;">{_t:.2f}</b>{_vd}'
+                     f'<span style="color:{_c(_p2)};font-weight:700;">（较现价 {_p2:+.2f}%）</span></span>')
+    return ('<div style="margin-top:8px;padding:7px 12px;border-radius:8px;background:#0f172a;'
+            'border:0.5px solid #1e293b;display:flex;gap:14px;flex-wrap:wrap;align-items:center;'
+            'font-size:12px;">' + "".join(parts) + '</div>')
 ai_risk = (ai_review.get("risk_note") or "").strip()
 ai_date = ai_review.get("date", "")
 
@@ -1150,11 +1200,22 @@ if quant_json or ai_pick_names:
         _vlab = (_pk.get("valuation") or "") if isinstance(_pk, dict) else ""
         _note = (_pk.get("note") or "") if isinstance(_pk, dict) else ""
         _vcol = "#22c55e" if "合理" in _vlab else ("#ef4444" if ("偏贵" in _vlab or "陷阱" in _vlab) else "#94a3b8")
+        # v2.46 现价 vs 机构目标价对比(本地复盘目标价, 查不到则不展示)
+        _pk_tp = _pk.get("target_price") if isinstance(_pk, dict) else None
+        _tp_row = ""
+        if isinstance(_pk_tp, (int, float)) and _pk_tp > 0 and (_rr.get("price") or 0) > 0:
+            _cp2 = _rr["price"]; _d3 = _pk_tp - _cp2; _p3 = _d3 / _cp2 * 100
+            _cc3 = "#ef4444" if _p3 > 0 else ("#22c55e" if _p3 < 0 else "#94a3b8")
+            _tp_row = (f'<div style="font-size:11px;color:#94a3b8;margin-top:2px;">'
+                       f'💰 现价 {_cp2:.2f} → 🏦 机构目标 <b style="color:#a855f7;">{_pk_tp:.2f}</b>'
+                       f' · 价差 <b style="color:{_cc3};">{_d3:+.2f}</b>'
+                       f' · 预期 <b style="color:{_cc3};">{_p3:+.2f}%</b></div>')
         _ai_rows += (f'<div style="padding:5px 0;border-bottom:1px solid #1e293b;font-size:11px;">'
                      f'<span style="font-weight:700;color:#f8fafc;">{html_mod.escape(str(_nm))}</span>'
                      f'<span style="color:{_acol};font-weight:700;margin-left:6px;">{_rt}</span>'
                      f'<span style="float:right;color:#38bdf8;font-weight:700;">{_rr["total"]:.2f}</span></div>'
                      f'<div style="font-size:11px;color:#94a3b8;margin-top:2px;">FwdPE {_fwd_s} · 增速 {_gw_s} · 分位{_pos:.0f}%</div>'
+                     + _tp_row
                      + (f'<div style="font-size:11px;color:{_vcol};margin-top:2px;">{html_mod.escape(str(_vlab))}</div>' if _vlab else "")
                      + (f'<div style="font-size:11px;color:#94a3b8;margin-top:2px;">{html_mod.escape(str(_note))}</div>' if _note else ""))
     if not _ai_rows:
@@ -1361,6 +1422,8 @@ for idx, r in enumerate(top20):
     week_chg_str = f"{week_chg:+.2f}%" if week_chg is not None else "N/A"
     week_chg_cls = "up" if (week_chg or 0) > 0 else "down" if (week_chg or 0) < 0 else ""
     report_count = r.get("report_count", 0) or 0
+    cur_price = r.get("price") or 0        # v2.46: 现价(与目标价对比用)
+    _inst_tgt = _target_px.get(r["name"])  # v2.46: 本地复盘机构目标价(可能为 None)
 
     news_reasons = r.get("news_reasons", [])
     fund_reasons = r.get("fund_reasons", [])
@@ -1482,6 +1545,7 @@ for idx, r in enumerate(top20):
             </div>
             <div class="sd-body">
             <div class="meta-row">
+                <span>💰 现价 {cur_price:.2f}</span>
                 <span>💰 成交额: {turnover_yi:.0f}亿</span>
                 <span>📊 {pe_str}{fwd_str}{g_str}{peg_str}</span>
                 {f'<span style="color:{valu_note(r)[1]};">🧭 {valu_note(r)[0]}</span>' if valu_note(r)[0] else ''}
@@ -1551,6 +1615,9 @@ for idx, r in enumerate(top20):
                 {f'<div style="font-size:11px;color:#38bdf8;margin-top:4px;">⏳ 持有周期：{_hold}</div>' if _hold else ''}
                 {f'<div style="font-size:11px;color:#f97316;margin-top:5px;">⚠️ 技术矛盾提示: {"、".join(plan["flags"])}，明细评语与操作建议已按一致性约束对齐</div>' if plan["flags"] else ''}
             </div>''')
+        # v2.46 现价 vs 目标价并列对比(技术目标 + 机构目标价, 带价差与预期涨跌幅)
+        if cur_price > 0:
+            html_parts.append(_px_cmp_html(cur_price, plan.get("target"), _inst_tgt))
 
     html_parts.append(f'''
             <div style="font-size:11px;color:#38bdf8;margin-top:8px;">💡 评级原因: {', '.join(justification[:4])} → {rating}级 · {advice_with_market(r)}</div>
@@ -2715,6 +2782,145 @@ if _ams:
                      '<div style="font-size:13px;line-height:1.9;color:#e2e8f0;white-space:pre-wrap;">'
                      + html_mod.escape(_ams) + '</div></div>')
 html_parts.append(ai_model_html)
+
+# ===== v2.46 因子有效性评估（Rank IC）=====
+# 数据来源: factor_eval.py → factor_ic.json（每日随流水线更新；历史截面来自 git 提交记录）
+# 指标口径: IC = Spearman(因子值当日截面秩, 未来 h 交易日收益), h∈{1,5,20};
+#           t = mean(IC)/(std(IC)/√n), |t|≥2 视为统计显著; 样本<20 截面不判定。
+_ic_path = os.path.join(_ai_dir, "factor_ic.json")
+_ic = None
+try:
+    if os.path.exists(_ic_path):
+        with open(_ic_path, "r", encoding="utf-8") as _f:
+            _ic = json.load(_f)
+except Exception as _e:
+    print(f"⚠️ 读取 factor_ic.json 失败: {_e}")
+
+if _ic and _ic.get("factors"):
+    _IC_LINE_COLORS = ["#38bdf8", "#f472b6", "#fbbf24", "#a3e635", "#c084fc", "#fb923c"]
+
+    def _ic_cell(a):
+        """单周期 IC 单元格: IC 值(按正负着色, A股红涨绿跌) + t/胜率/样本子行。"""
+        if not a or not a.get("n"):
+            return '<td style="padding:6px 10px;color:#475569;text-align:center;">未到期</td>'
+        ic, t = a.get("ic_mean"), a.get("t_stat")
+        _c = "#ef4444" if (ic or 0) > 0 else ("#22c55e" if (ic or 0) < 0 else "#94a3b8")
+        _bold = "font-weight:800;" if (t is not None and abs(t) >= 2) else ""
+        _t_s = f"{t:+.2f}" if isinstance(t, (int, float)) else "—"
+        return (f'<td style="padding:6px 10px;text-align:center;">'
+                f'<div style="color:{_c};{_bold}font-size:13px;">{ic:+.3f}</div>'
+                f'<div style="font-size:10px;color:#64748b;margin-top:2px;">'
+                f't={_t_s} · 胜率{a.get("win_rate"):.0f}% · n={a.get("n")}</div></td>')
+
+    _ic_rows = ""
+    for _i, (_fk, _fv) in enumerate(_ic["factors"].items()):
+        _lab = _fv.get("label", _fk)
+        _vc = _fv.get("verdict_color", "#94a3b8")
+        _cells = "".join(_ic_cell((_fv.get("horizons") or {}).get(str(h))) for h in (1, 5, 20))
+        _sp = ((_fv.get("horizons") or {}).get("1") or {}).get("spread_mean")
+        _sp_s = (f'<div style="font-size:10px;color:#64748b;margin-top:2px;">'
+                 f'分层多空(T+1) {_sp:+.2f}%</div>') if isinstance(_sp, (int, float)) else ""
+        _ic_rows += (f'<tr><td style="padding:6px 10px;font-weight:700;color:#e2e8f0;white-space:nowrap;">'
+                     f'{html_mod.escape(str(_lab))}{_sp_s}</td>{_cells}'
+                     f'<td style="padding:6px 10px;text-align:center;">'
+                     f'<span title="{html_mod.escape(str(_fv.get("verdict_note") or ""))}" '
+                     f'style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px;'
+                     f'background:{_vc}22;color:{_vc};cursor:help;white-space:nowrap;">'
+                     f'{html_mod.escape(str(_fv.get("verdict") or "—"))}</span></td></tr>')
+
+    # 推荐组合层（样本极少时如实展示）
+    _rec_ic = _ic.get("recommendation_ic")
+    _rec_row = ""
+    if _rec_ic:
+        _rv = _rec_ic.get("verdict_color", "#94a3b8")
+        _rcells = "".join(_ic_cell((_rec_ic.get("horizons") or {}).get(str(h))) for h in (1, 5, 20))
+        _rec_row = (f'<tr><td style="padding:6px 10px;font-weight:700;color:#c4b5fd;white-space:nowrap;">'
+                    f'推荐组合（总分）</td>{_rcells}'
+                    f'<td style="padding:6px 10px;text-align:center;">'
+                    f'<span title="{html_mod.escape(str(_rec_ic.get("verdict_note") or ""))}" '
+                    f'style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px;'
+                    f'background:{_rv}22;color:{_rv};cursor:help;white-space:nowrap;">'
+                    f'{html_mod.escape(str(_rec_ic.get("verdict") or "—"))}</span></td></tr>')
+
+    # 累计 IC 曲线（T+1，仅画样本≥20 的因子；不同因子等长序列才可同轴比较）
+    _chart_svg = ""
+    _series = []
+    for _fk, _fv in _ic["factors"].items():
+        _a = (_fv.get("horizons") or {}).get("1") or {}
+        _s = _a.get("ic_series") or []
+        if _a.get("n", 0) >= 20 and len(_s) >= 10:
+            _series.append((_fv.get("label", _fk), _s))
+    if len(_series) >= 2:
+        _W, _H, _PL, _PR, _PT, _PB = 680, 200, 44, 12, 12, 30
+        _all = [v for _, s in _series for v in s]
+        _ymax = max(0.02, max(_all)); _ymin = min(-0.02, min(_all))
+        _n = max(len(s) for _, s in _series)
+        _x = lambda i: _PL + (_W - _PL - _PR) * (i / max(1, _n - 1))
+        _y = lambda v: _PT + (_H - _PT - _PB) * (1 - (v - _ymin) / (_ymax - _ymin))
+        _parts = [f'<svg viewBox="0 0 {_W} {_H}" style="width:100%;height:auto;">']
+        # 网格与零轴
+        for _gv in (-0.1, -0.05, 0.0, 0.05, 0.1):
+            if _ymin <= _gv <= _ymax:
+                _gy = _y(_gv)
+                _zero = abs(_gv) < 1e-9
+                _parts.append(f'<line x1="{_PL}" y1="{_gy:.1f}" x2="{_W-_PR}" y2="{_gy:.1f}" '
+                              f'stroke="{"#475569" if _zero else "#1e293b"}" stroke-width="{1.2 if _zero else 0.8}"/>')
+                _parts.append(f'<text x="{_PL-6}" y="{_gy+3:.1f}" fill="#64748b" font-size="9" '
+                              f'text-anchor="end">{_gv:+.2f}</text>')
+        for _li, (_lab, _s) in enumerate(_series):
+            _cum, _acc = [], 0.0
+            for v in _s:
+                _acc += v; _cum.append(_acc)
+            _pts = " ".join(f"{_x(i):.1f},{_y(v):.1f}" for i, v in enumerate(_cum))
+            _col = _IC_LINE_COLORS[_li % len(_IC_LINE_COLORS)]
+            _parts.append(f'<polyline points="{_pts}" fill="none" stroke="{_col}" '
+                          f'stroke-width="1.6" opacity="0.92"/>')
+        _parts.append(f'<text x="{_PL}" y="{_H-8}" fill="#64748b" font-size="9">'
+                      f'截面序列起点</text>')
+        _parts.append(f'<text x="{_W-_PR}" y="{_H-8}" fill="#64748b" font-size="9" '
+                      f'text-anchor="end">最近截面</text></svg>')
+        _chart_svg = "".join(_parts)
+        _legend = " ".join(
+            f'<span style="display:inline-flex;align-items:center;gap:4px;margin-right:12px;">'
+            f'<span style="width:14px;height:3px;border-radius:2px;background:{_IC_LINE_COLORS[_li % len(_IC_LINE_COLORS)]};"></span>'
+            f'<span style="color:#cbd5e1;">{html_mod.escape(str(_lab))}</span></span>'
+            for _li, (_lab, _s) in enumerate(_series))
+
+    _ic_notes = " ".join(str(x) for x in (_ic.get("notes") or []))
+    html_parts.append(f'''
+    <!-- v2.46 因子有效性评估（Rank IC） -->
+    <div class="section-block" style="margin:24px 0;padding:18px 20px;background:#0f172a;border:1px solid #334155;border-radius:12px;">
+        <div style="font-size:15px;font-weight:800;color:#7dd3fc;margin-bottom:4px;">
+            📐 因子有效性评估（Rank IC）</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:12px;line-height:1.7;">
+            口径：Rank IC = Spearman(因子值在当日截面的秩, 个股未来 h 交易日收益)，h ∈ {{1, 5, 20}} 交易日；
+            t = mean(IC)/(std(IC)/√n)，<b style="color:#f59e0b;">|t|≥2 视为统计显著</b>；
+            分层多空 = 每截面按因子分 5 组、头部组均值收益 − 尾部组均值收益（检验单调性）。
+            样本 &lt; 20 个截面不给出有效性判定。当前样本：
+            <b style="color:#e2e8f0;">{_ic.get("n_snapshots")} 个截面</b>
+            （{_ic.get("snapshot_range", ["?", "?"])[0]} ~ {_ic.get("snapshot_range", ["?", "?"])[1]}，
+            每日成交额 TOP200 全截面）。
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead><tr style="background:#1e293b;">
+                <th style="padding:6px 10px;text-align:left;color:#94a3b8;font-weight:600;">因子</th>
+                <th style="padding:6px 10px;color:#94a3b8;font-weight:600;">T+1（次日）</th>
+                <th style="padding:6px 10px;color:#94a3b8;font-weight:600;">T+5（一周）</th>
+                <th style="padding:6px 10px;color:#94a3b8;font-weight:600;">T+20（一月）</th>
+                <th style="padding:6px 10px;color:#94a3b8;font-weight:600;">有效性判定</th>
+            </tr></thead>
+            <tbody>{_ic_rows}{_rec_row}</tbody>
+        </table>
+        {f'<div style="margin-top:14px;"><div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">📈 累计 IC 曲线（T+1，按截面序号累计；曲线持续上行=因子稳定正向，下行=负向）</div>{_chart_svg}<div style="font-size:11px;margin-top:6px;">{_legend}</div></div>' if _chart_svg else ''}
+        <div style="font-size:11px;color:#f59e0b;margin-top:12px;padding:8px 10px;background:rgba(245,158,11,0.08);border-radius:6px;border-left:3px solid #f59e0b;line-height:1.7;">
+            ⚠️ <b>解读须知</b>：① 本名单为「当日成交额 TOP200」，高总分个股往往是刚放量上涨的动量股，
+            5~20 日维度出现负 IC 更可能是<b>动量回落/均值回归</b>与<b>样本筛选偏差</b>，而非"评分完全无效"；
+            ② IC 衡量的是<b>排序能力</b>而非绝对收益，也未扣交易成本；
+            ③ 历史截面取自 git 提交记录，评分模型版本随当日版本（含早期的行业归类缺陷），
+            行业归类修复（v2.46）后的数据自 {_ic.get("snapshot_range", ["?", "?"])[1]} 起生效。
+        </div>
+        <div style="font-size:10px;color:#475569;margin-top:8px;">数据说明：{html_mod.escape(_ic_notes[:400])}</div>
+    </div>''')
 
 # ===== v2.41 P0-4 推荐跟踪与胜率 (真实K线回填) =====
 try:

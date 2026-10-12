@@ -123,6 +123,8 @@ finalize)
   # --replace-day: Actions 已于 15:30 用规则引擎兜底评级记过一次快照,
   #   本地复盘改变了评级分布, 必须替换当日快照而非追加（否则当日样本虚增、胜率污染）
   "$PY" track_recommendations.py "$SCORED" --replace-day 2>/dev/null || warn "推荐跟踪更新失败(非致命)"
+  # 因子有效性评估(Rank IC): 追加当日截面 → factor_ic.json, 报告层渲染 IC 区块
+  "$PY" factor_eval.py 2>/dev/null || warn "因子 IC 评估失败(非致命, 报告将省略该区块)"
   "$PY" gen_report_top200.py "$SCORED" || { bad "报告生成失败"; exit 1; }
 
   LATEST_HTML="$(ls -t top200_report_*.html 2>/dev/null | head -1)"
@@ -147,6 +149,7 @@ push)
   git add -u gen_report_top200.py generate_ai_assessment.py 2>/dev/null || true
   git add index.html top200_report_*.html 2>/dev/null || true
   git add -f top200_scored_*.json ai_assessment.json recommendation_track.json 2>/dev/null || true
+  git add -f factor_history.json factor_ic.json 2>/dev/null || true
   # 复盘产物入库（模板与合并结果也保留，便于回溯当日核查依据）
   git add -f review_input_*.json review_research_*.json 2>/dev/null || true
   git rm --cached -q review_research_*.template.json 2>/dev/null || true

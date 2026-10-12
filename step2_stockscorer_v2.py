@@ -1098,7 +1098,7 @@ CYCLICAL_SECTORS = {
 
 def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
                roe=None, gross_margin=None, sub_theme_label=None,
-               hist_loss_free=False, fwd_np=None):
+               hist_loss_free=False, fwd_np=None, sw_l2=None):
     """基本面+竞争力评分 0-5，用估值阶梯替代单年PEG
     v2.8: 增加PEG指标、ROE、毛利率评分
     v2.10: 增加公司持续性/低PE可持续性子评分(周期股/存储链重点论证)
@@ -1247,7 +1247,9 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
     # ===== 公司持续性 / 低PE可持续性评估 (v2.10) =====
     # 判定: 周期股(盈利随景气波动) & 存储模组厂(模组环节薄利/价格周期敏感)
     # 论证低PE是否可持续: 用估值阶梯轨迹(收缩=周期底部错杀/扩张=顶部陷阱)+增速+ROE
-    is_cyclic = sector in CYCLICAL_SECTORS
+    # v2.46: 周期股判定 = 主题粗分类命中 或 真实申万二级行业命中
+    #   (粗分类如"周期资源"会覆盖煤炭/石油/钢铁, 但"综合"里的周期行业需靠 sw_l2 兜底)
+    is_cyclic = sector in CYCLICAL_SECTORS or (bool(sw_l2) and sw_l2 in SW_CYCLICAL)
     # v2.12: 存储产业链(芯片/模组/控制器/分销)均为强价格周期环节,
     # 与有色/化工等周期股同等对待, 需论证低PE可持续性(此前仅识别"存储模组"过窄)
     STORAGE_CYCLIC_KW = ("存储芯片", "存储模组", "存储控制器", "存储分销")
@@ -1429,6 +1431,85 @@ THEME_DB = {
         "reason": "面板行业供给宽松+价格弱势,当前为冷门支线题材",
         "top5": ["京东方A","TCL科技"],
     },
+    # ---- v2.46 补充: 静态字典原有键但此前无主题定义(全部落入"综合"模板) ----
+    "电力设备": {
+        "score": 3,
+        "label": "电力设备/电网/风电",
+        "reason": "电网投资+海风招标+特高压建设, 稳健成长赛道, 受招标节奏驱动",
+        "top5": ["思源电气", "中国西电", "特变电工"],
+    },
+    "高端制造": {
+        "score": 3,
+        "label": "高端制造/机器人",
+        "reason": "工业机器人/专用设备国产替代, 制造业升级长逻辑, 事件与订单驱动",
+        "top5": ["汇川技术", "埃斯顿", "先导智能"],
+    },
+    "航天军工": {
+        "score": 3,
+        "label": "航天军工",
+        "reason": "国防装备采购+商业航天, 事件驱动型题材, 订单节奏不透明",
+        "top5": ["中国船舶", "航天电子"],
+    },
+    "医药生物": {
+        "score": 3,
+        "label": "医药生物/创新药",
+        "reason": "创新药出海+医疗设备招标复苏, 防御性赛道, 受政策与临床数据驱动",
+        "top5": ["恒瑞医药", "药明康德"],
+    },
+    "金融": {
+        "score": 2,
+        "label": "金融/券商保险",
+        "reason": "券商保险跟涨大盘, 非当前题材主线, 弹性来自成交额与政策预期",
+        "top5": ["中信证券", "东方财富"],
+    },
+    "计算机软件": {
+        "score": 4,
+        "label": "计算机/AI应用",
+        "reason": "AI应用/信创/算力服务, 软件层阶段性活跃, 业绩兑现分化大",
+        "top5": ["浪潮信息", "中科曙光"],
+    },
+    "交通运输": {
+        "score": 2,
+        "label": "交通运输/航运",
+        "reason": "航运港口运价波动+出行链, 周期属性明显, 受运价与油价驱动",
+        "top5": ["中远海能", "招商轮船"],
+    },
+    "传媒娱乐": {
+        "score": 2,
+        "label": "传媒/游戏",
+        "reason": "游戏/影视/AI应用, 事件驱动轮动, 版号与内容周期主导",
+        "top5": ["世纪华通"],
+    },
+    "汽车": {
+        "score": 3,
+        "label": "汽车/智能驾驶",
+        "reason": "智能驾驶+机器人叙事, 整车与零部件轮动, 价格战压制盈利",
+        "top5": ["比亚迪"],
+    },
+    "消费": {
+        "score": 2,
+        "label": "消费/食饮零售",
+        "reason": "消费复苏偏弱, 防御性配置为主, 关注客流与提价兑现",
+        "top5": ["贵州茅台", "中国中免"],
+    },
+    "周期资源": {
+        "score": 2,
+        "label": "煤炭石油钢铁",
+        "reason": "强周期资源品, 受商品价格与稳增长政策驱动, 与成长风格负相关",
+        "top5": ["中国神华"],
+    },
+    "农业": {
+        "score": 2,
+        "label": "农业/养殖",
+        "reason": "农林牧渔, 猪周期与种植链, 防御性题材, 价格弹性主导",
+        "top5": [],
+    },
+    "电力": {
+        "score": 2,
+        "label": "电力/公用事业",
+        "reason": "公用事业防御属性, 电价与来水波动, 红利资金配置方向",
+        "top5": ["长江电力"],
+    },
     "综合": {
         "score": 3,
         "label": "综合/其他",
@@ -1580,6 +1661,161 @@ SUB_THEME = {
     "光智科技": ("红外光学/核材料", 3), "双星新材": ("BOPET/光学膜", 3),
 }
 
+# ============================================================
+# v2.46 行业数据有效性: 申万二级行业 → 主题大类
+# ------------------------------------------------------------
+# 历史问题(老大核查发现): get_sec() 仅为名称静态字典(348条), 而 TOP200 中
+#   30~40% 个股不在字典内 → sector 落入"综合" → 题材热度用中性模板评分、
+#   细分题材显示"综合/其他"(如大金重工实为风电设备, 并非综合)。
+#   另: 观察池输入自带的 sector 是申万二级名(如"化学制药"), THEME_DB 无此键,
+#   同样整体落入"综合"模板。
+# 修复: 以 sector/sw_map.json(申万二级, 覆盖全市场 5218 只)为权威源, 先把
+#   任意行业名归一到 THEME_DB 主题键; 静态字典降级为兜底; 细分题材展示层
+#   优先用真实申万二级行业名。解析来源记入结果 sector_src 供审计。
+# ============================================================
+SW2THEME = {
+    # --- AI/半导体 链 ---
+    "半导体": "AI/半导体", "其他电子Ⅱ": "AI/半导体", "元件": "AI/半导体",
+    "通信设备": "AI/半导体",
+    # --- 电子 ---
+    "光学光电子": "电子面板", "消费电子": "电子制造", "电子化学品Ⅱ": "电子材料",
+    "照明设备Ⅱ": "家电制造",
+    # --- 计算机/AI应用 ---
+    "计算机设备": "计算机软件", "软件开发": "计算机软件", "IT服务Ⅱ": "计算机软件",
+    # --- 新能源与电力设备 ---
+    "电池": "新能源", "光伏设备": "新能源", "风电设备": "新能源",
+    "电网设备": "电力设备", "电机Ⅱ": "电力设备", "其他电源设备Ⅱ": "电力设备",
+    "电力": "电力", "燃气Ⅱ": "电力",
+    # --- 有色资源 ---
+    "贵金属": "有色资源", "工业金属": "有色资源", "小金属": "有色资源",
+    "能源金属": "有色资源", "金属新材料": "有色资源",
+    # --- 材料/化工 ---
+    "化学原料": "化工", "化学制品": "化工", "化学纤维": "化工", "农化制品": "化工",
+    "橡胶": "化工", "塑料": "化工", "炼化及贸易": "化工",
+    "玻璃玻纤": "基础材料", "水泥": "基础材料", "装修建材": "基础材料",
+    "非金属材料Ⅱ": "基础材料",
+    # --- 家电/消费 ---
+    "白色家电": "家电制造", "黑色家电": "家电制造", "小家电": "家电制造",
+    "厨卫电器": "家电制造", "家电零部件Ⅱ": "家电制造", "其他家电Ⅱ": "家电制造",
+    "白酒Ⅱ": "消费", "非白酒": "消费", "饮料乳品": "消费", "食品加工": "消费",
+    "休闲食品": "消费", "调味发酵品Ⅱ": "消费", "一般零售": "消费", "专业连锁Ⅱ": "消费",
+    "互联网电商": "消费", "旅游零售Ⅱ": "消费", "化妆品": "消费", "个护用品": "消费",
+    "饰品": "消费", "服装家纺": "消费", "纺织制造": "消费", "家居用品": "消费",
+    "文娱用品": "消费", "旅游及景区": "消费", "酒店餐饮": "消费", "教育": "消费",
+    # --- 传媒 ---
+    "游戏Ⅱ": "传媒娱乐", "影视院线": "传媒娱乐", "数字媒体": "传媒娱乐",
+    "出版": "传媒娱乐", "广告营销": "传媒娱乐", "电视广播Ⅱ": "传媒娱乐",
+    "体育Ⅱ": "传媒娱乐",
+    # --- 汽车 ---
+    "乘用车": "汽车", "商用车": "汽车", "汽车零部件": "汽车", "汽车服务": "汽车",
+    "摩托车及其他": "汽车",
+    # --- 医药 ---
+    "化学制药": "医药生物", "生物制品": "医药生物", "医疗器械": "医药生物",
+    "医疗服务": "医药生物", "医药商业": "医药生物", "中药Ⅱ": "医药生物",
+    "医疗美容": "医药生物", "动物保健Ⅱ": "医药生物",
+    # --- 金融 ---
+    "证券Ⅱ": "金融", "国有大型银行Ⅱ": "金融", "股份制银行Ⅱ": "金融",
+    "城商行Ⅱ": "金融", "农商行Ⅱ": "金融", "保险Ⅱ": "金融", "多元金融": "金融",
+    # --- 军工 ---
+    "航天装备Ⅱ": "航天军工", "航空装备Ⅱ": "航天军工", "航海装备Ⅱ": "航天军工",
+    "地面兵装Ⅱ": "航天军工", "军工电子Ⅱ": "航天军工",
+    # --- 机械/高端制造 ---
+    "专用设备": "高端制造", "通用设备": "高端制造", "自动化设备": "高端制造",
+    "工程机械": "高端制造", "轨交设备Ⅱ": "高端制造",
+    # --- 交通运输 ---
+    "航运港口": "交通运输", "航空机场": "交通运输", "物流": "交通运输",
+    "铁路公路": "交通运输",
+    # --- 周期资源(煤炭石油钢铁化纤造纸) ---
+    "煤炭开采": "周期资源", "油气开采Ⅱ": "周期资源", "油服工程": "周期资源",
+    "焦炭Ⅱ": "周期资源", "普钢": "周期资源", "特钢Ⅱ": "周期资源",
+    "冶钢原料": "周期资源", "造纸": "周期资源",
+    # --- 农业 ---
+    "种植业": "农业", "养殖业": "农业", "饲料": "农业", "渔业": "农业",
+    "林业Ⅱ": "农业", "农产品加工": "农业", "农业综合Ⅱ": "农业",
+    # 未列入的申万二级(房地产开发/建筑/环保/贸易/专业服务/综合Ⅱ/包装印刷/
+    # 通信服务等)归"综合"——语义上确为中性常规赛道, 不做强行归类。
+}
+
+# 静态字典旧键 → THEME_DB 主题键(静态字典降级为兜底后仍需归一)
+STATIC2THEME = {
+    "电子元件": "AI/半导体", "新材料": "基础材料", "煤炭": "周期资源",
+    "石油": "周期资源", "航运": "交通运输", "建材": "基础材料",
+    "钢铁": "周期资源", "面板": "电子面板", "农业": "农业",
+}
+
+# 申万层面的周期行业集合: 主题粗分类(如"周期资源")会丢失周期属性时,
+# 用真实申万二级名补充 is_cyclic 判定(周期股低PE陷阱保护)。
+SW_CYCLICAL = {
+    "贵金属", "工业金属", "小金属", "能源金属", "金属新材料", "煤炭开采",
+    "油气开采Ⅱ", "油服工程", "焦炭Ⅱ", "普钢", "特钢Ⅱ", "冶钢原料", "水泥",
+    "玻璃玻纤", "装修建材", "航运港口", "航空机场", "电力", "燃气Ⅱ", "橡胶",
+    "塑料", "化学纤维", "造纸", "种植业", "养殖业", "饲料", "渔业", "林业Ⅱ",
+    "农产品加工", "农业综合Ⅱ", "房地产开发",
+}
+
+_SW_MAP_CACHE = None
+
+
+def load_sw_map():
+    """读取 sector/sw_map.json → (code6→申万二级名, 二级名集合, 二级→一级父行业)"""
+    global _SW_MAP_CACHE
+    if _SW_MAP_CACHE is not None:
+        return _SW_MAP_CACHE
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sector", "sw_map.json")
+    code2l2, l2_names, l2_parent = {}, set(), {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            m = json.load(f)
+        code2l2 = {str(c).zfill(6): n for c, n in (m.get("l2") or {}).items()}
+        l2_names = set((m.get("l2_members") or {}).keys())
+        l2_parent = dict(m.get("l2_parent") or {})
+    except Exception as e:
+        print(f"⚠️ 申万映射读取失败({path}): {e}; 行业解析降级为静态字典")
+    _SW_MAP_CACHE = (code2l2, l2_names, l2_parent)
+    return _SW_MAP_CACHE
+
+
+def _norm_code6(code):
+    """sz002487 / 002487 → 002487"""
+    c = str(code or "").strip().lower()
+    if len(c) > 6 and c[:2] in ("sh", "sz", "bj"):
+        return c[2:]
+    return c
+
+
+def to_theme_key(sec):
+    """任意行业名(申万二级/静态字典旧键/主题键) → THEME_DB 主题键"""
+    if not sec:
+        return "综合"
+    sec = str(sec).strip()
+    if sec in THEME_DB:
+        return sec
+    if sec in SW2THEME:
+        return SW2THEME[sec]
+    return STATIC2THEME.get(sec, "综合")
+
+
+def resolve_sector(name, code=None):
+    """行业主题解析(v2.46): 申万二级映射优先 → 静态字典 → 综合。
+    返回 (theme_key, sw_l2, source); sw_l2 为真实申万二级行业名(可能为 None)。
+    """
+    code2l2, _l2_names, _ = load_sw_map()
+    l2 = code2l2.get(_norm_code6(code)) if code else None
+    if l2:
+        th = SW2THEME.get(l2)
+        if th:
+            return th, l2, "sw"
+    s = get_sec(name)          # 静态字典兜底(名称匹配)
+    if s != "综合":
+        return to_theme_key(s), l2, "static"
+    return "综合", l2, "fallback"
+
+
+def sw_l2_of(code):
+    """code → 申万二级行业名(无映射返回 None)"""
+    code2l2, _l2_names, _ = load_sw_map()
+    return code2l2.get(_norm_code6(code))
+
 # 板块核心龙头（市值/人气前5，出现在榜可+1分）
 SECTOR_LEADER = {
     "中际旭创", "新易盛", "天孚通信", "寒武纪", "海光信息",  # AI算力
@@ -1616,6 +1852,8 @@ SECTOR_SINA_MAP = {
     "医药生物": "医药行业",
     "金融": "银行",
     "航天军工": "航天军工",
+    "周期资源": "煤炭行业",
+    "农业": "农牧饲渔",
 }
 
 
@@ -1747,7 +1985,7 @@ def _turnover_rank_score(pct_rank):
 def score_theme(name, sector, pct, turnover, all_top200_sectors,
                 sector_data=None, sector_zt_counts=None,
                 mom_map=None, theme_mom=None, sub_mom=None, code=None,
-                turnover_pct_map=None):
+                turnover_pct_map=None, sw_l2=None):
     """
     题材热度评分 (0-5): 以内禀质量(THEME_DB/SUB_THEME)为先验，以成分股近
     5/10/20日真实动量(中位数+上涨占比)为主导信号。
@@ -1783,7 +2021,9 @@ def score_theme(name, sector, pct, turnover, all_top200_sectors,
         intrinsic = sub_score
         reasons = [f"细分题材:{sub_label}(内禀{intrinsic})"]
     else:
-        sub_label = theme["label"]
+        # v2.46: 无细分条目时优先展示真实申万二级行业名(如大金重工→风电设备),
+        #   不再一律显示主题大类 label(旧行为导致"综合/其他"泛滥)
+        sub_label = sw_l2 or theme["label"]
         reasons = [f"板块:{sub_label}(内禀{intrinsic})"]
 
     # ============================================================
@@ -1896,6 +2136,8 @@ def score_theme(name, sector, pct, turnover, all_top200_sectors,
     # ===== 综合(透明加权): 内禀×0.30 + 板块动量×0.35 + 成交额排名×0.15 + 情绪确认×0.20 =====
     W_I, W_M, W_T, W_C = 0.30, 0.35, 0.15, 0.20
     score = _clamp(W_I * intrinsic + W_M * M + W_T * T + W_C * C, 0, 5)
+    # v2.46: 展示层清洗申万二级名的"Ⅱ"后缀(风电设备Ⅱ→风电设备), 聚合键不受影响
+    sub_label = re.sub(r"[ⅠⅡ]+$", "", sub_label) if sub_label else sub_label
     return round(score, 2), reasons, sub_label, lifecycle
 
 
@@ -3087,7 +3329,7 @@ def main():
     
     # --- Step 2: 板块分布预计算 + 板块行情数据获取 ---
     print(f"\n🔥 Step 2: 板块分布分析 + 板块行情获取")
-    all_top200_sectors = [get_sec(s["name"]) for s in stocks]
+    all_top200_sectors = [resolve_sector(s["name"], s["code"])[0] for s in stocks]
     sector_cnt = Counter(all_top200_sectors)
     print(f"   主线板块: " + " | ".join(f"{s}({n}只)" for s, n in sector_cnt.most_common(5)))
 
@@ -3273,7 +3515,7 @@ def main():
     sub_members = {}
     sector_members = {}
     for s in stocks:
-        sec = get_sec(s["name"])
+        sec, _sw_l2, _src = resolve_sector(s["name"], s["code"])
         sector_members.setdefault(sec, []).append(mom_map.get(s["code"]))
         lab = None
         sm = SUB_THEME.get(s["name"])
@@ -3295,6 +3537,10 @@ def main():
         if sm:
             lab = sm[0]
             sub_members.setdefault(lab, []).append(mom_map.get(s["code"]))
+        elif _sw_l2:
+            # v2.46: 无细分条目的个股按真实申万二级行业聚合,
+            #   使风电设备/化学制药等真实行业也有板块动量样本(此前完全缺席)
+            sub_members.setdefault(_sw_l2, []).append(mom_map.get(s["code"]))
     theme_mom = {sec: _agg_momentum(ms) for sec, ms in sector_members.items()}
     sub_mom = {lab: _agg_momentum(ms) for lab, ms in sub_members.items()}
     for lab in ("光模块", "光模块/CPO", "存储芯片", "内存接口", "AI芯片/CPU", "AI芯片/GPU", "半导体设备", "PCB", "覆铜板/PCB"):
@@ -3343,8 +3589,15 @@ def main():
         price = s.get("price", 0) or 0
         turnover = s.get("turnover", 0)
         
-        # 优先使用输入自带的 sector(观察池由 select_watchlist 用申万二级注入), 否则按名称推断
-        sector = s.get("sector") or get_sec(name)
+        # v2.46 行业解析: 输入 sector 可能是申万二级名(观察池注入) → 归一到主题键;
+        #   无输入则按"申万映射优先 → 静态字典 → 综合"解析; 来源记入 sector_src 供审计
+        sw_l2 = sw_l2_of(code)
+        _in_sec = (s.get("sector") or "").strip()
+        if _in_sec and _in_sec != "综合":
+            sector, _src = to_theme_key(_in_sec), "input"
+        else:
+            sector, _l2, _src = resolve_sector(name, code)
+            sw_l2 = sw_l2 or _l2
         kl = klines.get(code, [])
         
         # Fundamental (传入估值阶梯数据)
@@ -3366,7 +3619,7 @@ def main():
             growth_input, code, sector, pe_ladder_data=ladder_input,
             roe=roe_input, gross_margin=gm_input, sub_theme_label=sub_theme_label,
             hist_loss_free=hist_loss_free_map.get(code, False),
-            fwd_np=fwd_pe_map.get(code))
+            fwd_np=fwd_pe_map.get(code), sw_l2=sw_l2)
         
         # Tech (传入CAGR3用于成长加分, 传入周线用于双线多头判断)
         cagr3_input = cagr3_map.get(code)
@@ -3378,7 +3631,7 @@ def main():
             name, sector, pct, turnover, all_top200_sectors,
             sector_data=sector_data, sector_zt_counts=sector_zt_counts,
             mom_map=mom_map, theme_mom=theme_mom, sub_mom=sub_mom, code=code,
-            turnover_pct_map=turnover_pct_map)
+            turnover_pct_map=turnover_pct_map, sw_l2=sw_l2)
         
         # News (传入增速用于动态评估; ann_text 为近7日公告覆盖; 研报为近7日券商研报覆盖)
         ntext = news_map.get(code, "")
@@ -3416,6 +3669,7 @@ def main():
         
         results.append({
             "name": name, "code": code, "sector": sector,
+            "sector_src": _src,
             "price": price, "pct_chg": pct, "pe": pe,
             "turnover": turnover,
             "score_news": round(ns, 2), "score_tech": round(ts_adj, 2), "score_fund": round(fs, 2),
