@@ -1,0 +1,126 @@
+{
+ "version": "v2.41-ic",
+ "fitted_at": "2026-10-13 02:11:51",
+ "target_horizon": 1,
+ "method": "IC 驱动权重: 正IC维度按比例分配+地板5%+向先验收缩(λ); 走步验证(训练≥30截面,每5截面重拟,样本外比对); score_sector 有效样本<20 维持0.12(样本积累中)",
+ "weights": {
+  "score_news": 0.396,
+  "score_tech": 0.044,
+  "score_fund": 0.396,
+  "score_theme": 0.044,
+  "score_sector": 0.12
+ },
+ "prior_weights": {
+  "score_news": 0.2,
+  "score_tech": 0.2,
+  "score_fund": 0.3,
+  "score_theme": 0.18,
+  "score_sector": 0.12
+ },
+ "adopted": "ic_driven",
+ "walkforward": {
+  "n_oos_dates": 38,
+  "oos_ic_prior": 0.0248,
+  "oos_ic_new": 0.0445,
+  "oos_t_new": 2.22,
+  "lambda": 1.0,
+  "note": "样本外复合 IC +0.0445 vs 先验 +0.0248（λ=1.0，n=38）→ 采用 IC 驱动权重"
+ },
+ "full_period_composite_ic": {
+  "prior": {
+   "1": {
+    "n": 68,
+    "ic_mean": 0.0331,
+    "nw_t": 2.2,
+    "win_rate": 58.8
+   },
+   "5": {
+    "n": 64,
+    "ic_mean": 0.0427,
+    "nw_t": 1.78,
+    "win_rate": 64.1
+   },
+   "20": {
+    "n": 50,
+    "ic_mean": 0.0715,
+    "nw_t": 1.89,
+    "win_rate": 70.0
+   }
+  },
+  "lam_best": {
+   "1": {
+    "n": 68,
+    "ic_mean": 0.0544,
+    "nw_t": 3.44,
+    "win_rate": 67.6
+   },
+   "5": {
+    "n": 64,
+    "ic_mean": 0.0751,
+    "nw_t": 3.63,
+    "win_rate": 70.3
+   },
+   "20": {
+    "n": 50,
+    "ic_mean": 0.0988,
+    "nw_t": 3.08,
+    "win_rate": 80.0
+   }
+  }
+ },
+ "factor_ic_target_h": {
+  "score_news": 0.0493,
+  "score_tech": -0.0355,
+  "score_fund": 0.0494,
+  "score_theme": -0.0412
+ },
+ "lambda_scan": [
+  {
+   "lambda": 0.0,
+   "n_oos": 38,
+   "oos_ic_mean": 0.0248,
+   "oos_t": 1.18,
+   "oos_win_rate": 55.3
+  },
+  {
+   "lambda": 0.2,
+   "n_oos": 38,
+   "oos_ic_mean": 0.0306,
+   "oos_t": 1.48,
+   "oos_win_rate": 57.9
+  },
+  {
+   "lambda": 0.4,
+   "n_oos": 38,
+   "oos_ic_mean": 0.0346,
+   "oos_t": 1.69,
+   "oos_win_rate": 57.9
+  },
+  {
+   "lambda": 0.6,
+   "n_oos": 38,
+   "oos_ic_mean": 0.0391,
+   "oos_t": 1.93,
+   "oos_win_rate": 65.8
+  },
+  {
+   "lambda": 0.8,
+   "n_oos": 38,
+   "oos_ic_mean": 0.0424,
+   "oos_t": 2.11,
+   "oos_win_rate": 68.4
+  },
+  {
+   "lambda": 1.0,
+   "n_oos": 38,
+   "oos_ic_mean": 0.0445,
+   "oos_t": 2.22,
+   "oos_win_rate": 65.8
+  }
+ ],
+ "notes": [
+  "复合总分由 4 维分量按权重线性合成后与未来收益求 Rank IC（与生产 total 口径一致，score_sector 因历史样本不足未纳入复合评估，权重固定 0.12）",
+  "训练窗因子 IC 仅使用基准快照 T+1 收益完整落在训练窗内的观测，避免边界泄漏",
+  "样本外日期集合对先验与 IC 驱动权重完全相同，公平比对"
+ ]
+}

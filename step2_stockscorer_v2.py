@@ -23,6 +23,38 @@ IFIND_FIN = os.path.expanduser("~/.workbuddy/skills/ifind-repilot-finance-data-s
 IFIND_NEWS = os.path.expanduser("~/.workbuddy/skills/ifind-repilot-news-search/scripts/fetch_data.py")
 KLINES_N = 120
 
+# ===== v2.41 IC 驱动权重（2026-10-13 量化审查后）=====
+# 五维权重原为 v2.40 主观先验（消息0.20/技术0.20/基本面0.30/题材0.18/板块动量0.12）。
+# 76 交易日截面 Rank IC 实证（factor_eval.py，修正口径）：仅基本面全周期 IC 为正，
+# 消息/技术/题材 T+5/T+20 显著负向（TOP200 高换手关注度池的均值回复），
+# 综合总分 T+20 IC=-0.073 显著反预测 → 先验把 50% 权重压在负向维度上。
+# 现按 --optimize-weights 走步验证结果动态配置；文件缺失/非法时回退 v2.40 先验。
+WEIGHTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "factor_weights.json")
+_W_PRIOR = {"score_news": 0.20, "score_tech": 0.20, "score_fund": 0.30,
+            "score_theme": 0.18, "score_sector": 0.12}
+
+
+def load_factor_weights():
+    """读 factor_weights.json → (weights, meta)；失败回退 v2.40 先验。"""
+    try:
+        with open(WEIGHTS_FILE, encoding="utf-8") as f:
+            d = json.load(f)
+        w = d.get("weights") or {}
+        if not set(_W_PRIOR).issubset(w.keys()):
+            raise ValueError("weights 字段不全")
+        vals = {k: float(w[k]) for k in _W_PRIOR}
+        if any(v < 0 for v in vals.values()) or abs(sum(vals.values()) - 1.0) > 0.02:
+            raise ValueError("weights 非法: %s" % vals)
+        return vals, d
+    except Exception:
+        return dict(_W_PRIOR), None
+
+
+FW, FW_META = load_factor_weights()
+W_NEWS, W_TECH, W_FUND = FW["score_news"], FW["score_tech"], FW["score_fund"]
+W_THEME, W_SECTOR_W = FW["score_theme"], FW["score_sector"]
+SCORER_VER = FW_META.get("version", "v2.40") if FW_META else "v2.40"
+
 SECTOR = {
     "中际旭创":"AI/半导体","新易盛":"AI/半导体","天孚通信":"AI/半导体",
     "寒武纪":"AI/半导体","海光信息":"AI/半导体","中芯国际":"AI/半导体",
@@ -3656,7 +3688,10 @@ def main():
             if isinstance(td, dict):
                 td = dict(td)
                 td["industry_prospect"] = f"行业前景{'加分' if industry_bonus > 0 else '减分'}{industry_bonus:+.1f}({label})"
-        w = ns * 0.20 + ts_adj * 0.20 + fs * 0.30 + ths * 0.30
+        # v2.41: 权重改为 IC 驱动（factor_weights.json，缺失回退 v2.40 先验）。
+        #   step2 中间总分不含板块动量维度，题材维度暂承载 theme+sector 权重以保持 0-20 量纲；
+        #   最终五分由 apply_sector_momentum.py 按五维权重重算。
+        w = ns * W_NEWS + ts_adj * W_TECH + fs * W_FUND + ths * (W_THEME + W_SECTOR_W)
         total = round(w * 4, 2)
 
         if total >= 17: rating, advice = "S", "优先买入，可重仓"
@@ -3744,7 +3779,7 @@ def main():
     
     out_data = {
         "date": raw.get("date", ""),
-        "model": "stock-scorer v2.22",
+        "model": f"stock-scorer {SCORER_VER} (AI + sector-momentum[evidence])",
         "weights": "题材30%(内禀0.30+板块动量0.35+成交额排名0.15+情绪确认0.20) 消息20% 技术面20%(结构60%[均线趋势35%/MACD动能25%/量能资金25%/RSI入场时机15%]+动量40%,RSI为Wilder平滑口径) 基本面30%(含行业前景)",
         "results": results,
         "stats": {

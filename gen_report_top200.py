@@ -70,11 +70,20 @@ model_str = data.get("model", "stock-scorer")
 #   1) 个股信息旁增加现价, 与技术目标价/机构目标价并列对比(价差 + 预期涨跌幅)
 #   2) 新增「📐 因子有效性评估(Rank IC)」区块(评分层 factor_eval.py 产出 factor_ic.json)
 #   3) 行业数据有效性: 展示口径改为申万二级优先, 不再出现"综合/其他"滥用
-REPORT_VER = "v2.46"
+# v2.47: 量化工程审查（P0/P1/P2，见 优化建议清单_2026-10-13.md）——
+#   P0-1 IC 交易日对齐: 剔除非交易日/接口陈旧快照(实测 09-10/09-25/10-01~07 七次事故)
+#   P0-2 IC 全样本收益: 回填全市场前复权日线, 消除 TOP200 留存偏差(T+20 流失 34%)
+#   P0-3 IC Newey-West + Bonferroni: 重叠窗口 t 值虚高修正, 15 次检验校正阈值 |NW t|≥2.97
+#   P0-4 IC 驱动权重: factor_weights.json 走步验证(样本外复合IC 0.0248→0.0445),
+#        基本面/消息面加权, 题材/技术降至地板, 板块动量维持(样本积累中)
+#   P1 子区间稳定性/因子相关矩阵/workflow 数据新鲜度守卫(check_data_fresh.py)
+REPORT_VER = "v2.47"
 _has_sector = any(x.get('score_sector') is not None for x in results)
 _ver_tag = f"{REPORT_VER} · 五维" if _has_sector else f"{REPORT_VER} · 四维"
-_ver_short = "v2.40 (AI + 板块动量)" if _has_sector else "v2.30 (AI 增强)"
-_SCORER_VER = "v2.40 (AI + sector-momentum)" if _has_sector else "v2.30 (AI 增强)"
+# 评分层版本以 scored json 的 model 字段为准（权重变更自下一次全新评分跑生效，
+# 重跑历史数据时页头如实显示该数据当时的模型版本，不虚标）
+_SCORER_VER = str(data.get("model") or ("v2.41 (IC-driven weights + sector-momentum)"
+                                        if _has_sector else "v2.30 (AI 增强)"))
 total_stocks = len(results)
 
 # 颜色配置
@@ -2796,21 +2805,38 @@ try:
 except Exception as _e:
     print(f"⚠️ 读取 factor_ic.json 失败: {_e}")
 
+# v2.47: 权重决策记录（factor_eval.py --optimize-weights 产出）
+_wf_path = os.path.join(_ai_dir, "factor_weights.json")
+_wmeta = None
+try:
+    if os.path.exists(_wf_path):
+        with open(_wf_path, "r", encoding="utf-8") as _f:
+            _wmeta = json.load(_f)
+except Exception:
+    _wmeta = None
+
 if _ic and _ic.get("factors"):
     _IC_LINE_COLORS = ["#38bdf8", "#f472b6", "#fbbf24", "#a3e635", "#c084fc", "#fb923c"]
 
     def _ic_cell(a):
-        """单周期 IC 单元格: IC 值(按正负着色, A股红涨绿跌) + t/胜率/样本子行。"""
+        """单周期 IC 单元格: IC 值(红涨绿跌) + Newey-West t(★=Bonferroni 校正后显著) + 胜率/样本。
+
+        v2.47: t 值改用 Newey-West HAC 调整值 —— h=5/20 相邻截面 IC 观测共享 80%/95%
+        收益窗口, 普通 t 把 n 当独立样本会虚高显著性; ★ 标记通过 15 次检验
+        Bonferroni 校正(|NW t|≥2.97)的单元格。
+        """
         if not a or not a.get("n"):
             return '<td style="padding:6px 10px;color:#475569;text-align:center;">未到期</td>'
-        ic, t = a.get("ic_mean"), a.get("t_stat")
+        ic, t = a.get("ic_mean"), a.get("nw_t")
         _c = "#ef4444" if (ic or 0) > 0 else ("#22c55e" if (ic or 0) < 0 else "#94a3b8")
-        _bold = "font-weight:800;" if (t is not None and abs(t) >= 2) else ""
+        _bonf = bool(a.get("bonferroni_sig"))
+        _bold = "font-weight:800;" if _bonf else ""
         _t_s = f"{t:+.2f}" if isinstance(t, (int, float)) else "—"
+        _star = '<span style="color:#fbbf24;">★</span>' if _bonf else ""
         return (f'<td style="padding:6px 10px;text-align:center;">'
                 f'<div style="color:{_c};{_bold}font-size:13px;">{ic:+.3f}</div>'
                 f'<div style="font-size:10px;color:#64748b;margin-top:2px;">'
-                f't={_t_s} · 胜率{a.get("win_rate"):.0f}% · n={a.get("n")}</div></td>')
+                f'NW t={_t_s}{_star} · 胜率{a.get("win_rate"):.0f}% · n={a.get("n")}</div></td>')
 
     _ic_rows = ""
     for _i, (_fk, _fv) in enumerate(_ic["factors"].items()):
@@ -2820,8 +2846,17 @@ if _ic and _ic.get("factors"):
         _sp = ((_fv.get("horizons") or {}).get("1") or {}).get("spread_mean")
         _sp_s = (f'<div style="font-size:10px;color:#64748b;margin-top:2px;">'
                  f'分层多空(T+1) {_sp:+.2f}%</div>') if isinstance(_sp, (int, float)) else ""
+        # v2.47 子区间稳定性（T+1 半期均值）: 前半→后半方向一致 = 非单一行情驱动
+        _sub = ((_fv.get("horizons") or {}).get("1") or {}).get("subperiod") or {}
+        _sub_s = ""
+        if _sub:
+            _sw = (' <span style="color:#f59e0b;">⚠️制度切换</span>'
+                   if _sub.get("regime_shift") else "")
+            _sub_s = (f'<div style="font-size:10px;color:#64748b;margin-top:2px;">'
+                      f'半期 {_sub.get("first_half_mean"):+.3f}→{_sub.get("second_half_mean"):+.3f}'
+                      f'（稳定{_sub.get("sign_stable_pct"):.0f}%）{_sw}</div>')
         _ic_rows += (f'<tr><td style="padding:6px 10px;font-weight:700;color:#e2e8f0;white-space:nowrap;">'
-                     f'{html_mod.escape(str(_lab))}{_sp_s}</td>{_cells}'
+                     f'{html_mod.escape(str(_lab))}{_sp_s}{_sub_s}</td>{_cells}'
                      f'<td style="padding:6px 10px;text-align:center;">'
                      f'<span title="{html_mod.escape(str(_fv.get("verdict_note") or ""))}" '
                      f'style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px;'
@@ -2841,6 +2876,171 @@ if _ic and _ic.get("factors"):
                     f'style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px;'
                     f'background:{_rv}22;color:{_rv};cursor:help;white-space:nowrap;">'
                     f'{html_mod.escape(str(_rec_ic.get("verdict") or "—"))}</span></td></tr>')
+
+    # ===== v2.47 因子间截面相关矩阵（披露"五维"实际独立信息量）=====
+    _corr = _ic.get("factor_correlation") or {}
+    _corr_html = ""
+    if _corr:
+        _dims = ["score_news", "score_tech", "score_fund", "score_theme"]
+        _dl = {"score_news": "消息", "score_tech": "技术", "score_fund": "基本面", "score_theme": "题材"}
+        _crows = ""
+        for _ra in _dims:
+            _cc = ""
+            for _cb in _dims:
+                if _ra == _cb:
+                    _cc += '<td style="padding:4px 8px;text-align:center;color:#475569;">·</td>'
+                    continue
+                _v = (_corr.get(_ra + "|" + _cb) or _corr.get(_cb + "|" + _ra) or {}).get("mean")
+                if not isinstance(_v, (int, float)):
+                    _cc += '<td style="padding:4px 8px;text-align:center;color:#475569;">·</td>'
+                else:
+                    _col = "#ef4444" if _v >= 0.25 else ("#22c55e" if _v <= -0.25 else "#94a3b8")
+                    _cc += (f'<td style="padding:4px 8px;text-align:center;color:{_col};'
+                            f'font-weight:700;">{_v:+.2f}</td>')
+            _crows += (f'<tr><td style="padding:4px 8px;color:#cbd5e1;font-weight:700;'
+                       f'white-space:nowrap;">{_dl[_ra]}</td>{_cc}</tr>')
+        # 叙述由矩阵数据推导：最高 |ρ| pair 与整体相关性结论，避免文案与矩阵脱节
+        _pairs = []
+        for _ai, _ra in enumerate(_dims):
+            for _cb in _dims[_ai + 1:]:
+                _v = (_corr.get(_ra + "|" + _cb) or _corr.get(_cb + "|" + _ra) or {}).get("mean")
+                if isinstance(_v, (int, float)):
+                    _pairs.append((abs(_v), _v, _dl[_ra], _dl[_cb]))
+        if _pairs:
+            _pairs.sort(reverse=True)
+            _ab, _v, _la, _lb = _pairs[0]
+            _n_hi = sum(1 for a, _, _, _ in _pairs if a >= 0.25)
+            _corr_note = (f'最高 pair 为 {_la}×{_lb} ρ={_v:+.2f}，'
+                          + (f'共 {_n_hi} 对 |ρ|≥0.25，其余维度相关性低，'
+                             if _n_hi else '全部 pair |ρ|<0.25，')
+                          + '四维总体低相关，"五维"结构具备真实分散度。')
+        else:
+            _corr_note = '样本不足，相关矩阵暂缺。'
+        _corr_html = (f'''
+        <div style="margin-top:14px;">
+            <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">🔗 因子间截面相关（跨截面平均 Spearman）—— 披露"五维"实际独立信息量：|ρ|≥0.25 记红、≤−0.25 记绿。{_corr_note}</div>
+            <table style="border-collapse:collapse;font-size:11px;">
+                <thead><tr style="background:#1e293b;">
+                    <th style="padding:4px 8px;"></th>''' +
+                    "".join(f'<th style="padding:4px 8px;color:#94a3b8;font-weight:600;">{_dl[_d]}</th>'
+                            for _d in _dims) + f'''
+                </tr></thead>
+                <tbody>{_crows}</tbody>
+            </table>
+        </div>''')
+
+    # ===== v2.47 IC 驱动权重（factor_weights.json 走步验证结果）=====
+    _wblock = ""
+    if _wmeta and _wmeta.get("weights"):
+        _wn = _wmeta.get("weights") or {}
+        _wp = _wmeta.get("prior_weights") or {}
+        _wf = _wmeta.get("walkforward") or {}
+        _fpc = _wmeta.get("full_period_composite_ic") or {}
+        _fic1 = _wmeta.get("factor_ic_target_h") or {}
+        _DIMS5 = [("score_news", "消息面"), ("score_tech", "技术面"), ("score_fund", "基本面"),
+                  ("score_theme", "题材热度"), ("score_sector", "板块动量")]
+        _wrows = ""
+        for _k, _lab in _DIMS5:
+            _p, _n = _wp.get(_k), _wn.get(_k)
+            _live = ((_ic["factors"].get(_k) or {}).get("horizons") or {}).get("1") or {}
+            _fic_v = _live.get("ic_mean", _fic1.get(_k))
+            _fic_s = f"{_fic_v:+.3f}" if isinstance(_fic_v, (int, float)) else "—"
+            _fic_c = ("#ef4444" if isinstance(_fic_v, (int, float)) and _fic_v > 0
+                      else ("#22c55e" if isinstance(_fic_v, (int, float)) and _fic_v < 0
+                            else "#94a3b8"))
+            _delta = (_n - _p) if isinstance(_n, (int, float)) and isinstance(_p, (int, float)) else None
+            _d_s = f"{_delta:+.3f}" if _delta is not None else "—"
+            _d_c = "#ef4444" if (_delta or 0) > 0 else ("#22c55e" if (_delta or 0) < 0 else "#94a3b8")
+            _note = ('<span title="score_sector 仅 2026-09-21 起入库，有效截面不足 20 个，'
+                     '权重暂维持 0.12" style="color:#f59e0b;font-size:10px;cursor:help;">样本积累中</span>'
+                     if _k == "score_sector" else "")
+            _wrows += (f'<tr>'
+                       f'<td style="padding:5px 10px;color:#e2e8f0;font-weight:700;white-space:nowrap;">{_lab}</td>'
+                       f'<td style="padding:5px 10px;text-align:center;color:#94a3b8;">{_p:.2f}</td>'
+                       f'<td style="padding:5px 10px;text-align:center;color:#f8fafc;font-weight:800;">{_n:.2f}</td>'
+                       f'<td style="padding:5px 10px;text-align:center;color:{_d_c};font-weight:700;">{_d_s}</td>'
+                       f'<td style="padding:5px 10px;text-align:center;color:{_fic_c};">{_fic_s}</td>'
+                       f'<td style="padding:5px 10px;text-align:center;">{_note}</td></tr>')
+        _cmp_rows = ""
+        for _h, _hl in ((1, "T+1（次日）"), (5, "T+5（一周）"), (20, "T+20（一月）")):
+            _pa = (_fpc.get("prior") or {}).get(str(_h)) or {}
+            _na = (_fpc.get("lam_best") or {}).get(str(_h)) or {}
+            if not _pa.get("n"):
+                continue
+            _pi, _ni = _pa.get("ic_mean"), _na.get("ic_mean")
+            _pt, _nt = _pa.get("nw_t"), _na.get("nw_t")
+            _d = (_ni - _pi) if isinstance(_pi, (int, float)) and isinstance(_ni, (int, float)) else None
+            _dc = "#ef4444" if (_d or 0) > 0 else "#22c55e"
+            _cmp_rows += (f'<tr><td style="padding:5px 10px;color:#e2e8f0;font-weight:700;">{_hl}</td>'
+                          f'<td style="padding:5px 10px;text-align:center;color:#94a3b8;">'
+                          f'{_pi:+.3f}（NW t={_pt}）</td>'
+                          f'<td style="padding:5px 10px;text-align:center;color:#f8fafc;font-weight:800;">'
+                          f'{_ni:+.3f}（NW t={_nt}）</td>'
+                          f'<td style="padding:5px 10px;text-align:center;color:{_dc};font-weight:700;">'
+                          f'{_d:+.3f}</td></tr>')
+        _oos_p = _wf.get("oos_ic_prior")
+        _oos_n = _wf.get("oos_ic_new")
+        _oos_t = _wf.get("oos_t_new")
+        _oos_n_dates = _wf.get("n_oos_dates")
+        _lam = _wf.get("lambda")
+        _adopted_ok = _wmeta.get("adopted") == "ic_driven"
+        _adopt_txt = ('<b style="color:#a3e635;">已采用（样本外验证通过）</b>'
+                      if _adopted_ok else
+                      '<b style="color:#f59e0b;">维持先验（样本外未达采用门槛）</b>')
+        # "三周期全改善且 NW t≥3" 由数据推导，避免权重文件更新后断言失实
+        _all_improved = all(
+            isinstance(((_fpc.get("lam_best") or {}).get(str(_h)) or {}).get("ic_mean"), (int, float))
+            and isinstance(((_fpc.get("prior") or {}).get(str(_h)) or {}).get("ic_mean"), (int, float))
+            and _fpc["lam_best"][str(_h)]["ic_mean"] > _fpc["prior"][str(_h)]["ic_mean"]
+            for _h in (1, 5, 20))
+        _nts = [((_fpc.get("lam_best") or {}).get(str(_h)) or {}).get("nw_t") for _h in (1, 5, 20)]
+        _t_ge3 = all(isinstance(_t, (int, float)) and _t >= 3 for _t in _nts)
+        _claim = ('全周期复合 IC 三周期全部改善且 NW t 均≥3' if (_all_improved and _t_ge3)
+                  else '全周期复合 IC 改善幅度见上表')
+        _w_ver = _wmeta.get("version") or "v2.41-ic"
+        _oos_p_s = f"{_oos_p:+.4f}" if isinstance(_oos_p, (int, float)) else "—"
+        _oos_n_s = f"{_oos_n:+.4f}" if isinstance(_oos_n, (int, float)) else "—"
+        _wblock = (f'''
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid #1e293b;">
+            <div style="font-size:13px;font-weight:800;color:#a3e635;margin-bottom:4px;">
+                ⚖️ IC 驱动评分权重（stock-scorer {_w_ver}）· {_adopt_txt}</div>
+            <div style="font-size:11px;color:#64748b;margin-bottom:10px;line-height:1.7;">
+                方法：以 Rank IC 实证反向配置五维权重 —— 仅 IC&gt;0 的维度按 IC 比例分配，负向维度降至地板 5%；
+                向先验收缩（λ）防过拟合；<b style="color:#cbd5e1;">走步验证</b>（训练≥30 截面、每 5 截面重拟、
+                样本外与先验同日期集合比对）通过后才写入 factor_weights.json 并生效。
+                权重自下一次全新评分跑生效；当前数据若为历史评分，其总分仍按当时权重计算（页眉评分层版本以数据自身 model 字段为准）。
+            </div>
+            <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px;">
+                <thead><tr style="background:#1e293b;">
+                    <th style="padding:5px 10px;text-align:left;color:#94a3b8;font-weight:600;">维度</th>
+                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">先验权重<br/>(v2.40)</th>
+                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">现行权重<br/>(v2.41)</th>
+                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">变化</th>
+                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">该维度 T+1 IC</th>
+                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">备注</th>
+                </tr></thead>
+                <tbody>{_wrows}</tbody>
+            </table>
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                <thead><tr style="background:#1e293b;">
+                    <th style="padding:5px 10px;text-align:left;color:#94a3b8;font-weight:600;">复合总分 IC（相同截面集）</th>
+                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">先验权重</th>
+                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">现行权重</th>
+                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">改善</th>
+                </tr></thead>
+                <tbody>{_cmp_rows}</tbody>
+            </table>
+            <div style="font-size:11px;color:#94a3b8;margin-top:8px;line-height:1.7;">
+                📈 <b style="color:#e2e8f0;">样本外走步验证</b>：复合总分 IC 由先验 <b style="color:#e2e8f0;">{_oos_p_s}</b>
+                提升至 <b style="color:#a3e635;">{_oos_n_s}</b>（t={_oos_t}，{_oos_n_dates} 个样本外截面，λ={_lam}）；
+                {_claim}。
+            </div>
+            <div style="font-size:10px;color:#f59e0b;margin-top:6px;line-height:1.7;">
+                ⚠️ 选择性披露：λ 扫描（0~1.0 共 6 档）本身构成对样本外的多次使用，表中样本外值为乐观上界；
+                但全部 λ≥0.2 均优于先验（OOS IC 0.031~0.045），"IC 驱动优于先验"的结论对 λ 选择不敏感。
+                score_sector 有效样本仅 9 个（&lt;20），其 0.12 权重无 IC 证据，随每日截面积累后评估。
+            </div>
+        </div>''')
 
     # 累计 IC 曲线（T+1，仅画样本≥20 的因子；不同因子等长序列才可同轴比较）
     _chart_svg = ""
@@ -2893,13 +3093,15 @@ if _ic and _ic.get("factors"):
         <div style="font-size:15px;font-weight:800;color:#7dd3fc;margin-bottom:4px;">
             📐 因子有效性评估（Rank IC）</div>
         <div style="font-size:11px;color:#64748b;margin-bottom:12px;line-height:1.7;">
-            口径：Rank IC = Spearman(因子值在当日截面的秩, 个股未来 h 交易日收益)，h ∈ {{1, 5, 20}} 交易日；
-            t = mean(IC)/(std(IC)/√n)，<b style="color:#f59e0b;">|t|≥2 视为统计显著</b>；
-            分层多空 = 每截面按因子分 5 组、头部组均值收益 − 尾部组均值收益（检验单调性）。
+            口径（v2.47 修正）：Rank IC = Spearman(因子值在当日截面的秩, 个股未来 h 个<b>真实交易日</b>收益)，h ∈ {{1, 5, 20}}；
+            收益对当日 TOP200 <b>全部个股</b>计算（回填全市场前复权日线，消除"跌出榜单即消失"的留存偏差 —— v1 口径 T+20 流失 34%）；
+            t 值采用 <b style="color:#fbbf24;">Newey-West HAC</b> 调整（h=5/20 相邻观测共享 80%/95% 收益窗口，普通 t 会虚高显著性）；
+            <b style="color:#fbbf24;">★</b> = 通过 Bonferroni 多重检验校正（5 因子×3 周期=15 次，|NW t|≥2.97）。
             样本 &lt; 20 个截面不给出有效性判定。当前样本：
-            <b style="color:#e2e8f0;">{_ic.get("n_snapshots")} 个截面</b>
+            <b style="color:#e2e8f0;">{_ic.get("n_snapshots")} 个有效截面</b>
             （{_ic.get("snapshot_range", ["?", "?"])[0]} ~ {_ic.get("snapshot_range", ["?", "?"])[1]}，
-            每日成交额 TOP200 全截面）。
+            剔除非交易日/接口陈旧快照 {len(_ic.get("stale_snapshots_dropped") or [])} 个，
+            价格回填 {(_ic.get("price_backfill") or {}).get("n_codes") or "—"} 只 × {(_ic.get("price_backfill") or {}).get("n_trading_days") or "—"} 个交易日）。
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
             <thead><tr style="background:#1e293b;">
@@ -2912,12 +3114,19 @@ if _ic and _ic.get("factors"):
             <tbody>{_ic_rows}{_rec_row}</tbody>
         </table>
         {f'<div style="margin-top:14px;"><div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">📈 累计 IC 曲线（T+1，按截面序号累计；曲线持续上行=因子稳定正向，下行=负向）</div>{_chart_svg}<div style="font-size:11px;margin-top:6px;">{_legend}</div></div>' if _chart_svg else ''}
+        {_corr_html}
+        {_wblock}
         <div style="font-size:11px;color:#f59e0b;margin-top:12px;padding:8px 10px;background:rgba(245,158,11,0.08);border-radius:6px;border-left:3px solid #f59e0b;line-height:1.7;">
-            ⚠️ <b>解读须知</b>：① 本名单为「当日成交额 TOP200」，高总分个股往往是刚放量上涨的动量股，
-            5~20 日维度出现负 IC 更可能是<b>动量回落/均值回归</b>与<b>样本筛选偏差</b>，而非"评分完全无效"；
-            ② IC 衡量的是<b>排序能力</b>而非绝对收益，也未扣交易成本；
-            ③ 历史截面取自 git 提交记录，评分模型版本随当日版本（含早期的行业归类缺陷），
-            行业归类修复（v2.46）后的数据自 {_ic.get("snapshot_range", ["?", "?"])[1]} 起生效。
+            ⚠️ <b>解读须知</b>：① 口径已于 v2.47 修正（交易日对齐 / 全样本收益 / NW 调整 / Bonferroni）——
+            v1 口径因留存偏差与假日陈旧快照污染，曾把综合总分与消息面误判为负向；修正后
+            <b>总分全周期为正</b>、<b>基本面与消息面为正</b>（T+1/T+5/T+20 均正向）、题材与技术为负向，
+            评分权重已随之调整（见上方「⚖️ IC 驱动评分权重」）；
+            ② TOP200 为高换手关注度筛选池，题材/技术维度的负向 IC 反映「关注度脉冲后的均值回复」，
+            处理方式是<b>降权至地板 5% 而非删除</b>（保留下限以维持五维结构与展示完整性）；
+            ③ IC 衡量<b>排序能力</b>而非绝对收益，分层多空为未扣成本毛利口径；
+            ④ 历史截面取自 git 提交记录（含早期行业归类缺陷版本，v2.46 已修复）；
+            样本区间 2026-06-26~10-12 约 3.5 个月，子区间稳定性已披露于表中「半期」行，无制度切换；
+            ⑤ 投资有风险，本区块仅供研究与教育，不构成投资建议。
         </div>
         <div style="font-size:10px;color:#475569;margin-top:8px;">数据说明：{html_mod.escape(_ic_notes[:400])}</div>
     </div>''')

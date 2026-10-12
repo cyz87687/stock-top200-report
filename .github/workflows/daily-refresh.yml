@@ -78,6 +78,24 @@ jobs:
               break
             fi
 
+            # Step 1.5: 数据新鲜度守卫（v2.47 P1-7）
+            # 背景: 假日(09-25/10-01~07)与接口故障(09-10)日照常产出陈旧 scored json,
+            #   污染 Rank IC 交易日对齐。指数日线日期 < 当日, 或价格与上一交易日
+            #   ≥80% 相同 → 判定陈旧。
+            #   可重试: 收盘后指数日线偶有几分钟延迟, 30s 后重试通常恢复;
+            #   真假日则 3 次尝试后干净失败(不写评分数据), 由 17:30 补偿 cron 或
+            #   次日任务兜底。延迟跨午夜的 run 同样会被拒 —— 宁可缺一天,
+            #   不发布"数据日期≠发布日期"的错标报告(已知限制, 见 README)。
+            echo "[$(date -u '+%H:%M:%S')] Running check_data_fresh.py ..." >> $LOG
+            if python3 check_data_fresh.py >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Data freshness OK" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ❌ Stale/holiday data (attempt $ATTEMPT/$MAX_RETRIES)" >> $LOG
+              echo "result=stale_data" >> $GITHUB_OUTPUT
+              [ $ATTEMPT -lt $MAX_RETRIES ] && sleep $RETRY_DELAY && continue
+              break
+            fi
+
             # Step 2: Score and analyze
             INPUT_JSON="top200_all_a.json"
             if [ ! -f "$INPUT_JSON" ]; then

@@ -33,6 +33,34 @@ W_NEWS, W_TECH, W_FUND = 0.20, 0.20, 0.30
 W_THEME_NEW, W_SECTOR = 0.18, 0.12
 W_THEME_OLD = 0.30
 
+# v2.41: 权重改由 factor_weights.json 提供（IC 驱动 + 走步验证，见 factor_eval.py
+#   --optimize-weights）。文件缺失/非法时回退上面的 v2.40 先验值。
+_W_PRIOR = {"score_news": 0.20, "score_tech": 0.20, "score_fund": 0.30,
+            "score_theme": 0.18, "score_sector": 0.12}
+
+
+def _load_factor_weights():
+    path = os.path.join(HERE, "factor_weights.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            d = json.load(f)
+        w = d.get("weights") or {}
+        if not set(_W_PRIOR).issubset(w.keys()):
+            raise ValueError("weights 字段不全")
+        vals = {k: float(w[k]) for k in _W_PRIOR}
+        if any(v < 0 for v in vals.values()) or abs(sum(vals.values()) - 1.0) > 0.02:
+            raise ValueError("权重非法: %s" % vals)
+        return vals, d
+    except Exception:
+        return dict(_W_PRIOR), None
+
+
+_FW, _FW_META = _load_factor_weights()
+W_NEWS, W_TECH, W_FUND = _FW["score_news"], _FW["score_tech"], _FW["score_fund"]
+W_THEME_NEW, W_SECTOR = _FW["score_theme"], _FW["score_sector"]
+SCORER_VER = _FW_META.get("version", "v2.40") if _FW_META else "v2.40"
+print(f"⚖️ 五维权重（{SCORER_VER}）: " + " ".join(f"{k.replace('score_', '')}={v}" for k, v in _FW.items()))
+
 # 分档: (排名下界, 排名上界, 分值)
 BANKS_MOM_60 = [(1, 1, 5.0), (2, 3, 4.2), (4, 5, 3.5), (6, 10, 2.8), (11, 20, 2.0), (21, 40, 1.3), (41, 70, 0.7), (71, 10 ** 6, 0.3)]
 BANKS_MOM_10 = [(1, 3, 5.0), (4, 5, 4.2), (6, 10, 3.5), (11, 20, 2.6), (21, 40, 1.8), (41, 70, 1.0), (71, 10 ** 6, 0.5)]
@@ -146,7 +174,8 @@ def main():
     from collections import Counter
     rc = Counter(r['rating'] for r in results)
     data['results'] = results
-    data['model'] = f"stock-scorer v2.40 (AI + sector-momentum[{args.mode}])"
+    _ver_suffix = ", IC-driven weights" if (_FW_META or {}).get("adopted") == "ic_driven" else ""
+    data['model'] = f"stock-scorer {SCORER_VER} (AI + sector-momentum[{args.mode}]{_ver_suffix})"
     data['sector_momentum'] = {'date': mom_date, 'mode': args.mode,
                                'mom_long_days': mom.get('mom_long_days', 60),
                                'mom_short_days': mom.get('mom_short_days', 10),

@@ -1,46 +1,53 @@
 #!/usr/bin/env python3
-"""因子有效性评估（Rank IC）—— 量化视角衡量"推荐/因子"的预测能力。
+"""因子有效性评估（Rank IC）+ IC 驱动权重优化 —— 量化视角衡量"推荐/因子"的预测能力。
 
-设计目标（老大需求）：从量化投资视角给出专业因子评估机制，用 Rank IC（信息系数）
-等指标衡量个股推荐或因子的预测能力与有效性，并明确展示格式、计算周期与输出结构。
+v2（2026-10-13 量化工程审查后重写）—— 修正 v1 的三个口径缺陷并新增权重优化：
 
-━━━ 指标定义（专业口径）━━━
-Rank IC(t → t+h) = Spearman 秩相关( 因子值在 t 日截面的秩, 个股在 t+h 的收益率 )
-  · 用秩相关而非 Pearson：对极端涨跌幅/离群因子值稳健，是业界 IC 标准口径
-  · h ∈ {1, 5, 20} 交易日，与推荐跟踪表(recommendation_track.json)口径一致
-聚合指标（对同一因子的全部截面 IC 序列）：
-  · IC 均值   : 因子平均预测能力（>0 表示因子值越大未来收益越高）
-  · IC 标准差 : IC 序列波动（稳定性）
-  · t 统计量  : mean(IC) / (std(IC) / √n)，|t|≥2 通常视为统计显著
-  · IC 胜率   : IC > 0 的截面占比（方向一致性）
-  · 分层多空  : 每截面按因子分 5 组，头部组均值收益 − 尾部组均值收益，再取截面均值
-                （检验单调性；IC 高但多空差价差为负 = 因子只在尾部有效）
+━━━ v1 口径缺陷与修正 ━━━
+1. 非交易日陈旧快照：假日/接口故障日 workflow 照常产出 scored json（07:00 前守卫缺失），
+   v1 用「快照下标 i+h」当 h 个交易日 → 跨假日窗口实际不足 h 日，且陈旧日贡献全 0 收益。
+   修正：以回填的全市场前复权日线日期为真实交易日序列，快照按交易日对齐后取第 h 个后续交易日；
+   非交易日快照（如 10-01~10-07）整体剔除。
+2. 样本流失（TOP200 留存偏差）：v1 只对「t 与 t+h 都在榜」的个股算收益，
+   流失率 T+1 14.6% / T+5 25.2% / T+20 34.0%，且流失非随机 → IC 为留存子样本的条件估计。
+   修正：回填全部历史代码前复权日线，对 t 日全部 TOP200 个股计算收益。
+   （前复权口径与推荐跟踪表一致；7 月为 A 股分红密集期，不复权会制造伪跌幅。）
+3. 重叠窗口 t 值虚高：h=5/20 相邻 IC 观测共享 80%/95% 收益窗口，序列自相关使
+   t=mean/(std/√n) 高估显著性。修正：Newey-West HAC（Bartlett, lag=h-1）；
+   多重检验（5 因子 × 3 周期 = 15 次）按 Bonferroni 阈值 |t|≥2.97 与宽松 |t|≥2 两级披露。
 
-━━━ 两个评估对象 ━━━
-1) 五维因子（全截面）: total / score_news / score_tech / score_fund /
-   score_theme / score_sector —— 回答"评分模型哪个维度真正有预测力"
-2) 推荐组合层: recommendation_track.json 中当日推荐标的的 total 与未来收益
-   —— 回答"我们推荐的股票整体是否跑赢"
+━━━ 指标定义 ━━━
+Rank IC(t→t+h) = Spearman(因子值 t 日截面秩, 收益率 t+h)；h∈{1,5,20} 交易日。
+聚合：IC均值 / IC标准差 / t(普通) / t(Newey-West) / IC胜率 / 分层多空(5组头尾价差) /
+      半期稳定性 / Bonferroni 校正显著性。
+对象：五维因子全截面 IC + 推荐组合层 IC + 因子间截面相关矩阵 + 复合总分 IC。
 
-━━━ 数据来源 ━━━
-· factor_history.json（每日追加的紧凑截面快照，主数据源，随仓库分发）
-· 本地 top200_scored_*.json（--bootstrap 时用于初始化历史）
-· git 历史中的 top200_scored_*.json（--bootstrap-from-git，仅本地可用，
-  Actions checkout 默认 depth=1 无历史）
+━━━ 权重优化（--optimize-weights）━━━
+规则：① 仅 IC>0 的维度按 IC 比例分配权重，负向维度降至地板 5%；
+      ② 向先验收缩 w=λ·w_IC+(1-λ)·w_prior 防过拟合；
+      ③ 走步验证（expanding window，训练≥30 截面，每 5 截面重拟，样本外比对）；
+      ④ 目标周期 T+1（与日报 operational 口径一致、无重叠、流失最低），T+5/T+20 作稳健性门槛；
+      ⑤ score_sector 有效截面不足（<20）→ 权重维持 0.12，标记"样本积累中"。
+产出：factor_weights.json（供 step2 / apply_sector_momentum 读取）。
 
 用法：
-  python3 factor_eval.py                     # 计算 → factor_ic.json
-  python3 factor_eval.py --bootstrap-from-git  # 从 git 历史初始化 factor_history.json
-  python3 factor_eval.py --show              # 计算并打印结果表
+  python3 factor_eval.py                       # 计算 → factor_ic.json（日常）
+  python3 factor_eval.py --bootstrap-prices    # 回填全量前复权日线（周期性，网络）
+  python3 factor_eval.py --bootstrap-from-git  # 从 git 历史初始化截面（仅本地）
+  python3 factor_eval.py --optimize-weights    # 拟合新权重 → factor_weights.json
+  python3 factor_eval.py --show                # 打印结果表
 
-数据纪律：全部取自行程内真实文件的真实字段；样本不足时如实标注，不补齐、不编造。
+数据纪律：全部取自行程内真实文件/接口；样本不足如实标注，不补齐、不编造。
+投资有风险，本内容仅供研究与教育，不构成投资建议。
 """
 import json
 import os
 import sys
 import glob
 import math
+import time
 import subprocess
+import urllib.request
 from collections import defaultdict
 from datetime import datetime
 
@@ -48,10 +55,14 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 HISTORY_PATH = os.path.join(HERE, "factor_history.json")
 OUT_PATH = os.path.join(HERE, "factor_ic.json")
 TRACK_PATH = os.path.join(HERE, "recommendation_track.json")
+WEIGHTS_PATH = os.path.join(HERE, "factor_weights.json")
 
-HORIZONS = (1, 5, 20)          # 交易日，与推荐跟踪表 HORIZONS 一致
-MIN_SAMPLE = 20                # 少于此截面数不给有效性判定（统计显著性不足）
-QUANTILES = 5                  # 分层检验组数
+HORIZONS = (1, 5, 20)
+MIN_SAMPLE = 20
+QUANTILES = 5
+N_TESTS = 15                       # 5 因子 × 3 周期（Bonferroni 家族检验数）
+T_BONF = 2.97                      # α=0.05 双侧 Bonferroni 阈值（0.05/15）
+T_LOOSE = 2.0                      # 宽松阈值（业界常用）
 
 # 因子字段 → 展示名（顺序即报告表格顺序）
 FACTORS = [
@@ -62,19 +73,42 @@ FACTORS = [
     ("score_news", "消息面"),
     ("score_sector", "板块动量"),
 ]
+# 可优化权重的四个维度（历史样本完整）；score_sector 样本不足暂固定
+OPT_DIMS = ["score_news", "score_tech", "score_fund", "score_theme"]
+PRIOR_W4 = {"score_news": 0.20, "score_tech": 0.20, "score_fund": 0.30, "score_theme": 0.18}  # 合计0.88
+W_SECTOR_FIXED = 0.12              # score_sector 固定权重（样本积累中）
+W_FLOOR = 0.05                     # 单维度地板（保持五维模型意义，不全零）
+TARGET_H = 1                       # 权重优化目标周期
 
 FACTOR_VERDICTS = [
-    # (|IC|下限, t下限, 判定, 颜色)
     (0.05, 2.0, "显著有效", "#22c55e"),
     (0.03, 1.5, "弱有效", "#84cc16"),
     (0.02, 0.0, "方向为正·不显著", "#f59e0b"),
 ]
+
+# 价格回填（腾讯前复权日线，多域名轮询；与 step2/track 同口径）
+TQ_HOSTS = ["https://ifzq.gtimg.cn", "https://web.ifzq.gtimg.cn", "https://proxy.finance.qq.com/ifzqgtimg"]
+PX_NEED = 130                      # 覆盖 2026-06-01 起全部交易日（约90根）留余量
 
 
 # ---------------------------------------------------------------- 工具函数
 def _norm_code(code):
     c = str(code or "").strip().lower()
     return c[2:] if len(c) > 6 and c[:2] in ("sh", "sz", "bj") else c
+
+
+def _symbol(code6):
+    """6 位代码 → 带市场前缀（腾讯参数用）。"""
+    c = _norm_code(code6)
+    if not c or len(c) != 6:
+        return None
+    if c[0] in "659":
+        return "sh" + c
+    if c[0] in "03":
+        return "sz" + c
+    if c[0] in "48":
+        return "bj" + c
+    return "sz" + c
 
 
 def _ranks(vals):
@@ -107,7 +141,7 @@ def _pearson(x, y):
 
 
 def rank_ic(factor_vals, ret_vals):
-    """Spearman 秩相关（= 秩序列的 Pearson）。样本不足或零方差返回 None。"""
+    """Spearman 秩相关。样本不足或零方差返回 None。"""
     if len(factor_vals) < 5:
         return None
     return _pearson(_ranks(factor_vals), _ranks(ret_vals))
@@ -124,6 +158,60 @@ def _std(xs):
         return None
     m = sum(xs) / len(xs)
     return math.sqrt(sum((x - m) ** 2 for x in xs) / (len(xs) - 1))
+
+
+def _nw_t(series, lag):
+    """Newey-West HAC t 统计量（Bartlett 核）。
+
+    重叠收益窗口（h>1）下相邻 IC 观测高度自相关，普通 t 值把 n 当独立样本、
+    显著性虚高。lag=h-1：h=1 时退化为普通 t。
+    """
+    xs = [x for x in series if x is not None]
+    n = len(xs)
+    if n < 3:
+        return None
+    m = sum(xs) / n
+    e = [x - m for x in xs]
+    g0 = sum(v * v for v in e)
+    s = g0
+    for k in range(1, lag + 1):
+        if k >= n:
+            break
+        gk = sum(e[i] * e[i - k] for i in range(k, n))
+        s += 2.0 * (1.0 - k / (lag + 1.0)) * gk
+    if s <= 0:
+        return None
+    var = s / n
+    return m / math.sqrt(var / n)
+
+
+def _plain_t(series):
+    xs = [x for x in series if x is not None]
+    n = len(xs)
+    if n < 2:
+        return None
+    m, sd = _mean(xs), _std(xs)
+    if not sd or sd <= 0:
+        return None
+    return m / (sd / math.sqrt(n))
+
+
+def _subperiod(series):
+    """半期拆分：制度依赖检测。前半段全正、后半段转负的因子，全样本均值会高估当期有效性。"""
+    xs = [x for x in series if x is not None]
+    n = len(xs)
+    if n < 10:
+        return None
+    h1 = xs[:n // 2]
+    h2 = xs[n // 2:]
+    m1, m2 = _mean(h1), _mean(h2)
+    agree = sum(1 for x in xs if (x > 0) == ((m1 + m2) > 0)) / n
+    return {
+        "first_half_mean": round(m1, 4),
+        "second_half_mean": round(m2, 4),
+        "sign_stable_pct": round(agree * 100, 1),
+        "regime_shift": bool(m1 * m2 < 0),
+    }
 
 
 def _quantile_spread(factor_vals, ret_vals, q=QUANTILES):
@@ -153,7 +241,7 @@ def snapshot_from_scored(path):
             v = r.get(k)
             if isinstance(v, (int, float)):
                 row[k] = v
-        if len(row) > 2:          # 至少有一个因子字段
+        if len(row) > 2:
             rows.append(row)
     return {"date": str(d.get("date") or os.path.basename(path)), "rows": rows}
 
@@ -174,7 +262,6 @@ def save_history(hist):
 
 
 def upsert_snapshot(hist, snap, replace=True):
-    """按日期去重写入截面；replace=True 时覆盖同日旧快照（重跑/修正场景）。"""
     if not snap or not snap.get("rows"):
         return False
     snaps = hist.setdefault("snapshots", [])
@@ -195,7 +282,7 @@ def bootstrap_from_git():
         out = subprocess.run(
             ["git", "log", "--all", "--diff-filter=A", "--name-only", "--format=%H",
              "--", "top200_scored_*.json"],
-            capture_output=True, text=True, cwd=HERE, timeout=120).stdout
+            capture_output=True, text=True, cwd=HERE, timeout=180).stdout
     except Exception as e:
         print(f"❌ git 历史读取失败: {e}")
         return 1
@@ -207,9 +294,9 @@ def bootstrap_from_git():
             continue
         if line.startswith("top200_scored_"):
             if "_watch_" in line:
-                continue                  # 观察池截面不并入(口径: 主力池 TOP200)
+                continue
             date = line[len("top200_scored_"):-len(".json")]
-            commit_of.setdefault(date, cur_commit)   # 取最早加入的提交
+            commit_of.setdefault(date, cur_commit)
         elif len(line) >= 7 and all(c in "0123456789abcdef" for c in line):
             cur_commit = line
     if not commit_of:
@@ -225,7 +312,7 @@ def bootstrap_from_git():
         try:
             raw = subprocess.run(["git", "show", f"{commit}:top200_scored_{date}.json"],
                                  capture_output=True, text=True, cwd=HERE,
-                                 timeout=120).stdout
+                                 timeout=180).stdout
             d = json.loads(raw)
             tmp = os.path.join(HERE, f"._boot_{date}.json")
             with open(tmp, "w", encoding="utf-8") as f:
@@ -243,35 +330,214 @@ def bootstrap_from_git():
     return 0
 
 
-# ---------------------------------------------------------------- IC 计算
-def _fwd_returns(snapshots, h):
-    """生成 (date, {code: fwd_ret%}) —— t 日截面与第 h 个后续截面的价差收益。"""
-    dates = [s["date"] for s in snapshots]
+# ---------------------------------------------------------------- 价格回填（P0-2）
+def _fetch_qfq(sym, need=PX_NEED):
+    """腾讯前复权日线 → [(date, close)]；多域名轮询，WAF 页自动换域。"""
+    for _host in TQ_HOSTS:
+        url = f"{_host}/appstock/app/fqkline/get?param={sym},day,,,{need},qfq"
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        try:
+            with urllib.request.urlopen(req, timeout=12) as r:
+                txt = r.read().decode("utf-8")
+        except Exception:
+            continue
+        if txt.lstrip().startswith("<"):
+            continue
+        try:
+            data = json.loads(txt)
+            kdata = data.get("data", {}).get(sym, {})
+            raw_kl = kdata.get("qfqday") or kdata.get("day")
+        except Exception:
+            continue
+        if raw_kl:
+            out = []
+            for k in raw_kl:
+                try:
+                    out.append((k[0], float(k[2])))
+                except Exception:
+                    continue
+            if out:
+                return out
+    return None
+
+
+def bootstrap_prices():
+    """回填全部历史代码前复权日线 → hist['prices']={dates, px}。
+
+    用途：① 真实交易日序列（腾讯日线只含交易日，天然剔除假日陈旧快照）；
+          ② 全样本收益（消除 TOP200 留存偏差）。周期性运行（网络 ~709 请求）。
+    """
+    hist = load_history()
+    codes = set()
+    for s in hist.get("snapshots", []):
+        for r in s.get("rows", []):
+            codes.add(r["code"])
+    codes = sorted(c for c in codes if c and len(c) == 6)
+    if not codes:
+        print("⚠️ 无历史截面，先 --bootstrap-from-git")
+        return 1
+
+    old = hist.get("prices") or {}
+    old_dates = old.get("dates") or []
+    old_px = old.get("px") or {}
+    px_series = {}          # code -> {date: close}
+    n_ok = n_fail = n_skip = 0
+    for i, c in enumerate(codes):
+        sym = _symbol(c)
+        if not sym:
+            n_skip += 1
+            continue
+        if (i + 1) % 100 == 0:
+            print(f"   回填进度 {i + 1}/{len(codes)}（成功 {n_ok} 失败 {n_fail}）")
+        # 已有且覆盖到最新交易日则跳过（增量场景）
+        prev = old_px.get(c)
+        kl = _fetch_qfq(sym)
+        if not kl:
+            # 保留旧数据（接口偶发失败不丢历史）
+            if prev:
+                px_series[c] = {d: v for d, v in zip(old_dates, prev) if v is not None}
+                n_skip += 1
+            else:
+                n_fail += 1
+            continue
+        px_series[c] = dict(kl)
+        n_ok += 1
+        time.sleep(0.03)
+
+    all_dates = sorted({d for m in px_series.values() for d in m})
+    px_compact = {c: [m.get(d) for d in all_dates] for c, m in px_series.items()}
+    hist["prices"] = {
+        "fetched_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "dates": all_dates,
+        "px": px_compact,
+        "n_codes": len(px_compact),
+    }
+    save_history(hist)
+    print(f"✅ 价格回填完成: {len(px_compact)} 只（新抓 {n_ok}，保留旧 {n_skip}，失败 {n_fail}）"
+          f"，交易日 {len(all_dates)} 个（{all_dates[0]} ~ {all_dates[-1]}）")
+    return 0
+
+
+def px_index(hist):
+    """→ (tdays, {code: {date: close}})；无回填数据时退化为快照日期（含陈旧过滤）。"""
+    p = hist.get("prices") or {}
+    dates = p.get("dates") or []
+    px_raw = p.get("px") or {}
+    if dates and px_raw:
+        px = {c: {d: v for d, v in zip(dates, arr) if v is not None}
+              for c, arr in px_raw.items()}
+        return list(dates), px
+    # 退化：快照日期即交易日（旧行为）；陈旧快照在调用方按 tdays 成员过滤
+    snaps = hist.get("snapshots", [])
+    px = {}
+    for s in snaps:
+        for r in s.get("rows", []):
+            px.setdefault(r["code"], {})[s["date"]] = r["price"]
+    return sorted({s["date"] for s in snaps}), px
+
+
+def merge_snapshot_prices(hist):
+    """把快照自带的当日价格并入 px 图（日常零成本增量，无需网络）。"""
+    p = hist.get("prices")
+    if not p or not p.get("dates"):
+        return False
+    dates = p["dates"]
+    didx = {d: i for i, d in enumerate(dates)}
+    px = p["px"]
+    changed = False
+    for s in hist.get("snapshots", []):
+        d = s["date"]
+        if d not in didx:
+            continue                      # 非交易日快照不并入交易日价格
+        i = didx[d]
+        for r in s.get("rows", []):
+            arr = px.get(r["code"])
+            if arr is not None and (arr[i] is None) and isinstance(r.get("price"), (int, float)):
+                arr[i] = r["price"]
+                changed = True
+    return changed
+
+
+# ---------------------------------------------------------------- IC 计算（修正口径）
+def _fwd_returns(snapshots, h, tdays, px, max_base_idx=None):
+    """生成 (date_t, date_t+h, {code: ret%}) —— t 日**全部** TOP200 个股的第 h 个后续交易日收益。
+
+    · 快照日期必须是真实交易日（tdays 成员），非交易日陈旧快照整体剔除；
+    · 收益对 t 日全部在榜个股计算（不要求 t+h 仍在榜）→ 消除留存偏差；
+    · max_base_idx：训练/样本外切分时限制基准快照的交易日下标。
+    """
+    tidx = {d: i for i, d in enumerate(tdays)}
     out = []
-    for i, s in enumerate(snapshots):
-        j = i + h
-        if j >= len(snapshots):
-            break
-        later = snapshots[j]
-        px_later = {r["code"]: r["price"] for r in later["rows"]}
+    for s in snapshots:
+        d0 = s["date"]
+        if d0 not in tidx:
+            continue
+        i0 = tidx[d0]
+        if max_base_idx is not None and i0 > max_base_idx:
+            continue
+        j = i0 + h
+        if j >= len(tdays):
+            continue
+        d1 = tdays[j]
         rets = {}
         for r in s["rows"]:
-            p1 = px_later.get(r["code"])
-            if p1 and r["price"] > 0:
-                rets[r["code"]] = (p1 - r["price"]) / r["price"] * 100.0
-        if rets:
-            out.append((s["date"], rets))
+            c = r["code"]
+            m = px.get(c)
+            p0 = (m.get(d0) if m else None) or r.get("price")
+            p1 = m.get(d1) if m else None
+            if p1 and p0 and p0 > 0:
+                rets[c] = (p1 - p0) / p0 * 100.0
+        if len(rets) >= 5:
+            out.append((d0, d1, rets))
     return out
 
 
-def _eval_factor(snapshots, field):
-    """对单因子计算全部 horizon 的 IC 聚合指标。"""
+def _drop_stale_price_snapshots(snaps):
+    """剔除「接口陈旧」快照：价格与上一快照 ≥80% 相同 → 行情接口返回了旧数据
+    （实测 09-10：市场实际开市，但 scored json 用的是 09-09 的价格）。
+    注意与「非交易日快照」区分：后者由 tdays 成员过滤，此处针对开市日的陈旧抓取。"""
+    kept, dropped = [], []
+    prev_px = None
+    for s in snaps:
+        cur = {r["code"]: r["price"] for r in s["rows"]}
+        if prev_px:
+            common = [c for c in cur if c in prev_px and prev_px[c] > 0]
+            if common:
+                same = sum(1 for c in common if abs(cur[c] - prev_px[c]) < 1e-9)
+                if same / len(common) >= 0.8:
+                    dropped.append(s["date"])
+                    continue
+        kept.append(s)
+        prev_px = cur
+    return kept, dropped
+
+
+def _agg_stats(ics, spreads, dates, h):
+    n = len(ics)
+    m, sd = _mean(ics), _std(ics)
+    return {
+        "n": n,
+        "dates": dates,
+        "ic_series": [round(x, 4) for x in ics],
+        "ic_mean": round(m, 4) if m is not None else None,
+        "ic_std": round(sd, 4) if sd is not None else None,
+        "t_stat": round(_plain_t(ics), 2) if _plain_t(ics) is not None else None,
+        "nw_t": round(_nw_t(ics, h - 1), 2) if _nw_t(ics, h - 1) is not None else None,
+        "bonferroni_sig": bool(_nw_t(ics, h - 1) is not None and abs(_nw_t(ics, h - 1)) >= T_BONF),
+        "win_rate": round(sum(1 for x in ics if x > 0) / n * 100, 1) if n else None,
+        "spread_mean": round(_mean(spreads), 3) if spreads else None,
+        "subperiod": _subperiod(ics),
+    }
+
+
+def _eval_factor(snapshots, field, tdays, px, max_base_idx=None):
+    """对单因子计算全部 horizon 的 IC 聚合指标（修正口径）。"""
     res = {}
     for h in HORIZONS:
-        fwd = _fwd_returns(snapshots, h)
+        fwd = _fwd_returns(snapshots, h, tdays, px, max_base_idx)
         ics, spreads, dates = [], [], []
-        for date, rets in fwd:
-            base = next(s for s in snapshots if s["date"] == date)
+        for d0, d1, rets in fwd:
+            base = next(s for s in snapshots if s["date"] == d0)
             fv, rv = [], []
             for r in base["rows"]:
                 if r["code"] in rets and isinstance(r.get(field), (int, float)):
@@ -281,30 +547,18 @@ def _eval_factor(snapshots, field):
             if ic is not None:
                 ics.append(ic)
                 spreads.append(_quantile_spread(fv, rv))
-                dates.append(date)
-        n = len(ics)
-        m, sd = _mean(ics), _std(ics)
-        t_stat = (m / (sd / math.sqrt(n))) if (n >= 2 and sd and sd > 0) else None
-        res[str(h)] = {
-            "n": n,
-            "dates": dates,
-            "ic_series": [round(x, 4) for x in ics],
-            "ic_mean": round(m, 4) if m is not None else None,
-            "ic_std": round(sd, 4) if sd is not None else None,
-            "t_stat": round(t_stat, 2) if t_stat is not None else None,
-            "win_rate": round(sum(1 for x in ics if x > 0) / n * 100, 1) if n else None,
-            "spread_mean": round(_mean(spreads), 3) if spreads else None,
-        }
+                dates.append(d0)
+        res[str(h)] = _agg_stats(ics, spreads, dates, h)
     return res
 
 
 def _verdict_h(agg):
-    """单周期有效性判定。"""
+    """单周期有效性判定（以 Newey-West t 为主口径）。"""
     n = agg.get("n") or 0
     if n < MIN_SAMPLE:
-        return "样本积累中", "#94a3b8", f"n={n}"
+        return "样本积累中", "#94a3b8", f"n={n}<{MIN_SAMPLE}"
     ic = agg.get("ic_mean")
-    t = agg.get("t_stat")
+    t = agg.get("nw_t")
     if ic is None:
         return "数据不足", "#94a3b8", "观测不足"
     aic = abs(ic)
@@ -315,29 +569,34 @@ def _verdict_h(agg):
             label, color = lab, col
             break
     if ic < 0 and aic >= 0.02:
-        return "负向（可作反向指标）", "#38bdf8", f"IC={ic:+.3f}，方向为负"
-    return label, color, f"IC={ic:+.3f}，t={t}"
+        return "负向（可作反向指标）", "#38bdf8", f"IC={ic:+.3f}，NW t={t}"
+    note = f"IC={ic:+.3f}，NW t={t}"
+    if agg.get("bonferroni_sig"):
+        note += "（校正后显著）"
+    elif t is not None and abs(t) >= T_LOOSE:
+        note += "（宽松显著·未过多重校正）"
+    return label, color, note
 
 
 def _overall_verdict(horizons):
-    """综合判定: 取 |t| 最大且样本达标的周期(不同因子有效周期不同,
-    如基本面在 T+20 显著而 T+1 不显著, 只报 T+1 会漏判)。"""
+    """综合判定: 取 |NW t| 最大且样本达标的周期。"""
     best, best_t = None, -1.0
     for h in HORIZONS:
         a = horizons.get(str(h)) or {}
         if (a.get("n") or 0) < MIN_SAMPLE:
             continue
-        t = a.get("t_stat")
+        t = a.get("nw_t")
         if t is not None and abs(t) > abs(best_t):
             best, best_t = a, t
     if best is None:
         n_max = max((horizons.get(str(h)) or {}).get("n") or 0 for h in HORIZONS)
         return "样本积累中", "#94a3b8", f"各周期样本均 <{MIN_SAMPLE}（最大 {n_max}）"
     lab, col, note = _verdict_h(best)
-    return lab, col, note + f"（T+{ [h for h in HORIZONS if (horizons.get(str(h)) or {}) is best][0] }）"
+    hh = next(h for h in HORIZONS if (horizons.get(str(h)) or {}) is best)
+    return lab, col, note + f"（T+{hh}）"
 
 
-def _eval_recommendations():
+def _eval_recommendations(tdays=None, px=None):
     """推荐组合层 IC：按 date 截面，因子=推荐时总分，收益=rets[h]。"""
     if not os.path.exists(TRACK_PATH):
         return None
@@ -367,45 +626,253 @@ def _eval_recommendations():
                 ics.append(ic)
                 spreads.append(_quantile_spread(fv2, rv2))
                 dates.append(date)
-        n = len(ics)
-        m, sd = _mean(ics), _std(ics)
-        t_stat = (m / (sd / math.sqrt(n))) if (n >= 2 and sd and sd > 0) else None
-        out[str(h)] = {
-            "n": n, "dates": dates,
-            "ic_series": [round(x, 4) for x in ics],
-            "ic_mean": round(m, 4) if m is not None else None,
-            "ic_std": round(sd, 4) if sd is not None else None,
-            "t_stat": round(t_stat, 2) if t_stat is not None else None,
-            "win_rate": round(sum(1 for x in ics if x > 0) / n * 100, 1) if n else None,
-            "spread_mean": round(_mean(spreads), 3) if spreads else None,
-        }
+        out[str(h)] = _agg_stats(ics, spreads, dates, h)
     return out
 
 
+def _factor_corr(snapshots, fields=OPT_DIMS):
+    """因子间截面 Spearman 相关（跨截面平均）—— 披露"五维"实际独立信息量。"""
+    pair_vals = defaultdict(list)
+    for s in snapshots:
+        rows = [r for r in s["rows"]
+                if all(isinstance(r.get(f), (int, float)) for f in fields)]
+        if len(rows) < 20:
+            continue
+        ranks = {f: _ranks([r[f] for r in rows]) for f in fields}
+        for i, a in enumerate(fields):
+            for b in fields[i + 1:]:
+                ic = _pearson(ranks[a], ranks[b])
+                if ic is not None:
+                    pair_vals[f"{a}|{b}"].append(ic)
+    out = {}
+    for k, v in pair_vals.items():
+        out[k] = {"mean": round(_mean(v), 3), "n": len(v)}
+    return out
+
+
+# ---------------------------------------------------------------- 复合总分与权重优化
+def _norm4(w):
+    s = sum(w.values())
+    return {k: v / s for k, v in w.items()} if s > 0 else {k: 1.0 / len(w) for k in w}
+
+
+def _composite_ic(snapshots, w4, h, tdays, px, max_base_idx=None, dates_only=None):
+    """给定 4 维权重（自动归一），计算复合总分的 IC 序列与聚合指标。"""
+    wn = _norm4(w4)
+    fwd = _fwd_returns(snapshots, h, tdays, px, max_base_idx)
+    ics, spreads, dates = [], [], []
+    for d0, d1, rets in fwd:
+        if dates_only is not None and d0 not in dates_only:
+            continue
+        base = next(s for s in snapshots if s["date"] == d0)
+        fv, rv = [], []
+        for r in base["rows"]:
+            if r["code"] in rets and all(isinstance(r.get(f), (int, float)) for f in OPT_DIMS):
+                fv.append(sum(wn[f] * r[f] for f in OPT_DIMS))
+                rv.append(rets[r["code"]])
+        ic = rank_ic(fv, rv)
+        if ic is not None:
+            ics.append(ic)
+            spreads.append(_quantile_spread(fv, rv))
+            dates.append(d0)
+    return _agg_stats(ics, spreads, dates, h)
+
+
+def _fit_ic_weights(ic_map, lam, prior_norm, floor=W_FLOOR):
+    """IC 驱动权重：正 IC 按比例分配 + 地板 + 向先验收缩。"""
+    pos = {k: max(float(ic_map.get(k) or 0.0), 0.0) for k in OPT_DIMS}
+    s = sum(pos.values())
+    if s <= 1e-9:                       # 全部非正 → 均分（无正向信号时不硬造）
+        w_ic = {k: 1.0 / len(OPT_DIMS) for k in OPT_DIMS}
+    else:
+        w_ic = {k: pos[k] / s for k in OPT_DIMS}
+    w_ic = {k: max(v, floor) for k, v in w_ic.items()}
+    w_ic = _norm4(w_ic)
+    w = {k: lam * w_ic[k] + (1.0 - lam) * prior_norm[k] for k in OPT_DIMS}
+    w = {k: max(v, floor) for k, v in w.items()}
+    return _norm4(w)
+
+
+def optimize_weights(snaps, tdays, px):
+    """走步验证拟合 IC 驱动权重 → factor_weights.json。
+
+    返回 (result_dict, weights5)。样本外复合 IC 未优于先验时维持先验并如实记录。
+    """
+    aligned = [s for s in snaps if s["date"] in set(tdays)]
+    prior_norm = _norm4(PRIOR_W4)
+    dates = [s["date"] for s in aligned]
+    tidx = {d: i for i, d in enumerate(tdays)}
+
+    # 全周期因子 IC（目标周期）——静态拟合参考
+    full_ic = {}
+    for f in OPT_DIMS:
+        a = _eval_factor(aligned, f, tdays, px).get(str(TARGET_H)) or {}
+        full_ic[f] = a.get("ic_mean")
+
+    MIN_TRAIN, STEP = 30, 5
+    scan = []
+    best = None
+    for lam in (0.0, 0.2, 0.4, 0.6, 0.8, 1.0):
+        oos_ics, oos_dates = [], []
+        k = MIN_TRAIN
+        while k < len(dates):
+            train_dates = dates[:k]
+            # 训练集因子 IC（基准快照的 T+1 收益必须落在训练窗内，避免边界泄漏）
+            limit_idx = tidx[dates[k]] - TARGET_H
+            ic_map = {}
+            for f in OPT_DIMS:
+                a = _eval_factor(aligned, f, tdays, px, max_base_idx=limit_idx).get(str(TARGET_H)) or {}
+                # 只用训练窗内的观测
+                sub = [x for x, d in zip(a.get("ic_series") or [], a.get("dates") or [])
+                       if d in set(train_dates)]
+                ic_map[f] = _mean(sub) or 0.0
+            w = _fit_ic_weights(ic_map, lam, prior_norm)
+            test_dates = set(dates[k:k + STEP])
+            agg = _composite_ic(aligned, w, TARGET_H, tdays, px, dates_only=test_dates)
+            if agg.get("ic_series"):
+                oos_ics.extend(agg["ic_series"])
+                oos_dates.extend(agg["dates"])
+            k += STEP
+        if len(oos_ics) >= 8:
+            m, sd = _mean(oos_ics), _std(oos_ics)
+            t = m / (sd / math.sqrt(len(oos_ics))) if sd and sd > 0 else None
+            scan.append({"lambda": lam, "n_oos": len(oos_ics),
+                         "oos_ic_mean": round(m, 4),
+                         "oos_t": round(t, 2) if t is not None else None,
+                         "oos_win_rate": round(sum(1 for x in oos_ics if x > 0) / len(oos_ics) * 100, 1)})
+            cand = {"lambda": lam, "mean": m, "t": t, "ics": oos_ics}
+            if best is None or (m, t or -9) > (best["mean"], best["t"] or -9):
+                best = cand
+        else:
+            scan.append({"lambda": lam, "n_oos": len(oos_ics), "oos_ic_mean": None,
+                         "oos_t": None, "oos_win_rate": None})
+
+    # 先验基线：同一 OOS 日期集合上的复合 IC
+    oos_dates_best = []
+    if best:
+        k = MIN_TRAIN
+        while k < len(dates):
+            oos_dates_best.extend(dates[k:k + STEP])
+            k += STEP
+        oos_dates_best = [d for d in oos_dates_best if d in tidx and tidx[d] + TARGET_H < len(tdays)]
+    prior_oos = _composite_ic(aligned, prior_norm, TARGET_H, tdays, px,
+                              dates_only=set(oos_dates_best)) if oos_dates_best else {"n": 0}
+
+    # 全周期复合 IC（样本内参考）：先验 vs 各 λ 静态拟合
+    full_cmp = {}
+    for name, w in (("prior", prior_norm),
+                    ("lam_best", _fit_ic_weights(full_ic, best["lambda"], prior_norm) if best else prior_norm)):
+        full_cmp[name] = {str(h): _composite_ic(aligned, w, h, tdays, px) for h in HORIZONS}
+
+    adopted = "prior"
+    final_w4 = prior_norm
+    wf_note = ""
+    if best and best["mean"] is not None:
+        prior_m = prior_oos.get("ic_mean")
+        if prior_m is None or best["mean"] > prior_m + 0.005:
+            adopted = "ic_driven"
+            final_w4 = _fit_ic_weights(full_ic, best["lambda"], prior_norm)
+            wf_note = (f"样本外复合 IC {best['mean']:+.4f} vs 先验 {prior_m if prior_m is not None else float('nan'):+.4f}"
+                       f"（λ={best['lambda']}，n={best['n_oos'] if 'n_oos' in best else len(best['ics'])}）→ 采用 IC 驱动权重")
+        else:
+            wf_note = (f"样本外复合 IC {best['mean']:+.4f} 未显著优于先验 {prior_m if prior_m is not None else float('nan'):+.4f}"
+                       f" → 维持先验权重（防过拟合）")
+
+    # 组装 5 维权重（4 维 × 0.88 + 板块动量固定 0.12）
+    w5 = {k: round(v * (1 - W_SECTOR_FIXED), 3) for k, v in final_w4.items()}
+    w5["score_sector"] = W_SECTOR_FIXED
+    # 修正舍入误差
+    _diff = round(1.0 - sum(w5.values()), 3)
+    if abs(_diff) > 1e-9:
+        _k = max(w5, key=lambda k: w5[k])
+        w5[_k] = round(w5[_k] + _diff, 3)
+
+    prior5 = {k: round(v * (1 - W_SECTOR_FIXED), 3) for k, v in prior_norm.items()}
+    prior5["score_sector"] = W_SECTOR_FIXED
+
+    result = {
+        "version": "v2.41-ic",
+        "fitted_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "target_horizon": TARGET_H,
+        "method": ("IC 驱动权重: 正IC维度按比例分配+地板5%+向先验收缩(λ); "
+                   "走步验证(训练≥30截面,每5截面重拟,样本外比对); "
+                   "score_sector 有效样本<20 维持0.12(样本积累中)"),
+        "weights": w5,
+        "prior_weights": prior5,
+        "adopted": adopted,
+        "walkforward": {
+            "n_oos_dates": len(oos_dates_best),
+            "oos_ic_prior": prior_oos.get("ic_mean"),
+            "oos_ic_new": round(best["mean"], 4) if best else None,
+            "oos_t_new": round(best["t"], 2) if best and best["t"] is not None else None,
+            "lambda": best["lambda"] if best else None,
+            "note": wf_note,
+        },
+        "full_period_composite_ic": {
+            name: {h: {k: v.get(k) for k in ("n", "ic_mean", "nw_t", "win_rate")}
+                   for h, v in d.items()} for name, d in full_cmp.items()
+        },
+        "factor_ic_target_h": {k: (round(v, 4) if v is not None else None)
+                               for k, v in full_ic.items()},
+        "lambda_scan": scan,
+        "notes": [
+            "复合总分由 4 维分量按权重线性合成后与未来收益求 Rank IC（与生产 total 口径一致，"
+            "score_sector 因历史样本不足未纳入复合评估，权重固定 0.12）",
+            "训练窗因子 IC 仅使用基准快照 T+1 收益完整落在训练窗内的观测，避免边界泄漏",
+            "样本外日期集合对先验与 IC 驱动权重完全相同，公平比对",
+        ],
+    }
+    return result, w5
+
+
+def load_weights():
+    """供 step2/apply_sector_momentum 调用：读 factor_weights.json，失败回退先验。"""
+    try:
+        with open(WEIGHTS_PATH, encoding="utf-8") as f:
+            d = json.load(f)
+        w = d.get("weights") or {}
+        need = set(OPT_DIMS) | {"score_sector"}
+        if not need.issubset(w.keys()):
+            raise ValueError("weights 字段不全")
+        vals = [float(w[k]) for k in need]
+        if any(v < 0 for v in vals) or abs(sum(vals) - 1.0) > 0.02:
+            raise ValueError(f"weights 非法: {vals}")
+        return w, d
+    except Exception:
+        return None, None
+
+
+# ---------------------------------------------------------------- 主流程
 def main():
     args = sys.argv[1:]
     show = "--show" in args
-    bootstrap = "--bootstrap-from-git" in args
+    do_bootstrap_git = "--bootstrap-from-git" in args
+    do_bootstrap_px = "--bootstrap-prices" in args
+    do_opt = "--optimize-weights" in args
 
     hist = load_history()
 
-    # 1) 可选：从 git 历史引导
-    if bootstrap:
+    if do_bootstrap_git:
         bootstrap_from_git()
         hist = load_history()
+    if do_bootstrap_px:
+        bootstrap_prices()
+        hist = load_history()
 
-    # 2) 把本地最新 scored json 并入历史（幂等：同日覆盖）
+    # 本地最新 scored json 并入历史（幂等：同日覆盖）
     local_files = sorted(glob.glob(os.path.join(HERE, "top200_scored_*.json")))
     n_added = 0
     for p in local_files:
         if "_watch_" in os.path.basename(p):
-            continue                     # 观察池单独截面不并入（口径：主力池 TOP200）
+            continue
         try:
             snap = snapshot_from_scored(p)
             if upsert_snapshot(hist, snap):
                 n_added += 1
         except Exception as e:
             print(f"⚠️ {os.path.basename(p)} 解析失败: {str(e)[:60]}")
+    if merge_snapshot_prices(hist):
+        pass
     if n_added:
         save_history(hist)
         print(f"📚 历史截面更新: 新增/覆盖 {n_added} 个（现有 {len(hist['snapshots'])} 个）")
@@ -415,11 +882,20 @@ def main():
         print(f"❌ 截面数不足（{len(snaps)}），无法计算 IC；可用 --bootstrap-from-git 从 git 历史引导")
         return 1
 
-    # 3) 计算因子 IC
+    tdays, px = px_index(hist)
+    stale = [s["date"] for s in snaps if s["date"] not in set(tdays)]
+    aligned = [s for s in snaps if s["date"] in set(tdays)]
+    aligned, stale_px = _drop_stale_price_snapshots(aligned)
+    stale = stale + stale_px
+    if stale:
+        print(f"🧹 剔除陈旧快照 {len(stale)} 个: 非交易日 {[d for d in stale if d not in stale_px]}"
+              f"{'，接口陈旧 ' + str(stale_px) if stale_px else ''}")
+
+    # 因子 IC
     factors = {}
     for field, label in FACTORS:
-        agg = _eval_factor(snaps, field)
-        for h in HORIZONS:                     # 逐周期判定
+        agg = _eval_factor(aligned, field, tdays, px)
+        for h in HORIZONS:
             a = agg[str(h)]
             v, c, note = _verdict_h(a)
             a["verdict"], a["verdict_color"], a["verdict_note"] = v, c, note
@@ -436,32 +912,71 @@ def main():
         _rv, _rc, _rn = _overall_verdict(rec_ic)
         rec_ic = {"horizons": rec_ic, "verdict": _rv, "verdict_color": _rc, "verdict_note": _rn}
 
+    corr = _factor_corr(aligned)
+
+    # 当前生效权重 vs 先验的复合 IC（若权重文件存在）
+    w_now, w_meta = load_weights()
+    current_cmp = None
+    if w_now:
+        w4 = {k: float(w_now[k]) for k in OPT_DIMS}
+        current_cmp = {str(h): _composite_ic(aligned, w4, h, tdays, px) for h in HORIZONS}
+
     out = {
-        "date": snaps[-1]["date"],
+        "date": aligned[-1]["date"],
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "method": {
-            "name": "Rank IC（Spearman 秩相关）",
-            "formula": "IC(t→t+h) = Spearman(因子值_t 截面秩, 收益率_t+h)",
+            "name": "Rank IC（Spearman 秩相关，修正口径）",
+            "formula": "IC(t→t+h) = Spearman(因子值_t 截面秩, 收益率 t→第h个后续交易日)",
             "horizons_days": list(HORIZONS),
-            "t_stat": "mean(IC) / (std(IC)/√n)，|t|≥2 视为统计显著",
+            "t_stat": "普通 t = mean/(std/√n)；NW t = Newey-West HAC(Bartlett, lag=h-1)，重叠窗口下以 NW t 为准",
             "min_sample": MIN_SAMPLE,
-            "quantile_spread": f"每截面按因子分 {QUANTILES} 组，头部组均值收益 − 尾部组均值收益",
+            "quantile_spread": f"每截面按因子分 {QUANTILES} 组，头部组均值收益 − 尾部组均值收益（未扣成本，毛利口径）",
+            "bonferroni": f"{N_TESTS} 次检验（5因子×3周期），校正阈值 |NW t|≥{T_BONF}；宽松阈值 |t|≥{T_LOOSE}",
         },
-        "n_snapshots": len(snaps),
-        "snapshot_range": [snaps[0]["date"], snaps[-1]["date"]],
-        "snapshot_dates": [s["date"] for s in snaps],
+        "n_snapshots": len(aligned),
+        "n_snapshots_raw": len(snaps),
+        "stale_snapshots_dropped": stale,
+        "snapshot_range": [aligned[0]["date"], aligned[-1]["date"]],
+        "snapshot_dates": [s["date"] for s in aligned],
+        "price_backfill": {
+            "available": bool(hist.get("prices")),
+            "n_codes": (hist.get("prices") or {}).get("n_codes"),
+            "n_trading_days": len(tdays),
+            "fetched_at": (hist.get("prices") or {}).get("fetched_at"),
+        },
         "factors": factors,
         "recommendation_ic": rec_ic,
+        "factor_correlation": corr,
+        "current_weights_composite_ic": current_cmp,
+        "active_weights": w_now,
         "notes": [
-            f"全截面样本 {len(snaps)} 个交易日（{snaps[0]['date']} ~ {snaps[-1]['date']}），"
-            f"每截面约 {len(snaps[-1]['rows'])} 只（当日成交额 TOP200）",
-            "收益率为收盘价简单收益，未扣交易成本；IC 衡量排序能力而非绝对收益",
-            "历史截面来自 git 提交记录（评分模型版本随当时模型，含早期的综合行业归类问题）",
+            f"有效截面 {len(aligned)} 个交易日（{aligned[0]['date']} ~ {aligned[-1]['date']}），"
+            f"剔除非交易日陈旧快照 {len(stale)} 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差，需 --bootstrap-prices 回填）",
+            "IC 衡量排序能力而非绝对收益；分层多空为未扣成本毛利口径",
+            "TOP200 为高换手关注度筛选池：动量/关注型因子的负向 IC 更可能反映'关注度脉冲后的均值回复'，"
+            "而非因子构造错误；解读时须结合本池的选择机制",
+            "历史截面来自 git 提交记录（含早期综合行业归类版本，v2.46 已修复）",
         ],
     }
+
+    if do_opt:
+        result, w5 = optimize_weights(aligned, tdays, px)
+        with open(WEIGHTS_PATH, "w", encoding="utf-8") as f:
+            json.dump(result, f, ensure_ascii=False, indent=1)
+        out["weight_optimization"] = result
+        print(f"\n⚖️ 权重优化完成（adopted={result['adopted']}）→ {os.path.basename(WEIGHTS_PATH)}")
+        wf = result["walkforward"]
+        print(f"   样本外复合IC: 先验 {wf['oos_ic_prior']} → 新 {wf['oos_ic_new']}"
+              f"（λ={wf['lambda']}, n={wf['n_oos_dates']}）")
+        print(f"   新权重: " + " ".join(f"{k.replace('score_','')}={v}" for k, v in w5.items()))
+        for row in result["lambda_scan"]:
+            print(f"   λ={row['lambda']:<4} OOS IC={row['oos_ic_mean']} t={row['oos_t']} "
+                  f"胜率={row['oos_win_rate']}% n={row['n_oos']}")
+
     with open(OUT_PATH, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=1)
-    print(f"✅ 已生成 {os.path.basename(OUT_PATH)}: {len(factors)} 个因子 × {len(HORIZONS)} 周期")
+    print(f"✅ 已生成 {os.path.basename(OUT_PATH)}: {len(factors)} 个因子 × {len(HORIZONS)} 周期"
+          f"（有效截面 {len(aligned)}，剔除陈旧 {len(stale)}）")
 
     if show:
         _print_table(out)
@@ -470,9 +985,10 @@ def main():
 
 def _print_table(out):
     print()
-    print(f"📐 因子有效性评估（Rank IC）  截面 {out['n_snapshots']} 个 "
-          f"({out['snapshot_range'][0]} ~ {out['snapshot_range'][1]})")
-    hdr = f"{'因子':<10}" + "".join(f"{'T+' + str(h):>30}" for h in HORIZONS)
+    print(f"📐 因子有效性评估（Rank IC · 修正口径）  有效截面 {out['n_snapshots']} 个 "
+          f"({out['snapshot_range'][0]} ~ {out['snapshot_range'][1]}), "
+          f"剔除陈旧 {len(out['stale_snapshots_dropped'])} 个")
+    hdr = f"{'因子':<10}" + "".join(f"{'T+' + str(h):>34}" for h in HORIZONS)
     print(hdr)
     print("-" * len(hdr))
     for field, label in FACTORS:
@@ -481,11 +997,12 @@ def _print_table(out):
         for h in HORIZONS:
             a = f["horizons"][str(h)]
             if a["n"] == 0:
-                line += f"{'—(未到期)':>30}"
+                line += f"{'—(未到期)':>34}"
             else:
-                cell = (f"IC {a['ic_mean']:+.3f} t={a['t_stat']} "
+                bonf = "★" if a.get("bonferroni_sig") else " "
+                cell = (f"IC {a['ic_mean']:+.3f} NWt={a['nw_t']}{bonf} "
                         f"胜率{a['win_rate']:.0f}% n={a['n']}")
-                line += f"{cell:>30}"
+                line += f"{cell:>34}"
         print(line + f"   → {f['verdict']}")
     if out.get("recommendation_ic"):
         r = out["recommendation_ic"]["horizons"]
@@ -493,12 +1010,19 @@ def _print_table(out):
         for h in HORIZONS:
             a = r[str(h)]
             if a["n"] == 0:
-                line += f"{'—(未到期)':>30}"
+                line += f"{'—(未到期)':>34}"
             else:
-                cell = (f"IC {a['ic_mean']:+.3f} t={a['t_stat']} "
+                cell = (f"IC {a['ic_mean']:+.3f} NWt={a['nw_t']} "
                         f"胜率{a['win_rate']:.0f}% n={a['n']}")
-                line += f"{cell:>30}"
+                line += f"{cell:>34}"
         print(line + f"   → {out['recommendation_ic']['verdict']}")
+    print("\n（★ = Bonferroni 校正后显著 |NW t|≥%.2f；NW t 为 Newey-West 调整后 t 值）" % T_BONF)
+    corr = out.get("factor_correlation") or {}
+    if corr:
+        print("\n因子间截面相关（跨截面平均）:")
+        for k, v in corr.items():
+            a, b = k.split("|")
+            print(f"  {a.replace('score_',''):<8} × {b.replace('score_',''):<8} ρ={v['mean']:+.3f} (n={v['n']})")
 
 
 if __name__ == "__main__":
