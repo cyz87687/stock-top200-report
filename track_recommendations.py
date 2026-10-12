@@ -33,6 +33,11 @@ for _k in ('HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy', 'ALL_PROXY'
 TENCENT_HOSTS = ["https://ifzq.gtimg.cn", "https://web.ifzq.gtimg.cn", "https://proxy.finance.qq.com/ifzqgtimg"]
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
 HORIZONS = [1, 5, 20]
+# v2.44 P1-2: 基准指数(用于计算超额收益 alpha)。
+# 交易者需要区分"选股能力"与"大盘 beta": 绝对收益 +1% 在上证 +0.05% 的日子里
+# 是超额 +0.95%, 在大盘 +3% 的日子里则是跑输。基准取沪深300(sh000300)。
+BENCH_SYMBOL = "sh000300"
+BENCH_NAME = "沪深300"
 
 
 def _sym(code):
@@ -186,7 +191,8 @@ def record_snapshot(scored_path):
         if key in exist:
             continue
         rc.update({"date": date, "pick_price": rc.get("base_price"),
-                   "rets": {str(h): None for h in HORIZONS}})
+                   "rets": {str(h): None for h in HORIZONS},
+                   "excess": {str(h): None for h in HORIZONS}})
         track["records"].append(rc)
         added += 1
     save_track(track)
@@ -213,7 +219,10 @@ def _last_closed_trade_date():
 
 
 def backfill(track):
-    """用真实K线回填 T+N 收益 (仅使用已收盘交易日数据)"""
+    """用真实K线回填 T+N 收益 (仅使用已收盘交易日数据)
+
+    v2.44 P1-2: 同步回填【超额收益 alpha】= 个股 T+N 涨跌幅 − 基准(沪深300)同期涨跌幅。
+    """
     # 按 code 聚合, 每 code 只抓一次K线
     codes = {x["code"] for x in track["records"]}
     kl_cache = {}
@@ -225,12 +234,18 @@ def backfill(track):
             print(f"   ... {i}/{len(codes)}")
         time.sleep(0.05)
 
+    # v2.44 P1-2: 抓基准指数K线(沪深300)
+    bench_kl = fetch_kline(BENCH_SYMBOL)
+    print(f"📈 基准 {BENCH_NAME}({BENCH_SYMBOL}): {'已获取 ' + str(len(bench_kl)) + ' 根K线' if bench_kl else '获取失败, 超额收益将留空(不编造)'}")
+
     filled = 0
+    filled_ex = 0
     for rec in track["records"]:
         kl = kl_cache.get(rec["code"]) or {}
         if not kl:
             continue
         rec.setdefault("rets", {str(h): None for h in HORIZONS})
+        rec.setdefault("excess", {str(h): None for h in HORIZONS})
         # 关键: 剔除尚未收盘的当日K线(盘中价), 只保留 <= cutoff 的已收盘交易日
         dates = sorted(d for d in kl.keys() if d <= cutoff)
         base_d = rec["date"]
@@ -240,16 +255,31 @@ def backfill(track):
         except StopIteration:
             continue
         base_close = rec.get("pick_price") or kl[dates[idx]]
+        rec["base_trade_date"] = dates[idx]     # v2.44 P1-2(量化视角): 显式记录实际基准交易日
+        # 基准同窗口: 用与个股完全相同的日期轴, 保证可比
+        b_dates = sorted(d for d in bench_kl.keys() if d <= cutoff) if bench_kl else []
+        try:
+            b_idx = next(i for i, d in enumerate(b_dates) if d >= base_d) if b_dates else None
+        except StopIteration:
+            b_idx = None
         for h in HORIZONS:
             j = idx + h
             if j < len(dates):
                 ret = (kl[dates[j]] - base_close) / base_close * 100 if base_close else None
                 rec["rets"][str(h)] = round(ret, 2) if ret is not None else None
                 filled += 1
+                # 超额 = 个股收益 − 基准同期收益
+                if ret is not None and b_idx is not None and (b_idx + h) < len(b_dates):
+                    b0 = bench_kl[b_dates[b_idx]]
+                    b1 = bench_kl[b_dates[b_idx + h]]
+                    if b0:
+                        b_ret = (b1 - b0) / b0 * 100
+                        rec["excess"][str(h)] = round(ret - b_ret, 2)
+                        filled_ex += 1
             else:
                 rec["rets"][str(h)] = None
     save_track(track)
-    print(f"✅ 回填完成: {filled} 个收益点")
+    print(f"✅ 回填完成: {filled} 个收益点, {filled_ex} 个超额收益点")
     return track
 
 

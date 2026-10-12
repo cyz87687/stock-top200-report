@@ -55,7 +55,15 @@ model_str = data.get("model", "stock-scorer")
 # R6: 此前页头显示底层评分版本(v2.40)而评级口径区显示报告层版本(v2.41), 同页两版本打架。
 #     现统一: 报告层版本 REPORT_VER 单独常量化, 页头同时标明"报告层 + 评分层"两个版本号。
 # v2.43: 「组合区块三合一」——消除 AI 组合 3 处重复、修复"说降仓却给满额金额"的逻辑矛盾。
-REPORT_VER = "v2.43"
+# v2.44: 多角色评审 P0/P1 落地 ——
+#   P0-1 仓位口径单一化(消除 4~6成 vs 20%-40% 同页冲突)
+#   P0-2 点评来源如实标注(LLM / 规则引擎, 依 fallback 字段动态判定)
+#   P0-3 Hero 增加数据时效标签(超 1 交易日变红)
+#   P1-1 资金分配表增列参考买入区间与止损位
+#   P1-2 跟踪表增列超额收益(相对沪深300)
+#   P1-3 板块集中度提示
+#   P1-4 生存者偏差披露
+REPORT_VER = "v2.44"
 _has_sector = any(x.get('score_sector') is not None for x in results)
 _ver_tag = f"{REPORT_VER} · 五维" if _has_sector else f"{REPORT_VER} · 四维"
 _ver_short = "v2.40 (AI + 板块动量)" if _has_sector else "v2.30 (AI 增强)"
@@ -179,6 +187,26 @@ portfolio_picks = build_portfolio(results)
 sec_avg = stats.get("sector_avg", {})
 sorted_secs = sorted(sec_avg.items(), key=lambda x: -x[1].get("avg", 0))[:5]
 
+# ===== v2.44 P1-3 行业集中度测算（机构视角：风险敞口透明度）=====
+# 历史问题: 2026-10-09 半导体37+通信设备20+元件18=75/194 占 38.7%,
+#   名单实为"电子板块选股", 但报告无任何集中度提示 → 使用者误以为"全市场分散"。
+# 口径: 按展示层板块(申万二级优先)统计占比, 单个板块 >15% 触发提示。
+# 注: 此处内联取板块名(不调用 sector_disp —— 其定义在本段之后), 口径完全一致。
+_conc = _Counter()
+for _r in results:
+    _s = _r.get("sector_l2") or _r.get("sector_parent") or _r.get("sector", "")
+    if _s:
+        _conc[_s] += 1
+_conc_total = sum(_conc.values()) or 1
+_conc_top = _conc.most_common(3)
+_conc_top_pct = [(nm, cnt, cnt / _conc_total * 100) for nm, cnt in _conc_top]
+_conc_max_pct = _conc_top_pct[0][2] if _conc_top_pct else 0
+# 前3板块合计占比(衡量整体集中度)
+_conc_sum3 = sum(p for _, _, p in _conc_top_pct)
+_conc_txt = " · ".join(f"{nm} {cnt}只({p:.0f}%)" for nm, cnt, p in _conc_top_pct)
+_conc_warn = _conc_max_pct > 15
+_conc_color = "#dc2626" if _conc_max_pct > 25 else ("#f59e0b" if _conc_warn else "#22c55e")
+
 # ===== v2.41 P0-2 市场状态 → 仓位纪律 =====
 # 修复"顶部建议空仓 vs 个股逢低加仓"的矛盾: 由赚钱效应分统一决定当日总仓位上限,
 # 个股 advice 不再单独暗示仓位, 而是与市场状态联动降档。
@@ -207,6 +235,65 @@ mkt_score = (_mb.get("score") if _mb else market_review.get("money_score"))
 mkt_phase, mkt_pos, mkt_disc, mkt_color = position_rule(mkt_score)
 # 允许追加上限(市场状态为冰点时, 个股最高只能给出"观察"级建议)
 _bearish = (mkt_score is not None and mkt_score < 40)
+
+# ===== v2.44 P0-1 仓位口径单一化（修复同页双口径冲突）=====
+# 历史 bug: 页头 Hero 由 POSITION_LADDER(报告层硬编码阶梯)输出「4~6成」,
+#          而 main_line 引用数据层 market_breadth.position 输出「建议仓位 20%-40%」,
+#          同一分数(47)给出几乎不重叠的两套区间 → 使用者无法判断该信哪条。
+# 现确立【单一事实源】= 报告层 POSITION_LADDER(与评级体系同源、可解释、可回测),
+#         数据层 position 字段一律不再出现在展示文案中(仅保留在 scored json 原始数据内备查)。
+# 换算关系(百分制 ↔ 成数, 1成=10%): ≤2成=[0,20%) 2~4成=[20,40%) 4~6成=[40,60%)
+#                                    6~8成=[60,80%) 8成+=[80,100%]
+_POS_PCT = {
+    "≤2成": "0%~20%", "2~4成": "20%~40%", "4~6成": "40%~60%",
+    "6~8成": "60%~80%", "8成+警惕": "80%~100%", "—": "—",
+}
+mkt_pos_pct = _POS_PCT.get(mkt_pos, "—")        # 与 mkt_pos 严格同源, 不再独立计算
+mkt_pos_full = f"{mkt_pos}（约 {mkt_pos_pct}）"   # 全站统一表述
+
+# ===== v2.44 P0-3 数据时效标签（修复"页头无数据截止时间"）=====
+# 历史问题: 数据日期只在 navbar/页脚, Hero 决策区无标注;
+#          15:30~20:00 打开页面看到的是前一交易日数据却毫不知情(与 cron 排队延迟叠加)。
+def _data_freshness(data_date_str):
+    """→ (文案, 颜色, 是否告警)；按数据日期与"最近已收盘交易日"的【交易日差】判定时效。
+
+    注意: 必须用交易日差而非自然日差 —— 周五数据在周一打开时自然日差 3 天,
+          但实际只隔 1 个交易日, 用自然日会误报"延迟 3 天"。
+    """
+    from datetime import datetime as _d, timedelta as _td, timezone as _tz
+    try:
+        _dd = _d.strptime(str(data_date_str)[:10], "%Y-%m-%d").date()
+    except Exception:
+        return ("数据日期未知", "#94a3b8", False)
+    _bj = _d.now(_tz.utc) + _td(hours=8)
+    _today = _bj.date()
+    # 回溯到"最近一个已收盘交易日"(15:00 前算前一日, 再跳过周末)
+    _ref = _today
+    if _bj.hour < 15:
+        _ref = _ref - _td(days=1)
+    while _ref.weekday() >= 5:
+        _ref = _ref - _td(days=1)
+
+    def _wkdays(a, b):
+        """a→b 之间的工作日数(b 更晚); 用于近似交易日差。"""
+        n, cur = 0, a
+        while cur < b:
+            cur += _td(days=1)
+            if cur.weekday() < 5:
+                n += 1
+        return n
+
+    _gap = _wkdays(_dd, _ref)
+    _dd_str = _dd.strftime("%Y-%m-%d")
+    if _gap <= 0:
+        return (f"数据截止 {_dd_str} 收盘（最新交易日）", "#22c55e", False)
+    if _gap == 1:
+        return (f"数据截止 {_dd_str} 收盘（1 个交易日前）", "#f59e0b", False)
+    return (f"⚠️ 数据截止 {_dd_str} 收盘（已延迟约 {_gap} 个交易日）", "#dc2626", True)
+
+
+_fresh_txt, _fresh_color, _fresh_warn = _data_freshness(date_str)
+
 
 
 def advice_with_market(r):
@@ -782,11 +869,13 @@ top_sector = sorted_secs[0] if sorted_secs else ("-", {"avg": 0, "count": 0})
 main_line = f"今日S级{s_count}只、A级{a_count}只，主线板块：{top_sector[0]}(均分{top_sector[1].get('avg',0):.2f})"
 
 # 大盘赚钱效应 → 入场时机一句话摘要
+# v2.44 P0-1: 此处原引用 market_breadth["position"]("建议仓位 20%-40%"),
+#   与页头 Hero 的 POSITION_LADDER("4~6成")形成同页双口径冲突。
+#   现统一只报"赚钱效应分 + 状态", 仓位表述完全交由 Hero 的单一事实源输出。
 if market_breadth and market_breadth.get("available"):
     mb_sc = market_breadth["score"]
     mb_phase = market_breadth["phase"]
-    mb_pos = market_breadth["position"]
-    main_line += f" · 大盘赚钱效应{mb_sc}分 {mb_phase}, {mb_pos}"
+    main_line += f" · 大盘赚钱效应{mb_sc}分 {mb_phase}"
 
 # 评级变化统计
 rating_changes = {"up": [], "down": [], "new": []}
@@ -832,8 +921,11 @@ html_parts.append(f'''
     <div class="hero" id="sec-decision">
         <h1>📊 A股成交额 TOP{total_stocks} 评分<span class="hero-ver">报告层 {REPORT_VER} · 评分层 {_SCORER_VER}</span></h1>
         <div style="font-size:11px;color:#94a3b8;">🎯 今日市场状态 → 总仓位纪律（赚钱效应 {mkt_score if mkt_score is not None else '—'} 分）</div>
-        <div class="hero-verdict" style="color:{mkt_color};">{mkt_phase} · 建议仓位 {mkt_pos}</div>
+        <div class="hero-verdict" style="color:{mkt_color};">{mkt_phase} · 建议仓位 {mkt_pos_full}</div>
         <div style="font-size:13px;color:#cbd5e1;">{mkt_disc}</div>
+        <div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;background:{_fresh_color}1a;color:{_fresh_color};border:0.5px solid {_fresh_color}55;">
+            🕒 {_fresh_txt}
+        </div>
         <div class="hero-kpis">
             <div class="hero-kpi" style="border-left-color:#22c55e;">
                 <div class="k-lbl">⭐ S + A 级（重点跟踪）</div>
@@ -900,9 +992,28 @@ ai_watch = ai_review.get("watch_directions") or []
 ai_risk = (ai_review.get("risk_note") or "").strip()
 ai_date = ai_review.get("date", "")
 
+# ===== v2.44 P0-2 点评来源如实标注（修复"AI 生成"标注失实）=====
+# 历史 bug: 页面固定写"每日AI生成", 但 ai_assessment.json 实际为
+#   generated_by="...LLM fallback rule engine...", fallback=True（规则引擎拼接模板）,
+#   且 GitHub repo secrets 未配置(云端无法调 LLM) → 构成来源标注失实, 违反数据纪律。
+# 现依 fallback / generated_by 字段动态判定来源, 如实标注;
+#   仅在确为 LLM 生成时才写"AI 生成"。同时把原始生成者串附在 title 中可追溯。
+_ai_is_fallback = bool(ai_review.get("fallback"))
+_ai_genby = str(ai_review.get("generated_by") or "")
+if _ai_is_fallback or ("fallback" in _ai_genby.lower()) or ("rule engine" in _ai_genby.lower()):
+    _ai_src_label = "规则引擎生成"
+    _ai_src_color = "#f59e0b"
+    _ai_src_tip = ("本条点评由本地规则引擎按当日真实行情数据拼接生成，"
+                   "非大模型生成；配置 LLM 密钥后自动切换为大模型生成。")
+else:
+    _ai_src_label = "AI 生成"
+    _ai_src_color = "#38bdf8"
+    _ai_src_tip = "本条点评由大模型基于当日真实行情数据生成。"
+
 if ai_text:
-    review_title = (f'🤖 AI 盘面复盘点评 <span style="font-size:11px;color:#64748b;font-weight:400;">'
-                   f'(每日AI生成 · {ai_date})</span>')
+    review_title = (f'🤖 盘面复盘点评 <span title="{html_mod.escape(_ai_src_tip)}" '
+                   f'style="font-size:11px;color:{_ai_src_color};font-weight:400;cursor:help;">'
+                   f'({_ai_src_label} · {ai_date})</span>')
     if ai_watch:
         _items = "".join(f"<li style='margin:4px 0;'>{html_mod.escape(str(w))}</li>" for w in ai_watch)
         watch_html = (f'<div style="margin:12px 0;padding:10px 14px;background:#0f172a;'
@@ -1027,7 +1138,7 @@ if quant_json or ai_pick_names:
         _cap_pool = [n for n in _inter if _names_map.get(n, {}).get("price")]
         _total_cap = 100000
         _cap_head = "💰 资金分配示例（基准：10万本金 · 交集等权 · 100股取整）"
-        _cap_desc = f'分配对象：<b>双引擎交集（共识标的）</b>。仓位再按上方总仓位纪律（当前 {mkt_pos}）等比缩放。'
+        _cap_desc = f'分配对象：<b>双引擎交集（共识标的）</b>。仓位再按上方总仓位纪律（当前 {mkt_pos_full}）等比缩放。'
         _cap_bar = "#22c55e"
     else:
         _cap_pool = [n for n in dict.fromkeys(quant_picks_all) if _names_map.get(n, {}).get("price")]
@@ -1045,10 +1156,24 @@ if quant_json or ai_pick_names:
             _shares = int(_per / _cp / 100) * 100 if _cp > 0 else 0
             _amt = _shares * _cp
             _rt = _cr.get("rating", "-")
+            # v2.44 P1-1: 增列参考买入区间与止损位
+            # 历史问题: 资金表只给"现价", 新手会当场市价追进; 而 build_trade_plan 算出的
+            #   买点/止损只出现在 S/A 详情卡片, 资金表使用者看不到 → 补齐。
+            _cplan = build_trade_plan(_cr)
+            if _cplan:
+                _buy_rng = f"{_cplan['buy_lo']:.2f}~{_cplan['buy_hi']:.2f}"
+                _stop_v = f"{_cplan['stop']:.2f}"
+                _stop_pct = (_cplan['stop'] - _cp) / _cp * 100 if _cp else 0
+                _stop_disp = f"{_stop_v} ({_stop_pct:+.1f}%)"
+                _stop_col = "#ef4444"
+            else:
+                _buy_rng = "—"; _stop_disp = "—"; _stop_col = "#94a3b8"
             _cap_rows += (f'<tr style="border-top:1px solid #1e293b;">'
                           f'<td style="padding:4px 8px;color:#e2e8f0;">{html_mod.escape(str(_cn))}</td>'
                           f'<td style="padding:4px 8px;color:{RATING_COLORS.get(_rt, "#94a3b8")};">{_rt}</td>'
                           f'<td style="padding:4px 8px;color:#94a3b8;">{_cp:.2f}</td>'
+                          f'<td style="padding:4px 8px;color:#22c55e;">{_buy_rng}</td>'
+                          f'<td style="padding:4px 8px;color:{_stop_col};">{_stop_disp}</td>'
                           f'<td style="padding:4px 8px;color:#e2e8f0;">{_shares}股</td>'
                           f'<td style="padding:4px 8px;color:#38bdf8;">¥{_amt:,.0f}</td></tr>')
     if _cap_rows:
@@ -1059,10 +1184,12 @@ if quant_json or ai_pick_names:
             <table style="width:100%;border-collapse:collapse;font-size:11px;">
                 <thead><tr style="color:#94a3b8;text-align:left;">
                     <th style="padding:3px 8px;">标的</th><th style="padding:3px 8px;">评级</th>
-                    <th style="padding:3px 8px;">现价</th><th style="padding:3px 8px;">建议股数</th><th style="padding:3px 8px;">金额</th>
+                    <th style="padding:3px 8px;">现价</th><th style="padding:3px 8px;">参考买入区间</th>
+                    <th style="padding:3px 8px;">止损位</th><th style="padding:3px 8px;">建议股数</th><th style="padding:3px 8px;">金额</th>
                 </tr></thead>
                 <tbody>{_cap_rows}</tbody>
             </table>
+            <div style="font-size:11px;color:#64748b;margin-top:6px;">📌 买入区间按技术结构（多头取 ma5~ma10 回踩区／弱势取 ma10~ma20 企稳区）推导；止损位取最近支撑下方 1.5%，与个股详情页同源。<b style="color:#f59e0b;">现价高于买入区间时应等待回踩，勿市价追高。</b></div>
         </div>''')
     else:
         _cap_html = ""
@@ -1119,6 +1246,27 @@ html_parts.append('''
                 </div>
             </div>
             <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">板块均分TOP5</div>''')
+
+# v2.44 P1-3 行业集中度提示(插入板块均分TOP5 之前)
+if _conc_top_pct:
+    _conc_icon = "⚠️" if _conc_warn else "✅"
+    _conc_warn_txt = (f"单一板块占比 {_conc_max_pct:.0f}% 已超 15% 警戒线 —— 本名单存在明显行业集中，"
+                      f"建议结合其他赛道分散，勿将本名单等同于全市场分散配置。"
+                      if _conc_warn else
+                      f"最大单一板块占比 {_conc_max_pct:.0f}%，行业分布相对均衡。")
+    html_parts.append(f'''
+            <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">行业集中度（前3板块 · 合计 {_conc_sum3:.0f}%）</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">''')
+    for _nm, _cnt, _p in _conc_top_pct:
+        _bc = "#dc2626" if _p > 25 else ("#f59e0b" if _p > 15 else "#3b82f6")
+        html_parts.append(f'''
+                <span style="font-size:11px;padding:3px 9px;border-radius:10px;background:{_bc}1a;color:{_bc};border:0.5px solid {_bc}55;">
+                    {html_mod.escape(str(_nm))} {_cnt}只 · {_p:.0f}%</span>''')
+    html_parts.append(f'''
+            </div>
+            <div style="font-size:11px;color:{_conc_color};margin-bottom:10px;line-height:1.6;">
+                {_conc_icon} {_conc_warn_txt}
+            </div>''')
 
 for s, v in sorted_secs:
     cnt = v.get("count", 0)
@@ -1255,12 +1403,34 @@ for idx, r in enumerate(top20):
     a_collapse = "" if rating == "S" else " collapsed"
     _toggle = ("" if rating == "S" else
                '<span class="expand-hint" onclick="this.closest(\'.stock-detail\').classList.toggle(\'collapsed\');">▾ 展开明细</span>')
+
+    # ===== v2.44 P0-4 评级与基本面背离风险标记 =====
+    # 历史问题: 东岳硅材总分 12.68 进 S/A 前 28, 但 growth=−103.6%、fwdPE=56,
+    #   页面无任何风险提示 → 高评级与基本面恶化并存, 使用者易误读为"优质标的"。
+    # 根因: 高评级主要由题材热度/技术动量驱动, 基本面维度可被加权稀释。
+    # 处理: 风险标记(不篡改评级, 仅如实提示背离), 在卡片头部显著展示。
+    _fund_flags = []
+    if isinstance(growth, (int, float)) and growth < 0:
+        _fund_flags.append(f"业绩负增长 {growth:+.0f}%")
+    if isinstance(fwd, (int, float)) and fwd > 80:
+        _fund_flags.append(f"FwdPE {fwd:.0f}x 偏高")
+    _fd_n = r.get("fund_detail") or {}
+    if isinstance(_fd_n.get("deriv2_delta"), (int, float)) and _fd_n["deriv2_delta"] < -20:
+        _fund_flags.append(f"增长减速 {_fd_n['deriv2_delta']:+.0f}pt")
+    # 仅当评级为 S/A(推荐级) 且存在基本面瑕疵时才提示, 避免噪声
+    _risk_badge = ""
+    if _fund_flags and rating in ("S", "A"):
+        _risk_badge = ('<span title="该股评级主要由题材热度与技术动量驱动，基本面存在瑕疵，'
+                       '请勿仅凭评级买入" style="font-size:11px;font-weight:700;padding:1px 6px;'
+                       'border-radius:3px;background:#fee2e2;color:#dc2626;margin-left:6px;cursor:help;">'
+                       '⚠️基本面背离 ' + "·".join(_fund_flags) + '</span>')
+
     html_parts.append(f'''
         <div class="stock-detail {s_class}{a_collapse}" data-rating="{rating}" data-sector="{sector_disp(r)}" data-code="{r['code']}" data-name="{r['name']}">
             <div class="header-row">
                 <div class="rank" style="background:{rank_color}">#{i}</div>
                 <div>
-                    <div class="name">{r['name']}{change_tag}{ai_badge}</div>
+                    <div class="name">{r['name']}{change_tag}{ai_badge}{_risk_badge}</div>
                     <div class="code">{r['code']} · {sector_disp(r)}</div>
                 </div>
                 {_toggle}
@@ -2487,7 +2657,7 @@ except Exception as _e:
     watch_html = ""
 html_parts.append(watch_html)
 
-# ===== v2.30 AI 评分模型总结 (由AI生成) =====
+# ===== v2.30 评分模型总结 (v2.44: 来源如实标注) =====
 _ams = data.get("ai_model_summary", "").strip()
 _model_ver = 'v2.40 (五维·含板块动量)' if any(x.get('score_sector') is not None for x in results) else 'v2.30 (四维)'
 # 兼容旧文案中的版本号
@@ -2497,7 +2667,9 @@ if _ams:
     ai_model_html = ('    <div class="ai-model-summary" style="margin:24px 0;padding:18px 20px;'
                      'background:linear-gradient(135deg,#1e1b4b,#0f172a);border:1px solid #6d28d9;border-radius:12px;">'
                      '<div style="font-size:15px;font-weight:800;color:#c4b5fd;margin-bottom:10px;">'
-                     '🤖 评分模型总结 (' + _model_ver + ')</div>'
+                     '📊 评分模型总结 (' + _model_ver + ')'
+                     '<span style="font-size:11px;font-weight:400;color:' + _ai_src_color + ';margin-left:8px;">'
+                     '来源：' + _ai_src_label + '</span></div>'
                      '<div style="font-size:13px;line-height:1.9;color:#e2e8f0;white-space:pre-wrap;">'
                      + html_mod.escape(_ams) + '</div></div>')
 html_parts.append(ai_model_html)
@@ -2510,6 +2682,7 @@ try:
     if _recs:
         from collections import defaultdict as _dd
         _agg = _dd(lambda: {h: [] for h in (1, 5, 20)})
+        _agg_ex = _dd(lambda: {h: [] for h in (1, 5, 20)})
         _cutoff = None
         for _rc in _recs:
             for _h in (1, 5, 20):
@@ -2518,6 +2691,10 @@ try:
                     _agg[_rc["kind"]][_h].append(_v)
                     _agg["__ALL__"][_h].append(_v)
                     _cutoff = max(_cutoff, _rc["date"]) if _cutoff else _rc["date"]
+                _ex = (_rc.get("excess") or {}).get(str(_h))
+                if _ex is not None:
+                    _agg_ex[_rc["kind"]][_h].append(_ex)
+                    _agg_ex["__ALL__"][_h].append(_ex)
 
         def _stat_cell(vals):
             if not vals:
@@ -2528,6 +2705,16 @@ try:
             return (f'<td style="padding:5px 8px;color:{_c};font-weight:700;">{_avg:+.2f}%</td>'
                     f'<td style="padding:5px 8px;color:#94a3b8;">{_win:.0f}%</td>')
 
+        # v2.44 P1-2 超额收益单元格(相对沪深300)
+        def _ex_cell(vals):
+            if not vals:
+                return '<td style="padding:5px 8px;color:#475569;">—</td>'
+            _avg = sum(vals) / len(vals)
+            _win = sum(1 for x in vals if x > 0) / len(vals) * 100
+            _c = "#ef4444" if _avg > 0 else ("#22c55e" if _avg < 0 else "#94a3b8")
+            return (f'<td style="padding:5px 8px;color:{_c};font-weight:700;">{_avg:+.2f}%</td>'
+                    f'<td style="padding:5px 8px;color:#94a3b8;">{_win:.0f}%</td>')
+
         _rows = ""
         _lbl = {"__ALL__": "全部推荐", "rating": "评级 S/A 级", "ai_portfolio": "AI 组合",
                 "quant_momentum": "量化·动量", "quant_reversal": "量化·反转"}
@@ -2535,11 +2722,13 @@ try:
             if _k not in _agg:
                 continue
             _d = _agg[_k]
+            _de = _agg_ex.get(_k, {h: [] for h in (1, 5, 20)})
             _n1 = len(_d[1])
             _rows += (f'<tr style="border-top:1px solid #1e293b;">'
                       f'<td style="padding:5px 8px;color:#e2e8f0;font-weight:600;">{_lbl.get(_k, _k)}</td>'
                       f'<td style="padding:5px 8px;color:#94a3b8;">{_n1}</td>'
-                      + _stat_cell(_d[1]) + _stat_cell(_d[5]) + _stat_cell(_d[20]) + '</tr>')
+                      + _stat_cell(_d[1]) + _stat_cell(_d[5]) + _stat_cell(_d[20])
+                      + _ex_cell(_de[1]) + _ex_cell(_de[5]) + _ex_cell(_de[20]) + '</tr>')
 
         _has_data = any(_agg[_k][1] or _agg[_k][5] for _k in _agg)
         # R3: 样本量 < 30 时, 跟踪表无统计意义 —— 折叠为进度提示, 不占版面
@@ -2554,12 +2743,25 @@ try:
         else:
             _track_inner = f'''
         <table style="width:100%;border-collapse:collapse;font-size:11px;">
-            <thead><tr style="color:#94a3b8;text-align:left;">
-                <th style="padding:4px 8px;">分组</th><th style="padding:4px 8px;">样本</th>
-                <th style="padding:4px 8px;">T+1 均值</th><th style="padding:4px 8px;">胜率</th>
-                <th style="padding:4px 8px;">T+5 均值</th><th style="padding:4px 8px;">胜率</th>
-                <th style="padding:4px 8px;">T+20 均值</th><th style="padding:4px 8px;">胜率</th>
-            </tr></thead>
+            <thead>
+            <tr style="color:#94a3b8;text-align:left;">
+                <th style="padding:4px 8px;" rowspan="2">分组</th><th style="padding:4px 8px;" rowspan="2">样本</th>
+                <th style="padding:4px 8px;border-bottom:1px solid #334155;" colspan="2">T+1</th>
+                <th style="padding:4px 8px;border-bottom:1px solid #334155;" colspan="2">T+5</th>
+                <th style="padding:4px 8px;border-bottom:1px solid #334155;" colspan="2">T+20</th>
+                <th style="padding:4px 8px;border-bottom:1px solid #334155;color:#38bdf8;" colspan="2">超额 T+1<br><span style="font-weight:400;color:#64748b;">vs 沪深300</span></th>
+                <th style="padding:4px 8px;border-bottom:1px solid #334155;color:#38bdf8;" colspan="2">超额 T+5<br><span style="font-weight:400;color:#64748b;">vs 沪深300</span></th>
+                <th style="padding:4px 8px;border-bottom:1px solid #334155;color:#38bdf8;" colspan="2">超额 T+20<br><span style="font-weight:400;color:#64748b;">vs 沪深300</span></th>
+            </tr>
+            <tr style="color:#64748b;text-align:left;font-weight:400;font-size:11px;">
+                <th style="padding:2px 8px;">均值</th><th style="padding:2px 8px;">胜率</th>
+                <th style="padding:2px 8px;">均值</th><th style="padding:2px 8px;">胜率</th>
+                <th style="padding:2px 8px;">均值</th><th style="padding:2px 8px;">胜率</th>
+                <th style="padding:2px 8px;">均值</th><th style="padding:2px 8px;">胜率</th>
+                <th style="padding:2px 8px;">均值</th><th style="padding:2px 8px;">胜率</th>
+                <th style="padding:2px 8px;">均值</th><th style="padding:2px 8px;">胜率</th>
+            </tr>
+            </thead>
             <tbody>{_rows}</tbody>
         </table>'''
             _track_summary = f"📊 推荐跟踪 · 胜率验证（已回填 {_n_all} 条样本）"
@@ -2569,13 +2771,16 @@ try:
         _track_first_date = _track_dates[0] if _track_dates else "首日"
         _track_n_days = len(_track_dates)
         html_parts.append(f'''
-    <!-- v2.41 P0-4 推荐跟踪 (v2.42 R3 空态折叠) -->
+    <!-- v2.41 P0-4 推荐跟踪 (v2.42 R3 空态折叠; v2.44 P1-2 超额收益 / P1-4 偏差披露) -->
     <details class="track-block" style="margin:14px 0;"{_track_open}>
         <summary style="cursor:pointer;font-size:12px;color:#38bdf8;padding:10px 12px;background:#1e293b;border-radius:8px;">{_track_summary}</summary>
         <div style="padding:12px 14px;background:#1e293b;border-radius:0 0 8px 8px;">
-        <div style="font-size:11px;color:#64748b;margin-bottom:10px;">自 {_track_first_date} 起累计记录 {len(_recs)} 条推荐（覆盖 {_track_n_days} 个交易日）；T+N 收益按推荐日收盘价为基准，用前复权K线回填。</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:10px;">自 {_track_first_date} 起累计记录 {len(_recs)} 条推荐（覆盖 {_track_n_days} 个交易日）；T+N 收益按推荐日收盘价为基准，用前复权K线回填；<b style="color:#38bdf8;">超额收益 = 个股 T+N 涨跌幅 − 沪深300 同期涨跌幅</b>（用于剥离大盘 beta，区分选股能力）。</div>
         {_track_inner}
-        <div style="font-size:11px;color:#475569;margin-top:6px;">说明：每日运行 track_recommendations.py 记录并回填。胜率=上涨样本占比（红涨绿跌口径）。</div>
+        <div style="font-size:11px;color:#475569;margin-top:6px;">说明：每日运行 track_recommendations.py 记录并回填。胜率=上涨样本占比（红涨绿跌口径）。T+5/T+20 需对应交易日到期后才有值，"积累中"表示尚未到期。</div>
+        <div style="font-size:11px;color:#f59e0b;margin-top:8px;padding:8px 10px;background:rgba(245,158,11,0.08);border-radius:6px;border-left:3px solid #f59e0b;line-height:1.6;">
+            ⚠️ <b>样本偏差披露（生存者偏差）</b>：本跟踪表标的均取自「当日成交额 TOP200」名单。<b>当日大跌、成交萎缩而跌出榜单的个股不再被追踪</b>，因此统计结果存在向上的生存者偏差，实际策略表现可能低于表中数值。此外，样本量较小（当前 {len(_recs)} 条）时统计显著性不足，请勿据此单独下结论。
+        </div>
         </div>
     </details>''')
 except Exception as _e:
@@ -2586,6 +2791,7 @@ html_parts.append('''
     <div class="footer" id="sec-notes">
         <p style="color:#64748b;">📄 ''' + REPORT_VER + ''' 报告层 · ''' + _SCORER_VER + ''' 评分层 · 数据日期 ''' + date_str + ''' · 更新时间 ''' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '''</p>
         <p>📚 数据源：东方财富 + 腾讯K线 + 同花顺 + 新浪/乐股 · 全市场成交额排名</p>
+        <p>🗒️ 点评来源：''' + _ai_src_label + '''（''' + html_mod.escape(_ai_src_tip) + '''）</p>
         <p>⚠️ 免责声明: 本报告由AI基于stock-scorer极简评分模型自动生成,仅供参考,不构成投资建议。投资有风险,入市需谨慎。</p>
         <p>评分模型 (''' + ('v2.40 AI+板块动量版' if any(x.get('score_sector') is not None for x in results) else 'v2.30 AI增强版') + '''): '''
         + ('基本面30% + 题材热度18% + 消息面20%(AI赋分) + 技术面20% + 板块动量12%(申万二级板块60日/10日动量排名, 按6:4合成)；'

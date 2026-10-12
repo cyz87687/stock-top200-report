@@ -61,6 +61,7 @@ def _build_summary(scored_path):
     up, down = mr.get("up"), mr.get("down")
     zt, dt = mr.get("zt"), mr.get("dt")
     money_phase = mr.get("money_phase", "")
+    money_score = mr.get("money_score")
     date = data.get("date") or datetime.now().strftime("%Y-%m-%d")
 
     # 个股排序
@@ -101,6 +102,7 @@ def _build_summary(scored_path):
         "zt": zt,
         "dt": dt,
         "money_phase": money_phase,
+        "money_score": money_score,
         "top_gainers": top_gainers,
         "top_losers": top_losers,
         "sector_avg": sector_avg,
@@ -220,10 +222,28 @@ def _fallback_ai_assessment(s):
         "整体呈现结构性分化，需控仓聚焦高景气主线。"
     )
 
+    # ===== v2.44 P0-1b 修复同文件内情绪自相矛盾 =====
+    # 历史 bug: watch[2] 硬编码"赚钱效应阶段偏冰点", 而 commentary 用动态 money_phase,
+    #   于是出现 10-09 那种"commentary 说中性偏暖 / watch_directions 说偏冰点"的同文件打架。
+    # 现按当日 money_score 分档动态生成, 与 commentary 同源。
+    _ms = s.get("money_score")
+    if _ms is None:
+        _senti_line = "赚钱效应数据暂缺，以个股信号为主，控制单票仓位。"
+    elif _ms < 20:
+        _senti_line = f"赚钱效应{_ms}分，处于冰点/退潮阶段，仓位控制为主，等待情绪修复信号。"
+    elif _ms < 40:
+        _senti_line = f"赚钱效应{_ms}分，处于弱势磨底阶段，仅轻仓试错，严设止损。"
+    elif _ms < 60:
+        _senti_line = f"赚钱效应{_ms}分，处于中性震荡阶段，结构性参与为主，不追高。"
+    elif _ms < 80:
+        _senti_line = f"赚钱效应{_ms}分，情绪回暖，可逢回调加仓，注意节奏。"
+    else:
+        _senti_line = f"赚钱效应{_ms}分，市场亢奋偏过热，注意兑现，不追高。"
+
     watch = [
         f"强势题材{'/'.join(hot_names[:3])}资金抱团，关注龙头持续性，避免加速段追高。",
         f"弱势题材{'/'.join(weak_names[:2])}仍在兑现，短线规避。",
-        "赚钱效应阶段偏冰点，仓位控制为主，等待情绪修复信号。",
+        _senti_line,
         "观察成交额能否维持，缩量环境下题材轮动会加快。",
         "科创50逆势走强，关注半导体/AI芯片独立行情的延续性。",
     ]
