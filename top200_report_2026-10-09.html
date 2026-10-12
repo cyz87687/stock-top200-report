@@ -6902,18 +6902,27 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
     <div class="ai-model-summary" style="margin:24px 0;padding:18px 20px;background:linear-gradient(135deg,#1e1b4b,#0f172a);border:1px solid #6d28d9;border-radius:12px;"><div style="font-size:15px;font-weight:800;color:#c4b5fd;margin-bottom:10px;">🤖 评分模型总结 (v2.40 (五维·含板块动量))</div><div style="font-size:13px;line-height:1.9;color:#e2e8f0;white-space:pre-wrap;">模型 stock-scorer v2.22 基于2026-10-09真实行情：四大指数上证+0.05%, 深证+0.17%, 创业板+0.22%, 科创+0.07%，全市场2989/2108，成交19164.0亿，赚钱效应中性偏暖(结构性行情)。自动识别强势/弱势题材并赋分，基本面叠加业绩导数，最终生成关注方向与组合建议。</div></div>
 
     <!-- v2.41 P0-4 推荐跟踪 (v2.42 R3 空态折叠) -->
-    <details class="track-block" style="margin:14px 0;">
-        <summary style="cursor:pointer;font-size:12px;color:#38bdf8;padding:10px 12px;background:#1e293b;border-radius:8px;">📊 推荐跟踪 · 胜率验证（样本积累中 27/30）</summary>
+    <details class="track-block" style="margin:14px 0;" open>
+        <summary style="cursor:pointer;font-size:12px;color:#38bdf8;padding:10px 12px;background:#1e293b;border-radius:8px;">📊 推荐跟踪 · 胜率验证（已回填 27 条样本）</summary>
         <div style="padding:12px 14px;background:#1e293b;border-radius:0 0 8px 8px;">
-        <div style="font-size:11px;color:#64748b;margin-bottom:10px;">自 2026-10-08 起累计记录 27 条推荐；T+N 收益按推荐日收盘价为基准，用前复权K线回填。</div>
-        <div style="font-size:11px;color:#f59e0b;padding:10px 12px;background:rgba(245,158,11,0.08);border-radius:8px;">⏳ 样本积累中（27 条记录 / 建议 ≥30 条）：首日已建立推荐快照，T+1 次日起、T+5/T+20 后续交易日自动回填，届时本区块自动展开胜率表。</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:10px;">自 2026-10-08 起累计记录 54 条推荐（覆盖 2 个交易日）；T+N 收益按推荐日收盘价为基准，用前复权K线回填。</div>
+        
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+            <thead><tr style="color:#94a3b8;text-align:left;">
+                <th style="padding:4px 8px;">分组</th><th style="padding:4px 8px;">样本</th>
+                <th style="padding:4px 8px;">T+1 均值</th><th style="padding:4px 8px;">胜率</th>
+                <th style="padding:4px 8px;">T+5 均值</th><th style="padding:4px 8px;">胜率</th>
+                <th style="padding:4px 8px;">T+20 均值</th><th style="padding:4px 8px;">胜率</th>
+            </tr></thead>
+            <tbody><tr style="border-top:1px solid #1e293b;"><td style="padding:5px 8px;color:#e2e8f0;font-weight:600;">全部推荐</td><td style="padding:5px 8px;color:#94a3b8;">27</td><td style="padding:5px 8px;color:#22c55e;font-weight:700;">-1.25%</td><td style="padding:5px 8px;color:#94a3b8;">44%</td><td style="padding:5px 8px;color:#475569;">积累中</td><td style="padding:5px 8px;color:#475569;">积累中</td></tr><tr style="border-top:1px solid #1e293b;"><td style="padding:5px 8px;color:#e2e8f0;font-weight:600;">评级 S/A 级</td><td style="padding:5px 8px;color:#94a3b8;">20</td><td style="padding:5px 8px;color:#22c55e;font-weight:700;">-1.49%</td><td style="padding:5px 8px;color:#94a3b8;">40%</td><td style="padding:5px 8px;color:#475569;">积累中</td><td style="padding:5px 8px;color:#475569;">积累中</td></tr><tr style="border-top:1px solid #1e293b;"><td style="padding:5px 8px;color:#e2e8f0;font-weight:600;">AI 组合</td><td style="padding:5px 8px;color:#94a3b8;">3</td><td style="padding:5px 8px;color:#22c55e;font-weight:700;">-0.13%</td><td style="padding:5px 8px;color:#94a3b8;">67%</td><td style="padding:5px 8px;color:#475569;">积累中</td><td style="padding:5px 8px;color:#475569;">积累中</td></tr><tr style="border-top:1px solid #1e293b;"><td style="padding:5px 8px;color:#e2e8f0;font-weight:600;">量化·动量</td><td style="padding:5px 8px;color:#94a3b8;">2</td><td style="padding:5px 8px;color:#22c55e;font-weight:700;">-0.77%</td><td style="padding:5px 8px;color:#94a3b8;">50%</td><td style="padding:5px 8px;color:#475569;">积累中</td><td style="padding:5px 8px;color:#475569;">积累中</td></tr><tr style="border-top:1px solid #1e293b;"><td style="padding:5px 8px;color:#e2e8f0;font-weight:600;">量化·反转</td><td style="padding:5px 8px;color:#94a3b8;">2</td><td style="padding:5px 8px;color:#22c55e;font-weight:700;">-1.04%</td><td style="padding:5px 8px;color:#94a3b8;">50%</td><td style="padding:5px 8px;color:#475569;">积累中</td><td style="padding:5px 8px;color:#475569;">积累中</td></tr></tbody>
+        </table>
         <div style="font-size:11px;color:#475569;margin-top:6px;">说明：每日运行 track_recommendations.py 记录并回填。胜率=上涨样本占比（红涨绿跌口径）。</div>
         </div>
     </details>
 
     <!-- A2 元信息下沉: 版本号/数据源/口径说明全部收进页脚 -->
     <div class="footer" id="sec-notes">
-        <p style="color:#64748b;">📄 v2.43 报告层 · v2.40 (AI + sector-momentum) 评分层 · 数据日期 2026-10-09 · 更新时间 2026-10-09 15:13:54</p>
+        <p style="color:#64748b;">📄 v2.43 报告层 · v2.40 (AI + sector-momentum) 评分层 · 数据日期 2026-10-09 · 更新时间 2026-10-12 14:04:50</p>
         <p>📚 数据源：东方财富 + 腾讯K线 + 同花顺 + 新浪/乐股 · 全市场成交额排名</p>
         <p>⚠️ 免责声明: 本报告由AI基于stock-scorer极简评分模型自动生成,仅供参考,不构成投资建议。投资有风险,入市需谨慎。</p>
         <p>评分模型 (v2.40 AI+板块动量版): 基本面30% + 题材热度18% + 消息面20%(AI赋分) + 技术面20% + 板块动量12%(申万二级板块60日/10日动量排名, 按6:4合成)；消息/题材热度由AI基于当日题材资金共识赋分(0.7×AI+0.3×算法)</p>
