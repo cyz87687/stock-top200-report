@@ -36,6 +36,7 @@ market_review = data.get("market_review") or {}  # v2.11 盘面复盘点评(数�
 
 # 加载历史报告用于评级变化追踪
 prev_ratings = {}
+prev_pool_codes = set()   # v3.2 P1-3: 上一交易日池成员（用于「新入池」diff 标记）
 prev_files = [f for f in sorted(glob.glob("top200_scored_*.json"), reverse=True)
               if "_watch_" not in f and ".bak" not in f]
 for pf in prev_files:
@@ -46,9 +47,16 @@ for pf in prev_files:
             prev_data = json.load(f)
         for r in prev_data.get("results", []):
             prev_ratings[r["code"]] = {"rating": r["rating"], "total": r["total"]}
+            prev_pool_codes.add(r["code"])
         break  # 只取最近一次
     except:
         pass
+# v3.2 P1-3: 池口径一致性守卫 —— 两日池规模差异 >50% 视为口径切换，停用「新入池」diff 标记
+_pool_scale_ok = False
+if prev_pool_codes:
+    _cur_n = len(results) or 1
+    _ratio = _cur_n / max(1, len(prev_pool_codes))
+    _pool_scale_ok = 0.67 <= _ratio <= 1.5
 date_str = data.get("date", datetime.now().strftime("%Y-%m-%d"))
 model_str = data.get("model", "stock-scorer")
 # 版本号展示: 报告层 REPORT_VER / 底层评分 v2.40(五维) 或 v2.30(四维)
@@ -688,6 +696,7 @@ a {color:inherit;}
 .qual-new {background:#fef3c7;color:#b45309;border:1px solid #f59e0b;}
 .qual-illiq {background:#fee2e2;color:#b91c1c;border:1px solid #ef4444;}
 .qual-susp {background:#e2e8f0;color:#475569;border:1px solid #94a3b8;}
+.qual-pool {background:#dbeafe;color:#1d4ed8;border:1px solid #3b82f6;}
 
 /* 分页 */
 .pagination {display:flex;gap:6px;justify-content:center;align-items:center;margin:16px 0;flex-wrap:wrap;}
@@ -2744,6 +2753,7 @@ html_parts.append('''
             <select id="qualFilter">
                 <option value="">全部标的</option>
                 <option value="qualified">仅合格标的</option>
+                <option value="new_pool">🔵 今日新入池</option>
                 <option value="illiquid">⚠️ 流动性未达标</option>
                 <option value="new_stock">🆕 次新股</option>
             </select>
@@ -2877,7 +2887,13 @@ for idx, r in enumerate(results):
     theme_text = ", ".join([html_mod.escape(x) for x in theme_reasons[:3]]) if theme_reasons else "无"
 
     # v3.2 P1-4: 资格风险徽标（次新股 / 流动性未达标 / 停牌），透明披露不隐藏
+    # v3.2 P1-3: 「新入池」标记 = 今日在池 且 上一交易日不在池（池口径 diff，非评级变化）
+    #   守卫：池口径切换（如 TOP200→TOP500 扩池）时 diff 会几乎全量命中，属「扩池」而非「新入池」，
+    #   故仅当两日池规模接近（比例 0.67~1.5）才启用该标记，避免误导。
+    _is_new_pool = bool(prev_pool_codes) and _pool_scale_ok and (r.get("code") not in prev_pool_codes)
     _qual_tags = []
+    if _is_new_pool:
+        _qual_tags.append('<span class="qual-badge qual-pool" title="今日新入候选池（上一交易日不在池）">池新</span>')
     if r.get("is_new"):
         _qual_tags.append('<span class="qual-badge qual-new" title="上市不足 60 日（次新），因子 K 线不足已兜底">新</span>')
     if not r.get("liquid_ok", True):
@@ -2888,7 +2904,7 @@ for idx, r in enumerate(results):
 
     html_parts.append(f'''
                 <tr class="expandable" data-rating="{rating}" data-sector="{sector_disp(r)}" data-code="{r['code']}" data-name="{r['name']}" data-original-rank="{i}" data-fwd-pe="{r.get('fwd_pe',0) or 0}" data-growth="{r.get('growth',0) or 0}" data-position="{tech.get('position',50) or 50}" data-score-theme="{_theme_disp_t:.2f}"
-                    data-route="{route_of(r)}" data-liquid="{'1' if r.get('liquid_ok', True) else '0'}" data-newstock="{'1' if r.get('is_new') else '0'}" data-qual="{'1' if (r.get('liquid_ok', True) and not r.get('is_new') and not r.get('suspended')) else '0'}"
+                    data-route="{route_of(r)}" data-liquid="{'1' if r.get('liquid_ok', True) else '0'}" data-newstock="{'1' if r.get('is_new') else '0'}" data-newpool="{'1' if _is_new_pool else '0'}" data-qual="{'1' if (r.get('liquid_ok', True) and not r.get('is_new') and not r.get('suspended')) else '0'}"
                     data-news="{r['score_news']:.2f}" data-tech-score="{_tech_disp_t:.2f}" data-fund-score="{r['score_fund']:.2f}" data-theme-score="{_theme_disp_t:.2f}"
                     data-s-news="{r['score_news']:.2f}" data-s-tech="{_tech_disp_t:.2f}" data-s-fund="{r['score_fund']:.2f}" data-s-theme="{_theme_disp_t:.2f}"{f' data-s-sector="{r["score_sector"]:.2f}"' if r.get('score_sector') is not None else ''}{_dsub_attrs}
                     data-news-text="{html_mod.escape(news_text)}" data-tech-text="{html_mod.escape(tech_text)}" data-fund-text="{html_mod.escape(fund_text)}" data-theme-text="{html_mod.escape(theme_text)}">
@@ -3715,6 +3731,7 @@ function applyFilters() {
         // v3.2 P1-4: 资格筛选（合格/流动性未达标/次新）
         if (qualSel) {
             if (qualSel === 'qualified' && row.dataset.qual !== '1') return false;
+            if (qualSel === 'new_pool' && row.dataset.newpool !== '1') return false;
             if (qualSel === 'illiquid' && row.dataset.liquid !== '0') return false;
             if (qualSel === 'new_stock' && row.dataset.newstock !== '1') return false;
         }
