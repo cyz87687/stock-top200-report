@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-"""新浪接口获取全A成交额TOP200 - 东方财富被限流时的备用方案
+"""新浪接口获取全A成交额 TOP500 主力池 (v3.0 扩池, 观察池已删除)
 v2.13 增强:
   1. 数据质量校验: 成交额全0/920段北交所异常占位数据 → 判定失败, 不覆盖已有数据
-  2. 备源: 校验失败时改用 akshare 东方财富全A快照按成交额取TOP200
-  3. 双源均失败 → 保留旧 top200_all_a.json 并 exit 1 (工作流重试)
+  2. 备源: 校验失败时改用 akshare 东方财富全A快照按成交额取TOP500
+  3. 双源均失败 → 保留旧 top500_all_a.json 并 exit 1 (工作流重试)
+v3.0 变更(2026-10-13):
+  4. 池大小由 config.json pool_size 驱动(默认500), 观察池逻辑整体删除
+  5. 入池资格过滤: ST/*ST/退市整理 名称判据剔除, 计数透明(dropped_eligibility)
 """
 import urllib.request
 import json
@@ -17,7 +20,55 @@ for _k in ('HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy', 'ALL_PROXY'
     os.environ.pop(_k, None)
 
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
-OUT = "top200_all_a.json"
+OUT = "top500_all_a.json"
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+CONFIG_PATH = os.path.join(HERE, "config.json")
+
+
+def load_pool_config():
+    """读 config.json: 池大小与抓取页数。缺失/损坏回退 TOP200 兼容缺省。"""
+    cfg = {"pool_size": 500, "fetch": {"pages": 15, "page_size": 100, "total_n": 1500},
+           "eligibility_filter": {"exclude_st": True, "exclude_delisting": True}}
+    if os.path.exists(CONFIG_PATH):
+        try:
+            with open(CONFIG_PATH, encoding="utf-8") as f:
+                user = json.load(f)
+            if user.get("pool_size"):
+                cfg["pool_size"] = int(user["pool_size"])
+            if isinstance(user.get("fetch"), dict):
+                cfg["fetch"].update(user["fetch"])
+            if isinstance(user.get("eligibility_filter"), dict):
+                cfg["eligibility_filter"].update(user["eligibility_filter"])
+        except Exception as e:
+            print(f"  ⚠️ config.json 解析失败({str(e)[:40]}), 使用缺省池大小 TOP200")
+    return cfg
+
+
+def eligibility_filter(stocks, cfg=None):
+    """入池资格过滤: ST/*ST/退市整理 名称判据剔除。返回 (kept, dropped)。
+
+    数据纪律: 仅按名称判据剔除(可靠、无额外接口依赖), 不做停牌/上市天数推断
+    (那需要逐股接口, 成本高且易误杀)。dropped 计数透明输出。
+    """
+    cfg = cfg or {"exclude_st": True, "exclude_delisting": True}
+    if not (cfg.get("exclude_st", True) or cfg.get("exclude_delisting", True)):
+        return stocks, []
+    kept, dropped = [], []
+    for s in stocks:
+        name = str(s.get("name", "") or "").upper().replace(" ", "")
+        is_st = cfg.get("exclude_st", True) and ("ST" in name or "*ST" in name)
+        is_delist = cfg.get("exclude_delisting", True) and ("退" in name or "退市" in name)
+        if is_st or is_delist:
+            dropped.append({"name": s.get("name"), "code": s.get("code") or s.get("symbol"),
+                            "reason": "ST" if is_st else "退市"})
+        else:
+            kept.append(s)
+    return kept, dropped
+
+
+_POOL_CFG = load_pool_config()
+POOL = _POOL_CFG["pool_size"]
 
 
 def fetch_page(page, num=80):
@@ -54,8 +105,8 @@ def validate_data(stocks):
     return True, f"通过 (有效成交额 {valid_amt}/{n})"
 
 
-def fallback_eastmoney():
-    """备源: akshare 东方财富全A快照, 按成交额降序取TOP200"""
+def fallback_eastmoney(pool=500):
+    """备源: akshare 东方财富全A快照, 按成交额降序取 TOP{pool}"""
     try:
         import akshare as ak
         df = ak.stock_zh_a_spot_em()
@@ -63,7 +114,7 @@ def fallback_eastmoney():
             return None, "东财快照为空"
         df = df.dropna(subset=["成交额"])
         df = df[df["成交额"] > 0]
-        df = df.sort_values("成交额", ascending=False).head(200)
+        df = df.sort_values("成交额", ascending=False).head(pool)
         out = []
         for _, r in df.iterrows():
             code_raw = str(r["代码"])
@@ -115,39 +166,42 @@ def normalize(stocks, start_rank=1):
 
 
 def main():
+    fc = _POOL_CFG.get("fetch", {})
+    pages = int(fc.get("pages", 15))
+    page_size = int(fc.get("page_size", 100))
     print("=" * 60)
-    print("  新浪接口获取全A成交额TOP1000 (主力池TOP200 + 观察池200~1000)")
+    print(f"  新浪接口获取全A成交额 TOP{POOL} 主力池 (v3.0 扩池, 观察池已删除)")
     print("=" * 60)
     all_stocks = []
-    for page in range(1, 11):
+    for page in range(1, pages + 1):
         print(f"获取第{page}页...")
-        data = fetch_page(page, num=100)
+        data = fetch_page(page, num=page_size)
         if not data:
             continue
         all_stocks.extend(data)
         print(f"  累计 {len(all_stocks)} 只")
         time.sleep(0.8)
 
+    all_stocks, dropped = eligibility_filter(all_stocks, _POOL_CFG.get("eligibility_filter"))
+    if dropped:
+        print(f"  资格过滤剔除 ST/退市 {len(dropped)} 只: {', '.join(str(d.get('name','')) for d in dropped[:5])}{'...' if len(dropped) > 5 else ''}")
     all_stocks.sort(key=lambda x: -float(x.get("amount", 0)))
-    top1000 = all_stocks[:1000]
-    top200 = top1000[:200]
-    print(f"\n✅ 共获取 {len(top1000)} 只（含 TOP200 主力池）")
+    main_pool = all_stocks[:POOL]
+    print(f"\n✅ 共获取 {len(all_stocks)} 只（主力池 TOP{POOL}）")
 
-    # ===== 数据质量校验（针对主力池 TOP200）=====
-    ok, reason = validate_data(top200)
+    # ===== 数据质量校验（针对主力池）=====
+    ok, reason = validate_data(main_pool)
     used_fallback = False
     if not ok:
         print(f"⚠️ 新浪数据校验失败: {reason}")
         print("🔄 尝试东财备源...")
-        out, fb = fallback_eastmoney()
+        out, fb = fallback_eastmoney(POOL)
         if out:
             ok2, reason2 = validate_data([{"symbol": s["code"], "code": s["code"],
                                            "trade": s["price"], "amount": s["amount"]} for s in out])
             if ok2:
                 print(f"✅ {fb}, 校验通过 ({reason2})")
-                # 东财备源只给 200 只，观察池暂缺（保底）
-                top200_norm = out
-                top1000_norm = out
+                main_norm = out
                 used_fallback = True
             else:
                 print(f"❌ 东财备源校验也失败: {reason2}")
@@ -156,39 +210,28 @@ def main():
             print(f"❌ {fb}")
             sys.exit(1)
     else:
-        top200_norm = normalize(top200, 1)
-        top1000_norm = normalize(top1000, 1)
-    # 观察池 = 成交额 200~1000 名（800 只）
-    watch_pool = top1000_norm[200:]
+        main_norm = normalize(main_pool, 1)
 
     _src = "东财备源(akshare)" if used_fallback else "新浪财经全市场行情接口"
     _today = datetime.now().strftime("%Y-%m-%d")
 
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump({
-            "top50": top200_norm[:50],
-            "top100": top200_norm[:100],
-            "top200": top200_norm,
+            "top50": main_norm[:50],
+            "top100": main_norm[:100],
+            "top500": main_norm,
+            "main_pool": main_norm,
+            "pool_size": len(main_norm),
             "all_count": len(all_stocks),
+            "dropped_eligibility": len(dropped),
             "date": _today,
             "source": _src,
-        }, f, ensure_ascii=False, indent=2)
-
-    OUT1000 = "top1000_all_a.json"
-    with open(OUT1000, "w", encoding="utf-8") as f:
-        json.dump({
-            "date": _today,
-            "source": _src,
-            "main_pool": top200_norm,          # 主力池 TOP200
-            "watch_pool": watch_pool,          # 观察池 200~1000
-            "stocks": top1000_norm,            # 全量 1000
-            "count": len(top1000_norm),
         }, f, ensure_ascii=False, indent=2)
 
     print(f"\n📊 主力池 TOP10:")
-    for i, s in enumerate(top200_norm[:10]):
+    for i, s in enumerate(main_norm[:10]):
         print(f"  {i+1}. {s['name']:8s} {s['code']} {s['price']:8.2f} {s['pct_chg']:+.2f}% 成交额{s['turnover']/10000:.0f}万")
-    print(f"\n✅ 数据已保存: {OUT} (主力池{len(top200_norm)}) + {OUT1000} (观察池{len(watch_pool)})")
+    print(f"\n✅ 数据已保存: {OUT} (主力池{len(main_norm)}只, 无观察池)")
 
 
 if __name__ == "__main__":

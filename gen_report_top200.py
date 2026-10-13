@@ -98,6 +98,15 @@ _SCORER_VER = str(data.get("model") or ("v3.0-10dim (全市场回测先验 + AI 
                                          if _has_sector else "v2.30 (AI 增强)")))
 total_stocks = len(results)
 
+# ===== v3.0 扩池: 池规模动态标签（不再硬编码 TOP200）=====
+# scored json 的 pool_size 为抓取时的期望池大小(默认500), 覆盖不足时以实际 results 数为准。
+try:
+    _pool_size = int(data.get("pool_size") or 0) or total_stocks
+except Exception:
+    _pool_size = total_stocks
+_POOL_N = _pool_size                 # 报告文案统一引用, 如 "TOP{_POOL_N}"
+_pool_cov = (total_stocks / _pool_size) if _pool_size else 1.0
+
 # 颜色配置
 RATING_COLORS = {"S": "#22c55e", "A": "#3b82f6", "B": "#f59e0b", "C": "#f97316", "D": "#dc2626"}
 RATING_BG = {"S": "#dcfce7", "A": "#dbeafe", "B": "#fef3c7", "C": "#ffedd5", "D": "#fee2e2"}
@@ -905,7 +914,6 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
         <a href="#sec-decision">① 今日决策</a>
         <a href="#sec-list">② 选股清单</a>
         <a href="#sec-research">③ 深度研究</a>
-        <a href="#sec-watch">④ 观察池</a>
         <a href="#sec-notes">ⓘ 说明</a>
         <span class="nav-date">数据日期 ''' + date_str + '''</span>
     </nav>
@@ -966,16 +974,26 @@ me_disp = (f"{mr_score}分 {mr_phase}" if mr_score is not None else "—")
 # 原页面: 标题→版本→副标题→数据源→5统计卡→口径说明→仓位横幅 共约900px才见决策内容。
 # 现: Hero 一屏内给出 [仓位纪律 + S/A计数 + 主线板块 + 核心3只], 元信息全部下沉页脚。
 _hero_gap = '''</div>'''
+# v3.0 扩池: 池覆盖率不足时在 Hero 追加透明提示(正常覆盖率不显示)
+_cov_banner = ''
+if _pool_cov < 0.96:
+    _cov_pct = f"{_pool_cov:.0%}"
+    _cov_banner = ('<div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;'
+                   'padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;'
+                   'background:#f59e0b1a;color:#f59e0b;border:0.5px solid #f59e0b55;">'
+                   '🧩 池覆盖 ' + str(total_stocks) + '/' + str(_POOL_N) + ' (' + _cov_pct +
+                   ') · 低于 96% 阈值</div>')
 html_parts.append(f'''
     <!-- A1 首屏 Hero 决策区 -->
     <div class="hero" id="sec-decision">
-        <h1>📊 A股成交额 TOP{total_stocks} 评分<span class="hero-ver">报告层 {_ver_tag} · 评分层 {_SCORER_VER}</span></h1>
+        <h1>📊 A股成交额 TOP{_POOL_N} 评分<span class="hero-ver">报告层 {_ver_tag} · 评分层 {_SCORER_VER}</span></h1>
         <div style="font-size:11px;color:#94a3b8;">🎯 今日市场状态 → 总仓位纪律（赚钱效应 {mkt_score if mkt_score is not None else '—'} 分）</div>
         <div class="hero-verdict" style="color:{mkt_color};">{mkt_phase} · 建议仓位 {mkt_pos_full}</div>
         <div style="font-size:13px;color:#cbd5e1;">{mkt_disc}</div>
         <div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;background:{_fresh_color}1a;color:{_fresh_color};border:0.5px solid {_fresh_color}55;">
             🕒 {_fresh_txt}
         </div>
+        {_cov_banner}
         <div class="hero-kpis">
             <div class="hero-kpi" style="border-left-color:#22c55e;">
                 <div class="k-lbl">⭐ S + A 级（重点跟踪）</div>
@@ -2833,58 +2851,8 @@ html_parts.append('''
 
 ''')
 
-# ===== v2.41 观察池 (成交额 200~1000 名, AI 筛选复盘标的) =====
-watch_html = ""
-try:
-    _wf = os.path.join(_ai_dir, f"watchlist_{date_str}.json")
-    _wsf = os.path.join(_ai_dir, f"top200_scored_watch_{date_str}.json")
-    _wl = json.load(open(_wf, encoding='utf-8')) if os.path.exists(_wf) else {}
-    _ws = {r['name']: r for r in json.load(open(_wsf, encoding='utf-8')).get('results', [])} if os.path.exists(_wsf) else {}
-    _sel = _wl.get('selected', [])
-    if _sel:
-        # 按评分降序排序(未评分/无分排最后), 取前3标注"最值得关注"
-        _sel_sorted = sorted(_sel, key=lambda s: -(float(_ws.get(s['name'], {}).get('total') or 0)))
-        _top3 = {s['name'] for s in _sel_sorted[:3]}
-        _rows = ""
-        for _i, _s in enumerate(_sel_sorted, 1):
-            _r = _ws.get(_s['name'], {})
-            _total = _r.get('total')
-            _rating = _r.get('rating', '-')
-            _ts = f"{_total:.1f}" if _total is not None else "—"
-            _rtag = f"<span class='tag t-{_rating}'>{_rating}</span>" if _rating != '-' else '-'
-            _pct = _s.get('pct_chg')
-            _pct_s = f"{_pct:+.2f}%" if _pct is not None else "—"
-            _pc = "up" if (_pct or 0) > 0 else "down" if (_pct or 0) < 0 else ""
-            _amt_yi = (_s.get('amount', 0) or 0) / 1e8
-            _sec = _r.get('sector_l2') or _r.get('sector', '') or _s.get('sector', '')
-            _sec_parent = _r.get('sector_parent', '')
-            _sec_txt = html_mod.escape(str(_sec)) + (f" <span style='color:#94a3b8;font-size:11px'>({html_mod.escape(str(_sec_parent))})</span>" if _sec_parent else '')
-            # 最值得关注标注(评分前3)
-            _star = ("<span style='color:#f59e0b;font-weight:700' title='评分最高，最值得关注'>★</span> "
-                     if _s['name'] in _top3 and _total is not None else "")
-            _rows += (f"<tr><td>{_i}</td><td><b>{_star}{html_mod.escape(_s['name'])}</b></td>"
-                      f"<td class='mono'>{_s['code']}</td><td>{_sec_txt}</td>"
-                      f"<td class='{_pc}'>{_pct_s}</td><td>{_amt_yi:.1f}亿</td>"
-                      f"<td>{_rtag} {_ts}</td>"
-                      f"<td style='font-size:12px;color:#64748b'>{html_mod.escape(_s.get('reason',''))}</td></tr>")
-        _gen_by = _wl.get('generated_by', 'rule-fallback')
-        watch_html = ('''    <!-- 观察池 (v2.41; v2.42 默认折叠) -->
-    <div class="section-title" id="sec-watch">🔭 观察池 (成交额 200~1000 名 · AI 筛选 · 评分降序)</div>
-    <details style="margin-bottom:20px;">
-        <summary style="cursor:pointer;font-size:12px;color:#38bdf8;padding:10px 12px;background:#1e293b;border-radius:8px;">📂 展开观察池 ''' + str(len(_sel)) + ''' 只标的（主力池之外的机会，默认收起）</summary>
-        <div class="sub" style="margin-top:10px;">主力池之外的全市场成交额 200~1000 名区间，每日由 AI 从异动/题材联动中筛选需要复盘的标的，按五维综合评分降序排列，★ 为评分前 3 名（最值得关注）。
-        生成方式：''' + _gen_by + '''；评分：stock-scorer v2.40 五维。</div>
-        <div class="table-container">
-            <table class="stock-table" style="font-size:12px;">
-                <thead><tr><th>#</th><th>名称</th><th>代码</th><th>板块</th><th>当日</th><th>成交额</th><th>评分</th><th>AI 筛选理由</th></tr></thead>
-                <tbody>''' + _rows + '''</tbody>
-            </table>
-        </div>
-    </details>
-''')
-except Exception as _e:
-    watch_html = ""
-html_parts.append(watch_html)
+# ===== v3.0: 观察池已删除(2026-10-13 老大指令) — 原 v2.41 观察池区块(成交额200~1000名 AI筛选)整体移除,
+#      当日重点关注标的改由本地复盘链路的「互联网搜索清单」环节提供(见 run_local_review.sh)。=====
 
 # ===== v2.30 评分模型总结 (v2.44: 来源如实标注) =====
 _ams = data.get("ai_model_summary", "").strip()
@@ -3165,7 +3133,7 @@ if _ic and _ic.get("factors"):
             _wf_html = (f'''
                 <div style="font-size:11px;color:#f59e0b;margin-top:8px;line-height:1.7;padding:8px 10px;background:rgba(245,158,11,0.08);border-radius:6px;">
                     📈 <b>样本外走步验证：待池内积累</b> —— 十维新维度（超跌60/乖离/RSI反转/量能反向/超买反向/题材内禀/关注度）
-                    在 TOP200 池<b>无历史截面快照</b>，当前权重为全市场回测（2021-01~2026-09，5019 只，630 万事件）证据的
+                    在 TOP''' + str(_POOL_N) + ''' 池<b>无历史截面快照</b>，当前权重为全市场回测（2021-01~2026-09，5019 只，630 万事件）证据的
                     先验映射；满 30+ 截面后由 <code style="color:#e2e8f0;">factor_eval.py --optimize-weights</code>
                     重拟合，届时本区块自动展示走步验证摘要（OOS 复合 IC 对比 / λ 扫描 / 胜率）。
                 </div>''')
@@ -3253,7 +3221,7 @@ if _ic and _ic.get("factors"):
             📐 因子有效性评估（Rank IC）</div>
         <div style="font-size:11px;color:#64748b;margin-bottom:12px;line-height:1.7;">
             口径（v2.47 修正）：Rank IC = Spearman(因子值在当日截面的秩, 个股未来 h 个<b>真实交易日</b>收益)，h ∈ {{1, 5, 20}}；
-            收益对当日 TOP200 <b>全部个股</b>计算（回填全市场前复权日线，消除"跌出榜单即消失"的留存偏差 —— v1 口径 T+20 流失 34%）；
+            收益对当日 TOP''' + str(_POOL_N) + ''' <b>全部个股</b>计算（回填全市场前复权日线，消除"跌出榜单即消失"的留存偏差 —— v1 口径 T+20 流失 34%）；
             t 值采用 <b style="color:#fbbf24;">Newey-West HAC</b> 调整（h=5/20 相邻观测共享 80%/95% 收益窗口，普通 t 会虚高显著性）；
             <b style="color:#fbbf24;">★</b> = 通过 Bonferroni 多重检验校正（v3.0 起 10 维度×3 周期=30 次，|NW t|≥3.08；旧五维期 15 次，|NW t|≥2.97）。
             样本 &lt; 20 个截面不给出有效性判定。当前样本：
@@ -3281,9 +3249,9 @@ if _ic and _ic.get("factors"):
             <b>总分全周期为正</b>、<b>基本面与消息面为正</b>（T+1/T+5/T+20 均正向）；
             ② v3.0-10dim（2026-10-13）：依据全市场回测 Top5 因子重构为十维——技术面/题材两个负 IC 维度拆解，
             其有效成分（RSI 反转）由新维度承载、负向成分（放量脉冲/超买）以反向维度承载，均线/MACD/动量退出评分；
-            题材/技术两行保留为<b>对照展示</b>（负向 IC 正是拆解决策的依据）；新维度在 TOP200 池无历史截面，
+            题材/技术两行保留为<b>对照展示</b>（负向 IC 正是拆解决策的依据）；新维度在 TOP{_POOL_N} 池无历史截面，
             初始权重为全市场回测先验映射，<b>满 30+ 池内截面后重拟合</b>（见上方⚖️区块状态标注）；
-            ③ TOP200 为高换手关注度筛选池，负向 IC 反映「关注度脉冲后的均值回复」，
+            ③ TOP{_POOL_N} 为高换手关注度筛选池，负向 IC 反映「关注度脉冲后的均值回复」，
             处理方式是<b>降权/反向而非删除</b>；
             ④ IC 衡量<b>排序能力</b>而非绝对收益，分层多空为未扣成本毛利口径；
             ⑤ 历史截面取自 git 提交记录（含早期行业归类缺陷版本，v2.46 已修复）；
@@ -3398,7 +3366,7 @@ try:
         {_track_inner}
         <div style="font-size:11px;color:#475569;margin-top:6px;">说明：每日运行 track_recommendations.py 记录并回填。胜率=上涨样本占比（红涨绿跌口径）。T+5/T+20 需对应交易日到期后才有值，"积累中"表示尚未到期。</div>
         <div style="font-size:11px;color:#f59e0b;margin-top:8px;padding:8px 10px;background:rgba(245,158,11,0.08);border-radius:6px;border-left:3px solid #f59e0b;line-height:1.6;">
-            ⚠️ <b>样本偏差披露（生存者偏差）</b>：本跟踪表标的均取自「当日成交额 TOP200」名单。<b>当日大跌、成交萎缩而跌出榜单的个股不再被追踪</b>，因此统计结果存在向上的生存者偏差，实际策略表现可能低于表中数值。此外，样本量较小（当前 {len(_recs)} 条）时统计显著性不足，请勿据此单独下结论。
+            ⚠️ <b>样本偏差披露（生存者偏差）</b>：本跟踪表标的均取自「当日成交额 TOP{_POOL_N}」名单。<b>当日大跌、成交萎缩而跌出榜单的个股不再被追踪</b>，因此统计结果存在向上的生存者偏差，实际策略表现可能低于表中数值。此外，样本量较小（当前 {len(_recs)} 条）时统计显著性不足，请勿据此单独下结论。
         </div>
         </div>
     </details>''')
@@ -3409,13 +3377,15 @@ html_parts.append('''
     <!-- A2 元信息下沉: 版本号/数据源/口径说明全部收进页脚 -->
     <div class="footer" id="sec-notes">
         <p style="color:#64748b;">📄 ''' + REPORT_VER + ''' 报告层 · ''' + _SCORER_VER + ''' 评分层 · 数据日期 ''' + date_str + ''' · 更新时间 ''' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '''</p>
-        <p>📚 数据源：东方财富 + 腾讯K线 + 同花顺 + 新浪/乐股 · 全市场成交额排名</p>
+        <p>📚 数据源：东方财富 + 腾讯K线 + 同花顺 + 新浪/乐股 · 全市场成交额排名 · 样本池 TOP''' + str(_POOL_N) + '''（覆盖 ''' + str(total_stocks) + ''' 只 / ''' + f'{_pool_cov:.0%}' + '''）</p>
         <p>🗒️ 点评来源：''' + _ai_src_label + '''（''' + html_mod.escape(_ai_src_tip) + '''）</p>
         <p>⚠️ 免责声明: 本报告由AI基于stock-scorer极简评分模型自动生成,仅供参考,不构成投资建议。投资有风险,入市需谨慎。</p>
-        <p>评分模型 (''' + ('v2.40 AI+板块动量版' if any(x.get('score_sector') is not None for x in results) else 'v2.30 AI增强版') + '''): '''
-        + ('基本面30% + 题材热度18% + 消息面20%(AI赋分) + 技术面20% + 板块动量12%(申万二级板块60日/10日动量排名, 按6:4合成)；'
-           if any(x.get('score_sector') is not None for x in results) else
-           '题材热度30% + 基本面30%(含业绩一阶导/二阶导) + 消息面20%(AI赋分) + 技术面20%；')
+        <p>评分模型 (''' + _SCORER_VER + '''): '''
+        + ('十维 — 基本面18% + 消息面18% + 板块动量10% + 超跌60反转12% + 乖离低位10% + RSI反转6% + 量能反向10% + 超买反向6% + 题材内禀5% + 关注度5%（据全市场回测 Top5 因子拆解五维；新维度池内截面<30，权重先验·待池内验证）；'
+           if _has_10d else
+           ('基本面30% + 题材热度18% + 消息面20%(AI赋分) + 技术面20% + 板块动量12%(申万二级板块60日/10日动量排名, 按6:4合成)；'
+            if _has_sector else
+            '题材热度30% + 基本面30%(含业绩一阶导/二阶导) + 消息面20%(AI赋分) + 技术面20%；'))
         + '''消息/题材热度由AI基于当日题材资金共识赋分(0.7×AI+0.3×算法)</p>
     </div>
 </div>

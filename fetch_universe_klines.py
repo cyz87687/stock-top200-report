@@ -2,8 +2,8 @@
 """回测数据准备: 拉取候选池前复权日线 (TOP200 vs TOP500 池扩大对照实验)
 
 候选池 = factor_history.json 快照并集(709只, 历史TOP200出现过)
-        ∪ top1000_all_a.json stocks(1000只, 当日TOP1000, 含200~1000名)
-        → 去重后约 1400 只
+        ∪ top500_all_a.json 名单(当日全市场成交额TOP500; 旧 top1000_all_a.json 兜底)
+        → 去重后约 1100+ 只
 
 输出 data/universe_klines.json:
   {code: {date: [open, close, high, low, volume]}}  前复权日线(腾讯, 多域名轮询+新浪兜底)
@@ -99,13 +99,17 @@ def main():
         for s in d.get('snapshots', []):
             for r in s['rows']:
                 codes.add(r['code'])
-    t1000 = os.path.join(HERE, 'top1000_all_a.json')
-    if os.path.exists(t1000):
-        d = json.load(open(t1000, encoding='utf-8'))
-        for r in d.get('stocks', []):
+    # 全市场名单: 优先生成中的 top500_all_a.json, 回退已停产的 top1000_all_a.json
+    up = os.path.join(HERE, 'top500_all_a.json')
+    if not os.path.exists(up):
+        up = os.path.join(HERE, 'top1000_all_a.json')
+    if os.path.exists(up):
+        d = json.load(open(up, encoding='utf-8'))
+        rows = (d.get('stocks') or []) + (d.get('main_pool') or []) + (d.get('top500') or [])
+        for r in rows:
             codes.add(r['code'])
     codes = sorted(codes)
-    print(f"候选池: {len(codes)} 只 (factor_history ∪ top1000)")
+    print(f"候选池: {len(codes)} 只 (factor_history ∪ 全市场名单)")
 
     # --- 断点续拉 ---
     klines = {}

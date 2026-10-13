@@ -500,6 +500,61 @@ def fetch_announcements_map(days=7):
     return {c: " | ".join(v) for c, v in ann.items()}
 
 
+# ============================================================
+# v3.0 B2: 同花顺财务摘要 —— 按代码缓存(7天TTL) + 指数退避重试
+# 扩池至TOP500后调用量×2.5, 该接口偶发限流; 缓存+重试保证覆盖率
+# ============================================================
+FIN_CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'fin_cache')
+FIN_CACHE_TTL_DAYS = 7
+
+
+def fetch_ths_abstract_cached(sym, indicator='按年度', ttl_days=FIN_CACHE_TTL_DAYS):
+    """同花顺财务摘要(按年度): 命中缓存直接返回; 否则网络拉取+落盘缓存。
+    指数退避重试最多4次(1.5s/3s/4.5s/6s), 仍失败返回 None(调用方兜底)。"""
+    os.makedirs(FIN_CACHE_DIR, exist_ok=True)
+    cache_path = os.path.join(FIN_CACHE_DIR, f"{sym}.json")
+    if os.path.exists(cache_path):
+        try:
+            age_days = (time.time() - os.path.getmtime(cache_path)) / 86400
+            if age_days < ttl_days:
+                import pandas as pd
+                rows = json.load(open(cache_path, encoding='utf-8')).get('rows') or []
+                if rows:
+                    return pd.DataFrame(rows)
+        except Exception:
+            pass
+    for attempt in range(4):
+        try:
+            import akshare as ak
+            df = ak.stock_financial_abstract_ths(symbol=sym, indicator=indicator)
+            if df is not None and len(df) > 0:
+                try:
+                    json.dump({'sym': sym,
+                               'cached_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                               'rows': df.to_dict('records')},
+                              open(cache_path, 'w', encoding='utf-8'), ensure_ascii=False, default=str)
+                except Exception:
+                    pass
+                return df
+        except Exception:
+            pass
+        time.sleep(1.5 * (attempt + 1))
+    return None
+
+
+def _num_or_none(v):
+    """财务字段清洗: None/False/'--'/''/百分号 → float 或 None"""
+    if v is None or v is False or v == 'False':
+        return None
+    s = str(v).replace('%', '').replace(',', '').strip()
+    if not s or s in ('--', '-', 'False', 'nan'):
+        return None
+    try:
+        return float(s)
+    except Exception:
+        return None
+
+
 def fetch_research_reports_map(days=7, codes=None):
     """近 days 日个股研报(akshare stock_research_report_em), 按6位代码聚合。
     v2.17 新增: 作为消息面评分信号源, 弥补 iFinD新闻/交易所公告未覆盖券商研报的缺口
@@ -3410,13 +3465,17 @@ def build_market_review(market_breadth, stats, results):
 # Main
 # ============================================================
 def main():
-    inp = sys.argv[1] if len(sys.argv) > 1 else "top200_all_a.json"
+    inp = sys.argv[1] if len(sys.argv) > 1 else "top500_all_a.json"
     out = sys.argv[2] if len(sys.argv) > 2 else f"top200_scored_{datetime.now().strftime('%Y-%m-%d')}.json"
-    
+
     with open(inp) as f:
         raw = json.load(f)
-    # 优先使用 top200，如果不存在则降级到 top100 或 top50
-    if "top200" in raw:
+    # v3.0: 优先 main_pool/top500(扩池口径), 兼容旧 top200/top100/top50
+    if "main_pool" in raw:
+        stocks = raw["main_pool"]
+    elif "top500" in raw:
+        stocks = raw["top500"]
+    elif "top200" in raw:
         stocks = raw["top200"]
     elif "top100" in raw:
         stocks = raw["top100"]
@@ -3532,18 +3591,21 @@ def main():
         print("✓" if fund_map[s["code"]] else "✗")
     
     # --- Step 4.5: akshare 财务增速 + 机构预测 + 腾讯行情PE ---
-    print(f"\n📊 Step 4.5: akshare财务数据 (200只)")
+    #   v3.0 B2: 摘要接口改走缓存+退避重试(fetch_ths_abstract_cached);
+    #   扩容解析 ROE/资产负债率/每股经营现金流(OCFG YoY) → ths_extra_map
+    print(f"\n📊 Step 4.5: akshare财务数据 ({len(stocks)}只, 摘要缓存+退避重试)")
     import akshare as ak
     growth_map = {}
     fwd_pe_map = {}
     cagr3_map = {}
     hist_loss_free_map = {}  # v2.14: 近4年扣非净利全为正(穿越周期盈利稳定)
+    ths_extra_map = {}       # v3.0 B2: {code: {roe, debt_ratio, ocf_ps, ocfg}}
     for i, s in enumerate(stocks):
         code = s["code"]
         sym = code[2:]
         name = s["name"]
         try:
-            df = ak.stock_financial_abstract_ths(symbol=sym, indicator='按年度')
+            df = fetch_ths_abstract_cached(sym)
             if df is not None and len(df) > 0:
                 latest = df.iloc[-1]
                 pg = latest.get('扣非净利润同比增长率', None)
@@ -3578,6 +3640,22 @@ def main():
                                 v is not None and v > 0 for v in vals[-4:])
                     except:
                         pass
+                # v3.0 B2: ROE/资产负债率/每股经营现金流(OCFG YoY) 扩容解析
+                #   —— ROE 原仅 iFinD 前20只有, 扩池后全池可得
+                _ex = ths_extra_map.setdefault(code, {})
+                _roe = _num_or_none(latest.get('净资产收益率'))
+                if _roe is not None:
+                    _ex['roe'] = _roe
+                _dr = _num_or_none(latest.get('资产负债率'))
+                if _dr is not None:
+                    _ex['debt_ratio'] = _dr
+                _ocf_now = _num_or_none(latest.get('每股经营现金流'))
+                if _ocf_now is not None:
+                    _ex['ocf_ps'] = _ocf_now
+                    if len(df) >= 2:
+                        _ocf_prev = _num_or_none(df.iloc[-2].get('每股经营现金流'))
+                        if _ocf_prev and _ocf_prev > 0:
+                            _ex['ocfg'] = round((_ocf_now / _ocf_prev - 1) * 100, 1)
         except:
             pass
         try:
@@ -3596,7 +3674,7 @@ def main():
         except:
             pass
         if (i + 1) % 50 == 0:
-            print(f"   [{i+1}/200] 增速={len(growth_map)} FwdPE预测={len(fwd_pe_map)} CAGR3={len(cagr3_map)}")
+            print(f"   [{i+1}/{len(stocks)}] 增速={len(growth_map)} FwdPE预测={len(fwd_pe_map)} CAGR3={len(cagr3_map)} ROE等={len(ths_extra_map)}")
         if (i + 1) % 10 == 0:
             time.sleep(0.3)
     
@@ -3763,7 +3841,8 @@ def main():
             if growth_input is None:
                 growth_input = k_growth
         ladder_input = pe_ladder.get(code)
-        roe_input = fparsed.get("roe")
+        _ths_ex = ths_extra_map.get(code, {})
+        roe_input = fparsed.get("roe") or _ths_ex.get("roe")   # v3.0 B2: ROE 兜底扩容至全池
         gm_input = fparsed.get("gross_margin")
         sub_theme_label = get_sub_theme_label(name)
         fs, fr, fwd_pe_resolved, growth_resolved, ladder_resolved, sustain_info = score_fund(
@@ -3871,6 +3950,10 @@ def main():
             "growth": round(growth_resolved, 1) if growth_resolved else None,
             "pe_ladder": ladder_resolved if ladder_resolved else None,
             "cagr3": cagr3_input,
+            # v3.0 B2: 同花顺摘要扩容字段(全池可得, 供报告层/护栏/后续因子用)
+            "roe": _ths_ex.get("roe"),
+            "debt_ratio": _ths_ex.get("debt_ratio"),
+            "ocfg": _ths_ex.get("ocfg"),
             "week_chg": week_chg,
         })
 
@@ -3924,15 +4007,32 @@ def main():
         s = r["sector"]
         sec_avg.setdefault(s, []).append(r["total"])
     
+    # v3.0 A3: 因子覆盖度(A3) —— 逐股票标记各维数据是否真实(非兜底), 供报告层披露
+    for r in results:
+        td = r.get("tech") or {}
+        r["factor_coverage"] = {
+            "kline": bool(td.get("rsi") is not None or td.get("trend")),
+            "fund": (r.get("fwd_pe") is not None or r.get("growth") is not None
+                     or r.get("pe") is not None),
+            "news": (r.get("score_news", 0) > 1 or bool(r.get("news_items"))),
+            "theme": bool(r.get("theme_reasons")),
+            "amount": (r.get("turnover") or 0) > 0,
+        }
+    _cov_dims = ("kline", "fund", "news", "theme", "amount")
+    _cov_summary = {d: round(sum(1 for r in results if r["factor_coverage"][d]) / max(1, len(results)), 3)
+                    for d in _cov_dims}
+
     out_data = {
         "date": raw.get("date", ""),
         "model": f"stock-scorer {SCORER_VER} (10-dim + AI + sector-momentum[evidence])",
+        "pool_size": raw.get("pool_size") or len(stocks),
         "weights": "题材30%(内禀0.30+板块动量0.35+成交额排名0.15+情绪确认0.20) 消息20% 技术面20%(结构60%[均线趋势35%/MACD动能25%/量能资金25%/RSI入场时机15%]+动量40%,RSI为Wilder平滑口径) 基本面30%(含行业前景)",
         "results": results,
         "stats": {
             "rating_dist": {r: rc.get(r, 0) for r in "SABCD"},
             "sector_avg": {s: {"count": len(v), "avg": round(sum(v)/len(v), 1)}
                           for s, v in sorted(sec_avg.items(), key=lambda x: -sum(x[1])/len(x[1]))},
+            "factor_coverage": _cov_summary,
             "market_breadth": money_effect,
         },
         # v2.11: 盘面复盘点评(数据驱动, 无幻觉) — 替代原"今日核心结论"+"大盘赚钱效应"模块

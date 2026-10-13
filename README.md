@@ -1,6 +1,6 @@
-# A股成交额 TOP200 复盘评分系统
+# A股成交额 TOP500 复盘评分系统
 
-> 基于当日真实行情数据，对全市场成交额 TOP200 主力池 + 200~1000 名观察池进行**十维加权评分**、AI 复盘评估与组合推荐，每日收盘后自动生成单页 HTML 报告并发布至 GitHub Pages。
+> 基于当日真实行情数据，对全市场成交额 TOP500 主力池进行**十维加权评分**、AI 复盘评估与组合推荐，每日收盘后自动生成单页 HTML 报告并发布至 GitHub Pages。
 
 **线上报告**：https://cyz87687.github.io/stock-top200-report/
 
@@ -9,13 +9,13 @@
 | 报告层版本 | **v3.0** |
 | 评分模型版本 | **stock-scorer v3.0-10dim**（十维 · 全市场回测先验 · AI 增强 · 含板块动量） |
 | 数据日期 | 见线上报告页眉（最新交易日） |
-| 主力池 | 全A成交额 TOP200 |
-| 观察池 | 全A成交额 200~1000 名（800 只，每日 AI 精选需复盘标的） |
+| 主力池 | 全A成交额 TOP500（`config.json` `pool_size`，入池剔除 ST/退市） |
+| 观察池 | **已删除（2026-10-13）** —— 全链路移除，改为单池 TOP500 |
 | 自动更新 | 工作日 15:30（北京时间）via GitHub Actions |
-| 本地深度复盘 | 收盘后由 `run_local_review.sh` 编排，逐公司联网核查覆盖页面结论 |
+| 本地深度复盘 | 收盘后由 `run_local_review.sh` 编排：先互联网搜索当日焦点标的 → 逐公司联网核查覆盖页面结论 |
 | 因子有效性评估 | Rank IC（T+1/T+5/T+20），Newey-West t + Bonferroni 校正，`factor_eval.py` 每日更新 |
 | 评分权重 | 全市场回测 Top5 因子先验映射（`factor_weights.json`），池内 IC 积累 ≥30 截面后走步验证再拟合 |
-| 数据新鲜度守卫 | `check_data_fresh.py`（workflow Step 1.5，陈旧数据熔断） |
+| 数据新鲜度守卫 | `check_data_fresh.py`（workflow Step 1.5，陈旧数据 + 池覆盖率熔断） |
 
 ---
 
@@ -69,23 +69,26 @@ total = ( 消息面×0.18 + 基本面×0.18 + 板块动量×0.10
 ## 二、每日数据链路（严格按序）
 
 ```
-1. fetch_top200_sina.py              → top200_all_a.json（主力池TOP200）
-                                       + top1000_all_a.json（观察池200~1000名）
-1.5 check_data_fresh.py              数据新鲜度守卫（指数日线日期 + 价格陈旧率，异常则熔断 exit≠0）
-2. step2_stockscorer_v2.py <in> <out>  十维基础评分（腾讯前复权K线 + 东财资金 + akshare财务，约15分钟；
+1. fetch_top200_sina.py              → top500_all_a.json（主力池 TOP500，config.json pool_size 驱动；
+                                       入池剔除 ST/*ST/退市，计数透明 dropped_eligibility）
+1.5 check_data_fresh.py              数据新鲜度守卫（指数日线日期 + 价格陈旧率 + 池覆盖率，异常则熔断 exit≠0）
+2. step2_stockscorer_v2.py <in> <out>  十维基础评分（腾讯前复权K线 + 东财资金 + akshare财务，约35分钟；
                                        权重读 factor_weights.json，缺失回退十维先验）
-3. select_watchlist.py               → watchlist_<date>.json（观察池规则预筛120只 → LLM精选20~35只）
-4. step2_stockscorer_v2.py <watchlist> <watch_scored>  观察池评分
-5. generate_ai_assessment.py <scored> ai_assessment.json    LLM 盘面评估（失败自动规则兜底）
-6. enhance_scores.py <scored> ai_assessment.json            基本面导数 + AI赋分增强
-7. sector_momentum_daily.py          → sector/sector_momentum_<date>.json（申万二级板块动量）
-8. apply_sector_momentum.py <scored> --mode evidence         并入板块动量维（主力池 + 观察池各一次）
-9. pick_portfolio.py ... --per-parent 2 --min-total 12       A动量/B反转双路线选股
-10. gen_portfolio_report.py                                  组合报告
-11. factor_eval.py                                           【研究层】Rank IC 因子有效性评估 → factor_ic.json
+3. generate_ai_assessment.py <scored> ai_assessment.json    LLM 盘面评估（失败自动规则兜底）
+4. enhance_scores.py <scored> ai_assessment.json            基本面导数 + AI赋分增强
+5. sector_momentum_daily.py          → sector/sector_momentum_<date>.json（申万二级板块动量）
+6. apply_sector_momentum.py <scored> --mode evidence         并入板块动量维
+7. track_recommendations.py <scored>                         推荐跟踪快照 + T+N 回填
+8. factor_eval.py                                            【研究层】Rank IC 因子有效性评估 → factor_ic.json
     （--optimize-weights 权重再拟合，由人工/Agent 周期性触发，不进每日自动链路）
-12. gen_report_top200.py <scored> <out.html>                 主报告（含观察池区块）→ cp 为 index.html
+9. pick_portfolio.py <scored> --per-parent 2 --min-total 12  A动量/B反转双路线选股
+    （路线差异化池：reversal→TOP500 / momentum→TOP200，行业暴露上限，见 config.json route_pool_map）
+10. gen_portfolio_report.py                                  组合报告
+11. gen_report_top200.py <scored> <out.html>                 主报告 → cp 为 index.html
 ```
+
+> ⚠️ **v3.0（2026-10-13）观察池逻辑已全链路删除**：`select_watchlist.py` 移除、`top1000_all_a.json` 停产、
+> 报告层不再有观察池区块。生产链路为**单池 TOP500**；`config.json` `dual_pool_compare` 为历史灰度开关（默认关）。
 
 自动化：`.github/workflows/daily-refresh.yml`（工作日 15:30 触发，带 3 次整体重试 + push rebase 重试）。
 
@@ -207,17 +210,20 @@ depth=1 无历史，故历史文件随仓库分发）。
 ⑤ ./run_local_review.sh push             提交推送
 ```
 
-**阶段0** `export_review_input.py` —— 理出「当日需要复盘的公司代码」，四类来源去重：
+**阶段0** `run_local_review.sh prepare` —— v3.0 起**先互联网搜索当日焦点标的**，再导出复盘候选：
 
 | 来源 | 说明 | 复盘深度 |
 |---|---|---|
 | 主力池 S/A 级 | 评级最高，买入决策依赖它 | deep |
 | 前向组合标的 | momentum / reversal 两条量化线实际持仓 | deep |
-| 观察池精选 A/B 级 | 200~1000 名中筛出的次日候选 | light |
+| 互联网焦点标的 | `fetch_focus_list.py` 当日搜索（东财人气榜/涨跌停池/强势股池 + Agent 联网检索补充）；**池外标的也纳入复盘** | light |
 | 主力池异动股 | 涨跌幅 \|x\| ≥ 9.5% 但未落入上面三类 | light |
 
+> 焦点清单来源全部为真实互联网接口，单源失败自动降级不影响其他源；Agent 联网检索结论经
+> `--merge-search` 并入（优先级高于机器源）。池外焦点标的以 `in_main_pool=False` 标记纳入复盘。
+
 产出 `review_input_<date>.json` 含市场画像、板块/题材聚合、每只候选的 `focus[]`（按真实字段
-推导的「该查什么」规则清单，非结论）。
+推导的「该查什么」规则清单，非结论）与 `in_main_pool` 标记。
 
 **阶段2** `merge_review_research.py` —— 汇总逐公司资料并**校验 9 条规则**，防编造与张冠李戴：
 

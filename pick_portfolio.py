@@ -27,6 +27,32 @@ SECTOR_DIR = os.path.join(HERE, 'sector')
 MAP_PATH = os.path.join(SECTOR_DIR, 'sw_map.json')
 MOM_PATH = os.path.join(SECTOR_DIR, 'sector_momentum_latest.json')
 BT_REF = os.path.join(SECTOR_DIR, 'backtest_ref.json')
+CONFIG_PATH = os.path.join(HERE, 'config.json')
+
+# config.json 缺省值（与 fetch_top200_sina.py 保持同一套约定）
+_DEF_CFG = {
+    'route_pool_map': {'reversal': 500, 'momentum': 200},
+    'momentum_route_weight': 0.5,
+    'liquidity_filter': {'enabled': True, 'min_avg_amount_20d': 5e7, 'min_avg_turnover_rate': 0.01},
+    'industry_limits': {'max_single_stock': 0.08, 'max_l2_sector': 0.25,
+                        'max_l1_parent': 0.35, 'max_l1_deviation_pp': 8},
+}
+
+
+def load_config():
+    """读 config.json；缺失/损坏则回退内置缺省（保证向后可用）。"""
+    cfg = json.loads(json.dumps(_DEF_CFG))   # deep copy
+    if os.path.exists(CONFIG_PATH):
+        try:
+            user = json.load(open(CONFIG_PATH, encoding='utf-8'))
+            for k in cfg:
+                if isinstance(cfg[k], dict) and isinstance(user.get(k), dict):
+                    cfg[k].update(user[k])
+                elif k in user:
+                    cfg[k] = user[k]
+        except Exception as e:
+            print(f"  ⚠️ config.json 解析失败({str(e)[:40]}), 使用缺省")
+    return cfg
 
 
 def code6(code):
@@ -77,12 +103,25 @@ def select(rows, results, mode, min_cands):
     return chosen
 
 
-def build(cands, mode, per_sector, per_parent, top, min_total=12.0):
+def build(cands, mode, per_sector, per_parent, top, min_total=12.0, cfg=None):
     """构建组合。约束：
       - min_total  : 综合评分低于该值的个股不入选(默认12分, 只推 B 级及以上)
       - per_sector : 同一申万二级板块最多 N 只
       - per_parent : 同一申万一级行业(parent)最多 N 只 —— 防行业集中(如多只银行股)
+      - cfg.industry_limits: 以「持仓占比」表达的更细上限(单票/二级/一级),
+        与 per_* 的「只数上限」叠加取更严者(等权下占比≈只数/top)
     """
+    cfg = cfg or _DEF_CFG
+    lim = cfg.get('industry_limits', {})
+    # 等权假设下的「只数上限」换算: 以占比上限反推每板块/每行业允许的只数
+    eff_per_sector = per_sector
+    eff_per_parent = per_parent
+    if top > 0:
+        if lim.get('max_l2_sector'):
+            eff_per_sector = min(per_sector, max(2, int(top * float(lim['max_l2_sector']) + 0.999)))
+        if lim.get('max_l1_parent'):
+            eff_per_parent = min(per_parent, max(2, int(top * float(lim['max_l1_parent']) + 0.999)))
+
     cands = [r for r in cands if float(r.get('total') or 0) >= min_total]
     if mode == 'reversal':
         # 回测支持: 弱势板块内 RSI<30 优先
@@ -94,9 +133,9 @@ def build(cands, mode, per_sector, per_parent, top, min_total=12.0):
     for r in cands:
         s = r.get('sector_l2') or '未分类'
         p = r.get('sector_parent') or s
-        if per_cnt.get(s, 0) >= per_sector:
+        if per_cnt.get(s, 0) >= eff_per_sector:
             continue
-        if per_parent and par_cnt.get(p, 0) >= per_parent:
+        if eff_per_parent and par_cnt.get(p, 0) >= eff_per_parent:
             continue
         per_cnt[s] = per_cnt.get(s, 0) + 1
         par_cnt[p] = par_cnt.get(p, 0) + 1
@@ -119,8 +158,14 @@ def main():
     ap.add_argument('--per-sector', type=int, default=3)
     ap.add_argument('--per-parent', type=int, default=2, help='同一申万一级行业最多N只(防行业集中)')
     ap.add_argument('--min-total', type=float, default=12.0, help='最低综合评分(默认12, 只推B级及以上)')
+    ap.add_argument('--no-route-pool', action='store_true',
+                    help='关闭路线差异化池(两路线都用全池), 用于对照')
     ap.add_argument('--out', default=None)
     args = ap.parse_args()
+
+    cfg = load_config()
+    route_pool = cfg.get('route_pool_map', {})
+    mom_w = float(cfg.get('momentum_route_weight', 0.5) or 0.5)
 
     scored = args.scored
     if scored is None:
@@ -137,20 +182,49 @@ def main():
     mdate = mom.get('date')
     sdate = data.get('date')
     n = len(rows)
-    print(f"scored 日期 {sdate} | 板块动量日期 {mdate} | 板块数 {n} | 候选池 {len(results)} 只")
+
+    # ---- 路线差异化池：按成交额(turnover)排名切分 ----
+    # 依据: TOP200 vs TOP500 对照回测 —— B 反转路线在 TOP500 全胜(选股超额 +6.3pp),
+    #       A 动量路线在 TOP500 全败(反转市)。故 reversal 用更大池(默认500),
+    #       momentum 维持小池(默认200), 兼顾证据与集中度。
+    ranked = sorted(results, key=lambda r: -float(r.get('turnover') or 0))
+    for i, r in enumerate(ranked, 1):
+        r['_amt_rank'] = i
+    pool_stat = {}
+    for mode in ('momentum', 'reversal'):
+        ps = int(route_pool.get(mode, len(ranked)) or len(ranked))
+        pool_stat[mode] = min(ps, len(ranked))
+    print(f"scored 日期 {sdate} | 板块动量日期 {mdate} | 板块数 {n} | 全池 {len(results)} 只")
+    if not args.no_route_pool and len(ranked) > min(pool_stat.values()):
+        print(f"  路线差异化池: momentum→前{pool_stat['momentum']} / reversal→前{pool_stat['reversal']}"
+              f"（动量路线降权系数 {mom_w}）")
 
     out = {'date': sdate, 'momentum_date': mdate, 'top': args.top, 'per_sector': args.per_sector,
-           'per_parent': args.per_parent, 'portfolios': {}}
+           'per_parent': args.per_parent,
+           'route_pool_map': ({'momentum': pool_stat['momentum'], 'reversal': pool_stat['reversal']}
+                              if not args.no_route_pool else {'momentum': len(ranked), 'reversal': len(ranked)}),
+           'momentum_route_weight': mom_w,
+           'portfolios': {}}
     min_cands = max(args.top, 10)   # 候选不足 top 数量时继续放宽板块层级 → 组合更分散
     for mode in ('momentum', 'reversal'):
+        # 路线池过滤（--no-route-pool 或池本身就好时用全池）
+        if args.no_route_pool:
+            route_results = results
+        else:
+            cap = pool_stat[mode]
+            route_results = [r for r in results if r.get('_amt_rank', 1) <= cap]
         levels = pick_sectors(rows, mode)
-        secs, level, cands, trace = select(rows, results, mode, min_cands)
-        picked = build(cands, mode, args.per_sector, args.per_parent, args.top, args.min_total)
+        secs, level, cands, trace = select(rows, route_results, mode, min_cands)
+        picked = build(cands, mode, args.per_sector, args.per_parent, args.top, args.min_total, cfg)
         out['portfolios'][mode] = {
             'level_used': level, 'target_rule': levels[0][0], 'level_trace': trace,
             'sectors': sorted(secs), 'n_candidates': len(cands),
+            'pool_used': len(route_results),
+            'route_weight': (mom_w if mode == 'momentum' else 1.0),
             'picks': [{'name': r['name'], 'code': r['code'], 'sector_l2': r.get('sector_l2'),
                        'parent': r.get('sector_parent', ''), 'total': r['total'], 'rating': r['rating'],
+                       'adj_total': round(float(r['total']) * (mom_w if mode == 'momentum' else 1.0), 2),
+                       'amt_rank': r.get('_amt_rank'),
                        'price': r.get('price'), 'pct_chg': r.get('pct_chg'),
                        'rsi': (r.get('tech') or {}).get('rsi'), 'trend': (r.get('tech') or {}).get('trend'),
                        'sector_r60': r.get('sector_r60'), 'sector_r10': r.get('sector_r10'),
@@ -160,7 +234,7 @@ def main():
                        'score_fund': r.get('score_fund'), 'score_theme': r.get('score_theme')}
                       for r in picked],
         }
-        print(f"\n=== {mode} 路线 | {level} ===")
+        print(f"\n=== {mode} 路线 | {level} | 路线池 {len(route_results)} 只 ===")
         for t in trace:
             print(f"   [{t['level']:<34}] 板块{t['n_sectors']:>3} 候选{t['n_cands']:>3}")
         print(f"  选中板块({len(secs)}): {', '.join(sorted(secs)[:12])}{'...' if len(secs) > 12 else ''}  候选 {len(cands)} 只")

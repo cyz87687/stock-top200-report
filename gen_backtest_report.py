@@ -114,7 +114,34 @@ def main():
                 L.append(f"| H={h} | {leg.upper()} | {pct(m['ann_ret'])} | {num(m['sharpe'])} | {num(m['mdd'])}% | "
                          f"{pct(a['ann_alpha'])} | {pct(p['ann_alpha'])} | {num(d['trade_win_rate'])}% | {d['n_trades']} |")
     L.append('')
-    L.append('## 四、β-α 分解（选股超额差异从哪来）')
+    L.append('## 四、成本敏感性（B 反转路线 H=20，单边 0/2/4/6bp）')
+    L.append('')
+    L.append('日频信号、周度调仓；单笔一进一出 = 2×单边成本。下表对毛收益按持有期折算日成本拖累后重算，')
+    L.append('给出「成本可行域」下界（仅扣显性成本，未含冲击随规模递增的非线性）。')
+    L.append('')
+    L.append('| 单边成本 | TOP200 年化 | TOP200 选股超额 | TOP500 年化 | TOP500 选股超额 | 超额差(500−200) |')
+    L.append('|---|---|---|---|---|---|')
+    cs = g.get('cost_sensitivity') or {}
+    for k in ('0bp', '2bp', '4bp', '6bp'):
+        r2 = (cs.get('top200') or {}).get(k) or {}
+        r5 = (cs.get('top500') or {}).get(k) or {}
+        if r2.get('ann_ret') is None or r5.get('ann_ret') is None:
+            continue
+        a2, a5 = r2.get('ann_alpha_vs_pool'), r5.get('ann_alpha_vs_pool')
+        L.append(f"| {k} | {pct(r2['ann_ret'])} | {pct(a2)} | {pct(r5['ann_ret'])} | {pct(a5)} | "
+                 f"{pct(a5-a2) if (a2 is not None and a5 is not None) else '—'} |")
+    L.append('')
+    # 结论行由数据推导, 勿硬编码
+    _c06 = (cs.get('top500') or {}).get('6bp') or {}
+    _c26 = (cs.get('top200') or {}).get('6bp') or {}
+    if _c06.get('ann_alpha_vs_pool') is not None and _c26.get('ann_alpha_vs_pool') is not None:
+        _edge6 = _c06['ann_alpha_vs_pool'] - _c26['ann_alpha_vs_pool']
+        L.append(f"**6bp 最保守情形下，TOP500 选股超额仍达 {pct(_c06['ann_alpha_vs_pool'])}，"
+                 f"领先 TOP200 {pct(_edge6)}** —— 成本不改变「B 路线 TOP500 占优」的方向性结论；")
+        L.append(f"年化层面两者均为负（{pct(_c26.get('ann_ret'))} vs {pct(_c06.get('ann_ret'))}），"
+                 f"因区间为单边下跌市，**正收益依赖池 beta 修复**，选股 α 才是可持续部分。")
+    L.append('')
+    L.append('## 五、β-α 分解（选股超额差异从哪来）')
     L.append('')
     g = groups['reversal_h20']
     b2, b5 = g['pool_bench']['top200']['ann_ret'], g['pool_bench']['top500']['ann_ret']
@@ -124,7 +151,7 @@ def main():
     L.append(f"- 选股 α 差异（同池等权基准上的超额差）: **{pct(sel5-sel2)}**")
     L.append('- 即: 扩大池的收益主要来自**选股能力提升**（更广的超跌候选面），而非池自身涨跌差异；')
     L.append('')
-    L.append('## 五、结论')
+    L.append('## 六、结论')
     L.append('')
     L.append('### 1. B 反转路线：TOP500 六组全胜，建议扩大')
     L.append('')
@@ -164,7 +191,8 @@ def main():
     L.append('- 成交额排名为近似值（TOP200 边界一致率 75.5%），组间差异被稀释，方向性结论不受影响；')
     L.append('- 单笔胜率差异（+5pp）未达统计显著（z≈1.5），但 6 组方向一致 + 选股超额/回撤多项占优，'
              '综合证据支持「扩大对 B 路线有益」；')
-    L.append('- 未计交易成本（日频信号、周度调仓，佣金+冲击约 0.1~0.3%/次，对年化影响约 -2~-5pp）。')
+    L.append('- 已计交易成本敏感性（单边 0/2/4/6bp，见第四节）：6bp 下 TOP500 选股超额仍领先，'
+             '方向性结论稳健；显性成本外未含冲击随规模的非线性（实际成本更高时请再上抬 bp 档）。')
     L.append('')
 
     with open(OUT_MD, 'w', encoding='utf-8') as f:

@@ -39,7 +39,9 @@ TENCENT_HOSTS = ["https://ifzq.gtimg.cn", "https://web.ifzq.gtimg.cn", "https://
 KL_PATH = os.path.join(HERE, 'data', 'universe_klines.json')
 SW_MAP_PATH = os.path.join(HERE, 'sector', 'sw_map.json')
 FH_PATH = os.path.join(HERE, 'factor_history.json')
-T1000_PATH = os.path.join(HERE, 'top1000_all_a.json')
+T1000_PATH = (os.path.join(HERE, 'top500_all_a.json')
+              if os.path.exists(os.path.join(HERE, 'top500_all_a.json'))
+              else os.path.join(HERE, 'top1000_all_a.json'))  # 旧文件名兜底(已停产)
 BENCH_SYMBOL = 'sh000300'
 ANN = 244  # A股年化交易日
 
@@ -239,14 +241,37 @@ def alpha_metrics(curve, base_curve):
             'daily_win_alpha': sum(1 for r in a if r > 0) / n * 100}
 
 
+def cost_adjusted_curve(curve, hold, cost_bps):
+    """成本敏感性: 按持有期推算日换手, 从日收益中扣减双边成本。
+
+    假设(保守, 等权、每日有 1/hold 的仓位到期换手):
+      单个持仓一进一出 = 2 边 × cost_bps; 持有 hold 天 → 平均每日成本
+      drag = 2 × cost_bps × 1e-4 / hold
+    cost_bps=0 时即毛收益。此口径只扣显性成本(佣金+冲击合成值),
+    未含冲击随规模递增的非线性, 作为「成本可行域」下界。
+    """
+    if cost_bps <= 0:
+        return list(curve)
+    drag = 2.0 * cost_bps * 1e-4 / max(1, hold)
+    return [r - drag for r in curve]
+
+
 def calibrate_amount(klines, t1000_path):
-    """成交额近似校准: 用10-12真实成交额对比 典型价×量 近似"""
+    """成交额近似校准: 用最近交易日真实成交额对比 典型价×量 近似
+
+    兼容两代文件: 新 top500_all_a.json(键 main_pool/top500, 无 stocks)
+    与旧 top1000_all_a.json(键 stocks, 已停产)。取并集以最大化校准样本。
+    """
     if not os.path.exists(t1000_path):
         return None
     d = json.load(open(t1000_path, encoding='utf-8'))
     day = d.get('date')
-    real = {code6(r['code']): r['amount'] for r in d.get('stocks', [])
-            if r.get('amount') and code6(r['code'])}
+    _rows = (d.get('stocks') or []) + (d.get('main_pool') or []) + (d.get('top500') or [])
+    real = {}
+    for r in _rows:
+        c6 = code6(r.get('code'))
+        if c6 and r.get('amount'):
+            real[c6] = r['amount']
     pairs = []
     for code, amt in real.items():
         kd = klines.get(code, {})
@@ -296,9 +321,12 @@ def main():
     ap.add_argument('--top', type=int, default=10, help='组合只数(默认10)')
     ap.add_argument('--per-sector', type=int, default=3)
     ap.add_argument('--per-parent', type=int, default=2)
+    ap.add_argument('--cost-bps', default='0,2,4,6',
+                    help='成本敏感性(单边基点, 逗号分隔; 默认 0/2/4/6bp 双边合计)')
     args = ap.parse_args()
     routes = [r.strip() for r in args.routes.split(',') if r.strip()]
     holds = [int(h) for h in args.holds.split(',') if h.strip()]
+    cost_list = [float(c) for c in args.cost_bps.split(',') if c.strip()]
 
     print('加载数据...')
     klines = load_klines()
@@ -441,6 +469,26 @@ def main():
                       f"MDD {m.get('mdd', 0):.1f}% | 超额vsHS300 {a.get('ann_alpha', 0):+.1f}% | "
                       f"选股超额vs池 {ap.get('ann_alpha', 0):+.1f}% | "
                       f"单笔胜率 {out[leg]['trade_win_rate'] or 0:.0f}% | 笔数 {out[leg]['n_trades']}")
+
+            # ---- 成本敏感性: 对每 leg 的毛曲线按 0/2/4/6bp 单边扣减 ----
+            # 输出年化 + 选股超额(vs池)随成本的衰减, 给出「成本可行域」下界。
+            cost_sens = {}
+            for leg, L in legs.items():
+                row = {}
+                for cb in cost_list:
+                    adj = cost_adjusted_curve(L['curve'], hold, cb)
+                    mm = equity_metrics(adj) or {}
+                    aa = alpha_metrics(adj, L['pool_curve']) or {}
+                    row[f'{cb:g}bp'] = {'ann_ret': mm.get('ann_ret'), 'sharpe': mm.get('sharpe'),
+                                        'ann_alpha_vs_pool': aa.get('ann_alpha')}
+                cost_sens[leg] = row
+            result['groups'][gkey]['cost_sensitivity'] = cost_sens
+            for leg in ('top200', 'top500'):
+                row = cost_sens[leg]
+                _cells = '  '.join(
+                    f"{k}:{v['ann_ret']:+.1f}%/α{v['ann_alpha_vs_pool']:+.1f}%"
+                    for k, v in row.items() if v.get('ann_ret') is not None)
+                print(f"  [{leg}] 成本敏感性(年化/选股超额): {_cells}")
 
     os.makedirs(os.path.join(HERE, 'data'), exist_ok=True)
     json.dump(result, open(os.path.join(HERE, 'data', 'backtest_universe_result.json'), 'w', encoding='utf-8'),

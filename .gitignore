@@ -27,3 +27,5 @@ step2_*.log
 *.prebak
 *.tmp
 .piptmp/
+data/universe_klines.json
+data/universe_klines_failed.json

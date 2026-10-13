@@ -14,16 +14,17 @@
 #   复盘层   本脚本                            —— 本地深度复盘覆盖(逐公司核查 → 注入 → 重生成页面)
 #   因子回测与每日复盘解耦: finalize 不再调用 factor_eval.py(IC 登记归 Actions Step 3.96)
 #
-# 链路时序
+# 链路时序（v3.0 起：复盘前先互联网搜索当日重点关注标的）
 #   ① Actions 产出当日 top200_scored_<date>.json  ← 前置条件
-#   ② ./run_local_review.sh prepare               ← 阶段0: 导出候选 + 生成待填模板
-#   ③ 【Agent/人工】逐公司联网查资料，填写 review_research_<date>.json  ← 阶段1
+#   ② ./run_local_review.sh prepare               ← 阶段0: 互联网搜索焦点清单(机器源) + 导出候选 + 模板
+#   ③ 【Agent】先读焦点清单 → 联网检索补充(--merge-search) → 逐公司核查，填写 review_research_<date>.json ← 阶段1
 #   ④ ./run_local_review.sh finalize              ← 阶段2 校验 + 阶段3 注入 + 重生成页面
 #   ⑤ ./run_local_review.sh status                ← 随时查看进度
 #
 # 子命令
 #   status    查看当日链路进度（各阶段产物是否存在、候选与核查数量）
-#   prepare   阶段0：导出复盘输入数据包 + 生成填写模板
+#   prepare   阶段0：互联网搜索当日焦点清单 + 导出复盘输入数据包 + 生成填写模板
+#   focus     仅跑互联网焦点清单（机器源 + --emit-template 模板 / --merge-search 合并 Agent 检索）
 #   finalize  阶段2+3：校验汇总 → 生成 ai_assessment → enhance → 报告 → 同步 index
 #   check     仅跑阶段2 校验（不写页面；--force 可强制出汇总）
 #   push      提交并推送（沿用 api.github.com 通道，失败时提示 push_via_api.py）
@@ -55,6 +56,7 @@ done
 set -- "${_args[@]:-}"
 
 SCORED="top200_scored_${BJ_DATE}.json"
+FOCUS="focus_list_${BJ_DATE}.json"
 INPUT="review_input_${BJ_DATE}.json"
 RESEARCH="review_research_${BJ_DATE}.json"
 MERGED="review_research_merged_${BJ_DATE}.json"
@@ -70,17 +72,24 @@ case "$CMD" in
 status)
   mark "本地复盘链路进度 · ${BJ_DATE}"
   printf '  ① 算法评分产物  : '; [ -f "$SCORED" ] && ok "$SCORED" || bad "$SCORED 缺失（需等 Actions 跑完）"
+  printf '  ①b 焦点清单      : '; [ -f "$FOCUS" ] && ok "$FOCUS" || warn "$FOCUS 未生成（prepare 会自动跑互联网搜索）"
   printf '  ② 候选数据包    : '; [ -f "$INPUT" ] && ok "$INPUT" || warn "$INPUT 未生成"
   printf '  ③ 逐公司资料    : '; [ -f "$RESEARCH" ] && ok "$RESEARCH" || warn "$RESEARCH 未填写（阶段1 待做）"
   printf '  ④ 校验汇总      : '; [ -f "$MERGED" ] && ok "$MERGED" || warn "$MERGED 未生成"
   if [ -f "$INPUT" ]; then
-    "$PY" - "$INPUT" "$RESEARCH" <<'PY'
+    "$PY" - "$INPUT" "$RESEARCH" "$FOCUS" <<'PY'
 import json, sys, os
 inp = json.load(open(sys.argv[1], encoding='utf-8'))
 st = inp.get('stats', {})
 print(f"\n  候选 {st.get('n_candidates')} 只  深度 {st.get('by_tier', {}).get('deep')} / "
       f"轻量 {st.get('by_tier', {}).get('light')}")
 print(f"  来源 {st.get('by_source')}")
+if os.path.exists(sys.argv[3]):
+    fl = json.load(open(sys.argv[3], encoding='utf-8'))
+    n_pool_out = sum(1 for c in inp['candidates']
+                     if c.get('in_main_pool') is False)
+    print(f"  互联网焦点 {len(fl.get('focus') or [])} 只（机器源 {fl.get('sources_used')}，"
+          f"Agent检索补充 {fl.get('agent_search', {}).get('n_additions', 0)}；池外焦点入复盘 {n_pool_out} 只）")
 if os.path.exists(sys.argv[2]):
     res = json.load(open(sys.argv[2], encoding='utf-8'))
     done = {c.get('code') for c in (res.get('companies') or [])
@@ -93,17 +102,39 @@ PY
   ;;
 
 prepare)
-  mark "阶段0 · 导出复盘输入"
+  mark "阶段0.5 · 互联网搜索当日重点关注标的（复盘前置，v3.0）"
+  "$PY" fetch_focus_list.py --date "$BJ_DATE" || warn "焦点清单机器源失败(非致命, 继续)"
+  "$PY" fetch_focus_list.py --date "$BJ_DATE" --emit-template || true
+  if [ -f "$FOCUS" ]; then
+    ok "焦点清单: $FOCUS（$( "$PY" -c "import json;print(len(json.load(open('$FOCUS'))['focus']))" 2>/dev/null || echo '?') 只）"
+  fi
+
+  mark "阶段0 · 导出复盘输入（含互联网焦点标的）"
   if [ ! -f "$SCORED" ]; then
     bad "未找到 $SCORED —— 请等 GitHub Actions 产出当日评分后重试"
     exit 1
   fi
-  "$PY" export_review_input.py "$SCORED" --out "$INPUT" || exit 1
+  "$PY" export_review_input.py "$SCORED" --focus "$FOCUS" --out "$INPUT" || exit 1
   mark "生成待填模板"
   "$PY" merge_review_research.py --input "$INPUT" --emit-template || exit 1
   echo
-  ok "下一步：由 Agent 逐公司联网查资料，填写 review_research_${BJ_DATE}.json"
-  ok "（模板位于 review_research_${BJ_DATE}.template.json，可直接复制改名后填写）"
+  ok "下一步（阶段1）：Agent 先读 $FOCUS 当日重点关注标的，"
+  ok "  ① 把联网检索结论（龙虎榜/公告/政策/题材催化）写入 focus_list_${BJ_DATE}.search.json"
+  ok "  ② 跑 ./run_local_review.sh focus --merge-search 合并进焦点清单"
+  ok "  ③ 逐公司联网核查，填写 review_research_${BJ_DATE}.json（模板在 .template.json）"
+  ;;
+
+focus)
+  mark "互联网焦点清单 · ${BJ_DATE}"
+  "$PY" fetch_focus_list.py --date "$BJ_DATE" "$@" || exit 1
+  if [ -f "$FOCUS" ]; then
+    # 焦点清单更新后用最新清单重导候选(保持候选包与焦点一致)
+    if [ -f "$SCORED" ]; then
+      "$PY" export_review_input.py "$SCORED" --focus "$FOCUS" --out "$INPUT" 2>/dev/null \
+        && ok "已用最新焦点清单重导候选: $INPUT" \
+        || warn "候选重导失败(非致命, finalize 前可手动重跑)"
+    fi
+  fi
   ;;
 
 finalize)
@@ -158,8 +189,8 @@ push)
   git add -f top200_scored_*.json ai_assessment.json recommendation_track.json 2>/dev/null || true
   # 研究层产物仅在本地点火过 factor_eval.py 时才需捎带(日常由 Actions 提交, 此处一般无变更)
   git add -f factor_history.json factor_ic.json 2>/dev/null || true
-  # 复盘产物入库（模板与合并结果也保留，便于回溯当日核查依据）
-  git add -f review_input_*.json review_research_*.json 2>/dev/null || true
+  # 复盘产物入库（模板与合并结果也保留，便于回溯当日核查依据；焦点清单=当日搜索证据）
+  git add -f review_input_*.json review_research_*.json focus_list_*.json 2>/dev/null || true
   git rm --cached -q review_research_*.template.json 2>/dev/null || true
   if git diff --cached --quiet; then
     echo "  无变更需要提交"

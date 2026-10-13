@@ -9,7 +9,8 @@
 复盘对象口径（四类来源，按优先级去重）：
   1. 主力池 S/A 级        —— 评级最高，买入决策依赖它，必须核实驱动因素
   2. 前向组合标的          —— momentum / reversal 两条量化线的实际持仓
-  3. 观察池精选 A/B 级     —— 200~1000 名中 AI(或规则)选出的次日候选
+  3. 互联网焦点标的        —— fetch_focus_list.py 当日搜索清单（人气榜/涨跌停池/强势股池
+                              + Agent 联网检索补充），复盘前必须先看
   4. 主力池异动极端股      —— 涨跌幅 |x| >= 9.5% 但未落入上面三类的（涨停/跌停/暴跌）
 
 输出：review_input_<date>.json
@@ -19,7 +20,7 @@
     sectors [ {name, count, avg_pct, mom60, mom10, r60, r10} ],
     themes  [ {name, count, avg_pct, leaders} ],
     candidates [ { code, name, sources[], sector*, price, pct_chg, rating, total,
-                   scores{}, valuation{}, tech_brief{}, theme{}, focus[] } ],
+                   scores{}, valuation{}, tech_brief{}, theme{}, focus[], in_main_pool } ],
     stats { n_candidates, by_source{} }
   }
 
@@ -29,7 +30,8 @@
   - `focus[]` 是按规则从真实字段推导的「该查什么」清单，不是结论。
 
 用法：
-  python3 export_review_input.py [scored_json] [--watch watch_scored_json] [--portfolio p.json]
+  python3 export_review_input.py [scored_json] [--focus focus_list_<date>.json]
+                                 [--portfolio p.json]
                                  [--out review_input_<date>.json] [--max 40] [--list]
   --list : 只打印人读清单（代码 + 名称 + 来源 + 待查要点），不写文件
 """
@@ -44,9 +46,9 @@ from datetime import datetime
 # 复盘来源标签（顺序即优先级，数字越小优先级越高）
 SRC_MAIN_SA = "主力池S/A级"
 SRC_PORTFOLIO = "前向组合标的"
-SRC_WATCH = "观察池精选(200~1000名)"
+SRC_FOCUS = "互联网焦点标的"
 SRC_ANOMALY = "主力池异动股"
-SRC_PRIORITY = {SRC_MAIN_SA: 0, SRC_PORTFOLIO: 1, SRC_WATCH: 2, SRC_ANOMALY: 3}
+SRC_PRIORITY = {SRC_MAIN_SA: 0, SRC_PORTFOLIO: 1, SRC_FOCUS: 2, SRC_ANOMALY: 3}
 
 # 异动阈值（涨跌幅绝对值）
 ANOMALY_PCT = 9.5
@@ -162,9 +164,10 @@ def _derive_focus(rec, srcs, sector_rank):
     if pct is not None and abs(pct) >= ANOMALY_PCT:
         _dir = "涨停/大涨" if pct > 0 else "跌停/大跌"
         f.append(f"当日{_dir}({pct:+.2f}%)：查驱动事件（公告/政策/订单/资金）及龙虎榜")
-    # 9) 观察池专属
-    if SRC_WATCH in srcs:
-        f.append("榜外标的：查近期成交放大原因与是否具备进入主力池的条件")
+    # 9) 互联网焦点清单专属
+    if SRC_FOCUS in srcs:
+        f.append("搜索清单焦点：查当日上榜/异动驱动（龙虎榜/涨停原因/题材催化/公告），"
+                 "并评估是否具备进入主力池的条件")
     if not f:
         f.append("常规核实：查最近公告与行业消息，确认无突发利空")
     return f
@@ -251,7 +254,7 @@ def _theme_map_from_scored(results):
 
 
 # ---------- 主流程 ----------
-def build(scored_path, watch_path=None, portfolio_path=None, max_n=40):
+def build(scored_path, focus_path=None, portfolio_path=None, max_n=40):
     with open(scored_path, "r", encoding="utf-8") as f:
         data = json.load(f)
     results = data.get("results", [])
@@ -266,7 +269,7 @@ def build(scored_path, watch_path=None, portfolio_path=None, max_n=40):
 
     candidates = {}   # code -> record
 
-    def _add(rec, src, note=None):
+    def _add(rec, src, note=None, in_pool=True):
         c = _norm_code(rec.get("code"))
         if not c:
             return
@@ -279,6 +282,7 @@ def build(scored_path, watch_path=None, portfolio_path=None, max_n=40):
                 "name": rec.get("name"),
                 "sources": [src],
                 "source_note": note,
+                "in_main_pool": in_pool,
                 "sector": rec.get("sector"),
                 "sector_l2": rec.get("sector_l2") or rec.get("sector"),
                 "sector_parent": rec.get("sector_parent"),
@@ -345,19 +349,25 @@ def build(scored_path, watch_path=None, portfolio_path=None, max_n=40):
                     _add(pk, SRC_PORTFOLIO, note=f"组合线={line}（非主力池）")
                 n_pf += 1
 
-    # 来源 3：观察池精选
-    n_watch = 0
-    watch_results = []
-    rel_watch = None
-    if watch_path and os.path.exists(watch_path):
-        with open(watch_path, "r", encoding="utf-8") as f:
-            w = json.load(f)
-        watch_results = w.get("results", [])
-        rel_watch = os.path.relpath(watch_path, os.path.dirname(os.path.abspath(scored_path)))
-        for r in watch_results:
-            if r.get("rating") in ("S", "A", "B"):
-                _add(r, SRC_WATCH)
-                n_watch += 1
+    # 来源 3：互联网焦点标的（fetch_focus_list.py 当日搜索清单）
+    #   池内标的 → 挂到 scored 记录上; 池外标的 → 以焦点清单自带字段构造(in_main_pool=False)
+    n_focus = 0
+    n_focus_out = 0
+    rel_focus = None
+    if focus_path and os.path.exists(focus_path):
+        with open(focus_path, "r", encoding="utf-8") as f:
+            fl = json.load(f)
+        rel_focus = os.path.relpath(focus_path, os.path.dirname(os.path.abspath(scored_path)))
+        for it in (fl.get("focus") or []):
+            c = _norm_code(it.get("code"))
+            base = by_code.get(c)
+            note = f"搜索清单第{it.get('rank', '?')}位({'+'.join(it.get('sources') or [])}): {it.get('reason', '')}"
+            if base is not None:
+                _add(base, SRC_FOCUS, note=note)
+            else:
+                _add(it, SRC_FOCUS, note=note + "（池外焦点）", in_pool=False)
+                n_focus_out += 1
+            n_focus += 1
 
     # 板块/题材（主力池口径）
     sectors = _sector_map_from_scored(results)
@@ -399,7 +409,7 @@ def build(scored_path, watch_path=None, portfolio_path=None, max_n=40):
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "generated_by": "export_review_input.py (阶段0 复盘输入导出)",
         "source_scored": os.path.basename(scored_path),
-        "source_watch": os.path.basename(watch_path) if (watch_path and os.path.exists(watch_path)) else None,
+        "source_focus": os.path.basename(focus_path) if (focus_path and os.path.exists(focus_path)) else None,
         "source_portfolio": os.path.basename(portfolio_path) if (portfolio_path and os.path.exists(portfolio_path)) else None,
         "model": data.get("model"),
         "market": {
@@ -420,7 +430,8 @@ def build(scored_path, watch_path=None, portfolio_path=None, max_n=40):
             "by_tier": dict(tier_cnt),
             "raw_counts": {
                 "main_sa": n_main, "anomaly": n_anom,
-                "portfolio_picks": n_pf, "watch_selected": n_watch,
+                "portfolio_picks": n_pf,
+                "focus_list": n_focus, "focus_out_of_pool": n_focus_out,
             },
             "by_source": dict(by_source),
             "rating_dist": dict(Counter(r.get("rating") for r in results)),
@@ -467,7 +478,7 @@ def print_list(pkg):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("scored", nargs="?", help="主力池 scored json（默认取最新）")
-    ap.add_argument("--watch", help="观察池 scored json（默认取最新 _watch_）")
+    ap.add_argument("--focus", help="互联网焦点清单 focus_list_<date>.json（默认取同日/最新）")
     ap.add_argument("--portfolio", help="组合 json（默认取最新 sector/portfolio_*.json）")
     ap.add_argument("--out", help="输出路径（默认 review_input_<date>.json）")
     ap.add_argument("--max", type=int, default=20,
@@ -482,20 +493,19 @@ def main():
         return 1
     scored = os.path.abspath(scored)
 
-    watch = args.watch
-    if watch is None:
-        w = _find_latest(here, "top200_scored_watch_*.json")
-        # 日期需与主力池同日，避免用到隔夜观察池
+    # 互联网焦点清单: 优先同日, 否则最新一份(v3.0 复盘前置环节)
+    focus = args.focus
+    if focus is None:
         _d = os.path.basename(scored).replace("top200_scored_", "").replace(".json", "")
-        w_same = os.path.join(here, f"top200_scored_watch_{_d}.json")
-        watch = w_same if os.path.exists(w_same) else w
+        f_same = os.path.join(here, f"focus_list_{_d}.json")
+        focus = f_same if os.path.exists(f_same) else _find_latest(here, "focus_list_*.json")
     portfolio = args.portfolio or _find_latest(here, "sector/portfolio_*.json")
 
     print(f"📥 主力池: {os.path.basename(scored)}")
-    print(f"📥 观察池: {os.path.basename(watch) if watch else '(无)'}")
+    print(f"📥 焦点清单: {os.path.basename(focus) if focus else '(无, 建议先跑 fetch_focus_list.py)'}")
     print(f"📥 组合  : {os.path.basename(portfolio) if portfolio else '(无)'}")
 
-    pkg = build(scored, watch, portfolio, max_n=args.max)
+    pkg = build(scored, focus, portfolio, max_n=args.max)
 
     if args.list:
         print_list(pkg)

@@ -261,7 +261,9 @@ def snapshot_from_scored(path):
                 row[k] = v
         if len(row) > 2:
             rows.append(row)
-    return {"date": str(d.get("date") or os.path.basename(path)), "rows": rows}
+    # v3.0 A2: 池口径留痕(扩池前后截面不可混算 IC; 旧文件无该字段 → 200)
+    return {"date": str(d.get("date") or os.path.basename(path)), "rows": rows,
+            "pool_size": int(d.get("pool_size") or 200)}
 
 
 def load_history():
@@ -887,6 +889,14 @@ def main():
     do_bootstrap_git = "--bootstrap-from-git" in args
     do_bootstrap_px = "--bootstrap-prices" in args
     do_opt = "--optimize-weights" in args
+    # v3.0 A2/E3: 池口径过滤(扩池TOP500后, 新旧截面分布不同不可混算)
+    pool_filter = None
+    for _i, _a in enumerate(args):
+        if _a == "--pool-filter" and _i + 1 < len(args):
+            try:
+                pool_filter = int(args[_i + 1])
+            except Exception:
+                print(f"⚠️ --pool-filter 参数无效: {args[_i + 1]}")
 
     hist = load_history()
 
@@ -928,6 +938,25 @@ def main():
     if stale:
         print(f"🧹 剔除陈旧快照 {len(stale)} 个: 非交易日 {[d for d in stale if d not in stale_px]}"
               f"{'，接口陈旧 ' + str(stale_px) if stale_px else ''}")
+
+    # v3.0 A2: 池口径过滤 —— 扩池前后截面分布不同(市值/流动性下移), 混算会污染 IC 与权重复核
+    _psize = lambda s: int(s.get("pool_size") or 200)
+    pool_sizes = sorted({_psize(s) for s in aligned})
+    if pool_filter is not None:
+        _before = len(aligned)
+        aligned = [s for s in aligned if _psize(s) == pool_filter]
+        print(f"🔍 池口径过滤 pool_size={pool_filter}: {_before} → {len(aligned)} 个截面"
+              f"（可用口径: {pool_sizes}）")
+        if len(aligned) < 3:
+            print(f"❌ 该口径截面不足（{len(aligned)}），无法计算 IC")
+            return 1
+    elif do_opt:
+        # E3: 权重复核默认只用当前池口径(最大 pool_size 组), 防新旧池混合拟合
+        _cur = max(pool_sizes) if pool_sizes else 200
+        _before = len(aligned)
+        aligned = [s for s in aligned if _psize(s) == _cur]
+        print(f"🔍 权重复核自动过滤至当前池口径 pool_size={_cur}: {_before} → {len(aligned)} 个截面"
+              f"（历史口径 {pool_sizes}; --pool-filter 可指定其他口径做诊断）")
 
     # 因子 IC
     factors = {}
@@ -974,6 +1003,8 @@ def main():
         "n_snapshots": len(aligned),
         "n_snapshots_raw": len(snaps),
         "stale_snapshots_dropped": stale,
+        "pool_filter": pool_filter,
+        "pool_sizes_available": pool_sizes,
         "snapshot_range": [aligned[0]["date"], aligned[-1]["date"]],
         "snapshot_dates": [s["date"] for s in aligned],
         "price_backfill": {

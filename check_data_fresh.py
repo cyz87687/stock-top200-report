@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
-"""数据新鲜度守卫（v2.47 P1-7）—— 阻止假日/接口故障的陈旧数据进入评分链路。
+"""数据新鲜度守卫（v2.47 P1-7 → v3.0 H2 扩池覆盖率）—— 阻止假日/接口故障的陈旧数据进入评分链路。
 
 背景（实测事故）：workflow 在 09-10、09-25、10-01~10-07 七个非正常日照常产出 scored json
 （09-25 中秋、10-01~07 国庆为假日；09-10 疑似接口返回旧快照）。fetch 的 validate_data
 只校验"成交额>0"，而假日快照的成交额同样>0 → 放行 → 陈旧价格进入 factor_history，
 污染 Rank IC 的交易日对齐（v1 口径缺陷之一）。
 
-两类检查，任一不过即 exit 非零（令 workflow 失败重试，不写评分数据）：
+三类检查，任一不过即 exit 非零（令 workflow 失败重试，不写评分数据）：
   1) 指数日线日期：上证指数最近一根日线 < 北京当日 → 假日/未收盘/行情接口延迟；
-  2) 价格陈旧：新抓取的 top200_all_a.json 与上一交易日 scored json 价格 ≥80% 相同
-     → 行情接口返回了旧快照。
+  2) 价格陈旧：新抓取的 top500_all_a.json 与上一交易日 scored json 价格 ≥80% 相同
+     → 行情接口返回了旧快照；
+  3) v3.0 H2 池覆盖率：主力池有效标的数 / 期望池大小(config.json pool_size)，
+     <96% 警告(exit 0, 报告层公告) / <90% 熔断(exit 4, workflow 重试)。
 
 用法（workflow Step 1.5，fetch 成功之后、step2 之前）：
-  python3 check_data_fresh.py          # 通过 exit 0；不新鲜 exit 2/3
+  python3 check_data_fresh.py          # 通过 exit 0；不新鲜 exit 2/3/4
 """
 import json
 import os
@@ -64,8 +66,10 @@ def prev_scored_path():
 
 
 def price_stale_ratio():
-    """新 top200_all_a.json 与上一交易日 scored json 的价格相同占比；无比对对象返回 None。"""
-    new_p = os.path.join(HERE, "top200_all_a.json")
+    """新 top500_all_a.json 与上一交易日 scored json 的价格相同占比；无比对对象返回 None。"""
+    new_p = os.path.join(HERE, "top500_all_a.json")
+    if not os.path.exists(new_p):
+        new_p = os.path.join(HERE, "top200_all_a.json")  # 过渡期兼容
     if not os.path.exists(new_p):
         return None
     prev = prev_scored_path()
@@ -83,7 +87,7 @@ def price_stale_ratio():
         if isinstance(r.get("price"), (int, float)) and r["price"] > 0:
             old_px[_norm(r.get("code"))] = r["price"]
     common = same = 0
-    for s in (new.get("top200") or []):
+    for s in (new.get("main_pool") or new.get("top500") or new.get("top200") or []):
         p = s.get("price")
         code = _norm(s.get("code"))
         if code in old_px and isinstance(p, (int, float)) and p > 0:
@@ -93,6 +97,40 @@ def price_stale_ratio():
     if common < 50:
         return None
     return same / common
+
+
+def load_pool_config():
+    """config.json 池参数(缺失回退旧口径 TOP200)"""
+    try:
+        cfg = json.load(open(os.path.join(HERE, 'config.json'), encoding='utf-8'))
+        cg = cfg.get('coverage_guard', {})
+        return {'pool_size': int(cfg.get('pool_size', 200)),
+                'min_coverage': float(cg.get('min_pool_coverage', 0.96)),
+                'meltdown': float(cg.get('meltdown_coverage', 0.90))}
+    except Exception:
+        return {'pool_size': 200, 'min_coverage': 0.96, 'meltdown': 0.90}
+
+
+def pool_coverage():
+    """v3.0 H2: 主力池覆盖率 = 有效标的数(price>0 且 amount>0) / 期望池大小。
+    无比对文件返回 None。"""
+    new_p = os.path.join(HERE, "top500_all_a.json")
+    if not os.path.exists(new_p):
+        new_p = os.path.join(HERE, "top200_all_a.json")  # 过渡期兼容
+    if not os.path.exists(new_p):
+        return None
+    try:
+        new = json.load(open(new_p, encoding="utf-8"))
+    except Exception:
+        return None
+    main = new.get("main_pool") or new.get("top500") or new.get("top200") or []
+    valid = [s for s in main
+             if isinstance(s.get("price"), (int, float)) and s["price"] > 0
+             and isinstance(s.get("amount"), (int, float)) and s["amount"] > 0]
+    cfg = load_pool_config()
+    return {"valid": len(valid), "expected": cfg["pool_size"],
+            "ratio": len(valid) / max(1, cfg["pool_size"]),
+            "min_coverage": cfg["min_coverage"], "meltdown": cfg["meltdown"]}
 
 
 def main():
@@ -120,6 +158,20 @@ def main():
             print("   → 行情接口返回旧快照，终止本次刷新")
             return 3
         print("✅ 价格已更新（非陈旧快照）")
+
+    # 检查 3（v3.0 H2）：主力池覆盖率
+    cov = pool_coverage()
+    if cov is not None:
+        print(f"   池覆盖率检测: 有效标的 {cov['valid']}/{cov['expected']} ({cov['ratio']:.1%}, "
+              f"阈值 警告<{cov['min_coverage']:.0%} 熔断<{cov['meltdown']:.0%})")
+        if cov["ratio"] < cov["meltdown"]:
+            print(f"❌ 池覆盖率过低: {cov['ratio']:.1%} < {cov['meltdown']:.0%}")
+            print("   → 行情接口大面积缺数，终止本次刷新（workflow 重试）")
+            return 4
+        if cov["ratio"] < cov["min_coverage"]:
+            print(f"⚠️ 池覆盖率低于 {cov['min_coverage']:.0%}: {cov['ratio']:.1%}（放行，报告层将公告）")
+        else:
+            print("✅ 池覆盖率正常")
     return 0
 
 
