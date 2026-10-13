@@ -16,6 +16,8 @@ ai_review_today.json
 # v2.45 本地复盘：待填模板不入库（空壳，无信息量）；review_input / review_research /
 #   merged 产物需入库留档（逐公司核查依据可回溯），故在 push 时用 git add -f 显式加入。
 review_research_*.template.json
+# v3.4 每日 AI 焦点池：Agent 联网检索填写模板不入库（草稿）；focus_pool_<date>.json 入库留档。
+focus_pool_*.search.json
 # 早期手动上传工具（已被 workflow git push + Pages 自动部署取代）
 upload826.py
 *_run_*.log

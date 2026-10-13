@@ -1,26 +1,43 @@
 #!/usr/bin/env python3
-"""当日重点关注标的清单 · 互联网搜索器（v3.0 本地复盘前置环节，2026-10-13）
+"""每日 AI 焦点池生成器（v3.4，2026-10-13 老大指令）
 
-老大指令（2026-10-13）：本地复盘流程调整——执行复盘操作前，先通过互联网搜索
-获取当日重点需要关注的标的清单，再基于搜索结果进行复盘分析。
+背景与定位
+----------
+v3.1 删除「观察池」后，当日重点关注标的改由「互联网搜索」提供，但该环节此前
+只挂在本地复盘脚本、且只做「机器源排名 + Agent 填空模板」，**没有真正落地
+『每日本地 AI 联网筛选』**。本脚本把它升级为正式的「每日 AI 焦点池」：
 
-数据源（全部为真实互联网接口，akshare 封装；单源失败自动降级不影响其他源）：
-  1. stock_hot_rank_em        东方财富·个股人气榜（全市场热度排名）
-  2. stock_zt_pool_em         东方财富·涨停池（当日涨停 + 连板数 + 封板时间）
-  3. stock_zt_pool_strong_em  东方财富·强势股池（非涨停的强势股）
-  4. stock_zt_pool_dt_pool_em 东方财富·跌停池（异动另一端，防只看涨）
+  观察池（旧：按成交额 200~1000 名用内部评分选）
+      ↓  替换为
+  每日 AI 焦点池（新：机器源 + 本地 AI 联网检索，按当日真实信息选）
 
- Agent 补充通道（本环境的互联网搜索由 Agent 执行，脚本只落格式）：
-  - 首次运行自动生成 focus_list_<date>.search.json 模板（含填写说明）；
-  - Agent 通过联网检索把「当日题材催化/公告/龙虎榜/政策」等结论写入 additions；
-  - 带 --merge-search 重跑：把 Agent 补充并入主清单（优先级高于机器源，标 source=agent_search）。
+两层数据源
+----------
+A. 机器源（脚本自动跑，真实互联网接口，akshare 封装；单源失败自动降级）：
+     1. stock_hot_rank_em        东方财富·个股人气榜（全市场热度排名）
+     2. stock_zt_pool_em         东方财富·涨停池（当日涨停 + 连板数 + 封板时间）
+     3. stock_zt_pool_dt_pool_em 东方财富·跌停池（异动另一端，防只看涨）
+     4. stock_zt_pool_strong_em  东方财富·强势股池（非涨停的放量强势股）
+B. 本地 AI 联网检索（由 Agent 执行，脚本只负责落格式与合并）：
+     - 脚本生成 focus_pool_<date>.search.json 模板（含填写说明）；
+     - Agent 联网检索当日「题材催化 / 公告 / 政策 / 龙虎榜 / 产业链」等，写入 additions；
+     - 带 --merge-search 重跑：把 Agent 结论并入焦点池（优先级高于机器源，
+       标 source=agent_search，score 加权）。
 
-输出：focus_list_<date>.json
-  { date, generated_at, sources_used{}, focus[ {name, code, score, sources[], reason} ],
-    agent_search{ merged: bool, n_additions } }
+输出 focus_pool_<date>.json
+---------------------------
+  { date, generated_at, title, method, sources_used{}, n_raw, elapsed_s,
+    agent_search{merged, n_additions}, ai_summary,
+    focus[ {rank, name, code, score, sources[], reason, ai_reason,
+            in_main_pool, sector, rating, total, price, pct_chg} ] }
 
-用法：
+字段 in_main_pool / sector / rating / total：与当日主力池 scored json 对照得出，
+便于报告层直接渲染「池内焦点（带评级）vs 池外焦点」。
+
+用法
+----
   python3 fetch_focus_list.py [--date YYYY-MM-DD] [--top 40] [--merge-search] [--list]
+  python3 fetch_focus_list.py --emit-template   # 只生成 Agent 联网检索模板
 """
 import json
 import os
@@ -154,6 +171,46 @@ def src_strong_pool(date_str, n=20):
 
 
 # ---------------------------------------------------------------
+# 主力池对照：读当日 scored json，得到 code → 池内字段（用于 in_main_pool 标记）
+# ---------------------------------------------------------------
+def load_scored_map(here, date_str, scored_path=None):
+    """→ (set(code6), dict(code6 → {name, sector, rating, total, price, pct_chg}))
+
+    优先显式路径，其次同日 top200_scored_<date>.json，最后取最新一份。
+    """
+    cands = []
+    if scored_path:
+        cands.append(scored_path)
+    cands.append(os.path.join(here, f"top200_scored_{date_str}.json"))
+    try:
+        import glob
+        latest = sorted((f for f in glob.glob(os.path.join(here, "top200_scored_*.json"))
+                         if ".bak" not in f and "_watch_" not in f), reverse=True)
+        cands += latest[:1]
+    except Exception:
+        pass
+    for p in cands:
+        try:
+            if p and os.path.exists(p):
+                data = json.load(open(p, encoding='utf-8'))
+                m = {}
+                for r in (data.get("results") or []):
+                    c6 = norm_code6(r.get("code"))
+                    if not c6:
+                        continue
+                    m[c6] = {"name": r.get("name"),
+                             "sector": r.get("sector"),
+                             "rating": r.get("rating"),
+                             "total": r.get("total"),
+                             "price": r.get("price"),
+                             "pct_chg": r.get("pct_chg")}
+                return set(m.keys()), m
+        except Exception:
+            continue
+    return set(), {}
+
+
+# ---------------------------------------------------------------
 def merge_sources(items):
     """同 code 合并：分数取 max，sources/reason 累加"""
     agg = {}
@@ -166,7 +223,7 @@ def merge_sources(items):
             agg[c6] = {'name': it.get('name'), 'code': c6,
                        'score': float(it.get('score') or 0),
                        'sources': list(it.get('sources') or []),
-                       'reason': it.get('reason') or ''}
+                       'reason': it.get('reason') or '', 'ai_reason': ''}
         else:
             cur['score'] = max(cur['score'], float(it.get('score') or 0))
             cur['sources'] = sorted(set(cur['sources']) | set(it.get('sources') or []))
@@ -179,29 +236,32 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--date', default=None, help='数据日期(默认北京当日)')
     ap.add_argument('--top', type=int, default=40, help='输出清单条数(默认40)')
+    ap.add_argument('--scored', default=None, help='当日主力池 scored json(用于池内对照)')
     ap.add_argument('--merge-search', action='store_true',
-                    help='合并 Agent 联网检索补充(focus_list_<date>.search.json)')
+                    help='合并 Agent 联网检索补充(focus_pool_<date>.search.json)')
     ap.add_argument('--emit-template', action='store_true', help='只生成 Agent 填写模板')
     ap.add_argument('--list', action='store_true', help='只打印人读清单，不写文件')
     args = ap.parse_args()
 
     date_str = args.date or bj_today()
-    search_path = os.path.join(HERE, f'focus_list_{date_str}.search.json')
-    out_path = os.path.join(HERE, f'focus_list_{date_str}.json')
+    search_path = os.path.join(HERE, f'focus_pool_{date_str}.search.json')
+    out_path = os.path.join(HERE, f'focus_pool_{date_str}.json')
 
     if args.emit_template:
         tpl = {
             'date': date_str,
             'filled_by': 'agent-web-search',
             'instructions': (
-                '由 Agent 通过互联网搜索填写「当日重点需要关注的标的」。'
+                '由本地 Agent 通过互联网搜索填写「当日需要重点关注的个股/方向」。'
                 '每条: name(必需), code(6位或带前缀), reason(必需, 一句话说明为何关注), '
-                'source(如 龙虎榜/公告/政策/题材催化/产业链), url(可留空)。'
+                'source(如 龙虎榜/公告/政策/题材催化/产业链/研报), url(可留空)。'
+                'ai_summary: 一句话总结当日焦点主线(可留空)。'
                 '只收真实检索到的信息，查不到就留空，不要编造。'),
+            'ai_summary': '',
             'additions': [],
         }
         json.dump(tpl, open(search_path, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-        print(f'✅ Agent 搜索模板 → {os.path.basename(search_path)}')
+        print(f'✅ Agent 联网检索模板 → {os.path.basename(search_path)}')
         return 0
 
     # ---- 机器源 ----
@@ -239,10 +299,11 @@ def main():
     agg = merge_sources(items)
 
     # ---- Agent 联网检索补充 ----
-    n_add = 0
+    n_add, ai_summary = 0, ''
     if args.merge_search and os.path.exists(search_path):
         try:
             srch = json.load(open(search_path, encoding='utf-8'))
+            ai_summary = str(srch.get('ai_summary', '') or '').strip()
             for a in (srch.get('additions') or []):
                 c6 = norm_code6(a.get('code'))
                 if not c6 or not (a.get('name') or '').strip():
@@ -250,16 +311,19 @@ def main():
                 reason = str(a.get('reason', '')).strip()
                 if not reason:
                     continue
+                src_tag = str(a.get('source', '') or '').strip()
+                tag = f"[联网检索·{src_tag}] " if src_tag else "[联网检索] "
                 cur = agg.get(c6)
                 if cur is None:
                     agg[c6] = {'name': a['name'], 'code': c6, 'score': 6.0,
                                'sources': ['agent_search'],
-                               'reason': f"[联网检索] {reason}"}
+                               'reason': f"{tag}{reason}", 'ai_reason': reason}
                 else:
                     cur['score'] += 3.0   # 人工/Agent 检索确认 → 加权
                     cur['sources'] = sorted(set(cur['sources']) | {'agent_search'})
+                    cur['ai_reason'] = reason
                     if reason not in cur['reason']:
-                        cur['reason'] += f"；[联网检索] {reason}"
+                        cur['reason'] += f"；{tag}{reason}"
                 n_add += 1
             print(f'  Agent 检索补充合并: {n_add} 条')
         except Exception as e:
@@ -267,34 +331,56 @@ def main():
     elif args.merge_search:
         print(f'  ⚠️ 未找到 {os.path.basename(search_path)}（可先 --emit-template 生成模板）')
 
+    # ---- 主力池对照（in_main_pool 标记 + 评级/板块富集）----
+    pool_codes, pool_map = load_scored_map(HERE, date_str, args.scored)
+
     ranked = sorted(agg.values(), key=lambda x: -x['score'])[:args.top]
     for i, it in enumerate(ranked, 1):
         it['rank'] = i
-        it['code'] = market_prefix(it['code']) + it['code']  # 统一带前缀(与生产口径一致)
+        c6 = it['code']
+        meta = pool_map.get(c6) or {}
+        it['in_main_pool'] = c6 in pool_codes
+        it['sector'] = meta.get('sector')
+        it['rating'] = meta.get('rating')
+        it['total'] = meta.get('total')
+        it['price'] = meta.get('price')
+        it['pct_chg'] = meta.get('pct_chg')
+        if not it.get('name') and meta.get('name'):
+            it['name'] = meta['name']
+        it['code'] = market_prefix(c6) + c6  # 统一带前缀(与生产口径一致)
 
+    n_in = sum(1 for x in ranked if x['in_main_pool'])
     out = {
         'date': date_str,
         'generated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'title': '每日 AI 焦点池',
+        'method': '机器源(东财人气榜/涨跌停池/强势股池) + 本地AI联网检索(题材催化/公告/政策/龙虎榜)',
         'generated_by': 'fetch_focus_list.py (互联网搜索: 东财人气榜/涨跌停池/强势股池 + Agent 检索)',
         'sources_used': sources_used,
         'n_raw': len(agg),
         'elapsed_s': round(time.time() - t0, 1),
         'agent_search': {'merged': bool(n_add), 'n_additions': n_add},
+        'ai_summary': ai_summary,
+        'n_in_pool': n_in,
+        'n_out_pool': len(ranked) - n_in,
         'focus': ranked,
     }
 
     if args.list:
-        print(f"\n📅 {date_str} 当日重点关注标的 {len(ranked)} 只（机器源 {sources_used}）")
+        print(f"\n📅 {date_str} 每日 AI 焦点池 {len(ranked)} 只"
+              f"（机器源 {sources_used}；池内 {n_in} / 池外 {len(ranked)-n_in}）")
         for it in ranked:
+            badge = f"[{it['rating']}]" if it.get('rating') else ("[池内]" if it['in_main_pool'] else "[池外]")
             print(f"  {it['rank']:>2}. {it['name']:<8}{it['code']}  {it['score']:>4.1f}分  "
-                  f"{'+'.join(it['sources']):<22} {it['reason'][:50]}")
+                  f"{badge:<4} {'+'.join(it['sources']):<22} {it['reason'][:46]}")
         return 0
 
     json.dump(out, open(out_path, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    print(f"\n✅ 焦点清单 → {os.path.basename(out_path)}（{len(ranked)} 只，机器源 {sources_used}）")
+    print(f"\n✅ 每日 AI 焦点池 → {os.path.basename(out_path)}"
+          f"（{len(ranked)} 只，池内 {n_in} / 池外 {len(ranked)-n_in}，机器源 {sources_used}）")
     if not os.path.exists(search_path):
         print(f"💡 下一步：python3 fetch_focus_list.py --emit-template 生成 Agent 联网检索模板，"
-              f"填写后 --merge-search 重跑即完成「先搜索后复盘」")
+              f"填写后 --merge-search 重跑即完成「AI 联网筛选」")
     return 0
 
 

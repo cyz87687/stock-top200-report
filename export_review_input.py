@@ -493,16 +493,20 @@ def main():
         return 1
     scored = os.path.abspath(scored)
 
-    # 互联网焦点清单: 优先同日, 否则最新一份(v3.0 复盘前置环节)
+    # 每日 AI 焦点池（v3.4，替代观察池）: 优先 focus_pool_（新）/ focus_list_（旧名兼容）
     focus = args.focus
     if focus is None:
         _d = os.path.basename(scored).replace("top200_scored_", "").replace(".json", "")
-        f_same = os.path.join(here, f"focus_list_{_d}.json")
-        focus = f_same if os.path.exists(f_same) else _find_latest(here, "focus_list_*.json")
+        f_same = os.path.join(here, f"focus_pool_{_d}.json")
+        if not os.path.exists(f_same):
+            f_old = os.path.join(here, f"focus_list_{_d}.json")
+            f_same = f_old if os.path.exists(f_old) else f_same
+        focus = f_same if os.path.exists(f_same) else (
+            _find_latest(here, "focus_pool_*.json") or _find_latest(here, "focus_list_*.json"))
     portfolio = args.portfolio or _find_latest(here, "sector/portfolio_*.json")
 
     print(f"📥 主力池: {os.path.basename(scored)}")
-    print(f"📥 焦点清单: {os.path.basename(focus) if focus else '(无, 建议先跑 fetch_focus_list.py)'}")
+    print(f"📥 焦点池: {os.path.basename(focus) if focus else '(无, 建议先跑 fetch_focus_list.py)'}")
     print(f"📥 组合  : {os.path.basename(portfolio) if portfolio else '(无)'}")
 
     pkg = build(scored, focus, portfolio, max_n=args.max)

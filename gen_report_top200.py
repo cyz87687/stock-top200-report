@@ -1223,6 +1223,111 @@ try:
 except Exception as _e:
     print(f"⚠️ 读取本地复盘目标价失败: {_e}")
 
+# ===== v3.4 每日 AI 焦点池（替代 v3.1 已删除的「观察池」）=====
+# 来源: fetch_focus_list.py 产出的 focus_pool_<date>.json
+#   观察池旧逻辑=按成交额 200~1000 名用内部评分选 → 已废弃；
+#   现改为「每日 AI 焦点池」= 机器源(东财人气榜/涨跌停池/强势股池) + 本地AI联网检索(题材催化/公告/政策/龙虎榜)。
+# 数据纪律: 只读与当日数据日期一致的焦点池文件，避免陈旧文件冒充当日焦点。
+_focus_pool = {}
+try:
+    _fp = os.path.join(_ai_dir, f"focus_pool_{date_str}.json")
+    if not os.path.exists(_fp):
+        _fp = os.path.join(_ai_dir, f"focus_list_{date_str}.json")  # 兼容旧文件名
+    if os.path.exists(_fp):
+        _obj = json.load(open(_fp, encoding="utf-8"))
+        _odate = str(_obj.get("date", ""))
+        if (not date_str) or (date_str in _odate):
+            _focus_pool = _obj
+            print(f"🎯 每日AI焦点池: {len(_obj.get('focus') or [])} 只 (来源 {os.path.basename(_fp)})")
+        else:
+            print(f"⚠️ 跳过日期不匹配的焦点池 {os.path.basename(_fp)} (文件 date={_odate} ≠ 数据日期 {date_str})")
+except Exception as _e:
+    print(f"⚠️ 读取焦点池失败: {_e}")
+
+
+def _focus_pool_html(fp):
+    """每日 AI 焦点池区块渲染（v3.4）。
+    表格列: 排名 / 名称(代码) / 类型(池内评级 或 池外) / 入选来源 / 入选理由。
+    池内标的显示当日评分评级与总分，池外标的标记「池外」并提示仅作关注线索。
+    """
+    focus = fp.get("focus") or []
+    if not focus:
+        return ""
+    srcs = fp.get("sources_used") or {}
+    ag = fp.get("agent_search") or {}
+    n_in = fp.get("n_in_pool")
+    if n_in is None:
+        n_in = sum(1 for x in focus if x.get("in_main_pool"))
+    n_out = len(focus) - n_in
+    ai_sum = (fp.get("ai_summary") or "").strip()
+
+    src_txt = " · ".join(f"{k} {v}" for k, v in srcs.items() if v) or "无"
+    _RCOLOR = {"S": "#fbbf24", "A": "#3b82f6", "B": "#f59e0b", "C": "#f97316", "D": "#dc2626"}
+
+    rows = []
+    for it in focus[:40]:
+        name = html_mod.escape(str(it.get("name") or "—"))
+        code = html_mod.escape(str(it.get("code") or ""))
+        reason = html_mod.escape(str(it.get("reason") or ""))
+        src = html_mod.escape("+".join(it.get("sources") or []))
+        if it.get("in_main_pool"):
+            rt = it.get("rating")
+            tot = it.get("total")
+            _c = _RCOLOR.get(rt, "#94a3b8")
+            badge = (f'<span style="color:{_c};font-weight:800;">{rt or "池内"}</span>'
+                     + (f'<span style="color:#64748b;font-size:10px;"> {tot:.1f}</span>'
+                        if isinstance(tot, (int, float)) else ''))
+        else:
+            badge = '<span style="color:#64748b;font-weight:700;">池外</span>'
+        pct = it.get("pct_chg")
+        if isinstance(pct, (int, float)):
+            _pc = "#ef4444" if pct > 0 else ("#22c55e" if pct < 0 else "#94a3b8")
+            name += f'<span style="font-size:10px;color:{_pc};margin-left:4px;">{pct:+.1f}%</span>'
+        rows.append(
+            f'<tr style="border-bottom:1px solid #1e293b;">'
+            f'<td style="padding:5px 6px;color:#64748b;">{it.get("rank","")}</td>'
+            f'<td style="padding:5px 6px;color:#e2e8f0;font-weight:600;">{name}'
+            f'<span style="font-size:10px;color:#64748b;margin-left:4px;">{code}</span></td>'
+            f'<td style="padding:5px 6px;text-align:center;">{badge}</td>'
+            f'<td style="padding:5px 6px;color:#94a3b8;font-size:10px;">{src}</td>'
+            f'<td style="padding:5px 6px;color:#cbd5e1;font-size:11px;">{reason}</td>'
+            f'</tr>')
+
+    ai_badge = (f'<span style="color:#a78bfa;">AI联网检索 +{ag.get("n_additions",0)} 条</span>'
+                if ag.get("merged") else
+                '<span style="color:#64748b;">AI联网检索 未合并（仅机器源）</span>')
+    ai_sum_html = (f'<div style="font-size:11px;color:#c4b5fd;padding:8px 10px;margin-bottom:8px;'
+                   f'background:rgba(167,139,250,0.08);border-radius:6px;border-left:3px solid #a78bfa;">'
+                   f'🤖 AI 焦点主线：{html_mod.escape(ai_sum)}</div>') if ai_sum else ""
+
+    return f'''
+    <div class="section-block" id="sec-focus-pool" style="margin:24px 0;padding:18px 20px;background:#0f172a;border:1px solid #334155;border-radius:12px;">
+        <div class="section-title" style="border-bottom:2px solid #a78bfa;color:#a78bfa;">
+            🎯 每日 AI 焦点池 <span style="font-size:11px;color:#64748b;font-weight:400;">
+            （机器源 + 本地AI联网筛选 · 共 {len(focus)} 只：池内 {n_in} / 池外 {n_out}）</span>
+        </div>
+        <div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">
+            数据源：{html_mod.escape(src_txt)}　｜　{ai_badge}　｜　
+            方法：{html_mod.escape(str(fp.get("method","")))[:120]}
+        </div>
+        {ai_sum_html}
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead><tr style="border-bottom:2px solid #334155;color:#94a3b8;">
+                <th style="padding:6px;text-align:left;width:34px;">#</th>
+                <th style="padding:6px;text-align:left;">标的</th>
+                <th style="padding:6px;text-align:center;width:72px;">类型</th>
+                <th style="padding:6px;text-align:left;width:150px;">入选来源</th>
+                <th style="padding:6px;text-align:left;">入选理由</th>
+            </tr></thead>
+            <tbody>{''.join(rows)}</tbody>
+        </table>
+        <div style="font-size:11px;color:#64748b;margin-top:8px;">
+            📌 说明：本池替代原「观察池」（v3.1 已删除）——不再按成交额排名用内部评分选样，
+            而是每日由互联网真实数据 + 本地 AI 联网检索筛出「需要关注的标的」。
+            <b style="color:#a78bfa;">池外标的仅为关注线索</b>（无当日评分），不等于推荐。
+        </div>
+    </div>'''
+
 
 def _px_cmp_html(cur, tech_target, inst=None):
     """现价 vs 目标价并列对比(v2.46): 现价 → 技术目标 [+ 机构目标], 带价差与预期涨跌幅。
@@ -3034,8 +3139,13 @@ html_parts.append('''
 
 ''')
 
-# ===== v3.0: 观察池已删除(2026-10-13 老大指令) — 原 v2.41 观察池区块(成交额200~1000名 AI筛选)整体移除,
-#      当日重点关注标的改由本地复盘链路的「互联网搜索清单」环节提供(见 run_local_review.sh)。=====
+# ===== v3.4: 「每日 AI 焦点池」区块（替代 v3.1 已删除的「观察池」）=====
+#   观察池旧逻辑=按成交额 200~1000 名用内部评分选 → 已废弃；
+#   现改为 fetch_focus_list.py 产出的 focus_pool_<date>.json
+#   = 机器源(东财人气榜/涨跌停池/强势股池) + 本地AI联网检索(题材催化/公告/政策/龙虎榜)。
+#   数据缺失时静默不渲染（不阻断报告生成）。
+if _focus_pool.get("focus"):
+    html_parts.append(_focus_pool_html(_focus_pool))
 
 # ===== v2.30 评分模型总结 (v2.44: 来源如实标注) =====
 _ams = data.get("ai_model_summary", "").strip()

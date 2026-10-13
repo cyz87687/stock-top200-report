@@ -10,9 +10,10 @@
 | 评分模型版本 | **stock-scorer v3.0-10dim**（十维 · 全市场回测先验 · AI 增强 · 含板块动量） |
 | 数据日期 | 见线上报告页眉（最新交易日） |
 | 主力池 | 全A成交额 TOP500（`config.json` `pool_size`，入池剔除 ST/退市） |
-| 观察池 | **已删除（2026-10-13）** —— 全链路移除，改为单池 TOP500 |
+| 每日 AI 焦点池 | **替代已删除的观察池（v3.4，2026-10-13）** —— 机器源（东财人气榜/涨跌停池/强势股池）+ **本地 AI 联网检索**（题材催化/公告/政策/龙虎榜），由 `fetch_focus_list.py` 产出 `focus_pool_<date>.json`，报告页「🎯 每日 AI 焦点池」区块展示 |
 | 自动更新 | 工作日 15:30（北京时间）via GitHub Actions |
 | 本地深度复盘 | 收盘后由 `run_local_review.sh` 编排：先互联网搜索当日焦点标的 → 逐公司联网核查覆盖页面结论 |
+| 本地焦点池编排 | `run_daily_focus.sh`（status/prepare/merge/render/push）：机器源 → Agent 联网检索 → 合并 → 出稿 |
 | 因子有效性评估 | Rank IC（T+1/T+5/T+20），Newey-West t + Bonferroni 校正，`factor_eval.py` 每日更新 |
 | 评分权重 | 全市场回测 Top5 因子先验映射（`factor_weights.json`），池内 IC 积累 ≥30 截面后走步验证再拟合 |
 | 数据新鲜度守卫 | `check_data_fresh.py`（workflow Step 1.5，陈旧数据 + 池覆盖率熔断） |
@@ -89,6 +90,22 @@ total = ( 消息面×0.18 + 基本面×0.18 + 板块动量×0.10
 
 > ⚠️ **v3.0（2026-10-13）观察池逻辑已全链路删除**：`select_watchlist.py` 移除、`top1000_all_a.json` 停产、
 > 报告层不再有观察池区块。生产链路为**单池 TOP500**；`config.json` `dual_pool_compare` 为历史灰度开关（默认关）。
+>
+> ✅ **v3.4（2026-10-13）「观察池」由「每日 AI 焦点池」替代**：原观察池按成交额 200~1000 名用内部评分选样，
+> 现改为**每日由互联网真实数据 + 本地 AI 联网检索**筛出「需要关注的个股」。数据文件 `focus_pool_<date>.json`，
+> 报告页新增「🎯 每日 AI 焦点池」区块（池内标的带当日评级/总分，池外标的标记为关注线索）。详见下文。
+
+### 每日 AI 焦点池（v3.4 · 替代观察池）
+
+| 项 | 说明 |
+|---|---|
+| 定位 | 观察池已删除后，承担「当日重点关注标的」的产出；**不是推荐**，是关注线索 |
+| 机器源 | 东财人气榜（`stock_hot_rank_em`）/ 涨停池（`stock_zt_pool_em`）/ 跌停池 / 强势股池（`stock_zt_pool_strong_em`），单源失败自动降级 |
+| AI 联网检索 | 由本地 Agent 联网检索当日「题材催化 / 公告 / 政策 / 龙虎榜 / 产业链」，写入 `focus_pool_<date>.search.json` 后 `--merge-search` 合并（优先级高于机器源） |
+| 产出文件 | `focus_pool_<date>.json`（含 `focus[]`：排名/名称/代码/来源/理由/`in_main_pool`/评级/总分） |
+| 报告展示 | 「🎯 每日 AI 焦点池」区块：表格列 排名 / 标的（代码 + 涨跌幅）/ 类型（池内评级 或 池外）/ 入选来源 / 入选理由 |
+| 编排 | `./run_daily_focus.sh prepare` → 【Agent 联网检索】 → `merge` → `render` → `push`；`status` 随时查看进度 |
+| 数据纪律 | 只读与当日数据日期一致的焦点池文件；查不到的写「未查到」，不编造 |
 
 自动化：`.github/workflows/daily-refresh.yml`（工作日 15:30 触发，带 3 次整体重试 + push rebase 重试）。
 
@@ -366,7 +383,8 @@ Step 1.5 设为**可重试**（30s×3）：收盘后指数日线偶有几分钟�
 
 - 最新 1 份主报告 HTML（`top200_report_<最新日期>.html` + `index.html`）
 - 最新 **2 份**主力池评分 JSON（`gen_report_top200.py` 依赖上一份做评级变化追踪）
-- 最新 1 份观察池评分 / watchlist / 组合 JSON / 组合报告 HTML
+- 最新 1 份**每日 AI 焦点池** JSON（`focus_pool_<最新日期>.json`，替代原观察池/watchlist）
+- 最新 1 份组合 JSON / 组合报告 HTML
 - 最新 1 份板块动量 + `sector_momentum_latest.json` + 静态映射 `sw_map.json` / `backtest_ref.json`
 - `factor_history.json`（Rank IC 逐日截面快照 + 前复权价格回填，约 22KB/日，**只增不改**）
   + `factor_ic.json`（最新评估结果）+ `factor_weights.json`（十维先验/IC 驱动权重决策记录）
@@ -401,8 +419,8 @@ python3 fetch_top200_sina.py && python3 step2_stockscorer_v2.py top200_all_a.jso
 ├── index.html                     # 线上主报告（最新）
 ├── top200_report_<date>.html      # 当日主报告
 ├── top200_scored_<date>.json      # 主力池十维评分（保留最新2份）
-├── top200_scored_watch_<date>.json# 观察池评分
-├── watchlist_<date>.json          # 观察池 AI 筛选结果
+├── focus_pool_<date>.json         # 每日 AI 焦点池（机器源 + 本地AI联网检索；替代原观察池/watchlist）
+├── focus_pool_<date>.search.json  # Agent 联网检索填写模板（不入库）
 ├── ai_assessment.json            # AI 盘面评估层
 ├── factor_history.json          # Rank IC 逐日截面快照 + 前复权价格回填（只增）
 ├── factor_ic.json               # 因子有效性评估结果（最新）

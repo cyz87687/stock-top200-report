@@ -56,7 +56,9 @@ done
 set -- "${_args[@]:-}"
 
 SCORED="top200_scored_${BJ_DATE}.json"
-FOCUS="focus_list_${BJ_DATE}.json"
+FOCUS="focus_pool_${BJ_DATE}.json"
+# v3.4: 焦点池文件名由 focus_list_ 改为 focus_pool_（替代观察池）；兼容旧名
+[ -f "$FOCUS" ] || [ ! -f "focus_list_${BJ_DATE}.json" ] || FOCUS="focus_list_${BJ_DATE}.json"
 INPUT="review_input_${BJ_DATE}.json"
 RESEARCH="review_research_${BJ_DATE}.json"
 MERGED="review_research_merged_${BJ_DATE}.json"
@@ -102,11 +104,11 @@ PY
   ;;
 
 prepare)
-  mark "阶段0.5 · 互联网搜索当日重点关注标的（复盘前置，v3.0）"
-  "$PY" fetch_focus_list.py --date "$BJ_DATE" || warn "焦点清单机器源失败(非致命, 继续)"
+  mark "阶段0.5 · 每日 AI 焦点池（复盘前置，v3.4 替代观察池）"
+  "$PY" fetch_focus_list.py --date "$BJ_DATE" --scored "$SCORED" || warn "焦点池机器源失败(非致命, 继续)"
   "$PY" fetch_focus_list.py --date "$BJ_DATE" --emit-template || true
   if [ -f "$FOCUS" ]; then
-    ok "焦点清单: $FOCUS（$( "$PY" -c "import json;print(len(json.load(open('$FOCUS'))['focus']))" 2>/dev/null || echo '?') 只）"
+    ok "焦点池: $FOCUS（$( "$PY" -c "import json;print(len(json.load(open('$FOCUS'))['focus']))" 2>/dev/null || echo '?') 只）"
   fi
 
   mark "阶段0 · 导出复盘输入（含互联网焦点标的）"
@@ -125,8 +127,8 @@ prepare)
   ;;
 
 focus)
-  mark "互联网焦点清单 · ${BJ_DATE}"
-  "$PY" fetch_focus_list.py --date "$BJ_DATE" "$@" || exit 1
+  mark "每日 AI 焦点池 · ${BJ_DATE}"
+  "$PY" fetch_focus_list.py --date "$BJ_DATE" --scored "$SCORED" "$@" || exit 1
   if [ -f "$FOCUS" ]; then
     # 焦点清单更新后用最新清单重导候选(保持候选包与焦点一致)
     if [ -f "$SCORED" ]; then
