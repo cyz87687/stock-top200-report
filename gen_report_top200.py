@@ -567,10 +567,22 @@ def _quant_picks(mode):
 
 
 quant_picks_all = []
+# v3.2 P1-4: 量化双路线归属映射（code → [momentum, reversal]），供个股行 data-route 标注与路线筛选
+_route_map = {}
 for _m in ("momentum", "reversal"):
     _ps, _ = _quant_picks(_m)
     for _p in _ps:
         quant_picks_all.append(_p.get("name"))
+        _cd = _p.get("code")
+        if _cd:
+            _route_map.setdefault(_cd, [])
+            if _m not in _route_map[_cd]:
+                _route_map[_cd].append(_m)
+
+
+def route_of(r):
+    """个股所属量化路线标签（逗号拼接，供筛选/展示）。空串=未入选任一组合。"""
+    return ",".join(_route_map.get(r.get("code")) or [])
 
 # 开始生成HTML
 html_parts = []
@@ -671,6 +683,11 @@ a {color:inherit;}
 .rating-up {background:#dcfce7;color:#16a34a;}
 .rating-down {background:#fee2e2;color:#dc2626;}
 .rating-new {background:#fef3c7;color:#d97706;}
+/* v3.2 P1-4 资格风险徽标 */
+.qual-badge {display:inline-block;font-size:9px;line-height:1;font-weight:700;padding:2px 4px;border-radius:4px;margin-left:3px;vertical-align:middle;}
+.qual-new {background:#fef3c7;color:#b45309;border:1px solid #f59e0b;}
+.qual-illiq {background:#fee2e2;color:#b91c1c;border:1px solid #ef4444;}
+.qual-susp {background:#e2e8f0;color:#475569;border:1px solid #94a3b8;}
 
 /* 分页 */
 .pagination {display:flex;gap:6px;justify-content:center;align-items:center;margin:16px 0;flex-wrap:wrap;}
@@ -2714,6 +2731,24 @@ html_parts.append('''
             </select>
         </div>
         <div class="control-group">
+            <label>🧭 路线筛选</label>
+            <select id="routeFilter">
+                <option value="">全部路线</option>
+                <option value="reversal">🔄 反转路线（超跌反弹）</option>
+                <option value="momentum">📈 动量路线（顺动量做多）</option>
+                <option value="both">🔀 双路线入选</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label>✅ 资格筛选</label>
+            <select id="qualFilter">
+                <option value="">全部标的</option>
+                <option value="qualified">仅合格标的</option>
+                <option value="illiquid">⚠️ 流动性未达标</option>
+                <option value="new_stock">🆕 次新股</option>
+            </select>
+        </div>
+        <div class="control-group">
             <label>📈 每页显示</label>
             <select id="pageSize">
                 <option value="20">20条/页</option>
@@ -2841,13 +2876,24 @@ for idx, r in enumerate(results):
     fund_text = ", ".join([html_mod.escape(x) for x in fund_reasons[:3]]) if fund_reasons else "无"
     theme_text = ", ".join([html_mod.escape(x) for x in theme_reasons[:3]]) if theme_reasons else "无"
 
+    # v3.2 P1-4: 资格风险徽标（次新股 / 流动性未达标 / 停牌），透明披露不隐藏
+    _qual_tags = []
+    if r.get("is_new"):
+        _qual_tags.append('<span class="qual-badge qual-new" title="上市不足 60 日（次新），因子 K 线不足已兜底">新</span>')
+    if not r.get("liquid_ok", True):
+        _qual_tags.append('<span class="qual-badge qual-illiq" title="当日成交额低于流动性地板（近似口径），实盘冲击成本高">流</span>')
+    if r.get("suspended"):
+        _qual_tags.append('<span class="qual-badge qual-susp" title="当日停牌（价格未更新）">停</span>')
+    _qual_badge = (" " + "".join(_qual_tags)) if _qual_tags else ""
+
     html_parts.append(f'''
                 <tr class="expandable" data-rating="{rating}" data-sector="{sector_disp(r)}" data-code="{r['code']}" data-name="{r['name']}" data-original-rank="{i}" data-fwd-pe="{r.get('fwd_pe',0) or 0}" data-growth="{r.get('growth',0) or 0}" data-position="{tech.get('position',50) or 50}" data-score-theme="{_theme_disp_t:.2f}"
+                    data-route="{route_of(r)}" data-liquid="{'1' if r.get('liquid_ok', True) else '0'}" data-newstock="{'1' if r.get('is_new') else '0'}" data-qual="{'1' if (r.get('liquid_ok', True) and not r.get('is_new') and not r.get('suspended')) else '0'}"
                     data-news="{r['score_news']:.2f}" data-tech-score="{_tech_disp_t:.2f}" data-fund-score="{r['score_fund']:.2f}" data-theme-score="{_theme_disp_t:.2f}"
                     data-s-news="{r['score_news']:.2f}" data-s-tech="{_tech_disp_t:.2f}" data-s-fund="{r['score_fund']:.2f}" data-s-theme="{_theme_disp_t:.2f}"{f' data-s-sector="{r["score_sector"]:.2f}"' if r.get('score_sector') is not None else ''}{_dsub_attrs}
                     data-news-text="{html_mod.escape(news_text)}" data-tech-text="{html_mod.escape(tech_text)}" data-fund-text="{html_mod.escape(fund_text)}" data-theme-text="{html_mod.escape(theme_text)}">
                     <td class="s-rank" data-value="{i}">{i}</td>
-                    <td class="s-name sticky-col col-name-sticky" data-value="{r['name']}">{r['name']}</td>
+                    <td class="s-name sticky-col col-name-sticky" data-value="{r['name']}">{r['name']}{_qual_badge}</td>
                     <td class="s-code col-code" data-value="{r['code']}">{r['code']}</td>
                     <td class="s-sector col-sector" data-value="{sector_disp(r)}">{sector_disp(r)}</td>
                     <td class="s-pct {pct_cls} col-pct sticky-col col-pct-sticky" data-value="{pct}">{pct:+.2f}%</td>
@@ -3534,6 +3580,11 @@ function initFilters() {
     });
     document.getElementById('ratingFilter').addEventListener('change', function() { currentPage = 1; applyFilters(); });
     document.getElementById('sectorFilter').addEventListener('change', function() { currentPage = 1; applyFilters(); });
+    // v3.2 P1-4: 路线/资格筛选
+    const _rf = document.getElementById('routeFilter');
+    if (_rf) _rf.addEventListener('change', function() { currentPage = 1; applyFilters(); });
+    const _qf = document.getElementById('qualFilter');
+    if (_qf) _qf.addEventListener('change', function() { currentPage = 1; applyFilters(); });
     document.getElementById('pageSize').addEventListener('change', function() { currentPage = 1; applyFilters(); });
 }
 
@@ -3642,6 +3693,8 @@ function applyFilters() {
     const rating = document.getElementById('ratingFilter').value;
     const sector = document.getElementById('sectorFilter').value;
     const pageSize = parseInt(document.getElementById('pageSize').value);
+    const routeSel = document.getElementById('routeFilter') ? document.getElementById('routeFilter').value : '';
+    const qualSel = document.getElementById('qualFilter') ? document.getElementById('qualFilter').value : '';
 
     const tbody = document.getElementById('tableBody');
     let rows = Array.from(tbody.querySelectorAll('tr.expandable'));
@@ -3653,6 +3706,18 @@ function applyFilters() {
         if (search && !row.dataset.name.toLowerCase().includes(search) && !row.dataset.code.toLowerCase().includes(search)) return false;
         if (rating && row.dataset.rating !== rating) return false;
         if (sector && row.dataset.sector !== sector) return false;
+        // v3.2 P1-4: 路线筛选（反转/动量/双路线入选）
+        if (routeSel) {
+            const _rts = (row.dataset.route || '').split(',').filter(Boolean);
+            if (routeSel === 'both') { if (_rts.indexOf('momentum') < 0 || _rts.indexOf('reversal') < 0) return false; }
+            else if (_rts.indexOf(routeSel) < 0) return false;
+        }
+        // v3.2 P1-4: 资格筛选（合格/流动性未达标/次新）
+        if (qualSel) {
+            if (qualSel === 'qualified' && row.dataset.qual !== '1') return false;
+            if (qualSel === 'illiquid' && row.dataset.liquid !== '0') return false;
+            if (qualSel === 'new_stock' && row.dataset.newstock !== '1') return false;
+        }
         if (!passesQuickFilter(row)) return false;
         return true;
     });
