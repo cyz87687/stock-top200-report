@@ -3133,7 +3133,7 @@ if _ic and _ic.get("factors"):
             _wf_html = (f'''
                 <div style="font-size:11px;color:#f59e0b;margin-top:8px;line-height:1.7;padding:8px 10px;background:rgba(245,158,11,0.08);border-radius:6px;">
                     📈 <b>样本外走步验证：待池内积累</b> —— 十维新维度（超跌60/乖离/RSI反转/量能反向/超买反向/题材内禀/关注度）
-                    在 TOP''' + str(_POOL_N) + ''' 池<b>无历史截面快照</b>，当前权重为全市场回测（2021-01~2026-09，5019 只，630 万事件）证据的
+                    在 TOP{_POOL_N} 池<b>无历史截面快照</b>，当前权重为全市场回测（2021-01~2026-09，5019 只，630 万事件）证据的
                     先验映射；满 30+ 截面后由 <code style="color:#e2e8f0;">factor_eval.py --optimize-weights</code>
                     重拟合，届时本区块自动展示走步验证摘要（OOS 复合 IC 对比 / λ 扫描 / 胜率）。
                 </div>''')
@@ -3221,7 +3221,7 @@ if _ic and _ic.get("factors"):
             📐 因子有效性评估（Rank IC）</div>
         <div style="font-size:11px;color:#64748b;margin-bottom:12px;line-height:1.7;">
             口径（v2.47 修正）：Rank IC = Spearman(因子值在当日截面的秩, 个股未来 h 个<b>真实交易日</b>收益)，h ∈ {{1, 5, 20}}；
-            收益对当日 TOP''' + str(_POOL_N) + ''' <b>全部个股</b>计算（回填全市场前复权日线，消除"跌出榜单即消失"的留存偏差 —— v1 口径 T+20 流失 34%）；
+            收益对当日 TOP{_POOL_N} <b>全部个股</b>计算（回填全市场前复权日线，消除"跌出榜单即消失"的留存偏差 —— v1 口径 T+20 流失 34%）；
             t 值采用 <b style="color:#fbbf24;">Newey-West HAC</b> 调整（h=5/20 相邻观测共享 80%/95% 收益窗口，普通 t 会虚高显著性）；
             <b style="color:#fbbf24;">★</b> = 通过 Bonferroni 多重检验校正（v3.0 起 10 维度×3 周期=30 次，|NW t|≥3.08；旧五维期 15 次，|NW t|≥2.97）。
             样本 &lt; 20 个截面不给出有效性判定。当前样本：
