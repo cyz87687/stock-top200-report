@@ -3482,13 +3482,14 @@ def main():
     else:
         stocks = raw["top50"]
     
-    # 剔除金融股
+    # 剔除金融股（项目初始设计：金融股无「题材热度」属性，与十维模型口径不符）
+    #   v3.2 P1-3: 记入 _fin_removed，随 stats 输出供报告层透明披露「池 N → 实际评分 M」
     FINANCE_SECTORS = {"金融"}
     before = len(stocks)
     stocks = [s for s in stocks if get_sec(s["name"]) not in FINANCE_SECTORS]
-    removed = before - len(stocks)
-    if removed:
-        print(f"   🚫 剔除金融股 {removed}只")
+    _fin_removed = before - len(stocks)
+    if _fin_removed:
+        print(f"   🚫 剔除金融股 {_fin_removed}只（无题材热度属性，不计入评分）")
 
     # v3.2 P0-1/P0-3: 资格/流动性标记映射（fetch 池 → 逐股透传，供报告层与组合层）
     _elig_map = {}
@@ -4057,6 +4058,7 @@ def main():
                           for s, v in sorted(sec_avg.items(), key=lambda x: -sum(x[1])/len(x[1]))},
             "factor_coverage": _cov_summary,
             "eligible_marks": raw.get("eligible_marks") or {},
+            "finance_removed": _fin_removed,
             "liquidity_floor": raw.get("liquidity_floor") or {},
             "market_breadth": money_effect,
         },

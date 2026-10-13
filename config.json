@@ -1,0 +1,43 @@
+{
+  "pool_size": 500,
+  "watch_range": [500, 1500],
+  "route_pool_map": {
+    "reversal": 500,
+    "momentum": 200
+  },
+  "momentum_route_weight": 0.5,
+  "liquidity_filter": {
+    "enabled": true,
+    "min_avg_amount_20d": 50000000,
+    "min_avg_turnover_rate": 0.01
+  },
+  "industry_limits": {
+    "max_single_stock": 0.08,
+    "max_l2_sector": 0.25,
+    "max_l1_parent": 0.35,
+    "max_l1_deviation_pp": 8
+  },
+  "eligibility_filter": {
+    "exclude_st": true,
+    "exclude_delisting": true,
+    "min_listing_days": 60,
+    "exclude_suspended": true
+  },
+  "dual_pool_compare": false,
+  "regime_tag": "下跌市验证（2026-06~10）",
+  "regime_note": "扩池结论（反转路线 TOP500 占优）来自 2026-06~10 单一下跌市回测；上涨市数据积累后须强制复盘，不得直接外推。",
+  "regime_review_trigger": "累计 ≥20 个上涨市交易日（上证 20 日均线向上且中位涨幅>0）后重跑 backtest_universe.py 并复核扩池结论",
+  "fetch": {
+    "pages": 15,
+    "page_size": 100,
+    "total_n": 1500
+  },
+  "coverage_guard": {
+    "min_pool_coverage": 0.96,
+    "meltdown_coverage": 0.90
+  },
+  "workflow": {
+    "timeout_minutes": 90,
+    "step_warn_ratio": 1.5
+  }
+}

@@ -1016,10 +1016,15 @@ _elig_badge = ''
 _prev_pool_path = None
 try:
     _pool_src = data.get("pool_source") or _POOL_N
+    # v3.2 P1-3: 池口径透明化 —— 报告实际评分只数 vs 候选池规模（差额主因：金融股不计入评分）
+    _fin_rm = int((stats.get("finance_removed") or 0))
+    _pool_note = f'候选池 TOP{_POOL_N} · 实际评分 {len(results)} 只'
+    if _fin_rm:
+        _pool_note += f'（金融股 {_fin_rm} 只无题材维度不计分）'
     _pool_badge = ('<div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;'
                    'padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;'
                    'background:#3b82f61a;color:#60a5fa;border:0.5px solid #3b82f655;">'
-                   f'🧺 候选池 TOP{_POOL_N}（成交额排名 · 十维评分）</div>')
+                   f'🧺 {_pool_note} · 成交额排名 · 十维评分</div>')
     # 资格标记（次新/停牌/流动性不达标）——取 scored json 的 eligible_marks
     _em = (stats.get("eligible_marks") or data.get("eligible_marks") or {})
     if _em and any(_em.get(k) for k in ("new_stock", "suspended", "illiquid")):
@@ -1028,6 +1033,23 @@ try:
                        'background:#f59e0b1a;color:#fbbf24;border:0.5px solid #f59e0b55;">'
                        f'🏷️ 资格剔除: 次新 {_em.get("new_stock",0)} / 停牌 {_em.get("suspended",0)}'
                        f' / 流动性不达标 {_em.get("illiquid",0)}</div>')
+except Exception:
+    pass
+
+# ===== v3.2 P1-5 区制标签（config.json regime_tag；数据驱动，无则不显示）=====
+_regime_badge = ''
+try:
+    _cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+    with open(_cfg_path, "r", encoding="utf-8") as _cf:
+        _cfg = json.load(_cf)
+    _rt = (_cfg.get("regime_tag") or "").strip()
+    _rn = (_cfg.get("regime_note") or "").strip()
+    if _rt:
+        _regime_badge = ('<div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;'
+                         'padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;'
+                         'background:#8b5cf61a;color:#a78bfa;border:0.5px solid #8b5cf655;" '
+                         'title="' + html_mod.escape(_rn) + '">'
+                         '🌡️ 区制标签: ' + html_mod.escape(_rt) + '</div>')
 except Exception:
     pass
 
@@ -1043,6 +1065,7 @@ html_parts.append(f'''
         </div>
         {_pool_badge}
         {_elig_badge}
+        {_regime_badge}
         {_cov_banner}
         <div class="hero-kpis">
             <div class="hero-kpi" style="border-left-color:#22c55e;">
