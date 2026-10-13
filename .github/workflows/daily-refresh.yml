@@ -204,6 +204,9 @@ jobs:
             fi
 
             # Step 3.96: 因子有效性评估 (Rank IC) → factor_ic.json + factor_history.json
+            # 【研究层 · 与复盘层解耦（v3.0, 2026-10-13）】
+            #   本步是因子回测(研究层)的唯一每日登记入口: 只做 IC 数据登记, 不影响当日评分/复盘逻辑。
+            #   复盘层(run_local_review.sh finalize)已移除 factor_eval 调用 —— 两层各司其职。
             # ⚠️ 必须在 gen_report_top200.py 之前运行: 报告层渲染「📐 因子有效性评估」区块。
             #    因子历史逐日追加到 factor_history.json(随仓库分发), 本地首次可用
             #    `python3 factor_eval.py --bootstrap-from-git` 从 git 历史引导(Actions 无历史)。

@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""将「板块60日动量 / 板块10日动量」并入评分模型 (stock-scorer v2.40)
+"""将「板块60日动量 / 板块10日动量」并入评分模型 (stock-scorer v3.0-10dim)
 
-新增第五维 score_sector (0-5)，权重从题材维度切出：
-  消息 0.20 | 技术 0.20 | 基本面 0.30 | 题材 0.18 | 板块动量 0.12   (合计 1.0)
-  total = (news*0.20 + tech*0.20 + fund*0.30 + theme*0.18 + sector*0.12) * 4
+v3.0-10dim（2026-10-13，依据《因子排名与10维评分模型设计_2026-10-13》）：
+十维总分（权重来自 factor_weights.json，缺失/非法回退十维先验）：
+  基本面0.18 | 消息0.18 | 板块动量0.10 | 超跌60 0.12 | 乖离低位0.10 |
+  RSI反转0.06 | 量能反向0.10 | 超买反向0.06 | 题材内禀0.05 | 关注度0.05  (合计1.0)
+  total = Σ(score_i × w_i) × 4
+技术面/题材旧维度已拆解：均线/MACD/动量退出评分（三重负证据，仅 tech detail 展示）；
+题材拆为内禀/关注度两维，板块动量子项归并 score_sector。
 
-两种赋分方向(由 --mode 决定, 默认 evidence)：
+两种板块动量赋分方向(由 --mode 决定, 默认 evidence)：
   momentum : 用户原始思路 —— 板块动量排名越靠前得分越高(R60=1 → 5.0)
   evidence : 回测证据 —— 申万二级板块 2021-2026 回测显示 R60 与后续 20 日超额
              呈完美负单调(R60=1 为 -1.82%, R60>70 为 +0.20%), 故动量末段得分更高
@@ -29,14 +33,23 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SECTOR_DIR = os.path.join(HERE, 'sector')
 MAP_PATH = os.path.join(SECTOR_DIR, 'sw_map.json')
 
-W_NEWS, W_TECH, W_FUND = 0.20, 0.20, 0.30
-W_THEME_NEW, W_SECTOR = 0.18, 0.12
-W_THEME_OLD = 0.30
-
-# v2.41: 权重改由 factor_weights.json 提供（IC 驱动 + 走步验证，见 factor_eval.py
-#   --optimize-weights）。文件缺失/非法时回退上面的 v2.40 先验值。
-_W_PRIOR = {"score_news": 0.20, "score_tech": 0.20, "score_fund": 0.30,
-            "score_theme": 0.18, "score_sector": 0.12}
+# v3.0-10dim: 十维先验（全市场回测证据的先验映射；fund/news/sector 为池内 IC 已验证，
+#   新拆 5 维 + 2 先验维标注 prior_pending，满 30+ 截面后 --optimize-weights 重拟合）
+_W_PRIOR_10D = {
+    "score_fund": 0.18, "score_news": 0.18, "score_sector": 0.10,
+    "score_oversold60": 0.12, "score_bias60": 0.10, "score_rsi_rev": 0.06,
+    "score_vol_pulse": 0.10, "score_overbought": 0.06,
+    "score_theme_intrinsic": 0.05, "score_attention": 0.05,
+}
+# 旧五维 → 十维映射（兼容历史 scored json 重跑）
+_W_MAP_FROM_5D = {
+    "score_fund": [("score_fund", 1.0)],
+    "score_news": [("score_news", 1.0)],
+    "score_sector": [("score_sector", 1.0)],
+    "score_tech": [("score_rsi_rev", 0.06 / 0.22), ("score_vol_pulse", 0.10 / 0.22),
+                   ("score_overbought", 0.06 / 0.22)],
+    "score_theme": [("score_theme_intrinsic", 0.5), ("score_attention", 0.5)],
+}
 
 
 def _load_factor_weights():
@@ -45,21 +58,28 @@ def _load_factor_weights():
         with open(path, encoding="utf-8") as f:
             d = json.load(f)
         w = d.get("weights") or {}
-        if not set(_W_PRIOR).issubset(w.keys()):
+        if all(k in w for k in _W_PRIOR_10D):            # 已是十维
+            vals = {k: float(w[k]) for k in _W_PRIOR_10D}
+        elif all(k in w for k in ("score_news", "score_tech", "score_fund",
+                                  "score_theme", "score_sector")):  # 旧五维 → 映射
+            vals = {k: 0.0 for k in _W_PRIOR_10D}
+            for old, v in w.items():
+                for new, s in _W_MAP_FROM_5D.get(old, []):
+                    vals[new] += float(v) * s
+            d = dict(d or {})
+            d["_migrated_from_5d"] = True
+        else:
             raise ValueError("weights 字段不全")
-        vals = {k: float(w[k]) for k in _W_PRIOR}
         if any(v < 0 for v in vals.values()) or abs(sum(vals.values()) - 1.0) > 0.02:
             raise ValueError("权重非法: %s" % vals)
         return vals, d
     except Exception:
-        return dict(_W_PRIOR), None
+        return dict(_W_PRIOR_10D), None
 
 
 _FW, _FW_META = _load_factor_weights()
-W_NEWS, W_TECH, W_FUND = _FW["score_news"], _FW["score_tech"], _FW["score_fund"]
-W_THEME_NEW, W_SECTOR = _FW["score_theme"], _FW["score_sector"]
-SCORER_VER = _FW_META.get("version", "v2.40") if _FW_META else "v2.40"
-print(f"⚖️ 五维权重（{SCORER_VER}）: " + " ".join(f"{k.replace('score_', '')}={v}" for k, v in _FW.items()))
+SCORER_VER = _FW_META.get("version", "v3.0-10dim") if _FW_META else "v3.0-10dim"
+print(f"⚖️ 十维权重（{SCORER_VER}）: " + " ".join(f"{k.replace('score_', '')}={v}" for k, v in _FW.items()))
 
 # 分档: (排名下界, 排名上界, 分值)
 BANKS_MOM_60 = [(1, 1, 5.0), (2, 3, 4.2), (4, 5, 3.5), (6, 10, 2.8), (11, 20, 2.0), (21, 40, 1.3), (41, 70, 0.7), (71, 10 ** 6, 0.3)]
@@ -151,11 +171,25 @@ def main():
         r['score_sector'] = round(score_sector, 2)
 
         if not args.keep_weights:
-            total = round((float(r.get('score_news') or 0) * W_NEWS
-                           + float(r.get('score_tech') or 0) * W_TECH
-                           + float(r.get('score_fund') or 0) * W_FUND
-                           + float(r.get('score_theme') or 0) * W_THEME_NEW
-                           + score_sector * W_SECTOR) * 4, 2)
+            # v3.0-10dim: 十维总分（新字段缺失的历史 scored json 按旧五维公式回退）
+            _has_10d = any('score_oversold60' in r for r in results)
+            if _has_10d:
+                total = round((float(r.get('score_fund') or 0) * _FW["score_fund"]
+                               + float(r.get('score_news') or 0) * _FW["score_news"]
+                               + float(r.get('score_oversold60') or 0) * _FW["score_oversold60"]
+                               + float(r.get('score_bias60') or 0) * _FW["score_bias60"]
+                               + float(r.get('score_rsi_rev') or 0) * _FW["score_rsi_rev"]
+                               + float(r.get('score_vol_pulse') or 0) * _FW["score_vol_pulse"]
+                               + float(r.get('score_overbought') or 0) * _FW["score_overbought"]
+                               + float(r.get('score_theme_intrinsic') or 0) * _FW["score_theme_intrinsic"]
+                               + float(r.get('score_attention') or 0) * _FW["score_attention"]
+                               + score_sector * _FW["score_sector"]) * 4, 2)
+            else:
+                total = round((float(r.get('score_news') or 0) * _FW["score_news"]
+                               + float(r.get('score_tech') or 0) * (_FW["score_rsi_rev"] + _FW["score_vol_pulse"] + _FW["score_overbought"])
+                               + float(r.get('score_fund') or 0) * _FW["score_fund"]
+                               + float(r.get('score_theme') or 0) * (_FW["score_theme_intrinsic"] + _FW["score_attention"])
+                               + score_sector * _FW["score_sector"]) * 4, 2)
             r['total'] = total
             if total >= 17:
                 rating, advice = "S", "优先买入，可重仓"
@@ -174,8 +208,10 @@ def main():
     from collections import Counter
     rc = Counter(r['rating'] for r in results)
     data['results'] = results
-    _ver_suffix = ", IC-driven weights" if (_FW_META or {}).get("adopted") == "ic_driven" else ""
-    data['model'] = f"stock-scorer {SCORER_VER} (AI + sector-momentum[{args.mode}]{_ver_suffix})"
+    _meta = _FW_META or {}
+    _ver_suffix = ", IC-driven weights" if _meta.get("adopted") == "ic_driven" else (
+        ", prior-pending (全市场回测先验, 池内 IC 积累中)" if _meta.get("version", "").startswith("v3.0") else "")
+    data['model'] = f"stock-scorer {SCORER_VER} (10-dim + AI + sector-momentum[{args.mode}]{_ver_suffix})"
     data['sector_momentum'] = {'date': mom_date, 'mode': args.mode,
                                'mom_long_days': mom.get('mom_long_days', 60),
                                'mom_short_days': mom.get('mom_short_days', 10),

@@ -8,6 +8,12 @@
 #   本脚本在其之上做「本地深度复盘覆盖」：用逐公司联网核查的结论，重跑增强与页面，
 #   把规则引擎兜底的点评替换为真实核查结论。
 #
+# 三层工程职责（v3.0 起明确分离，勿再混跑）
+#   研究层   factor_eval.py / factor-backtest/  —— 因子 IC 登记与权重再拟合(周期性人工触发)
+#   生产评分层 step2_stockscorer_v2.py 等      —— 每日 Actions 自动链路(评分/增强/板块动量/报告)
+#   复盘层   本脚本                            —— 本地深度复盘覆盖(逐公司核查 → 注入 → 重生成页面)
+#   因子回测与每日复盘解耦: finalize 不再调用 factor_eval.py(IC 登记归 Actions Step 3.96)
+#
 # 链路时序
 #   ① Actions 产出当日 top200_scored_<date>.json  ← 前置条件
 #   ② ./run_local_review.sh prepare               ← 阶段0: 导出候选 + 生成待填模板
@@ -123,8 +129,9 @@ finalize)
   # --replace-day: Actions 已于 15:30 用规则引擎兜底评级记过一次快照,
   #   本地复盘改变了评级分布, 必须替换当日快照而非追加（否则当日样本虚增、胜率污染）
   "$PY" track_recommendations.py "$SCORED" --replace-day 2>/dev/null || warn "推荐跟踪更新失败(非致命)"
-  # 因子有效性评估(Rank IC): 追加当日截面 → factor_ic.json, 报告层渲染 IC 区块
-  "$PY" factor_eval.py 2>/dev/null || warn "因子 IC 评估失败(非致命, 报告将省略该区块)"
+  # 因子有效性评估(Rank IC) 归属研究层, 由每日 Actions 链路(Step 3.96)登记,
+  #   复盘层不再调用 —— 工程职责分离(因子回测/每日复盘解耦, 2026-10-13 v3.0)。
+  #   本地如需手动评估: $PY factor_eval.py(幂等, 同日 upsert 覆盖)
   "$PY" gen_report_top200.py "$SCORED" || { bad "报告生成失败"; exit 1; }
 
   LATEST_HTML="$(ls -t top200_report_*.html 2>/dev/null | head -1)"
@@ -149,6 +156,7 @@ push)
   git add -u gen_report_top200.py generate_ai_assessment.py 2>/dev/null || true
   git add index.html top200_report_*.html 2>/dev/null || true
   git add -f top200_scored_*.json ai_assessment.json recommendation_track.json 2>/dev/null || true
+  # 研究层产物仅在本地点火过 factor_eval.py 时才需捎带(日常由 Actions 提交, 此处一般无变更)
   git add -f factor_history.json factor_ic.json 2>/dev/null || true
   # 复盘产物入库（模板与合并结果也保留，便于回溯当日核查依据）
   git add -f review_input_*.json review_research_*.json 2>/dev/null || true

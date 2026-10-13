@@ -60,24 +60,42 @@ WEIGHTS_PATH = os.path.join(HERE, "factor_weights.json")
 HORIZONS = (1, 5, 20)
 MIN_SAMPLE = 20
 QUANTILES = 5
-N_TESTS = 15                       # 5 因子 × 3 周期（Bonferroni 家族检验数）
-T_BONF = 2.97                      # α=0.05 双侧 Bonferroni 阈值（0.05/15）
+# v3.0-10dim: 检验家族 = 10 维度 × 3 周期 = 30 次（旧五维期 tech/theme 已拆解，
+#   保留行仅作对照展示）。旧样本期新维度无快照字段，实际有效检验数以输出为准。
+N_TESTS = 30                       # 10 因子 × 3 周期（Bonferroni 家族检验数）
+T_BONF = 3.08                      # α=0.05 双侧 Bonferroni 阈值（0.05/30）
 T_LOOSE = 2.0                      # 宽松阈值（业界常用）
 
 # 因子字段 → 展示名（顺序即报告表格顺序）
+# v3.0-10dim：tech/theme 标注「已拆解·仅对照」（其有效成分由 rsi_rev/vol_pulse/
+#   overbought/theme_intrinsic/attention 承载，负向成分证据见下）
 FACTORS = [
     ("total", "综合总分"),
-    ("score_theme", "题材热度"),
-    ("score_tech", "技术面"),
     ("score_fund", "基本面"),
     ("score_news", "消息面"),
+    ("score_oversold60", "超跌60反转"),
+    ("score_bias60", "乖离低位"),
+    ("score_rsi_rev", "RSI反转"),
+    ("score_vol_pulse", "量能反向"),
+    ("score_overbought", "超买反向"),
+    ("score_theme_intrinsic", "题材内禀"),
+    ("score_attention", "关注度相对"),
     ("score_sector", "板块动量"),
+    ("score_theme", "题材热度（已拆解·对照）"),
+    ("score_tech", "技术面（已拆解·对照）"),
 ]
-# 可优化权重的四个维度（历史样本完整）；score_sector 样本不足暂固定
-OPT_DIMS = ["score_news", "score_tech", "score_fund", "score_theme"]
-PRIOR_W4 = {"score_news": 0.20, "score_tech": 0.20, "score_fund": 0.30, "score_theme": 0.18}  # 合计0.88
-W_SECTOR_FIXED = 0.12              # score_sector 固定权重（样本积累中）
-W_FLOOR = 0.05                     # 单维度地板（保持五维模型意义，不全零）
+# 可优化权重的九个维度（fund/news 池内已验证；新拆 5 维先验映射待池内积累；
+#   2 先验维弱证据）；score_sector 样本不足暂固定 0.10
+OPT_DIMS = ["score_fund", "score_news", "score_oversold60", "score_bias60",
+            "score_rsi_rev", "score_vol_pulse", "score_overbought",
+            "score_theme_intrinsic", "score_attention"]
+# 十维先验（与 factor_weights.json v3.0-10dim 一致；运行时会优先读该文件 prior_weights）
+PRIOR_W10 = {"score_fund": 0.18, "score_news": 0.18, "score_oversold60": 0.12,
+             "score_bias60": 0.10, "score_rsi_rev": 0.06, "score_vol_pulse": 0.10,
+             "score_overbought": 0.06, "score_theme_intrinsic": 0.05,
+             "score_attention": 0.05}   # 合计0.90，sector 固定0.10补足
+W_SECTOR_FIXED = 0.10              # score_sector 固定权重（样本积累中）
+W_FLOOR = 0.03                     # 单维度地板（十维下保持维度意义；3%≈旧五维5%量纲）
 TARGET_H = 1                       # 权重优化目标周期
 
 FACTOR_VERDICTS = [
@@ -696,12 +714,31 @@ def _fit_ic_weights(ic_map, lam, prior_norm, floor=W_FLOOR):
 def optimize_weights(snaps, tdays, px):
     """走步验证拟合 IC 驱动权重 → factor_weights.json。
 
-    返回 (result_dict, weights5)。样本外复合 IC 未优于先验时维持先验并如实记录。
+    返回 (result_dict, weights10)。样本外复合 IC 未优于先验时维持先验并如实记录。
+    v3.0-10dim：OPT_DIMS 九个维度 + score_sector 固定；先验优先读 factor_weights.json
+    的 prior_weights（与生产同源），回退 PRIOR_W10 硬编码。
     """
     aligned = [s for s in snaps if s["date"] in set(tdays)]
-    prior_norm = _norm4(PRIOR_W4)
+    # 先验与生产同源：读 factor_weights.json 的 prior_weights，失败回退硬编码
+    prior_w = dict(PRIOR_W10)
+    try:
+        with open(WEIGHTS_PATH, encoding="utf-8") as f:
+            _d = json.load(f)
+        _pw = _d.get("prior_weights") or {}
+        if all(k in _pw for k in OPT_DIMS):
+            prior_w = {k: float(_pw[k]) for k in OPT_DIMS}
+    except Exception:
+        pass
+    prior_norm = _norm4(prior_w)
     dates = [s["date"] for s in aligned]
     tidx = {d: i for i, d in enumerate(tdays)}
+
+    # 十维守卫：至少一个含新维度字段的截面才值得拟合（旧五维快照无法评估新维度）
+    _has_new = any(any(isinstance(r.get("score_oversold60"), (int, float))
+                       for r in s["rows"]) for s in aligned[:5])
+    if not _has_new:
+        print("  ⚠️ 快照无十维字段（score_oversold60 等）→ 跳过权重重拟合，维持现权重")
+        return None, None
 
     # 全周期因子 IC（目标周期）——静态拟合参考
     full_ic = {}
@@ -778,27 +815,27 @@ def optimize_weights(snaps, tdays, px):
             wf_note = (f"样本外复合 IC {best['mean']:+.4f} 未显著优于先验 {prior_m if prior_m is not None else float('nan'):+.4f}"
                        f" → 维持先验权重（防过拟合）")
 
-    # 组装 5 维权重（4 维 × 0.88 + 板块动量固定 0.12）
-    w5 = {k: round(v * (1 - W_SECTOR_FIXED), 3) for k, v in final_w4.items()}
-    w5["score_sector"] = W_SECTOR_FIXED
+    # 组装十维权重（9 维 × 0.90 + 板块动量固定 0.10）
+    w10 = {k: round(v * (1 - W_SECTOR_FIXED), 3) for k, v in final_w4.items()}
+    w10["score_sector"] = W_SECTOR_FIXED
     # 修正舍入误差
-    _diff = round(1.0 - sum(w5.values()), 3)
+    _diff = round(1.0 - sum(w10.values()), 3)
     if abs(_diff) > 1e-9:
-        _k = max(w5, key=lambda k: w5[k])
-        w5[_k] = round(w5[_k] + _diff, 3)
+        _k = max(w10, key=lambda k: w10[k])
+        w10[_k] = round(w10[_k] + _diff, 3)
 
-    prior5 = {k: round(v * (1 - W_SECTOR_FIXED), 3) for k, v in prior_norm.items()}
-    prior5["score_sector"] = W_SECTOR_FIXED
+    prior10 = {k: round(v * (1 - W_SECTOR_FIXED), 3) for k, v in prior_norm.items()}
+    prior10["score_sector"] = W_SECTOR_FIXED
 
     result = {
-        "version": "v2.41-ic",
+        "version": "v3.1-10dim-ic",
         "fitted_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "target_horizon": TARGET_H,
-        "method": ("IC 驱动权重: 正IC维度按比例分配+地板5%+向先验收缩(λ); "
+        "method": ("十维 IC 驱动权重: 正IC维度按比例分配+地板3%+向先验收缩(λ); "
                    "走步验证(训练≥30截面,每5截面重拟,样本外比对); "
-                   "score_sector 有效样本<20 维持0.12(样本积累中)"),
-        "weights": w5,
-        "prior_weights": prior5,
+                   "score_sector 有效样本<20 维持0.10(样本积累中)"),
+        "weights": w10,
+        "prior_weights": prior10,
         "adopted": adopted,
         "walkforward": {
             "n_oos_dates": len(oos_dates_best),
@@ -816,13 +853,14 @@ def optimize_weights(snaps, tdays, px):
                                for k, v in full_ic.items()},
         "lambda_scan": scan,
         "notes": [
-            "复合总分由 4 维分量按权重线性合成后与未来收益求 Rank IC（与生产 total 口径一致，"
-            "score_sector 因历史样本不足未纳入复合评估，权重固定 0.12）",
+            "复合总分由 9 维分量按权重线性合成后与未来收益求 Rank IC（与生产 total 口径一致，"
+            "score_sector 因样本不足未纳入复合评估，权重固定 0.10）",
             "训练窗因子 IC 仅使用基准快照 T+1 收益完整落在训练窗内的观测，避免边界泄漏",
             "样本外日期集合对先验与 IC 驱动权重完全相同，公平比对",
+            "先验权重与生产同源（factor_weights.json prior_weights），拟合失败时回退该先验",
         ],
     }
-    return result, w5
+    return result, w10
 
 
 def load_weights():
@@ -960,18 +998,21 @@ def main():
     }
 
     if do_opt:
-        result, w5 = optimize_weights(aligned, tdays, px)
-        with open(WEIGHTS_PATH, "w", encoding="utf-8") as f:
-            json.dump(result, f, ensure_ascii=False, indent=1)
-        out["weight_optimization"] = result
-        print(f"\n⚖️ 权重优化完成（adopted={result['adopted']}）→ {os.path.basename(WEIGHTS_PATH)}")
-        wf = result["walkforward"]
-        print(f"   样本外复合IC: 先验 {wf['oos_ic_prior']} → 新 {wf['oos_ic_new']}"
-              f"（λ={wf['lambda']}, n={wf['n_oos_dates']}）")
-        print(f"   新权重: " + " ".join(f"{k.replace('score_','')}={v}" for k, v in w5.items()))
-        for row in result["lambda_scan"]:
-            print(f"   λ={row['lambda']:<4} OOS IC={row['oos_ic_mean']} t={row['oos_t']} "
-                  f"胜率={row['oos_win_rate']}% n={row['n_oos']}")
+        result, w10 = optimize_weights(aligned, tdays, px)
+        if result is None:
+            print("\n⚖️ 权重重拟合跳过（无十维快照字段，维持现权重）")
+        else:
+            with open(WEIGHTS_PATH, "w", encoding="utf-8") as f:
+                json.dump(result, f, ensure_ascii=False, indent=1)
+            out["weight_optimization"] = result
+            print(f"\n⚖️ 权重优化完成（adopted={result['adopted']}）→ {os.path.basename(WEIGHTS_PATH)}")
+            wf = result["walkforward"]
+            print(f"   样本外复合IC: 先验 {wf['oos_ic_prior']} → 新 {wf['oos_ic_new']}"
+                  f"（λ={wf['lambda']}, n={wf['n_oos_dates']}）")
+            print(f"   新权重: " + " ".join(f"{k.replace('score_','')}={v}" for k, v in w10.items()))
+            for row in result["lambda_scan"]:
+                print(f"   λ={row['lambda']:<4} OOS IC={row['oos_ic_mean']} t={row['oos_t']} "
+                      f"胜率={row['oos_win_rate']}% n={row['n_oos']}")
 
     with open(OUT_PATH, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=1)

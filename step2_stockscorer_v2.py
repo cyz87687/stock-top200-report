@@ -25,35 +25,64 @@ KLINES_N = 120
 
 # ===== v2.41 IC 驱动权重（2026-10-13 量化审查后）=====
 # 五维权重原为 v2.40 主观先验（消息0.20/技术0.20/基本面0.30/题材0.18/板块动量0.12）。
-# 76 交易日截面 Rank IC 实证（factor_eval.py，修正口径）：仅基本面全周期 IC 为正，
-# 消息/技术/题材 T+5/T+20 显著负向（TOP200 高换手关注度池的均值回复），
-# 综合总分 T+20 IC=-0.073 显著反预测 → 先验把 50% 权重压在负向维度上。
-# 现按 --optimize-weights 走步验证结果动态配置；文件缺失/非法时回退 v2.40 先验。
+# v3.0-10dim: 十维评分（2026-10-13，依据《因子排名与10维评分模型设计_2026-10-13》）。
+# 结构：保留池内 IC 已验证维度(fund/news/sector)；技术面/题材两个负 IC 维度拆解——
+#   有效成分(RSI 反转)由回测 Top5 的 score_rsi_rev 覆盖，负向成分(放量脉冲/超买)由
+#   score_vol_pulse/score_overbought 反向覆盖；另拆超跌60/乖离低位(回测超额前二)与
+#   两个先验维度(题材内禀/关注度)。均线/MACD 结构分与动量因子退出评分(三重负证据)，
+#   仅在 tech detail 展示。
+# ⚠️ 新拆 7 维在 TOP200 池无历史截面快照 → 初始权重为全市场回测先验映射，
+#   元数据标注 prior_pending；满 30+ 截面后由 factor_eval.py --optimize-weights 重拟合。
 WEIGHTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "factor_weights.json")
-_W_PRIOR = {"score_news": 0.20, "score_tech": 0.20, "score_fund": 0.30,
-            "score_theme": 0.18, "score_sector": 0.12}
+_W_PRIOR_10D = {
+    "score_fund": 0.18, "score_news": 0.18, "score_sector": 0.10,
+    "score_oversold60": 0.12, "score_bias60": 0.10, "score_rsi_rev": 0.06,
+    "score_vol_pulse": 0.10, "score_overbought": 0.06,
+    "score_theme_intrinsic": 0.05, "score_attention": 0.05,
+}
+# 旧五维(v2.41-ic) → 十维映射：tech 拆 3 维、theme 拆 2 维，按十维先验比例缩放
+_W_MAP_FROM_5D = {
+    "score_fund": [("score_fund", 1.0)],
+    "score_news": [("score_news", 1.0)],
+    "score_sector": [("score_sector", 1.0)],
+    "score_tech": [("score_rsi_rev", 0.06 / 0.22), ("score_vol_pulse", 0.10 / 0.22),
+                   ("score_overbought", 0.06 / 0.22)],
+    "score_theme": [("score_theme_intrinsic", 0.5), ("score_attention", 0.5)],
+}
 
 
 def load_factor_weights():
-    """读 factor_weights.json → (weights, meta)；失败回退 v2.40 先验。"""
+    """读 factor_weights.json → (weights10d, meta)。十维优先；旧五维按映射转换；
+    缺失/非法回退十维先验(v3.0-10dim)。"""
     try:
         with open(WEIGHTS_FILE, encoding="utf-8") as f:
             d = json.load(f)
         w = d.get("weights") or {}
-        if not set(_W_PRIOR).issubset(w.keys()):
+        if all(k in w for k in _W_PRIOR_10D):            # 已是十维
+            vals = {k: float(w[k]) for k in _W_PRIOR_10D}
+        elif set(_W_PRIOR_10D) & set(w) and all(
+                k in w for k in ("score_news", "score_tech", "score_fund", "score_theme", "score_sector")):
+            vals = {k: 0.0 for k in _W_PRIOR_10D}         # 旧五维 → 映射转换
+            for old, v in w.items():
+                for new, s in _W_MAP_FROM_5D.get(old, []):
+                    vals[new] += float(v) * s
+            d = dict(d or {})
+            d["_migrated_from_5d"] = True
+        else:
             raise ValueError("weights 字段不全")
-        vals = {k: float(w[k]) for k in _W_PRIOR}
         if any(v < 0 for v in vals.values()) or abs(sum(vals.values()) - 1.0) > 0.02:
             raise ValueError("weights 非法: %s" % vals)
         return vals, d
     except Exception:
-        return dict(_W_PRIOR), None
+        return dict(_W_PRIOR_10D), None
 
 
 FW, FW_META = load_factor_weights()
-W_NEWS, W_TECH, W_FUND = FW["score_news"], FW["score_tech"], FW["score_fund"]
-W_THEME, W_SECTOR_W = FW["score_theme"], FW["score_sector"]
-SCORER_VER = FW_META.get("version", "v2.40") if FW_META else "v2.40"
+W_FUND, W_NEWS, W_SECTOR_W = FW["score_fund"], FW["score_news"], FW["score_sector"]
+W_OVERSOLD60, W_BIAS60, W_RSI_REV = FW["score_oversold60"], FW["score_bias60"], FW["score_rsi_rev"]
+W_VOL_PULSE, W_OVERBOUGHT = FW["score_vol_pulse"], FW["score_overbought"]
+W_THEME_INT, W_ATTENTION = FW["score_theme_intrinsic"], FW["score_attention"]
+SCORER_VER = FW_META.get("version", "v3.0-10dim") if FW_META else "v3.0-10dim"
 
 SECTOR = {
     "中际旭创":"AI/半导体","新易盛":"AI/半导体","天孚通信":"AI/半导体",
@@ -774,34 +803,49 @@ def score_tech(kl, price, pct, cagr3=None, wkl=None):
     elif amt_ratio > 1.5 and pct < 0:
         vol_factor = max(0.0, vol_factor - 0.3)
 
-    # 因子4: RSI(入场时机) — 低位超卖=好时机, 高位超买=差时机
+    # 因子4: RSI(入场时机) — v3.0 分档重构(A1)：按实证七档单调递减
+    #   (factor-backtest supp.json: 20日 +1.13%→−0.75% 完美单调)。旧代码 <20 档 3.0
+    #   < 20-35 档 4.8 与实证矛盾(<20 与 20-30 并列最高档)，本版修复；
+    #   <20 与 20-30 同分是对日均 46 只小样本的保守处理。
+    #   注: 该子因子仅影响 tech detail 展示——十维总分已由独立 score_rsi_rev 承载。
     if rsi14 is None:
         rsi_factor = 2.5
-    elif rsi14 < 20:
-        rsi_factor = 3.0
-    elif rsi14 < 35:
-        rsi_factor = 4.8
+    elif rsi14 < 30:
+        rsi_factor = 5.0
+    elif rsi14 < 40:
+        rsi_factor = 4.0
     elif rsi14 < 50:
-        rsi_factor = 4.2
-    elif rsi14 < 65:
-        rsi_factor = 3.6
-    elif rsi14 < 75:
-        rsi_factor = 2.8
+        rsi_factor = 3.0
+    elif rsi14 < 60:
+        rsi_factor = 2.0
     else:
-        rsi_factor = 1.8
+        rsi_factor = 1.0
 
     W_MA, W_MACD, W_VOL, W_RSI = 0.35, 0.25, 0.25, 0.15
     _macd_f = macd_factor if macd_factor is not None else 2.5
     s = W_MA * ma_factor + W_MACD * _macd_f + W_VOL * vol_factor + W_RSI * rsi_factor
     r = ""
 
-    # ---- 动量分 (v2.17 新增): 与结构分融合, 动量占技术面 40% ----
-    _mom = _stock_momentum(kl)
-    _s_mom = _momentum_score(_mom)
-    W_MOM = 0.40
+    # ---- 动量分 (v2.17 新增) — v3.0 三档开关，默认 off(A3) ----
+    # 三重负证据: ①全市场 F1/F2 趋势多头全周期负 α；②TOP200 池 tech 维度
+    #   IC −0.035(T+1)/−0.030(T+20)；③因子报告§3.2「A股是反转市」。
+    # off=不融入(默认)；reverse=反向(低动量高分)；normal=原逻辑(仅对照臂)。
+    # 注: 十维总分已不含动量维度，该开关仅影响 tech detail 展示值；
+    #   detail 的 mom/momentum_score 字段无论开关都计算（仅展示，不进总分）。
+    MOM_MODE = "off"
+    W_MOM = 0.15
+    _mom = _stock_momentum(kl)          # detail 展示用（60 日一并返回）
+    _s_mom_disp = _momentum_score(_mom)
     _s_struct = s
-    s = _s_struct * (1 - W_MOM) + _s_mom * W_MOM
-    r += f"; 结构{_s_struct:.1f}/动量{_s_mom:.1f}(权重{W_MOM:.0%})"
+    if MOM_MODE != "off":
+        _s_mom = _s_mom_disp
+        if MOM_MODE == "reverse":
+            _s_mom = 5.0 - _s_mom
+        s = _s_struct * (1 - W_MOM) + _s_mom * W_MOM
+        r += f"; 结构{_s_struct:.1f}/动量{_s_mom:.1f}({MOM_MODE},权重{W_MOM:.0%})"
+    else:
+        s = _s_struct
+        r += f"; 动量off(三重负证据,detail仅展示)"
 
     # ---- 结构分四因子说明 ----
     _macd_f = macd_factor if macd_factor is not None else 2.5
@@ -834,7 +878,9 @@ def score_tech(kl, price, pct, cagr3=None, wkl=None):
         "mom5": round(_mom.get(5), 1) if _mom and _mom.get(5) is not None else None,
         "mom10": round(_mom.get(10), 1) if _mom and _mom.get(10) is not None else None,
         "mom20": round(_mom.get(20), 1) if _mom and _mom.get(20) is not None else None,
-        "momentum_score": round(_s_mom, 2),
+        "mom60": round(_mom.get(60), 1) if _mom and _mom.get(60) is not None else None,
+        "momentum_score": round(_s_mom_disp, 2),
+        "momentum_mode": MOM_MODE,
         "reason": r,
     }
 
@@ -1924,7 +1970,8 @@ def _clamp(v, lo, hi):
 
 
 def _stock_momentum(kl):
-    """从日K线计算个股近5/10/20日收益率(%)。返回 {5,10,20} 或 None。"""
+    """从日K线计算个股近5/10/20/60日收益率(%)。返回 {5,10,20,60} 或 None。
+    v3.0 增 60 日：供超跌60 因子(F12)使用。"""
     if not kl or len(kl) < 6:
         return None
     closes = [k["close"] for k in kl]
@@ -1935,7 +1982,7 @@ def _stock_momentum(kl):
         if base <= 0:
             return None
         return (closes[-1] - base) / base * 100.0
-    return {5: _ret(5), 10: _ret(10), 20: _ret(20)}
+    return {5: _ret(5), 10: _ret(10), 20: _ret(20), 60: _ret(60)}
 
 
 def _agg_momentum(moms):
@@ -1982,6 +2029,75 @@ def _momentum_score(mom):
     if r20 is not None and r10 is not None and r20 <= -10 and r10 <= -5:
         s -= 0.3
     return max(0.0, min(5.0, s))
+
+
+# ============================================================
+# v3.0-10dim: 回测 Top5 因子（2026-10-13，factor-backtest 扩展回测实证）
+# 口径: 全市场 2021-01~2026-09, 5019 只, T+1 开盘进(剔除涨停), h=20 日,
+#       基准=同日全市场等权, 聚类稳健 t。详见
+#       《因子排名与10维评分模型设计_2026-10-13》。
+# ⚠️ 这些维度在 TOP200 池无历史截面 → 初始权重为先验映射(prior_pending)，
+#   池内 IC 满 30+ 截面后由 --optimize-weights 重拟合。
+# ============================================================
+
+def score_oversold60(mom60):
+    """F12 超跌60（Top5#1，h20 超额 +2.57%, t=7.34, 60日 +3.85% 全场最高, 六年全正）。
+    60 日收益深跌 = 长线均值回复候选。"""
+    if mom60 is None:
+        return 2.5
+    if mom60 <= -30: return 5.0
+    if mom60 <= -20: return 4.0
+    if mom60 <= -10: return 3.0
+    if mom60 <= 0:   return 2.0
+    return 1.0
+
+
+def score_bias60(price, ma60):
+    """F9 乖离低位（Top5#2，h20 超额 +2.04%, t=9.40 全场最高, 六年全正）。
+    (收盘−MA60)/MA60 深度负值 = 相对均线位置超跌。"""
+    if not ma60 or ma60 <= 0 or not price:
+        return 2.5
+    bias = (price - ma60) / ma60 * 100.0
+    if bias <= -15: return 5.0
+    if bias <= -10: return 4.0
+    if bias <= -5:  return 3.0
+    if bias <= 0:   return 2.0
+    return 1.0
+
+
+def score_rsi_rev(rsi14):
+    """F4 RSI 反转（Top5#3，h20 超额 +1.13%, t=5.21, 六年全正；实证七档单调递减）。
+    替代旧技术面 RSI 子因子并修复 <20 档得分矛盾（旧代码 3.0 < 20-35 档 4.8）。"""
+    if rsi14 is None:
+        return 2.5
+    if rsi14 < 30: return 5.0
+    if rsi14 < 40: return 4.0
+    if rsi14 < 50: return 3.0
+    if rsi14 < 60: return 2.0
+    return 1.0
+
+
+def score_vol_pulse(amt_ratio):
+    """F8 放量反向（Top5#4，原生 h20 超额 −1.31%, t=−12.24 全场最强负向 → 反向后 +1.31%）。
+    额比 amt5/amt20 极高 = 关注度脉冲 = TOP200 池内均值回复（与 tech/theme 负 IC 互证）。"""
+    if amt_ratio is None:
+        return 3.0
+    if amt_ratio >= 2.0: return 1.0
+    if amt_ratio >= 1.5: return 2.0
+    if amt_ratio >= 1.0: return 3.0
+    if amt_ratio >= 0.7: return 4.0
+    return 5.0
+
+
+def score_overbought(rsi14):
+    """F5 超买反向（Top5#5，原生 h20 超额 −0.75%, t=−5.13 → 反向后 +0.75%）。
+    RSI>70 = 高位追高风险。⚠️ 2026 年原生转正(+1.74%)，制度漂移风险已登记，权重从低。"""
+    if rsi14 is None:
+        return 5.0
+    if rsi14 >= 70: return 1.0
+    if rsi14 >= 65: return 2.0
+    if rsi14 >= 60: return 3.0
+    return 5.0
 
 
 def _sector_momentum_score(mom20, mom10, mom5):
@@ -2166,11 +2282,15 @@ def score_theme(name, sector, pct, turnover, all_top200_sectors,
         reasons.append(f"板块有一定关注度({sector_count}只上榜)")
 
     # ===== 综合(透明加权): 内禀×0.30 + 板块动量×0.35 + 成交额排名×0.15 + 情绪确认×0.20 =====
+    # v3.0-10dim: 合成分仅作展示；十维总分由 theme_intrinsic(内禀)与
+    #   attention(成交额排名)两个独立维度承载，板块动量子项归并 score_sector。
     W_I, W_M, W_T, W_C = 0.30, 0.35, 0.15, 0.20
     score = _clamp(W_I * intrinsic + W_M * M + W_T * T + W_C * C, 0, 5)
     # v2.46: 展示层清洗申万二级名的"Ⅱ"后缀(风电设备Ⅱ→风电设备), 聚合键不受影响
     sub_label = re.sub(r"[ⅠⅡ]+$", "", sub_label) if sub_label else sub_label
-    return round(score, 2), reasons, sub_label, lifecycle
+    parts = {"intrinsic": round(intrinsic, 2), "board_mom": round(M, 2),
+             "turnover": round(T, 2), "sentiment": round(C, 2)}
+    return round(score, 2), reasons, sub_label, lifecycle, parts
 
 
 # ============================================================
@@ -3659,12 +3779,15 @@ def main():
         ts, td = score_tech(kl, price, pct, cagr3=cagr3_input, wkl=wkl)
 
         # Theme Heat (题材热度替代原资金面)
-        ths, thr, sub_theme_label, lifecycle = score_theme(
+        # v3.0: 返回 parts（内禀/板块动量/成交额排名/情绪确认），十维总分拆用
+        ths, thr, sub_theme_label, lifecycle, theme_parts = score_theme(
             name, sector, pct, turnover, all_top200_sectors,
             sector_data=sector_data, sector_zt_counts=sector_zt_counts,
             mom_map=mom_map, theme_mom=theme_mom, sub_mom=sub_mom, code=code,
             turnover_pct_map=turnover_pct_map, sw_l2=sw_l2)
-        
+        s_theme_int = theme_parts.get("intrinsic") or 2.5
+        s_attn = theme_parts.get("turnover") or 2.5
+
         # News (传入增速用于动态评估; ann_text 为近7日公告覆盖; 研报为近7日券商研报覆盖)
         ntext = news_map.get(code, "")
         ann_text = ann_map.get(code[2:], "")
@@ -3678,7 +3801,18 @@ def main():
         # 近一周(约5交易日)涨幅, 由日K线计算
         _mom_tmp = _stock_momentum(kl)
         week_chg = round(_mom_tmp.get(5), 2) if _mom_tmp and _mom_tmp.get(5) is not None else None
-        
+
+        # v3.0-10dim: 回测 Top5 因子分（从 score_tech detail 取 rsi/ma60/amount_ratio，避免重算）
+        _rsi14_v = td.get("rsi") if isinstance(td, dict) else None
+        _ma60_v = td.get("ma60") if isinstance(td, dict) else None
+        _amt_ratio_v = td.get("amount_ratio") if isinstance(td, dict) else None
+        _mom60_v = _mom_tmp.get(60) if _mom_tmp else None
+        s_oversold60 = score_oversold60(_mom60_v)
+        s_bias60 = score_bias60(price, _ma60_v)
+        s_rsi_rev = score_rsi_rev(_rsi14_v)
+        s_vol_pulse = score_vol_pulse(_amt_ratio_v)
+        s_overbought = score_overbought(_rsi14_v)
+
         # Weighted total: 题材30% + 基本面30% + 消息20% + 技术面20%
         # 行业前景加分叠加到技术面,上限5分
         industry_bonus = INDUSTRY_PROSPECT.get(code, 0)
@@ -3688,11 +3822,15 @@ def main():
             if isinstance(td, dict):
                 td = dict(td)
                 td["industry_prospect"] = f"行业前景{'加分' if industry_bonus > 0 else '减分'}{industry_bonus:+.1f}({label})"
-        # v2.41: 权重改为 IC 驱动（factor_weights.json，缺失回退 v2.40 先验）。
-        #   step2 中间总分不含板块动量维度，题材维度暂承载 theme+sector 权重以保持 0-20 量纲；
-        #   最终五分由 apply_sector_momentum.py 按五维权重重算。
-        w = ns * W_NEWS + ts_adj * W_TECH + fs * W_FUND + ths * (W_THEME + W_SECTOR_W)
-        total = round(w * 4, 2)
+        # v3.0-10dim: 十维中间总分（step2 无板块动量维度，按 (1−w_sector) 归一化
+        #   保持 0-20 量纲；最终分由 apply_sector_momentum.py 按十权重重算）。
+        #   权重来自 factor_weights.json（十维优先；旧五维自动映射；缺失回退十维先验）。
+        _w9 = (fs * W_FUND + ns * W_NEWS
+               + s_oversold60 * W_OVERSOLD60 + s_bias60 * W_BIAS60 + s_rsi_rev * W_RSI_REV
+               + s_vol_pulse * W_VOL_PULSE + s_overbought * W_OVERBOUGHT
+               + s_theme_int * W_THEME_INT + s_attn * W_ATTENTION)
+        _scale = 1.0 / max(0.5, 1.0 - W_SECTOR_W)
+        total = round(_w9 * _scale * 4, 2)
 
         if total >= 17: rating, advice = "S", "优先买入，可重仓"
         elif total >= 13: rating, advice = "A", "逢低加仓，重点关注"
@@ -3717,6 +3855,14 @@ def main():
             "report_count": report_count,
             "sub_theme": sub_theme_label,
             "lifecycle": lifecycle,
+            # v3.0-10dim: 回测 Top5 因子分 + 题材拆解两维（factor_eval 走步拟合登记用）
+            "score_oversold60": round(s_oversold60, 2),
+            "score_bias60": round(s_bias60, 2),
+            "score_rsi_rev": round(s_rsi_rev, 2),
+            "score_vol_pulse": round(s_vol_pulse, 2),
+            "score_overbought": round(s_overbought, 2),
+            "score_theme_intrinsic": round(s_theme_int, 2),
+            "score_attention": round(s_attn, 2),
             "score_sustain": round(sustain_info["score"], 2),
             "sustain_note": sustain_info["note"],
             "is_cyclic": sustain_info["is_cyclic"],
@@ -3729,7 +3875,8 @@ def main():
         })
 
         print(f"   {i+1:2d}. {name:6s} {em}{rating} {total:4.1f}  "
-              f"消息{ns}/技术{ts_adj}/基本{fs}/热度{ths} | {sector}({lifecycle})")
+              f"消息{ns}/技术{ts_adj}/基本{fs}/热度{ths} | 反转{s_oversold60}/乖离{s_bias60}/RSI{s_rsi_rev}"
+              f"/量能{s_vol_pulse}/超买{s_overbought} | {sector}({lifecycle})")
     
     results.sort(key=lambda x: (-x["total"], -(x["turnover"] or 0)))
     
@@ -3779,7 +3926,7 @@ def main():
     
     out_data = {
         "date": raw.get("date", ""),
-        "model": f"stock-scorer {SCORER_VER} (AI + sector-momentum[evidence])",
+        "model": f"stock-scorer {SCORER_VER} (10-dim + AI + sector-momentum[evidence])",
         "weights": "题材30%(内禀0.30+板块动量0.35+成交额排名0.15+情绪确认0.20) 消息20% 技术面20%(结构60%[均线趋势35%/MACD动能25%/量能资金25%/RSI入场时机15%]+动量40%,RSI为Wilder平滑口径) 基本面30%(含行业前景)",
         "results": results,
         "stats": {

@@ -1,49 +1,66 @@
 # A股成交额 TOP200 复盘评分系统
 
-> 基于当日真实行情数据，对全市场成交额 TOP200 主力池 + 200~1000 名观察池进行**五维加权评分**、AI 复盘评估与组合推荐，每日收盘后自动生成单页 HTML 报告并发布至 GitHub Pages。
+> 基于当日真实行情数据，对全市场成交额 TOP200 主力池 + 200~1000 名观察池进行**十维加权评分**、AI 复盘评估与组合推荐，每日收盘后自动生成单页 HTML 报告并发布至 GitHub Pages。
 
 **线上报告**：https://cyz87687.github.io/stock-top200-report/
 
 | 项目 | 值 |
 |---|---|
-| 报告层版本 | **v2.47** |
-| 评分模型版本 | **stock-scorer v2.41-ic**（五维 · AI 增强 · 含板块动量 · **IC 驱动权重**） |
+| 报告层版本 | **v3.0** |
+| 评分模型版本 | **stock-scorer v3.0-10dim**（十维 · 全市场回测先验 · AI 增强 · 含板块动量） |
 | 数据日期 | 见线上报告页眉（最新交易日） |
 | 主力池 | 全A成交额 TOP200 |
 | 观察池 | 全A成交额 200~1000 名（800 只，每日 AI 精选需复盘标的） |
 | 自动更新 | 工作日 15:30（北京时间）via GitHub Actions |
 | 本地深度复盘 | 收盘后由 `run_local_review.sh` 编排，逐公司联网核查覆盖页面结论 |
 | 因子有效性评估 | Rank IC（T+1/T+5/T+20），Newey-West t + Bonferroni 校正，`factor_eval.py` 每日更新 |
-| 评分权重 | IC 实证驱动（`factor_weights.json`），样本外走步验证通过后生效 |
+| 评分权重 | 全市场回测 Top5 因子先验映射（`factor_weights.json`），池内 IC 积累 ≥30 截面后走步验证再拟合 |
 | 数据新鲜度守卫 | `check_data_fresh.py`（workflow Step 1.5，陈旧数据熔断） |
 
 ---
 
-## 一、评分模型（v2.41-ic 五维 · IC 驱动权重）
+## 一、评分模型（v3.0-10dim 十维 · 全市场回测先验）
 
-总分按其五个维度的加权和计算，再放大 4 倍。权重由 **Rank IC 实证反向配置**（v2.47，见「二·七」）：
+总分按十个维度的加权和计算，再放大 4 倍。**十维结构依据全市场因子回测（2021-01~2026-09，
+5019 只 × 1386 日，T+1 开盘进/收盘出，聚类稳健 t）选出的 Top5 有效因子，对旧五维拆解重构**
+（设计文档见 `因子排名与10维评分模型设计_2026-10-13.md`）：
 
 ```
-现行权重（v2.41-ic，样本外走步验证通过）：
-total = ( 消息面×0.396 + 技术面×0.044 + 基本面×0.396 + 题材热度×0.044 + 板块动量×0.12 ) × 4
-
-先验权重（v2.40，IC 优化前）：
-total = ( 消息面×0.20 + 技术面×0.20 + 基本面×0.30 + 题材热度×0.18 + 板块动量×0.12 ) × 4
+现行权重（v3.0-10dim 先验映射，池内 IC 积累 ≥30 截面后走步验证再拟合）：
+total = ( 消息面×0.18 + 基本面×0.18 + 板块动量×0.10
+        + 超跌60反转×0.12 + 乖离低位×0.10 + RSI反转×0.06
+        + 量能反向×0.10 + 超买反向×0.06
+        + 题材内禀×0.05 + 关注度相对×0.05 ) × 4
 ```
 
-| 维度 | 先验权重 | 现行权重 | 该维度 T+1 IC | 说明 |
+| 维度 | 权重 | 证据来源 | 该维度证据 | 说明 |
 |---|---|---|---|---|
-| 基本面 | 0.30 | **0.396** | +0.049 | 基础分×0.6 + 业绩一阶导(增速)×0.2 + 业绩二阶导(growth−cagr3)×0.2 |
-| 消息面 | 0.20 | **0.396** | +0.049 | AI 赋分 0.7×LLM + 0.3×算法 |
-| 技术面 | 0.20 | **0.044** | −0.035 | 均线/RSI/趋势等（TOP200 关注度池内呈均值回复，降权至地板而非删除） |
-| 题材热度 | 0.18 | **0.044** | −0.041 | AI 赋分 + 当日涨跌修正 `day_mod = clamp(pct_chg/10, -1, +1)`（同上） |
-| 板块动量 | 0.12 | 0.12（维持） | 样本积累中 | 申万二级板块 60日/10日动量排名（0.6×R60档位 + 0.4×R10档位） |
+| 基本面 | 0.18 | 池内 IC 已验证 | T+1 IC +0.049 | 基础分×0.6 + 一阶导(增速)×0.2 + 二阶导(growth−cagr3)×0.2 |
+| 消息面 | 0.18 | 池内 IC 已验证 | T+1 IC +0.049 | AI 赋分 0.7×LLM + 0.3×算法，叠加 `day_mod` 当日涨跌绑定 |
+| 板块动量 | 0.10 | 池内积累中 | 样本 <20 截面 | 申万二级 60/10 日动量排名（0.6×R60 + 0.4×R10），`--mode evidence` |
+| 超跌60反转 | 0.12 | **全市场回测 Top1** | h20 超额 +2.57%，t=7.34 | 60 日收益 ≤−30% 计分，60 日维度 +3.85% 为全场最高 |
+| 乖离低位 | 0.10 | **全市场回测 Top2** | h20 超额 +2.04%，t=9.40 | 价格相对 MA60 乖离 ≤−15% 计分，全场 t 值最高 |
+| RSI反转 | 0.06 | **全市场回测 Top3** | h20 超额 +1.13%，t=5.21 | RSI14 <30 计分（与独立回测工程 RSI<30 结论互证） |
+| 量能反向 | 0.10 | **全市场回测 Top4（负向反向）** | h20 超额 −1.31%（反向 +1.31%），\|t\|=12.24 | 放量 2 倍以上记低分（回测用全市场量比代理；生产用成交额比 `amt_ratio`，同向） |
+| 超买反向 | 0.06 | **全市场回测 Top5（负向反向）** | h20 超额 −0.75%（反向 +0.75%） | RSI14 ≥70 计低分；2026 年原生转正，风险已登记 |
+| 题材内禀 | 0.05 | 低权重先验（旧 theme 对半拆） | — | 题材自身强度（AI + 算法融合） |
+| 关注度相对 | 0.05 | 低权重先验（旧 theme 对半拆） | — | 成交额排名/换手等关注度代理 |
+
+**Top5 选择标准**：h20 超额 |t|≥3 + 年度基本稳定（≥5/6 同向）+ 同族去重（Jaccard≥0.3 取代表），
+负向因子反向计分。旧「技术面/题材热度」两个负 IC 维度据此拆解——均线/MACD/动量三重负证据退出评分
+（仅 tech detail 展示，`MOM_MODE=off`）。
 
 **评级**：S≥17 ｜ A 13~17 ｜ B 9~13 ｜ C 5~9 ｜ D <5（v2.41 起报告层按当日截面动态分位定级）
 
-> **权重生效规则**：`factor_weights.json` 由 `factor_eval.py --optimize-weights` 生成（走步验证通过才写入），
-> `step2_stockscorer_v2.py` 与 `apply_sector_momentum.py` 启动时读取；文件缺失或校验失败自动回退先验权重。
-> 权重变更**自下一次全新评分跑生效**，历史数据的总分仍按当时权重计算（页眉评分层版本以数据自身 model 字段为准）。
+> **prior_pending 纪律（诚实披露）**：新拆 7 维在 TOP200 池无历史截面快照，初始权重为**全市场回测
+> 先验映射**（`factor_weights.json` version=v3.0-10dim, adopted=prior_pending_10dim）；
+> 池内截面积累满 30+ 后由 `factor_eval.py --optimize-weights` 走步验证重拟合，OOS 提升 >0.005
+> 才落档。页面权重块对每维标注证据状态徽章（池内验证 / 积累中 / 先验·待池内验证 / 先验·弱证据）。
+>
+> **权重生效规则**：`factor_weights.json` 由 `factor_eval.py --optimize-weights` 生成（走步验证
+> 通过才写入），`step2_stockscorer_v2.py` 与 `apply_sector_momentum.py` 启动时读取；文件缺失或
+> 校验失败自动回退十维先验。权重变更**自下一次全新评分跑生效**，历史数据的总分仍按当时权重
+> 计算（页眉评分层版本以数据自身 model 字段为准）。
 
 > **板块动量赋分方向**：`apply_sector_momentum.py --mode evidence`（默认）依据 2021–2026 回测证据——申万二级板块 R60 与后续 20 日超额呈负单调，故动量末段得分更高；`--mode momentum` 为用户原始思路（动量越强分越高）。
 
@@ -55,22 +72,36 @@ total = ( 消息面×0.20 + 技术面×0.20 + 基本面×0.30 + 题材热度×0.
 1. fetch_top200_sina.py              → top200_all_a.json（主力池TOP200）
                                        + top1000_all_a.json（观察池200~1000名）
 1.5 check_data_fresh.py              数据新鲜度守卫（指数日线日期 + 价格陈旧率，异常则熔断 exit≠0）
-2. step2_stockscorer_v2.py <in> <out>  五维基础评分（腾讯前复权K线 + 东财资金 + akshare财务，约15分钟；
-                                       权重读 factor_weights.json，缺失回退先验）
+2. step2_stockscorer_v2.py <in> <out>  十维基础评分（腾讯前复权K线 + 东财资金 + akshare财务，约15分钟；
+                                       权重读 factor_weights.json，缺失回退十维先验）
 3. select_watchlist.py               → watchlist_<date>.json（观察池规则预筛120只 → LLM精选20~35只）
 4. step2_stockscorer_v2.py <watchlist> <watch_scored>  观察池评分
 5. generate_ai_assessment.py <scored> ai_assessment.json    LLM 盘面评估（失败自动规则兜底）
 6. enhance_scores.py <scored> ai_assessment.json            基本面导数 + AI赋分增强
 7. sector_momentum_daily.py          → sector/sector_momentum_<date>.json（申万二级板块动量）
-8. apply_sector_momentum.py <scored> --mode evidence         并入第五维（主力池 + 观察池各一次）
+8. apply_sector_momentum.py <scored> --mode evidence         并入板块动量维（主力池 + 观察池各一次）
 9. pick_portfolio.py ... --per-parent 2 --min-total 12       A动量/B反转双路线选股
 10. gen_portfolio_report.py                                  组合报告
-11. factor_eval.py                                           Rank IC 因子有效性评估 → factor_ic.json
+11. factor_eval.py                                           【研究层】Rank IC 因子有效性评估 → factor_ic.json
     （--optimize-weights 权重再拟合，由人工/Agent 周期性触发，不进每日自动链路）
 12. gen_report_top200.py <scored> <out.html>                 主报告（含观察池区块）→ cp 为 index.html
 ```
 
 自动化：`.github/workflows/daily-refresh.yml`（工作日 15:30 触发，带 3 次整体重试 + push rebase 重试）。
+
+### 三层工程职责分离（v3.0 起）
+
+因子回测（研究层）与每日复盘（生产/复盘层）**明确解耦**，勿再混跑：
+
+| 层 | 组件 | 职责 | 触发方式 |
+|---|---|---|---|
+| 研究层 | `factor_eval.py` + 独立工程 `factor-backtest/` | 因子 IC 登记、权重再拟合、全市场回测 | Actions Step 3.96 每日登记；权重拟合人工/Agent 周期性触发 |
+| 生产评分层 | `step2_stockscorer_v2.py` / `enhance_scores.py` / `apply_sector_momentum.py` 等 | 每日自动评分链路 | Actions 工作日 15:30 |
+| 复盘层 | `run_local_review.sh`（四阶段） | 本地深度复盘覆盖：逐公司联网核查 → 注入 → 重生成页面 | 本地手动编排 |
+
+- 复盘层 `finalize` **不再调用** `factor_eval.py`（IC 登记唯一入口为 Actions Step 3.96）
+- 因子回测的因子库与评分模型的因子库相互独立：回测工程测全市场，评分模型测 TOP200 池内截面，
+  两边结论互证但口径不同（回测无成交额/市值字段，F8 在回测用量比代理、生产用额比）
 
 ---
 
@@ -125,13 +156,14 @@ resolve_sector(name, code) → (主题键, 申万二级名, 来源)
 | Rank IC(t→t+h) | Spearman(因子值在 t 日截面秩, 个股未来 h 个**真实交易日**收益)，h ∈ {1, 5, 20} |
 | IC 均值 / 标准差 | 因子平均预测能力 / IC 序列波动 |
 | t 统计量 | **Newey-West HAC 调整**（Bartlett 核，lag=h−1）：h=5/20 相邻截面 IC 观测共享 80%/95% 收益窗口，普通 t 把 n 当独立样本会虚高显著性 |
-| Bonferroni 校正 | 5 因子 × 3 周期 = 15 次检验，\|NW t\|≥2.97 记为 ★ 显著（宽松阈值 \|t\|≥2 仅作参考） |
+| Bonferroni 校正 | v3.0 起 10 维度 × 3 周期 = 30 次检验，\|NW t\|≥3.08 记为 ★ 显著（旧五维期 15 次检验阈值 2.97，披露备查） |
 | IC 胜率 | IC>0 的截面占比（方向一致性） |
 | 分层多空 | 每截面按因子分 5 组，头部组均值收益 − 尾部组均值收益（检验单调性） |
 | 子区间稳定性 | 半期拆分（前半→后半 IC 均值与方向一致率），检测制度依赖 |
-| 因子间相关 | 跨截面平均 Spearman 相关矩阵，披露"五维"实际独立信息量 |
+| 因子间相关 | 跨截面平均 Spearman 相关矩阵，披露各维度实际独立信息量 |
 
-**评估对象**：① 五维因子全截面 IC（total / 题材热度 / 技术面 / 基本面 / 消息面 / 板块动量）
+**评估对象**：① 十维因子全截面 IC（total / 基本面 / 消息面 / 超跌60 / 乖离 / RSI反转 / 量能反向 /
+超买反向 / 题材内禀 / 关注度 / 板块动量，另设旧「题材/技术面」两行对照供趋势比对）
 ② 推荐组合层 IC（`recommendation_track.json` 中当日推荐的 total 与未来收益）。
 
 **样本与数据来源**：`factor_history.json` 逐日追加紧凑截面快照（约 22KB/日）；
@@ -213,24 +245,28 @@ depth=1 无历史，故历史文件随仓库分发）。
 本地链路中以 `--replace-day` 运行——**替换**当日推荐快照而非追加，避免同日出现两套推荐
 导致样本虚增、胜率污染。
 
+**与因子回测的分离（v3.0）**：`finalize` 不再调用 `factor_eval.py`——因子 IC 登记唯一入口为
+Actions Step 3.96（研究层），复盘层只做「核查 → 注入 → 重生成页面」。本地如需手动评估：
+`python3 factor_eval.py`（幂等，同日 upsert 覆盖）。
+
 ---
 
-## 二·七、IC 驱动权重优化与数据新鲜度守卫（v2.47）
+## 二·七、权重优化与数据新鲜度守卫（v2.47 → v3.0）
 
 ### 权重优化方法（`factor_eval.py --optimize-weights`）
 
-以 Rank IC 实证反向配置五维权重，核心设计防过拟合：
+以 Rank IC 实证反向配置维度权重，核心设计防过拟合：
 
 ```
-① 仅 IC>0 的维度按 IC 比例分配；IC≤0 的维度降至地板 5%（保留下限维持五维结构）
+① 仅 IC>0 的维度按 IC 比例分配；IC≤0 的维度降至地板 3%（保留下限维持维度结构）
 ② 向先验收缩：w = λ·w_IC + (1−λ)·w_prior，λ 由走步验证选择
 ③ 走步验证：训练窗≥30 截面、每 5 截面重拟；训练窗因子 IC 仅用 T+1 收益完整落在
    训练窗内的观测（max_base_idx 防边界泄漏）；样本外与先验【同日期集合】公平比对
 ④ 样本外复合 IC 提升 >0.005 才采用，否则维持先验
-⑤ score_sector 有效截面<20（2026-09-21 起入库），权重维持 0.12，随积累后评估
+⑤ score_sector 有效截面<20（2026-09-21 起入库），权重维持 0.10，随积累后评估
 ```
 
-**优化结果（2026-10-13，69 有效截面）**：
+**v2.47 期优化结果（2026-10-13，69 有效截面，旧五维口径）**：
 
 | 指标 | 先验权重 | IC 驱动权重 |
 |---|---|---|
@@ -251,6 +287,17 @@ depth=1 无历史，故历史文件随仓库分发）。
 > **为何技术/题材是负向却只降权不删除**：TOP200 是高换手关注度筛选池，负 IC 反映「关注度
 > 脉冲后的均值回复」而非因子完全无效；地板 5% 保留下限以维持五维结构与展示完整性。
 > 这与独立因子回测工程结论互证（RSI<30 正超额、动量类负 α）。
+
+### v3.0 十维先验（2026-10-13）
+
+五维 IC 权重优化后，技术/题材两维已被压至地板——继续在旧结构内调子因子无意义（权重稀释），
+故依据**全市场因子回测 Top5 有效因子**将五维拆解重构为十维（见第一节）。
+
+- 新 7 维（超跌60/乖离/RSI反转/量能反向/超买反向/题材内禀/关注度）在 TOP200 池**无历史截面**，
+  权重取全市场回测先验映射：`factor_weights.json` version=**v3.0-10dim**，adopted=**prior_pending_10dim**
+- 池内截面积累 ≥30 后，`--optimize-weights` 按同一防过拟合流程重拟合（训练≥30/每5重拟/
+  边界防泄漏/同日期集合公平比对/OOS 提升 >0.005 才落档）
+- 页面对每维标注证据状态徽章，prior_pending 维度如实披露"先验·待池内验证"
 
 ### 数据新鲜度守卫（`check_data_fresh.py`，workflow Step 1.5）
 
@@ -298,8 +345,9 @@ Step 1.5 设为**可重试**（30s×3）：收盘后指数日线偶有几分钟�
   不得为凑展示而估算；技术目标价由 K 线结构真实推导并标注推导口径。
 - **行业归属纪律**：行业以申万二级映射（`sector/sw_map.json`）为权威源，静态字典仅兜底；
   解析来源记入 `sector_src` 供审计，禁止把未匹配个股一律归入"综合"了事。
-- **权重纪律**：五维权重只能由 `factor_eval.py --optimize-weights` 经样本外走步验证
-  （提升 >0.005）后写入 `factor_weights.json`，禁止手工拍脑袋改权重；脚本读取时校验
+- **权重纪律**：十维权重只能由 `factor_eval.py --optimize-weights` 经样本外走步验证
+  （提升 >0.005）后写入 `factor_weights.json`，禁止手工拍脑袋改权重；新拆维度的先验权重
+  依据全市场回测证据映射并如实标注 prior_pending，不得冒充池内验证结论；脚本读取时校验
   字段齐全/非负/Σ≈1，失败自动回退先验。
 - **口径诚实纪律**：IC 的 t 值必须 Newey-West HAC 调整 + Bonferroni 校正披露；
   选择性披露（λ 扫描）必须在页面注明；陈旧/非交易日快照必须剔除，不得混入截面。
@@ -315,7 +363,7 @@ Step 1.5 设为**可重试**（30s×3）：收盘后指数日线偶有几分钟�
 - 最新 1 份观察池评分 / watchlist / 组合 JSON / 组合报告 HTML
 - 最新 1 份板块动量 + `sector_momentum_latest.json` + 静态映射 `sw_map.json` / `backtest_ref.json`
 - `factor_history.json`（Rank IC 逐日截面快照 + 前复权价格回填，约 22KB/日，**只增不改**）
-  + `factor_ic.json`（最新评估结果）+ `factor_weights.json`（IC 驱动权重决策记录）
+  + `factor_ic.json`（最新评估结果）+ `factor_weights.json`（十维先验/IC 驱动权重决策记录）
 
 > **不入库文件**：`refresh_log.txt`（CI 日志改由 `upload-artifact` 工件保留 30 天）、`ai_review_today.json`（已停用）、`upload826.py`（早期手动上传工具，已被 workflow `git push` + Pages 自动部署取代）。
 
@@ -346,13 +394,13 @@ python3 fetch_top200_sina.py && python3 step2_stockscorer_v2.py top200_all_a.jso
 ```
 ├── index.html                     # 线上主报告（最新）
 ├── top200_report_<date>.html      # 当日主报告
-├── top200_scored_<date>.json      # 主力池五维评分（保留最新2份）
+├── top200_scored_<date>.json      # 主力池十维评分（保留最新2份）
 ├── top200_scored_watch_<date>.json# 观察池评分
 ├── watchlist_<date>.json          # 观察池 AI 筛选结果
 ├── ai_assessment.json            # AI 盘面评估层
 ├── factor_history.json          # Rank IC 逐日截面快照 + 前复权价格回填（只增）
 ├── factor_ic.json               # 因子有效性评估结果（最新）
-├── factor_weights.json          # IC 驱动评分权重（v2.41-ic，走步验证落档）
+├── factor_weights.json          # 评分权重决策记录（v3.0-10dim 先验，走步验证落档）
 ├── check_data_fresh.py          # 数据新鲜度守卫（workflow Step 1.5）
 ├── sector/
 │   ├── sw_map.json               # 申万二级行业映射（静态）

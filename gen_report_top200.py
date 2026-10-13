@@ -77,13 +77,25 @@ model_str = data.get("model", "stock-scorer")
 #   P0-4 IC 驱动权重: factor_weights.json 走步验证(样本外复合IC 0.0248→0.0445),
 #        基本面/消息面加权, 题材/技术降至地板, 板块动量维持(样本积累中)
 #   P1 子区间稳定性/因子相关矩阵/workflow 数据新鲜度守卫(check_data_fresh.py)
-REPORT_VER = "v2.47"
+# v3.0: 十维评分模型（据全市场回测 Top5 因子拆解五维，见 因子排名与10维评分模型设计_2026-10-13.md）——
+#   1) 五维 → 十维: 技术面拆为超跌60反转/乖离低位/RSI反转/量能反向/超买反向(旧tech权重按0.06:0.10:0.06映射),
+#      题材拆为题材内禀/关注度相对(旧theme权重对半拆分); 基本面/消息面/板块动量保持
+#   2) 权重先验(全市场回测映射): 0.18/0.18/0.10/0.12/0.10/0.06/0.10/0.06/0.05/0.05,
+#      新5维+关注度 prior_pending(池内截面<30, 积累后 --optimize-weights 重拟合)
+#   3) 因子表/权重块/相关矩阵/维度徽章全部十维化, 对照行(旧五维口径)保留供趋势比对
+#   4) 工程职责分离: 因子回测(研究层) 与 每日复盘(生产层) 解耦,
+#      factor_eval.py 仅归每日 Actions 链路做 IC 数据登记, 复盘 finalize 不再调用
+REPORT_VER = "v3.0"
 _has_sector = any(x.get('score_sector') is not None for x in results)
-_ver_tag = f"{REPORT_VER} · 五维" if _has_sector else f"{REPORT_VER} · 四维"
+_has_10d = any(x.get('score_oversold60') is not None for x in results)
+_ver_tag = (f"{REPORT_VER} · 十维" if _has_10d
+            else (f"{REPORT_VER} · 五维" if _has_sector else f"{REPORT_VER} · 四维"))
 # 评分层版本以 scored json 的 model 字段为准（权重变更自下一次全新评分跑生效，
 # 重跑历史数据时页头如实显示该数据当时的模型版本，不虚标）
-_SCORER_VER = str(data.get("model") or ("v2.41 (IC-driven weights + sector-momentum)"
-                                        if _has_sector else "v2.30 (AI 增强)"))
+_SCORER_VER = str(data.get("model") or ("v3.0-10dim (全市场回测先验 + AI + sector-momentum[evidence])"
+                                        if _has_10d else
+                                        ("v2.41 (IC-driven weights + sector-momentum)"
+                                         if _has_sector else "v2.30 (AI 增强)")))
 total_stocks = len(results)
 
 # 颜色配置
@@ -118,6 +130,21 @@ def _quantile_ratings(items):
 
 
 # 重算当日评级(保留绝对口径于 _rating_abs 备查)
+
+
+# ===== v3.0 十维/五维自适应展示复合分 =====
+# 十维数据的叙述层(评级理由/S&A深度分析)仍按"技术块/题材块"口径表述,
+# 复合分按十维权重加权还原, 保证与真实计分结构一致而非简单等权:
+#   技术块 = (0.12×超跌60 + 0.10×乖离 + 0.06×RSI反 + 0.10×量能反 + 0.06×超买反) / 0.44
+#   题材块 = (内禀 + 关注度) / 2  (旧 theme 权重对半映射口径)
+def _dim_composites(r):
+    """→ (tech_disp, theme_disp): 十维按权重加权复合, 旧五维直接取原字段"""
+    if r.get("score_oversold60") is not None:
+        _tw = 0.12 * r["score_oversold60"] + 0.10 * r["score_bias60"] + 0.06 * r["score_rsi_rev"] \
+            + 0.10 * r["score_vol_pulse"] + 0.06 * r["score_overbought"]
+        _th = (r.get("score_theme_intrinsic", 0) + r.get("score_attention", 0)) / 2
+        return _tw / 0.44, _th
+    return r.get("score_tech", 0), r.get("score_theme", 0)
 _rating_abs_orig = {r["code"]: r["rating"] for r in results}
 _new_rating = _quantile_ratings(results)
 _rating_shift = sum(1 for r in results if _rating_abs_orig.get(r["code"]) != _new_rating.get(r["code"]))
@@ -155,9 +182,16 @@ def build_portfolio(results, n=5):
         if position > 95:
             continue
         score_diversity = 0
-        dims = [r["score_news"], r["score_tech"], r["score_fund"], r.get("score_theme", 0)]
-        if r.get("score_sector") is not None:
-            dims.append(r["score_sector"])
+        if r.get("score_oversold60") is not None:  # 十维口径: 新5维+拆分后两维全参与
+            dims = [r["score_news"], r["score_fund"], r["score_oversold60"], r["score_bias60"],
+                    r["score_rsi_rev"], r["score_vol_pulse"], r["score_overbought"],
+                    r.get("score_theme_intrinsic", 0), r.get("score_attention", 0)]
+            if r.get("score_sector") is not None:
+                dims.append(r["score_sector"])
+        else:  # 旧五维口径(历史数据回放)
+            dims = [r["score_news"], r["score_tech"], r["score_fund"], r.get("score_theme", 0)]
+            if r.get("score_sector") is not None:
+                dims.append(r["score_sector"])
         if min(dims) >= 3:
             score_diversity = 1
         if min(dims) >= 4:
@@ -935,7 +969,7 @@ _hero_gap = '''</div>'''
 html_parts.append(f'''
     <!-- A1 首屏 Hero 决策区 -->
     <div class="hero" id="sec-decision">
-        <h1>📊 A股成交额 TOP{total_stocks} 评分<span class="hero-ver">报告层 {REPORT_VER} · 评分层 {_SCORER_VER}</span></h1>
+        <h1>📊 A股成交额 TOP{total_stocks} 评分<span class="hero-ver">报告层 {_ver_tag} · 评分层 {_SCORER_VER}</span></h1>
         <div style="font-size:11px;color:#94a3b8;">🎯 今日市场状态 → 总仓位纪律（赚钱效应 {mkt_score if mkt_score is not None else '—'} 分）</div>
         <div class="hero-verdict" style="color:{mkt_color};">{mkt_phase} · 建议仓位 {mkt_pos_full}</div>
         <div style="font-size:13px;color:#cbd5e1;">{mkt_disc}</div>
@@ -1487,17 +1521,18 @@ for idx, r in enumerate(top20):
     if report_count:
         news_detail += f' · <span style="color:#22c55e;font-weight:600;">研报×{report_count}</span>'
 
+    _tech_disp, _theme_disp = _dim_composites(r)
     justification = []
     if r['score_news'] >= 4: justification.append("消息面强劲")
     elif r['score_news'] <= 1: justification.append("消息面疲弱")
-    if r['score_tech'] >= 4: justification.append("技术面看多")
-    elif r['score_tech'] <= 1: justification.append("技术面承压")
+    if _tech_disp >= 4: justification.append("技术面看多")
+    elif _tech_disp <= 1: justification.append("技术面承压")
     if rsi_state == "超买": justification.append("RSI超买注意回调")
     elif rsi_state == "超卖": justification.append("RSI超卖存反弹")
     if r['score_fund'] >= 4: justification.append("估值吸引力强")
     elif r['score_fund'] <= 1: justification.append("估值偏高")
-    if r.get('score_theme', 0) >= 4: justification.append("主线题材热度高")
-    elif r.get('score_theme', 0) <= 1: justification.append("题材冷门")
+    if _theme_disp >= 4: justification.append("主线题材热度高")
+    elif _theme_disp <= 1: justification.append("题材冷门")
     if not justification: justification = ["各维度均衡"]
 
     # 评级变化标签
@@ -1539,6 +1574,49 @@ for idx, r in enumerate(top20):
                        'border-radius:3px;background:#fee2e2;color:#dc2626;margin-left:6px;cursor:help;">'
                        '⚠️基本面背离 ' + "·".join(_fund_flags) + '</span>')
 
+    # ===== v3.0 十维展示: 徽章行与维度卡片按数据口径自适应 =====
+    _is10 = r.get("score_oversold60") is not None
+    _tech_disp, _theme_disp = _dim_composites(r)
+    # AI 赋分附注(先赋临时变量, 规避 f-string 内层引号问题)
+    _ai_note = ""
+    if r.get("ai_applied"):
+        _ai_note = f" · 🤖AI赋分 消息{r['ai_news']:.2f}/热度{r['ai_theme_heat']:.2f}"
+        if not _is10:
+            _ai_note += f" | {r.get('ai_theme_label','')}"
+    _theme_detail = (", ".join(theme_reasons[:3]) if theme_reasons else "数据不足") + _ai_note
+    if _is10:
+        _badge_html = (f"<span>🏷️ {r['score_news']:.2f}/5消息 · {r['score_fund']:.2f}/5基本 · "
+                       f"超跌60 {r['score_oversold60']:.2f} · 乖离 {r['score_bias60']:.2f} · "
+                       f"RSI反 {r['score_rsi_rev']:.2f} · 量能反 {r['score_vol_pulse']:.2f} · "
+                       f"超买反 {r['score_overbought']:.2f} · 内禀 {r.get('score_theme_intrinsic', 0):.2f} · "
+                       f"关注 {r.get('score_attention', 0):.2f}</span>")
+        _tech_card_html = (f'<div class="dim-card">'
+                           f'<div class="dim-title">📈 技术块·五拆解 ({_tech_disp:.2f}/5)</div>'
+                           f'<div class="dim-score">{_tech_disp:.2f}</div>'
+                           f'<div class="dim-detail">超跌60反转 {r["score_oversold60"]:.2f} · 乖离低位 {r["score_bias60"]:.2f} · '
+                           f'RSI反转 {r["score_rsi_rev"]:.2f} · 量能反向 {r["score_vol_pulse"]:.2f} · '
+                           f'超买反向 {r["score_overbought"]:.2f}<br>趋势: {tech.get("trend","N/A")} · '
+                           f'分位: {tech.get("position","N/A")}%{f" · {factor_info}" if factor_info else ""} · {tech.get("reason","")}</div>'
+                           f'</div>')
+        _theme_card_html = (f'<div class="dim-card">'
+                            f'<div class="dim-title">🔥 题材块·双拆解 ({_theme_disp:.2f}/5){f" · {sub_theme}" if sub_theme else ""}</div>'
+                            f'<div class="dim-score">{_theme_disp:.2f}</div>'
+                            f'<div class="dim-detail">内禀 {r.get("score_theme_intrinsic", 0):.2f} · 关注度 {r.get("score_attention", 0):.2f} · {_theme_detail}</div>'
+                            f'</div>')
+    else:
+        _badge_html = (f"<span>🏷️ {r['score_news']:.2f}/5消息 · {r['score_tech']:.2f}/5技术 · "
+                       f"{r['score_fund']:.2f}/5基本 · {r.get('score_theme',0):.2f}/5热度</span>")
+        _tech_card_html = (f'<div class="dim-card">'
+                           f'<div class="dim-title">📈 技术面 ({r["score_tech"]:.2f}/5)</div>'
+                           f'<div class="dim-score">{r["score_tech"]:.2f}</div>'
+                           f'<div class="dim-detail">趋势: {tech.get("trend","N/A")} · 分位: {tech.get("position","N/A")}%{f" · {factor_info}" if factor_info else ""} · {tech.get("reason","")}</div>'
+                           f'</div>')
+        _theme_card_html = (f'<div class="dim-card">'
+                            f'<div class="dim-title">🔥 题材热度 ({r.get("score_theme",0):.2f}/5){f" · {sub_theme}" if sub_theme else ""}</div>'
+                            f'<div class="dim-score">{r.get("score_theme",0):.2f}</div>'
+                            f'<div class="dim-detail">{_theme_detail}</div>'
+                            f'</div>')
+
     html_parts.append(f'''
         <div class="stock-detail {s_class}{a_collapse}" data-rating="{rating}" data-sector="{sector_disp(r)}" data-code="{r['code']}" data-name="{r['name']}">
             <div class="header-row">
@@ -1559,7 +1637,7 @@ for idx, r in enumerate(top20):
                 <span>📊 {pe_str}{fwd_str}{g_str}{peg_str}</span>
                 {f'<span style="color:{valu_note(r)[1]};">🧭 {valu_note(r)[0]}</span>' if valu_note(r)[0] else ''}
                 <span class="s-pct {week_chg_cls}" style="font-weight:700;">📅 近一周 {week_chg_str}</span>
-                <span>🏷️ {r['score_news']:.2f}/5消息 · {r['score_tech']:.2f}/5技术 · {r['score_fund']:.2f}/5基本 · {r.get('score_theme',0):.2f}/5热度</span>
+                {_badge_html}
             </div>
             <div class="dim-row">
                 <div class="dim-card">
@@ -1567,21 +1645,13 @@ for idx, r in enumerate(top20):
                     <div class="dim-score">{r['score_news']:.2f}</div>
                     <div class="dim-detail">{news_detail}</div>
                 </div>
-                <div class="dim-card">
-                    <div class="dim-title">📈 技术面 ({r['score_tech']:.2f}/5)</div>
-                    <div class="dim-score">{r['score_tech']:.2f}</div>
-                    <div class="dim-detail">趋势: {tech.get('trend','N/A')} · 分位: {tech.get('position','N/A')}%{f' · {factor_info}' if factor_info else ''} · {tech.get('reason','')}</div>
-                </div>
+                {_tech_card_html}
                 <div class="dim-card">
                     <div class="dim-title">📊 基本面 ({r['score_fund']:.2f}/5)</div>
                     <div class="dim-score">{r['score_fund']:.2f}</div>
                     <div class="dim-detail">{fund_detail}{deriv_str}</div>
                 </div>
-                <div class="dim-card">
-                    <div class="dim-title">🔥 题材热度 ({r.get('score_theme',0):.2f}/5){f' · {sub_theme}' if sub_theme else ''}</div>
-                    <div class="dim-score">{r.get('score_theme',0):.2f}</div>
-                    <div class="dim-detail">{', '.join(theme_reasons[:3]) if theme_reasons else '数据不足'}{f" · 🤖AI赋分 消息{r['ai_news']:.2f}/热度{r['ai_theme_heat']:.2f} | {r.get('ai_theme_label','')}" if r.get('ai_applied') else ''}</div>
-                </div>
+                {_theme_card_html}
             </div>''')
 
     if risk_html:
@@ -2284,9 +2354,9 @@ def generate_research_analysis(r):
     turnover = (r.get("turnover", 0) or 0) / 100000000
 
     score_news = r.get("score_news", 0)
-    score_tech = r.get("score_tech", 0)
+    # v3.0: 十维数据按权重加权还原技术块/题材块复合分(旧五维直接取原字段)
+    score_tech, score_theme = _dim_composites(r)
     score_fund = r.get("score_fund", 0)
-    score_theme = r.get("score_theme", 0)
 
     news_reasons = r.get("news_reasons", [])
     fund_reasons = r.get("fund_reasons", [])
@@ -2532,7 +2602,28 @@ html_parts.append(f'''
 for stock in sa_stocks:
     html_parts.append(generate_research_analysis(stock))
 
-scores_label = '五维评分' if any(x.get('score_sector') is not None for x in results) else '四项评分'
+scores_label = ('十维评分' if any(x.get('score_oversold60') is not None for x in results)
+                else ('五维评分' if any(x.get('score_sector') is not None for x in results) else '四项评分'))
+# v3.0: 排序下拉按口径自适应 —— 十维列出全部子项(score_* → data-s-* 通用映射)
+_has10d = any(x.get('score_oversold60') is not None for x in results)
+_has_sec = any(x.get('score_sector') is not None for x in results)
+if _has10d:
+    _sort_opts = ('<option value="score_news">消息面</option>'
+                  '<option value="score_fund">基本面</option>'
+                  '<option value="score_oversold60">超跌60反转</option>'
+                  '<option value="score_bias60">乖离低位</option>'
+                  '<option value="score_rsi_rev">RSI反转</option>'
+                  '<option value="score_vol_pulse">量能反向</option>'
+                  '<option value="score_overbought">超买反向</option>'
+                  '<option value="score_theme_intrinsic">题材内禀</option>'
+                  '<option value="score_attention">关注度相对</option>'
+                  + ('<option value="score_sector">板块动量</option>' if _has_sec else ''))
+else:
+    _sort_opts = ('<option value="score_news">消息面</option>'
+                  '<option value="score_tech">技术面</option>'
+                  '<option value="score_fund">基本面</option>'
+                  '<option value="score_theme">题材热度</option>'
+                  + ('<option value="score_sector">板块动量</option>' if _has_sec else ''))
 
 html_parts.append('''
     </div>
@@ -2561,11 +2652,7 @@ html_parts.append('''
                 <option value="total">综合得分 (默认)</option>
                 <option value="turnover">成交额</option>
                 <option value="pct_chg">涨跌幅</option>
-                <option value="pe">PE估值</option>
-                <option value="score_news">消息面</option>
-                <option value="score_tech">技术面</option>
-                <option value="score_fund">基本面</option>
-                <option value="score_theme">题材热度</option>
+                <option value="pe">PE估值</option>''' + _sort_opts + '''
             </select>
         </div>
         <div class="control-group">
@@ -2658,12 +2745,35 @@ for idx, r in enumerate(results):
     week_chg_str = f"{week_chg:+.2f}%" if week_chg is not None else "N/A"
     week_cls = "up" if (week_chg or 0) > 0 else "down" if (week_chg or 0) < 0 else ""
 
-    scores = [r["score_news"], r["score_tech"], r["score_fund"], r.get("score_theme", r.get("score_flow", 0))]
-    score_colors = ["#ef4444", "#f97316", "#f59e0b", "#3b82f6", "#22c55e"]
-    # v2.40: 第五维「板块动量」(若 scored json 含该字段)
-    if r.get("score_sector") is not None:
-        scores.append(r["score_sector"])
-    scores_html = "".join([f'<div class="s-score" style="background:{score_colors[min(int(v),4)]}">{v}</div>' for v in scores])
+    # v3.0: 分数条按口径自适应 —— 十维展示全部10维(带 tooltip), 旧五维/带板块动量维持原样
+    _tech_disp_t, _theme_disp_t = _dim_composites(r)
+    # 十维子项排序数据属性(与排序下拉 score_* 选项对应, dataset 键名 sXxx)
+    _dsub_attrs = ""
+    if r.get("score_oversold60") is not None:
+        _dsub_attrs = (f' data-s-oversold60="{r["score_oversold60"]:.2f}" data-s-bias60="{r["score_bias60"]:.2f}"'
+                       f' data-s-rsi_rev="{r["score_rsi_rev"]:.2f}" data-s-vol_pulse="{r["score_vol_pulse"]:.2f}"'
+                       f' data-s-overbought="{r["score_overbought"]:.2f}"'
+                       f' data-s-theme_intrinsic="{r.get("score_theme_intrinsic", 0):.2f}"'
+                       f' data-s-attention="{r.get("score_attention", 0):.2f}"')
+    if r.get("score_oversold60") is not None:
+        scores = [r["score_news"], r["score_fund"], r["score_oversold60"], r["score_bias60"],
+                  r["score_rsi_rev"], r["score_vol_pulse"], r["score_overbought"],
+                  r.get("score_theme_intrinsic", 0), r.get("score_attention", 0)]
+        if r.get("score_sector") is not None:
+            scores.append(r["score_sector"])
+        _score_tips = ["消息面", "基本面", "超跌60反转", "乖离低位", "RSI反转", "量能反向",
+                       "超买反向", "题材内禀", "关注度相对"] + (["板块动量"] if r.get("score_sector") is not None else [])
+    else:
+        scores = [r["score_news"], r["score_tech"], r["score_fund"], r.get("score_theme", r.get("score_flow", 0))]
+        _score_tips = ["消息面", "技术面", "基本面", "题材热度"]
+        # v2.40: 第五维「板块动量」(若 scored json 含该字段)
+        if r.get("score_sector") is not None:
+            scores.append(r["score_sector"])
+            _score_tips.append("板块动量")
+    score_colors = ["#ef4444", "#f97316", "#f59e0b", "#3b82f6", "#22c55e",
+                    "#ef4444", "#f97316", "#f59e0b", "#3b82f6", "#22c55e"]
+    scores_html = "".join([f'<div class="s-score" style="background:{score_colors[min(int(v),4)]}" title="{_score_tips[k] if k < len(_score_tips) else ""}">{v}</div>'
+                           for k, v in enumerate(scores)])
 
     # 板块动量列: 申万二级板块 60/10 日动量排名与涨幅
     mom_html = "-"
@@ -2690,8 +2800,9 @@ for idx, r in enumerate(results):
     theme_text = ", ".join([html_mod.escape(x) for x in theme_reasons[:3]]) if theme_reasons else "无"
 
     html_parts.append(f'''
-                <tr class="expandable" data-rating="{rating}" data-sector="{sector_disp(r)}" data-code="{r['code']}" data-name="{r['name']}" data-original-rank="{i}" data-fwd-pe="{r.get('fwd_pe',0) or 0}" data-growth="{r.get('growth',0) or 0}" data-position="{tech.get('position',50) or 50}" data-score-theme="{r.get('score_theme',0)}"
-                    data-news="{r['score_news']:.2f}" data-tech-score="{r['score_tech']:.2f}" data-fund-score="{r['score_fund']:.2f}" data-theme-score="{r.get('score_theme',0):.2f}"
+                <tr class="expandable" data-rating="{rating}" data-sector="{sector_disp(r)}" data-code="{r['code']}" data-name="{r['name']}" data-original-rank="{i}" data-fwd-pe="{r.get('fwd_pe',0) or 0}" data-growth="{r.get('growth',0) or 0}" data-position="{tech.get('position',50) or 50}" data-score-theme="{_theme_disp_t:.2f}"
+                    data-news="{r['score_news']:.2f}" data-tech-score="{_tech_disp_t:.2f}" data-fund-score="{r['score_fund']:.2f}" data-theme-score="{_theme_disp_t:.2f}"
+                    data-s-news="{r['score_news']:.2f}" data-s-tech="{_tech_disp_t:.2f}" data-s-fund="{r['score_fund']:.2f}" data-s-theme="{_theme_disp_t:.2f}"{f' data-s-sector="{r["score_sector"]:.2f}"' if r.get('score_sector') is not None else ''}{_dsub_attrs}
                     data-news-text="{html_mod.escape(news_text)}" data-tech-text="{html_mod.escape(tech_text)}" data-fund-text="{html_mod.escape(fund_text)}" data-theme-text="{html_mod.escape(theme_text)}">
                     <td class="s-rank" data-value="{i}">{i}</td>
                     <td class="s-name sticky-col col-name-sticky" data-value="{r['name']}">{r['name']}</td>
@@ -2822,8 +2933,8 @@ if _ic and _ic.get("factors"):
         """单周期 IC 单元格: IC 值(红涨绿跌) + Newey-West t(★=Bonferroni 校正后显著) + 胜率/样本。
 
         v2.47: t 值改用 Newey-West HAC 调整值 —— h=5/20 相邻截面 IC 观测共享 80%/95%
-        收益窗口, 普通 t 把 n 当独立样本会虚高显著性; ★ 标记通过 15 次检验
-        Bonferroni 校正(|NW t|≥2.97)的单元格。
+        收益窗口, 普通 t 把 n 当独立样本会虚高显著性; ★ 标记通过 Bonferroni 校正
+        （v3.0 起 30 次检验，|NW t|≥3.08；旧五维期 15 次，|NW t|≥2.97）的单元格。
         """
         if not a or not a.get("n"):
             return '<td style="padding:6px 10px;color:#475569;text-align:center;">未到期</td>'
@@ -2881,8 +2992,13 @@ if _ic and _ic.get("factors"):
     _corr = _ic.get("factor_correlation") or {}
     _corr_html = ""
     if _corr:
-        _dims = ["score_news", "score_tech", "score_fund", "score_theme"]
-        _dl = {"score_news": "消息", "score_tech": "技术", "score_fund": "基本面", "score_theme": "题材"}
+        # v3.0-10dim: 维度清单从 _corr 实际键推导（五维/十维自适应，旧快照缺新维度时自动收缩）
+        _dl_all = {"score_fund": "基本面", "score_news": "消息", "score_oversold60": "超跌60",
+                   "score_bias60": "乖离", "score_rsi_rev": "RSI反转", "score_vol_pulse": "量能",
+                   "score_overbought": "超买", "score_theme_intrinsic": "内禀",
+                   "score_attention": "关注度", "score_tech": "技术", "score_theme": "题材"}
+        _dims = [d for d in _dl_all if any(k.split("|")[0] == d or k.split("|")[1] == d for k in _corr)]
+        _dl = {d: _dl_all[d] for d in _dims}
         _crows = ""
         for _ra in _dims:
             _cc = ""
@@ -2913,12 +3029,12 @@ if _ic and _ic.get("factors"):
             _corr_note = (f'最高 pair 为 {_la}×{_lb} ρ={_v:+.2f}，'
                           + (f'共 {_n_hi} 对 |ρ|≥0.25，其余维度相关性低，'
                              if _n_hi else '全部 pair |ρ|<0.25，')
-                          + '四维总体低相关，"五维"结构具备真实分散度。')
+                          + f'{len(_dims)} 个维度总体低相关，结构具备真实分散度。')
         else:
             _corr_note = '样本不足，相关矩阵暂缺。'
         _corr_html = (f'''
         <div style="margin-top:14px;">
-            <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">🔗 因子间截面相关（跨截面平均 Spearman）—— 披露"五维"实际独立信息量：|ρ|≥0.25 记红、≤−0.25 记绿。{_corr_note}</div>
+            <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">🔗 因子间截面相关（跨截面平均 Spearman）—— 披露各维度实际独立信息量：|ρ|≥0.25 记红、≤−0.25 记绿。{_corr_note}</div>
             <table style="border-collapse:collapse;font-size:11px;">
                 <thead><tr style="background:#1e293b;">
                     <th style="padding:4px 8px;"></th>''' +
@@ -2929,7 +3045,7 @@ if _ic and _ic.get("factors"):
             </table>
         </div>''')
 
-    # ===== v2.47 IC 驱动权重（factor_weights.json 走步验证结果）=====
+    # ===== v3.0-10dim 十维评分权重（factor_weights.json）=====
     _wblock = ""
     if _wmeta and _wmeta.get("weights"):
         _wn = _wmeta.get("weights") or {}
@@ -2937,10 +3053,30 @@ if _ic and _ic.get("factors"):
         _wf = _wmeta.get("walkforward") or {}
         _fpc = _wmeta.get("full_period_composite_ic") or {}
         _fic1 = _wmeta.get("factor_ic_target_h") or {}
-        _DIMS5 = [("score_news", "消息面"), ("score_tech", "技术面"), ("score_fund", "基本面"),
-                  ("score_theme", "题材热度"), ("score_sector", "板块动量")]
+        _dstat = _wmeta.get("dimension_status") or {}
+        # v3.0-10dim: 维度清单与顺序从权重文件读（五维/十维自适应），状态备注数据驱动
+        _DIMS10 = [(k, lbl) for k, lbl in [
+            ("score_fund", "基本面"), ("score_news", "消息面"), ("score_sector", "板块动量"),
+            ("score_oversold60", "超跌60反转"), ("score_bias60", "乖离低位"),
+            ("score_rsi_rev", "RSI反转"), ("score_vol_pulse", "量能反向"),
+            ("score_overbought", "超买反向"), ("score_theme_intrinsic", "题材内禀"),
+            ("score_attention", "关注度相对"),
+        ] if k in _wn]
+        _STAT_BADGE = {
+            "pool_validated": ('<span style="color:#22c55e;font-size:10px;">池内已验证</span>'),
+            "accumulating": ('<span style="color:#f59e0b;font-size:10px;">样本积累中</span>'),
+            "prior_pending": ('<span style="color:#f59e0b;font-size:10px;" title="全市场回测证据的先验映射，池内 IC 满 30+ 截面后重拟合">先验·待池内验证</span>'),
+            "prior_weak": ('<span style="color:#64748b;font-size:10px;" title="静态先验，无 IC 证据">先验·弱证据</span>'),
+        }
+
+        def _stat_badge(k):
+            st = str(_dstat.get(k, ""))
+            for key, b in _STAT_BADGE.items():
+                if st.startswith(key):
+                    return b
+            return ""
         _wrows = ""
-        for _k, _lab in _DIMS5:
+        for _k, _lab in _DIMS10:
             _p, _n = _wp.get(_k), _wn.get(_k)
             _live = ((_ic["factors"].get(_k) or {}).get("horizons") or {}).get("1") or {}
             _fic_v = _live.get("ic_mean", _fic1.get(_k))
@@ -2951,9 +3087,7 @@ if _ic and _ic.get("factors"):
             _delta = (_n - _p) if isinstance(_n, (int, float)) and isinstance(_p, (int, float)) else None
             _d_s = f"{_delta:+.3f}" if _delta is not None else "—"
             _d_c = "#ef4444" if (_delta or 0) > 0 else ("#22c55e" if (_delta or 0) < 0 else "#94a3b8")
-            _note = ('<span title="score_sector 仅 2026-09-21 起入库，有效截面不足 20 个，'
-                     '权重暂维持 0.12" style="color:#f59e0b;font-size:10px;cursor:help;">样本积累中</span>'
-                     if _k == "score_sector" else "")
+            _note = _stat_badge(_k)
             _wrows += (f'<tr>'
                        f'<td style="padding:5px 10px;color:#e2e8f0;font-weight:700;white-space:nowrap;">{_lab}</td>'
                        f'<td style="padding:5px 10px;text-align:center;color:#94a3b8;">{_p:.2f}</td>'
@@ -2984,44 +3118,30 @@ if _ic and _ic.get("factors"):
         _oos_n_dates = _wf.get("n_oos_dates")
         _lam = _wf.get("lambda")
         _adopted_ok = _wmeta.get("adopted") == "ic_driven"
+        _is_10d = len(_wn) >= 10
         _adopt_txt = ('<b style="color:#a3e635;">已采用（样本外验证通过）</b>'
                       if _adopted_ok else
-                      '<b style="color:#f59e0b;">维持先验（样本外未达采用门槛）</b>')
+                      ('<b style="color:#f59e0b;">十维先验映射（全市场回测证据 · 待池内 IC 复验）</b>'
+                       if _is_10d else
+                       '<b style="color:#f59e0b;">维持先验（样本外未达采用门槛）</b>'))
         # "三周期全改善且 NW t≥3" 由数据推导，避免权重文件更新后断言失实
         _all_improved = all(
             isinstance(((_fpc.get("lam_best") or {}).get(str(_h)) or {}).get("ic_mean"), (int, float))
             and isinstance(((_fpc.get("prior") or {}).get(str(_h)) or {}).get("ic_mean"), (int, float))
             and _fpc["lam_best"][str(_h)]["ic_mean"] > _fpc["prior"][str(_h)]["ic_mean"]
-            for _h in (1, 5, 20))
+            for _h in (1, 5, 20)) if _fpc else False
         _nts = [((_fpc.get("lam_best") or {}).get(str(_h)) or {}).get("nw_t") for _h in (1, 5, 20)]
-        _t_ge3 = all(isinstance(_t, (int, float)) and _t >= 3 for _t in _nts)
+        _t_ge3 = all(isinstance(_t, (int, float)) and _t >= 3 for _t in _nts) if _nts else False
         _claim = ('全周期复合 IC 三周期全部改善且 NW t 均≥3' if (_all_improved and _t_ge3)
                   else '全周期复合 IC 改善幅度见上表')
-        _w_ver = _wmeta.get("version") or "v2.41-ic"
+        _w_ver = _wmeta.get("version") or "v3.0-10dim"
         _oos_p_s = f"{_oos_p:+.4f}" if isinstance(_oos_p, (int, float)) else "—"
         _oos_n_s = f"{_oos_n:+.4f}" if isinstance(_oos_n, (int, float)) else "—"
-        _wblock = (f'''
-        <div style="margin-top:16px;padding-top:14px;border-top:1px solid #1e293b;">
-            <div style="font-size:13px;font-weight:800;color:#a3e635;margin-bottom:4px;">
-                ⚖️ IC 驱动评分权重（stock-scorer {_w_ver}）· {_adopt_txt}</div>
-            <div style="font-size:11px;color:#64748b;margin-bottom:10px;line-height:1.7;">
-                方法：以 Rank IC 实证反向配置五维权重 —— 仅 IC&gt;0 的维度按 IC 比例分配，负向维度降至地板 5%；
-                向先验收缩（λ）防过拟合；<b style="color:#cbd5e1;">走步验证</b>（训练≥30 截面、每 5 截面重拟、
-                样本外与先验同日期集合比对）通过后才写入 factor_weights.json 并生效。
-                权重自下一次全新评分跑生效；当前数据若为历史评分，其总分仍按当时权重计算（页眉评分层版本以数据自身 model 字段为准）。
-            </div>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px;">
-                <thead><tr style="background:#1e293b;">
-                    <th style="padding:5px 10px;text-align:left;color:#94a3b8;font-weight:600;">维度</th>
-                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">先验权重<br/>(v2.40)</th>
-                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">现行权重<br/>(v2.41)</th>
-                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">变化</th>
-                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">该维度 T+1 IC</th>
-                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">备注</th>
-                </tr></thead>
-                <tbody>{_wrows}</tbody>
-            </table>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        # 走步验证区：有数据显示摘要；十维先验期无数据 → 如实展示"待池内积累"
+        _cmp_tbl = ""
+        if _cmp_rows:
+            _cmp_tbl = (f'''
+            <table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;">
                 <thead><tr style="background:#1e293b;">
                     <th style="padding:5px 10px;text-align:left;color:#94a3b8;font-weight:600;">复合总分 IC（相同截面集）</th>
                     <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">先验权重</th>
@@ -3029,17 +3149,56 @@ if _ic and _ic.get("factors"):
                     <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">改善</th>
                 </tr></thead>
                 <tbody>{_cmp_rows}</tbody>
+            </table>''')
+        if isinstance(_oos_n, (int, float)):
+            _wf_html = (f'''
+                <div style="font-size:11px;color:#94a3b8;margin-top:8px;line-height:1.7;">
+                    📈 <b style="color:#e2e8f0;">样本外走步验证</b>：复合总分 IC 由先验 <b style="color:#e2e8f0;">{_oos_p_s}</b>
+                    提升至 <b style="color:#a3e635;">{_oos_n_s}</b>（t={_oos_t}，{_oos_n_dates} 个样本外截面，λ={_lam}）；
+                    {_claim}。
+                </div>{_cmp_tbl}
+                <div style="font-size:10px;color:#f59e0b;margin-top:6px;line-height:1.7;">
+                    ⚠️ 选择性披露：λ 扫描（0~1.0 共 6 档）本身构成对样本外的多次使用，表中样本外值为乐观上界；
+                    但全部 λ≥0.2 均优于先验，"IC 驱动优于先验"的结论对 λ 选择不敏感。
+                </div>''')
+        else:
+            _wf_html = (f'''
+                <div style="font-size:11px;color:#f59e0b;margin-top:8px;line-height:1.7;padding:8px 10px;background:rgba(245,158,11,0.08);border-radius:6px;">
+                    📈 <b>样本外走步验证：待池内积累</b> —— 十维新维度（超跌60/乖离/RSI反转/量能反向/超买反向/题材内禀/关注度）
+                    在 TOP200 池<b>无历史截面快照</b>，当前权重为全市场回测（2021-01~2026-09，5019 只，630 万事件）证据的
+                    先验映射；满 30+ 截面后由 <code style="color:#e2e8f0;">factor_eval.py --optimize-weights</code>
+                    重拟合，届时本区块自动展示走步验证摘要（OOS 复合 IC 对比 / λ 扫描 / 胜率）。
+                </div>''')
+        _method_txt = (
+            '方法：以 Rank IC 实证反向配置权重 —— 仅 IC&gt;0 的维度按 IC 比例分配，负向维度降至地板；'
+            '向先验收缩（λ）防过拟合；<b style="color:#cbd5e1;">走步验证</b>（训练≥30 截面、每 5 截面重拟、'
+            '样本外与先验同日期集合比对）通过后才写入 factor_weights.json 并生效。'
+            '权重自下一次全新评分跑生效；当前数据若为历史评分，其总分仍按当时权重计算（页眉评分层版本以数据自身 model 字段为准）。'
+            if not _is_10d else
+            '方法：v3.0-10dim 十维结构（依据《因子排名与10维评分模型设计_2026-10-13》）—— 基本面/消息面/板块动量为'
+            '池内 IC 已验证维度；超跌60/乖离低位/RSI反转/量能反向/超买反向为全市场回测 Top5 因子'
+            '（factor-backtest 扩展回测，h=20 超额 +2.57%/+2.04%/+1.13%/+1.31%/+0.75%，|t|=5.1~12.2）；'
+            '题材内禀/关注度为低权重先验维度。均线/MACD/动量退出评分（三重负证据，仅 tech detail 展示）。'
+            '权重自下一次全新评分跑生效；当前数据若为历史评分，其总分仍按当时权重计算（页眉评分层版本以数据自身 model 字段为准）。')
+        _wblock = (f'''
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid #1e293b;">
+            <div style="font-size:13px;font-weight:800;color:#a3e635;margin-bottom:4px;">
+                ⚖️ {'十维' if _is_10d else '五维'}评分权重（stock-scorer {_w_ver}）· {_adopt_txt}</div>
+            <div style="font-size:11px;color:#64748b;margin-bottom:10px;line-height:1.7;">
+                {_method_txt}
+            </div>
+            <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px;">
+                <thead><tr style="background:#1e293b;">
+                    <th style="padding:5px 10px;text-align:left;color:#94a3b8;font-weight:600;">维度</th>
+                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">先验权重<br/>({_w_ver})</th>
+                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">现行权重<br/>({_w_ver})</th>
+                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">变化</th>
+                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">该维度 T+1 IC</th>
+                    <th style="padding:5px 10px;color:#94a3b8;font-weight:600;">状态</th>
+                </tr></thead>
+                <tbody>{_wrows}</tbody>
             </table>
-            <div style="font-size:11px;color:#94a3b8;margin-top:8px;line-height:1.7;">
-                📈 <b style="color:#e2e8f0;">样本外走步验证</b>：复合总分 IC 由先验 <b style="color:#e2e8f0;">{_oos_p_s}</b>
-                提升至 <b style="color:#a3e635;">{_oos_n_s}</b>（t={_oos_t}，{_oos_n_dates} 个样本外截面，λ={_lam}）；
-                {_claim}。
-            </div>
-            <div style="font-size:10px;color:#f59e0b;margin-top:6px;line-height:1.7;">
-                ⚠️ 选择性披露：λ 扫描（0~1.0 共 6 档）本身构成对样本外的多次使用，表中样本外值为乐观上界；
-                但全部 λ≥0.2 均优于先验（OOS IC 0.031~0.045），"IC 驱动优于先验"的结论对 λ 选择不敏感。
-                score_sector 有效样本仅 9 个（&lt;20），其 0.12 权重无 IC 证据，随每日截面积累后评估。
-            </div>
+            {_wf_html}
         </div>''')
 
     # 累计 IC 曲线（T+1，仅画样本≥20 的因子；不同因子等长序列才可同轴比较）
@@ -3096,7 +3255,7 @@ if _ic and _ic.get("factors"):
             口径（v2.47 修正）：Rank IC = Spearman(因子值在当日截面的秩, 个股未来 h 个<b>真实交易日</b>收益)，h ∈ {{1, 5, 20}}；
             收益对当日 TOP200 <b>全部个股</b>计算（回填全市场前复权日线，消除"跌出榜单即消失"的留存偏差 —— v1 口径 T+20 流失 34%）；
             t 值采用 <b style="color:#fbbf24;">Newey-West HAC</b> 调整（h=5/20 相邻观测共享 80%/95% 收益窗口，普通 t 会虚高显著性）；
-            <b style="color:#fbbf24;">★</b> = 通过 Bonferroni 多重检验校正（5 因子×3 周期=15 次，|NW t|≥2.97）。
+            <b style="color:#fbbf24;">★</b> = 通过 Bonferroni 多重检验校正（v3.0 起 10 维度×3 周期=30 次，|NW t|≥3.08；旧五维期 15 次，|NW t|≥2.97）。
             样本 &lt; 20 个截面不给出有效性判定。当前样本：
             <b style="color:#e2e8f0;">{_ic.get("n_snapshots")} 个有效截面</b>
             （{_ic.get("snapshot_range", ["?", "?"])[0]} ~ {_ic.get("snapshot_range", ["?", "?"])[1]}，
@@ -3119,14 +3278,17 @@ if _ic and _ic.get("factors"):
         <div style="font-size:11px;color:#f59e0b;margin-top:12px;padding:8px 10px;background:rgba(245,158,11,0.08);border-radius:6px;border-left:3px solid #f59e0b;line-height:1.7;">
             ⚠️ <b>解读须知</b>：① 口径已于 v2.47 修正（交易日对齐 / 全样本收益 / NW 调整 / Bonferroni）——
             v1 口径因留存偏差与假日陈旧快照污染，曾把综合总分与消息面误判为负向；修正后
-            <b>总分全周期为正</b>、<b>基本面与消息面为正</b>（T+1/T+5/T+20 均正向）、题材与技术为负向，
-            评分权重已随之调整（见上方「⚖️ IC 驱动评分权重」）；
-            ② TOP200 为高换手关注度筛选池，题材/技术维度的负向 IC 反映「关注度脉冲后的均值回复」，
-            处理方式是<b>降权至地板 5% 而非删除</b>（保留下限以维持五维结构与展示完整性）；
-            ③ IC 衡量<b>排序能力</b>而非绝对收益，分层多空为未扣成本毛利口径；
-            ④ 历史截面取自 git 提交记录（含早期行业归类缺陷版本，v2.46 已修复）；
+            <b>总分全周期为正</b>、<b>基本面与消息面为正</b>（T+1/T+5/T+20 均正向）；
+            ② v3.0-10dim（2026-10-13）：依据全市场回测 Top5 因子重构为十维——技术面/题材两个负 IC 维度拆解，
+            其有效成分（RSI 反转）由新维度承载、负向成分（放量脉冲/超买）以反向维度承载，均线/MACD/动量退出评分；
+            题材/技术两行保留为<b>对照展示</b>（负向 IC 正是拆解决策的依据）；新维度在 TOP200 池无历史截面，
+            初始权重为全市场回测先验映射，<b>满 30+ 池内截面后重拟合</b>（见上方⚖️区块状态标注）；
+            ③ TOP200 为高换手关注度筛选池，负向 IC 反映「关注度脉冲后的均值回复」，
+            处理方式是<b>降权/反向而非删除</b>；
+            ④ IC 衡量<b>排序能力</b>而非绝对收益，分层多空为未扣成本毛利口径；
+            ⑤ 历史截面取自 git 提交记录（含早期行业归类缺陷版本，v2.46 已修复）；
             样本区间 2026-06-26~10-12 约 3.5 个月，子区间稳定性已披露于表中「半期」行，无制度切换；
-            ⑤ 投资有风险，本区块仅供研究与教育，不构成投资建议。
+            ⑥ 投资有风险，本区块仅供研究与教育，不构成投资建议。
         </div>
         <div style="font-size:10px;color:#475569;margin-top:8px;">数据说明：{html_mod.escape(_ic_notes[:400])}</div>
     </div>''')
@@ -3487,8 +3649,17 @@ function applyFilters() {
                 bVal = parseFloat(b.querySelector('.s-pe').dataset.value);
                 break;
             default:
-                aVal = parseInt(a.dataset.originalRank);
-                bVal = parseInt(b.dataset.originalRank);
+                // v3.0: score_* 通用映射(data-s-* 属性; 十维子项 data-s-oversold60 等同样生效)
+                if (currentSort.field.indexOf('score_') === 0) {
+                    const _k = 's' + currentSort.field.slice(6).charAt(0).toUpperCase() + currentSort.field.slice(7);
+                    aVal = parseFloat(a.dataset[_k]);
+                    bVal = parseFloat(b.dataset[_k]);
+                    if (isNaN(aVal)) aVal = 0;
+                    if (isNaN(bVal)) bVal = 0;
+                } else {
+                    aVal = parseInt(a.dataset.originalRank);
+                    bVal = parseInt(b.dataset.originalRank);
+                }
         }
         return currentSort.desc ? (bVal - aVal) : (aVal - bVal);
     });

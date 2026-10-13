@@ -1,126 +1,54 @@
 {
- "version": "v2.41-ic",
- "fitted_at": "2026-10-13 02:11:51",
+ "version": "v3.0-10dim",
+ "fitted_at": "2026-10-13 10:30:00",
  "target_horizon": 1,
- "method": "IC 驱动权重: 正IC维度按比例分配+地板5%+向先验收缩(λ); 走步验证(训练≥30截面,每5截面重拟,样本外比对); score_sector 有效样本<20 维持0.12(样本积累中)",
+ "method": "十维结构(2026-10-13)：保留池内 IC 已验证维度(fund/news/sector)；技术面/题材拆解为回测 Top5 因子+先验维度。新拆 7 维在 TOP200 池无历史截面 → 初始权重为全市场回测(factor-backtest, 2021-01~2026-09, 5019只, 630万事件)证据的先验映射；满 30+ 截面后由 --optimize-weights 重拟合。",
+ "adopted": "prior_pending_10dim",
  "weights": {
-  "score_news": 0.396,
-  "score_tech": 0.044,
-  "score_fund": 0.396,
-  "score_theme": 0.044,
-  "score_sector": 0.12
+  "score_fund": 0.18,
+  "score_news": 0.18,
+  "score_sector": 0.10,
+  "score_oversold60": 0.12,
+  "score_bias60": 0.10,
+  "score_rsi_rev": 0.06,
+  "score_vol_pulse": 0.10,
+  "score_overbought": 0.06,
+  "score_theme_intrinsic": 0.05,
+  "score_attention": 0.05
  },
  "prior_weights": {
-  "score_news": 0.2,
-  "score_tech": 0.2,
-  "score_fund": 0.3,
-  "score_theme": 0.18,
-  "score_sector": 0.12
+  "score_fund": 0.18,
+  "score_news": 0.18,
+  "score_sector": 0.10,
+  "score_oversold60": 0.12,
+  "score_bias60": 0.10,
+  "score_rsi_rev": 0.06,
+  "score_vol_pulse": 0.10,
+  "score_overbought": 0.06,
+  "score_theme_intrinsic": 0.05,
+  "score_attention": 0.05
  },
- "adopted": "ic_driven",
- "walkforward": {
-  "n_oos_dates": 38,
-  "oos_ic_prior": 0.0248,
-  "oos_ic_new": 0.0445,
-  "oos_t_new": 2.22,
-  "lambda": 1.0,
-  "note": "样本外复合 IC +0.0445 vs 先验 +0.0248（λ=1.0，n=38）→ 采用 IC 驱动权重"
+ "dimension_status": {
+  "score_fund": "pool_validated（池内 IC 三周期全正，T+1 NWt=3.21★）",
+  "score_news": "pool_validated（池内 IC 三周期全正，T+20 NWt=4.85★）",
+  "score_sector": "accumulating（池内有效截面 9<20，维持 0.10）",
+  "score_oversold60": "prior_pending（全市场 h20 +2.57%, t=7.34, 60日+3.85% 全场最高, 六年全正）",
+  "score_bias60": "prior_pending（全市场 h20 +2.04%, t=9.40 全场最高, 六年全正）",
+  "score_rsi_rev": "prior_pending（全市场 h20 +1.13%, t=5.21, 六年全正）",
+  "score_vol_pulse": "prior_pending（全市场原生 h20 -1.31%, t=-12.24 最强负向→反向后+1.31%）",
+  "score_overbought": "prior_pending（全市场原生 h20 -0.75%, t=-5.13→反向后+0.75%；2026 原生转正风险已登记）",
+  "score_theme_intrinsic": "prior_weak（静态先验，无 IC 证据，低保权重）",
+  "score_attention": "prior_pending（机理论证；成交额池内排名口径，相对板块口径为下一迭代）"
  },
- "full_period_composite_ic": {
-  "prior": {
-   "1": {
-    "n": 68,
-    "ic_mean": 0.0331,
-    "nw_t": 2.2,
-    "win_rate": 58.8
-   },
-   "5": {
-    "n": 64,
-    "ic_mean": 0.0427,
-    "nw_t": 1.78,
-    "win_rate": 64.1
-   },
-   "20": {
-    "n": 50,
-    "ic_mean": 0.0715,
-    "nw_t": 1.89,
-    "win_rate": 70.0
-   }
-  },
-  "lam_best": {
-   "1": {
-    "n": 68,
-    "ic_mean": 0.0544,
-    "nw_t": 3.44,
-    "win_rate": 67.6
-   },
-   "5": {
-    "n": 64,
-    "ic_mean": 0.0751,
-    "nw_t": 3.63,
-    "win_rate": 70.3
-   },
-   "20": {
-    "n": 50,
-    "ic_mean": 0.0988,
-    "nw_t": 3.08,
-    "win_rate": 80.0
-   }
-  }
+ "evidence_source": {
+  "全市场回测": "factor-backtest/data/results_ext.json（backtest_ext.py, 2026-10-13；F4/F5 基准与主回测 results.json 数字一致）",
+  "池内 IC": "factor_eval.py v2.47 修正口径（69 截面，Newey-West HAC + Bonferroni，回填 709 只×143 交易日前复权日线）",
+  "设计文档": "《因子排名与10维评分模型设计_2026-10-13.md》"
  },
- "factor_ic_target_h": {
-  "score_news": 0.0493,
-  "score_tech": -0.0355,
-  "score_fund": 0.0494,
-  "score_theme": -0.0412
- },
- "lambda_scan": [
-  {
-   "lambda": 0.0,
-   "n_oos": 38,
-   "oos_ic_mean": 0.0248,
-   "oos_t": 1.18,
-   "oos_win_rate": 55.3
-  },
-  {
-   "lambda": 0.2,
-   "n_oos": 38,
-   "oos_ic_mean": 0.0306,
-   "oos_t": 1.48,
-   "oos_win_rate": 57.9
-  },
-  {
-   "lambda": 0.4,
-   "n_oos": 38,
-   "oos_ic_mean": 0.0346,
-   "oos_t": 1.69,
-   "oos_win_rate": 57.9
-  },
-  {
-   "lambda": 0.6,
-   "n_oos": 38,
-   "oos_ic_mean": 0.0391,
-   "oos_t": 1.93,
-   "oos_win_rate": 65.8
-  },
-  {
-   "lambda": 0.8,
-   "n_oos": 38,
-   "oos_ic_mean": 0.0424,
-   "oos_t": 2.11,
-   "oos_win_rate": 68.4
-  },
-  {
-   "lambda": 1.0,
-   "n_oos": 38,
-   "oos_ic_mean": 0.0445,
-   "oos_t": 2.22,
-   "oos_win_rate": 65.8
-  }
- ],
  "notes": [
-  "复合总分由 4 维分量按权重线性合成后与未来收益求 Rank IC（与生产 total 口径一致，score_sector 因历史样本不足未纳入复合评估，权重固定 0.12）",
-  "训练窗因子 IC 仅使用基准快照 T+1 收益完整落在训练窗内的观测，避免边界泄漏",
-  "样本外日期集合对先验与 IC 驱动权重完全相同，公平比对"
+  "十维总分 = Σ(score_i × w_i) × 4；step2 中间分无板块维度，按 (1−w_sector) 归一化保持 0-20 量纲",
+  "新拆 7 维满 30+ 池内截面后跑 factor_eval.py --optimize-weights 重拟合（OPT_DIMS 已扩展至十维）",
+  "旧五维权重文件(v2.41-ic)被本文件替代；step2/apply 内置旧五维→十维映射兼容历史数据重跑",
+  "⚠️ 本权重不是池内 IC 驱动产物，是全市场回测先验映射——报告层 ⚖️ 区块如实展示「先验·待池内验证」"
  ]
 }
