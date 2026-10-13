@@ -2568,7 +2568,7 @@ def generate_research_analysis(r):
     elif growth and growth > 100:
         value_parts.append("<b>综合判断：高成长驱动，关注业绩兑现节奏与估值消化。</b>")
     else:
-        value_parts.append("<b>综合判断：综合评分靠前，建议纳入观察池择机参与。</b>")
+        value_parts.append("<b>综合判断：综合评分靠前，建议纳入重点跟踪、择机参与。</b>")
 
     value_analysis = "".join(value_parts)
 
