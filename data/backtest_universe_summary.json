@@ -1,0 +1,482 @@
+{
+ "config": {
+  "routes": [
+   "reversal",
+   "momentum"
+  ],
+  "holds": [
+   5,
+   10,
+   20
+  ],
+  "top": 10,
+  "per_sector": 3,
+  "per_parent": 2,
+  "dates": [
+   "2026-06-26",
+   "2026-10-12"
+  ],
+  "n_signal_days": 76,
+  "universe": 1121,
+  "calibration": {
+   "n": 996,
+   "spearman": 0.7183317586105777,
+   "top200_boundary_agree": 75.50200803212851,
+   "top500_boundary_agree": 84.23694779116467,
+   "calib_date": "2026-10-12"
+  },
+  "ann_days": 244
+ },
+ "groups": {
+  "reversal_h5": {
+   "legs": {
+    "top200": {
+     "metrics": {
+      "n_days": 230,
+      "ann_ret": 2.062688902434573,
+      "sharpe": 0.20271274930100844,
+      "mdd": -17.358489204284545,
+      "daily_win": 15.65217391304348
+     },
+     "alpha_vs_hs300": {
+      "ann_alpha": 21.77114623698939,
+      "sharpe_alpha": 0.8683649427578272,
+      "mdd_alpha": -13.377830289568182,
+      "daily_win_alpha": 50.0
+     },
+     "alpha_vs_pool": {
+      "ann_alpha": 38.30923808446567,
+      "sharpe_alpha": 1.941702208950662,
+      "mdd_alpha": -6.721244447632035,
+      "daily_win_alpha": 16.52173913043478
+     },
+     "n_trades": 615,
+     "trade_win_rate": 46.5040650406504,
+     "avg_trade_ret": 0.3380839174958342,
+     "trade_win_vs_hs300": 52.357723577235774
+    },
+    "top500": {
+     "metrics": {
+      "n_days": 230,
+      "ann_ret": 5.386609776021811,
+      "sharpe": 0.3535000105359799,
+      "mdd": -17.344164735013955,
+      "daily_win": 16.956521739130434
+     },
+     "alpha_vs_hs300": {
+      "ann_alpha": 19.174482232059574,
+      "sharpe_alpha": 0.7871111443988952,
+      "mdd_alpha": -16.985040543352913,
+      "daily_win_alpha": 51.5
+     },
+     "alpha_vs_pool": {
+      "ann_alpha": 43.779736001717204,
+      "sharpe_alpha": 3.110950292147092,
+      "mdd_alpha": -2.7503735303888943,
+      "daily_win_alpha": 20.0
+     },
+     "n_trades": 650,
+     "trade_win_rate": 47.84615384615385,
+     "avg_trade_ret": 0.6489201036533794,
+     "trade_win_vs_hs300": 54.769230769230774
+    }
+   },
+   "pool_bench": {
+    "top200": {
+     "n_days": 230,
+     "ann_ret": -28.821887165104766,
+     "sharpe": -0.9748111201283095,
+     "mdd": -35.81217478734613,
+     "daily_win": 13.91304347826087
+    },
+    "top500": {
+     "n_days": 230,
+     "ann_ret": -27.647216833090262,
+     "sharpe": -1.2618936639069451,
+     "mdd": -30.480113689566647,
+     "daily_win": 13.043478260869565
+    }
+   },
+   "n_signal_days_used": 70,
+   "n_trades": {
+    "top200": 615,
+    "top500": 650
+   }
+  },
+  "reversal_h10": {
+   "legs": {
+    "top200": {
+     "metrics": {
+      "n_days": 230,
+      "ann_ret": 2.521285454005051,
+      "sharpe": 0.222951162985005,
+      "mdd": -17.885447803065592,
+      "daily_win": 15.65217391304348
+     },
+     "alpha_vs_hs300": {
+      "ann_alpha": 24.752979827656475,
+      "sharpe_alpha": 0.9692172686819268,
+      "mdd_alpha": -13.377830289568182,
+      "daily_win_alpha": 50.5
+     },
+     "alpha_vs_pool": {
+      "ann_alpha": 38.48722101955466,
+      "sharpe_alpha": 1.8603651836788306,
+      "mdd_alpha": -7.1634647039731885,
+      "daily_win_alpha": 17.391304347826086
+     },
+     "n_trades": 565,
+     "trade_win_rate": 47.61061946902655,
+     "avg_trade_ret": 1.3412429270395676,
+     "trade_win_vs_hs300": 53.451327433628315
+    },
+    "top500": {
+     "metrics": {
+      "n_days": 230,
+      "ann_ret": 6.864260209064743,
+      "sharpe": 0.4389859567067597,
+      "mdd": -12.188797700203269,
+      "daily_win": 16.52173913043478
+     },
+     "alpha_vs_hs300": {
+      "ann_alpha": 22.52396420944869,
+      "sharpe_alpha": 0.9231778340364678,
+      "mdd_alpha": -13.377830289568182,
+      "daily_win_alpha": 52.5
+     },
+     "alpha_vs_pool": {
+      "ann_alpha": 45.25259501262462,
+      "sharpe_alpha": 3.115376999514572,
+      "mdd_alpha": -2.7503735303888943,
+      "daily_win_alpha": 20.434782608695652
+     },
+     "n_trades": 600,
+     "trade_win_rate": 47.0,
+     "avg_trade_ret": 1.6640779643285597,
+     "trade_win_vs_hs300": 56.49999999999999
+    }
+   },
+   "pool_bench": {
+    "top200": {
+     "n_days": 230,
+     "ann_ret": -28.821887165104766,
+     "sharpe": -0.9748111201283095,
+     "mdd": -35.81217478734613,
+     "daily_win": 13.91304347826087
+    },
+    "top500": {
+     "n_days": 230,
+     "ann_ret": -27.647216833090262,
+     "sharpe": -1.2618936639069451,
+     "mdd": -30.480113689566647,
+     "daily_win": 13.043478260869565
+    }
+   },
+   "n_signal_days_used": 70,
+   "n_trades": {
+    "top200": 565,
+    "top500": 600
+   }
+  },
+  "reversal_h20": {
+   "legs": {
+    "top200": {
+     "metrics": {
+      "n_days": 230,
+      "ann_ret": -5.846761895330821,
+      "sharpe": -0.19537534369282594,
+      "mdd": -20.97559925409832,
+      "daily_win": 15.65217391304348
+     },
+     "alpha_vs_hs300": {
+      "ann_alpha": 18.5258065960856,
+      "sharpe_alpha": 0.8080061463816178,
+      "mdd_alpha": -13.377830289568182,
+      "daily_win_alpha": 51.5
+     },
+     "alpha_vs_pool": {
+      "ann_alpha": 26.6362213152155,
+      "sharpe_alpha": 1.324113517262621,
+      "mdd_alpha": -12.754840770840016,
+      "daily_win_alpha": 14.347826086956522
+     },
+     "n_trades": 465,
+     "trade_win_rate": 43.225806451612904,
+     "avg_trade_ret": 0.8274729560969242,
+     "trade_win_vs_hs300": 50.10752688172043
+    },
+    "top500": {
+     "metrics": {
+      "n_days": 230,
+      "ann_ret": -1.899751175217601,
+      "sharpe": -0.014632695092016791,
+      "mdd": -16.657968429496627,
+      "daily_win": 16.52173913043478
+     },
+     "alpha_vs_hs300": {
+      "ann_alpha": 18.08740534840252,
+      "sharpe_alpha": 0.8112905373378657,
+      "mdd_alpha": -13.377830289568182,
+      "daily_win_alpha": 52.0
+     },
+     "alpha_vs_pool": {
+      "ann_alpha": 32.9545227350774,
+      "sharpe_alpha": 2.280969631816078,
+      "mdd_alpha": -3.7413904866909986,
+      "daily_win_alpha": 17.391304347826086
+     },
+     "n_trades": 500,
+     "trade_win_rate": 48.4,
+     "avg_trade_ret": 2.073959253783024,
+     "trade_win_vs_hs300": 56.99999999999999
+    }
+   },
+   "pool_bench": {
+    "top200": {
+     "n_days": 230,
+     "ann_ret": -28.821887165104766,
+     "sharpe": -0.9748111201283095,
+     "mdd": -35.81217478734613,
+     "daily_win": 13.91304347826087
+    },
+    "top500": {
+     "n_days": 230,
+     "ann_ret": -27.647216833090262,
+     "sharpe": -1.2618936639069451,
+     "mdd": -30.480113689566647,
+     "daily_win": 13.043478260869565
+    }
+   },
+   "n_signal_days_used": 70,
+   "n_trades": {
+    "top200": 465,
+    "top500": 500
+   }
+  },
+  "momentum_h5": {
+   "legs": {
+    "top200": {
+     "metrics": {
+      "n_days": 230,
+      "ann_ret": -20.044308529881828,
+      "sharpe": -0.7342327105631599,
+      "mdd": -30.50514486682164,
+      "daily_win": 14.782608695652174
+     },
+     "alpha_vs_hs300": {
+      "ann_alpha": -17.896220225932915,
+      "sharpe_alpha": -0.5083970616528939,
+      "mdd_alpha": -29.014586000544472,
+      "daily_win_alpha": 48.5
+     },
+     "alpha_vs_pool": {
+      "ann_alpha": 9.3021315699791,
+      "sharpe_alpha": 0.5921552519459083,
+      "mdd_alpha": -15.089451708510637,
+      "daily_win_alpha": 15.217391304347828
+     },
+     "n_trades": 575,
+     "trade_win_rate": 36.0,
+     "avg_trade_ret": -2.0416048206869046,
+     "trade_win_vs_hs300": 40.34782608695652
+    },
+    "top500": {
+     "metrics": {
+      "n_days": 230,
+      "ann_ret": -26.082802692930397,
+      "sharpe": -1.4427941111757656,
+      "mdd": -27.760256217378288,
+      "daily_win": 12.608695652173912
+     },
+     "alpha_vs_hs300": {
+      "ann_alpha": -16.966507660490215,
+      "sharpe_alpha": -0.6338321977814851,
+      "mdd_alpha": -25.523796852185654,
+      "daily_win_alpha": 48.0
+     },
+     "alpha_vs_pool": {
+      "ann_alpha": 0.18975798240687958,
+      "sharpe_alpha": 0.08738940147646287,
+      "mdd_alpha": -16.3997699872072,
+      "daily_win_alpha": 15.65217391304348
+     },
+     "n_trades": 650,
+     "trade_win_rate": 37.84615384615385,
+     "avg_trade_ret": -2.1898628941930993,
+     "trade_win_vs_hs300": 42.30769230769231
+    }
+   },
+   "pool_bench": {
+    "top200": {
+     "n_days": 230,
+     "ann_ret": -28.821887165104766,
+     "sharpe": -0.9748111201283095,
+     "mdd": -35.81217478734613,
+     "daily_win": 13.91304347826087
+    },
+    "top500": {
+     "n_days": 230,
+     "ann_ret": -27.647216833090262,
+     "sharpe": -1.2618936639069451,
+     "mdd": -30.480113689566647,
+     "daily_win": 13.043478260869565
+    }
+   },
+   "n_signal_days_used": 70,
+   "n_trades": {
+    "top200": 575,
+    "top500": 650
+   }
+  },
+  "momentum_h10": {
+   "legs": {
+    "top200": {
+     "metrics": {
+      "n_days": 230,
+      "ann_ret": -25.435510885016388,
+      "sharpe": -1.0445767616123982,
+      "mdd": -32.51604101749977,
+      "daily_win": 14.347826086956522
+     },
+     "alpha_vs_hs300": {
+      "ann_alpha": -21.32006570038675,
+      "sharpe_alpha": -0.6696218808336472,
+      "mdd_alpha": -31.073636215822752,
+      "daily_win_alpha": 49.0
+     },
+     "alpha_vs_pool": {
+      "ann_alpha": 2.2228447194486023,
+      "sharpe_alpha": 0.2237209021684033,
+      "mdd_alpha": -16.046779275809907,
+      "daily_win_alpha": 14.347826086956522
+     },
+     "n_trades": 547,
+     "trade_win_rate": 30.347349177330894,
+     "avg_trade_ret": -4.53184844932426,
+     "trade_win_vs_hs300": 36.19744058500914
+    },
+    "top500": {
+     "metrics": {
+      "n_days": 230,
+      "ann_ret": -33.012330778830034,
+      "sharpe": -1.9869985026524446,
+      "mdd": -34.1617198955435,
+      "daily_win": 12.608695652173912
+     },
+     "alpha_vs_hs300": {
+      "ann_alpha": -24.23355074735435,
+      "sharpe_alpha": -1.0242889811812175,
+      "mdd_alpha": -28.443030878236087,
+      "daily_win_alpha": 48.0
+     },
+     "alpha_vs_pool": {
+      "ann_alpha": -9.020652087046955,
+      "sharpe_alpha": -0.6572205602004687,
+      "mdd_alpha": -18.23595250892016,
+      "daily_win_alpha": 16.08695652173913
+     },
+     "n_trades": 600,
+     "trade_win_rate": 30.333333333333336,
+     "avg_trade_ret": -5.446467044543112,
+     "trade_win_vs_hs300": 36.16666666666667
+    }
+   },
+   "pool_bench": {
+    "top200": {
+     "n_days": 230,
+     "ann_ret": -28.821887165104766,
+     "sharpe": -0.9748111201283095,
+     "mdd": -35.81217478734613,
+     "daily_win": 13.91304347826087
+    },
+    "top500": {
+     "n_days": 230,
+     "ann_ret": -27.647216833090262,
+     "sharpe": -1.2618936639069451,
+     "mdd": -30.480113689566647,
+     "daily_win": 13.043478260869565
+    }
+   },
+   "n_signal_days_used": 70,
+   "n_trades": {
+    "top200": 547,
+    "top500": 600
+   }
+  },
+  "momentum_h20": {
+   "legs": {
+    "top200": {
+     "metrics": {
+      "n_days": 230,
+      "ann_ret": -21.985298700705393,
+      "sharpe": -0.844365510270135,
+      "mdd": -32.93002347677801,
+      "daily_win": 16.08695652173913
+     },
+     "alpha_vs_hs300": {
+      "ann_alpha": -18.90262684621287,
+      "sharpe_alpha": -0.552616760445837,
+      "mdd_alpha": -31.489779104059345,
+      "daily_win_alpha": 48.5
+     },
+     "alpha_vs_pool": {
+      "ann_alpha": 7.372715370161886,
+      "sharpe_alpha": 0.6368890727003923,
+      "mdd_alpha": -10.971550793570884,
+      "daily_win_alpha": 14.347826086956522
+     },
+     "n_trades": 484,
+     "trade_win_rate": 32.02479338842975,
+     "avg_trade_ret": -5.63225398780297,
+     "trade_win_vs_hs300": 35.74380165289256
+    },
+    "top500": {
+     "metrics": {
+      "n_days": 230,
+      "ann_ret": -25.564637148923342,
+      "sharpe": -1.4297329596856554,
+      "mdd": -29.182407316461646,
+      "daily_win": 13.478260869565217
+     },
+     "alpha_vs_hs300": {
+      "ann_alpha": -21.46777254361024,
+      "sharpe_alpha": -0.8485426962501189,
+      "mdd_alpha": -29.707429818542607,
+      "daily_win_alpha": 48.5
+     },
+     "alpha_vs_pool": {
+      "ann_alpha": 1.3960321848614399,
+      "sharpe_alpha": 0.1829943262915109,
+      "mdd_alpha": -11.194198685806766,
+      "daily_win_alpha": 16.956521739130434
+     },
+     "n_trades": 500,
+     "trade_win_rate": 35.4,
+     "avg_trade_ret": -5.378895983165883,
+     "trade_win_vs_hs300": 39.4
+    }
+   },
+   "pool_bench": {
+    "top200": {
+     "n_days": 230,
+     "ann_ret": -28.821887165104766,
+     "sharpe": -0.9748111201283095,
+     "mdd": -35.81217478734613,
+     "daily_win": 13.91304347826087
+    },
+    "top500": {
+     "n_days": 230,
+     "ann_ret": -27.647216833090262,
+     "sharpe": -1.2618936639069451,
+     "mdd": -30.480113689566647,
+     "daily_win": 13.043478260869565
+    }
+   },
+   "n_signal_days_used": 70,
+   "n_trades": {
+    "top200": 484,
+    "top500": 500
+   }
+  }
+ }
+}
