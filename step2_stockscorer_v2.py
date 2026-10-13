@@ -902,10 +902,10 @@ def score_tech(kl, price, pct, cagr3=None, wkl=None):
         s = _s_struct
         r += f"; 动量off(三重负证据,detail仅展示)"
 
-    # ---- 结构分四因子说明 ----
+    # ---- 结构分四因子说明 ---- v3.3 量纲升级: 内部 0-5 ×2 → 0-10
     _macd_f = macd_factor if macd_factor is not None else 2.5
-    r += (f"; 均线{ma_factor:.1f}({trend})·MACD{_macd_f:.1f}·量能{vol_factor:.1f}"
-          f"·RSI时机{rsi_factor:.1f}(RSI{rsi14:.0f})")
+    r += (f"; 均线{ma_factor*2:.1f}({trend})·MACD{_macd_f*2:.1f}·量能{vol_factor*2:.1f}"
+          f"·RSI时机{rsi_factor*2:.1f}(RSI{rsi14:.0f})")
 
     detail = {
         "ma5": round(ma5v, 1) if ma5v else None,
