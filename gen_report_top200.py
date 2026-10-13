@@ -34,7 +34,7 @@ results = data["results"]
 #   此处统一 ×2 映射到 0-10 展示；total 已由后端 step2/apply_sector_momentum ×20。
 _SCORE_KEYS10 = ("score_fund", "score_news", "score_tech", "score_theme", "score_oversold60",
                  "score_bias60", "score_rsi_rev", "score_vol_pulse", "score_overbought",
-                 "score_theme_intrinsic", "score_attention", "score_sector")
+                 "score_theme_intrinsic", "score_attention", "score_sector", "score_sustain")
 for _r in results:
     for _k in _SCORE_KEYS10:
         _v = _r.get(_k)
@@ -1164,7 +1164,7 @@ for _hi, _r in enumerate(top3_stocks):
     html_parts.append(f'''
             <div class="ht-item" style="border-left:3px solid {_tc};">
                 <div class="ht-name">#{_hi+1} {html_mod.escape(_r["name"])}</div>
-                <div class="ht-sc" style="color:{_tc};">{_r["total"]:.2f}<span style="font-size:11px;color:#94a3b8;"> / 20</span></div>
+                <div class="ht-sc" style="color:{_tc};">{_r["total"]:.2f}<span style="font-size:11px;color:#94a3b8;"> / 100</span></div>
                 <div class="ht-note">{html_mod.escape(_sec_)}{' · ' + html_mod.escape(_sub_) if _sub_ else ''}</div>
             </div>''')
 
@@ -1580,7 +1580,7 @@ if _conc_top_pct:
 for s, v in sorted_secs:
     cnt = v.get("count", 0)
     avg = v.get("avg", 0)
-    bar_w = round(min(avg / 20 * 100, 100), 1)
+    bar_w = round(min(avg / 100 * 100, 100), 1)
     html_parts.append(f'''
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
                     <span style="color:#e2e8f0;font-size:11px;min-width:60px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{s}</span>
@@ -1640,12 +1640,12 @@ for idx, r in enumerate(top20):
     risk_parts = [n for n in news_reasons if "⚠" in n]
     risk_html = "<br>".join([n.replace("⚠️", "") for n in risk_parts[:2]]) if risk_parts else ""
 
-    # v2.20: 技术面四因子展示(均线/MACD/量能/RSI)
+    # v2.20: 技术面四因子展示(均线/MACD/量能/RSI) —— v3.3 量纲升级: 内部 0-5 ×2 → 0-10 展示
     ma_f = tech.get("ma_factor")
     macd_f = tech.get("macd_factor")
     vol_f = tech.get("vol_factor")
     rsi_f = tech.get("rsi_factor")
-    factor_info = (f"均线{ma_f:.1f}·MACD{macd_f:.1f}·量能{vol_f:.1f}·RSI时机{rsi_f:.1f}"
+    factor_info = (f"均线{ma_f*2:.1f}·MACD{macd_f*2:.1f}·量能{vol_f*2:.1f}·RSI时机{rsi_f*2:.1f}"
                    if None not in (ma_f, macd_f, vol_f, rsi_f) else "")
 
     # v2.10: RSI 超买/超卖
@@ -1669,9 +1669,9 @@ for idx, r in enumerate(top20):
         _d2 = ai_fd.get("deriv2_delta")
         _s2 = ai_fd.get("deriv2_score")
         if _g1 is not None:
-            deriv_str = f" · 业绩一阶导(增速{_g1:+.0f}%) {_s1:.1f}分"
+            deriv_str = f" · 业绩一阶导(增速{_g1:+.0f}%) {_s1*2:.1f}/10分"
             if _d2 is not None:
-                deriv_str += f" · 二阶导(加速度{_d2:+.0f}pt) {_s2:.1f}分"
+                deriv_str += f" · 二阶导(加速度{_d2:+.0f}pt) {_s2*2:.1f}/10分"
     ai_badge = ""
     if r.get("ai_applied"):
         ai_badge = ('<span style="font-size:11px;font-weight:700;padding:1px 6px;border-radius:3px;'
@@ -1790,7 +1790,7 @@ for idx, r in enumerate(top20):
                 </div>
                 {_toggle}
                 <span class="s-pct {pct_cls}" style="font-size:13px;font-weight:700;">{pct:+.2f}%</span>
-                <div class="total" style="color:{RATING_COLORS[rating]}">{total:.2f}</div>
+                <div class="total" style="color:{RATING_COLORS[rating]}">{total:.2f}<span style="font-size:12px;font-weight:500;opacity:.65;"> /100</span></div>
                 <div class="rating" style="background:{RATING_BG[rating]};color:{RATING_COLORS[rating]}">{rating}</div>
             </div>
             <div class="sd-body">
@@ -2669,9 +2669,9 @@ def generate_research_analysis(r):
 
     # 评级定位
     if rating == "S":
-        value_parts.append(f"公司综合评分<b>{total:.2f}/20</b>，获评<b style='color:#fbbf24;'>S级(强烈推荐)</b>，")
+        value_parts.append(f"公司综合评分<b>{total:.2f}/100</b>，获评<b style='color:#fbbf24;'>S级(强烈推荐)</b>，")
     else:
-        value_parts.append(f"公司综合评分<b>{total:.2f}/20</b>，获评<b style='color:#3b82f6;'>A级(重点关注)</b>，")
+        value_parts.append(f"公司综合评分<b>{total:.2f}/100</b>，获评<b style='color:#3b82f6;'>A级(重点关注)</b>，")
 
     # 估值判断
     if fwd_pe and fwd_pe > 0:
@@ -2731,7 +2731,7 @@ def generate_research_analysis(r):
                 <span class="rc-code">{code}</span>
                 <span class="rc-rating" style="background:{rating_bg};color:{rating_color};">{rating}级</span>
                 <span class="rc-code">{sector}{' · ' + sub_theme if sub_theme else ''}</span>
-                <span class="rc-score">综合评分 <b style="color:{rating_color}">{total:.2f}</b>/20</span>
+                <span class="rc-score">综合评分 <b style="color:{rating_color}">{total:.2f}</b>/100</span>
             </div>
             <div class="research-module">
                 <div class="rm-title">📊 核心业务竞争力评估</div>
