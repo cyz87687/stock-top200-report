@@ -3489,6 +3489,23 @@ def main():
     removed = before - len(stocks)
     if removed:
         print(f"   🚫 剔除金融股 {removed}只")
+
+    # v3.2 P0-1/P0-3: 资格/流动性标记映射（fetch 池 → 逐股透传，供报告层与组合层）
+    _elig_map = {}
+    for _s in (raw.get("main_pool") or raw.get("top500") or []):
+        _c = _s.get("code")
+        if _c:
+            _elig_map[_c] = {
+                "turnover_ratio": _s.get("turnover_ratio"),
+                "circ_mv": _s.get("circ_mv"),
+                "liquid_ok": _s.get("liquid_ok", True),
+                "suspended": _s.get("suspended", False),
+                "is_new": _s.get("is_new", False),
+            }
+    _em = raw.get("eligible_marks") or {}
+    if _em:
+        print(f"   🏷️ 资格标记: 次新 {_em.get('new_stock', 0)} / 停牌 {_em.get('suspended', 0)}"
+              f" / 流动性不达标 {_em.get('illiquid', 0)} / 低换手 {_em.get('low_turnover', 0)}")
     
     print(f"📊 Stock-Scorer v2.7 | {len(stocks)}只标的")
     print(f"   权重: 题材热度30% 基本面30%(含行业前景) 消息20% 技术面20%")
@@ -3955,6 +3972,12 @@ def main():
             "debt_ratio": _ths_ex.get("debt_ratio"),
             "ocfg": _ths_ex.get("ocfg"),
             "week_chg": week_chg,
+            # v3.2 P0-1/P0-3: 资格/流动性标记透传（来自 fetch 池，供报告层与组合层消费）
+            "turnover_ratio": _elig_map.get(code, {}).get("turnover_ratio"),
+            "circ_mv": _elig_map.get(code, {}).get("circ_mv"),
+            "liquid_ok": _elig_map.get(code, {}).get("liquid_ok", True),
+            "suspended": _elig_map.get(code, {}).get("suspended", False),
+            "is_new": _elig_map.get(code, {}).get("is_new", False),
         })
 
         print(f"   {i+1:2d}. {name:6s} {em}{rating} {total:4.1f}  "
@@ -4033,6 +4056,8 @@ def main():
             "sector_avg": {s: {"count": len(v), "avg": round(sum(v)/len(v), 1)}
                           for s, v in sorted(sec_avg.items(), key=lambda x: -sum(x[1])/len(x[1]))},
             "factor_coverage": _cov_summary,
+            "eligible_marks": raw.get("eligible_marks") or {},
+            "liquidity_floor": raw.get("liquidity_floor") or {},
             "market_breadth": money_effect,
         },
         # v2.11: 盘面复盘点评(数据驱动, 无幻觉) — 替代原"今日核心结论"+"大盘赚钱效应"模块
