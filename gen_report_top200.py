@@ -983,6 +983,28 @@ if _pool_cov < 0.96:
                    'background:#f59e0b1a;color:#f59e0b;border:0.5px solid #f59e0b55;">'
                    '🧩 池覆盖 ' + str(total_stocks) + '/' + str(_POOL_N) + ' (' + _cov_pct +
                    ') · 低于 96% 阈值</div>')
+
+# ===== v3.2 P1-3 池口径徽章 + P1-5 区制标签（数据驱动，无硬编码兜底不显示）=====
+_pool_badge = ''
+_elig_badge = ''
+_prev_pool_path = None
+try:
+    _pool_src = data.get("pool_source") or _POOL_N
+    _pool_badge = ('<div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;'
+                   'padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;'
+                   'background:#3b82f61a;color:#60a5fa;border:0.5px solid #3b82f655;">'
+                   f'🧺 候选池 TOP{_POOL_N}（成交额排名 · 十维评分）</div>')
+    # 资格标记（次新/停牌/流动性不达标）——取 scored json 的 eligible_marks
+    _em = (stats.get("eligible_marks") or data.get("eligible_marks") or {})
+    if _em and any(_em.get(k) for k in ("new_stock", "suspended", "illiquid")):
+        _elig_badge = ('<div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;'
+                       'padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;'
+                       'background:#f59e0b1a;color:#fbbf24;border:0.5px solid #f59e0b55;">'
+                       f'🏷️ 资格剔除: 次新 {_em.get("new_stock",0)} / 停牌 {_em.get("suspended",0)}'
+                       f' / 流动性不达标 {_em.get("illiquid",0)}</div>')
+except Exception:
+    pass
+
 html_parts.append(f'''
     <!-- A1 首屏 Hero 决策区 -->
     <div class="hero" id="sec-decision">
@@ -993,6 +1015,8 @@ html_parts.append(f'''
         <div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;background:{_fresh_color}1a;color:{_fresh_color};border:0.5px solid {_fresh_color}55;">
             🕒 {_fresh_txt}
         </div>
+        {_pool_badge}
+        {_elig_badge}
         {_cov_banner}
         <div class="hero-kpis">
             <div class="hero-kpi" style="border-left-color:#22c55e;">
@@ -3260,6 +3284,53 @@ if _ic and _ic.get("factors"):
         </div>
         <div style="font-size:10px;color:#475569;margin-top:8px;">数据说明：{html_mod.escape(_ic_notes[:400])}</div>
     </div>''')
+
+# ===== v3.2 P1-1 因子数据覆盖率区块（H3）=====
+# 数据来自 scored json 的 stats.factor_coverage（每维非兜底比例）。
+# 目的：TOP500 扩池后新增 300 只的接口成功率未知，兜底低分若不可见，
+#   会把「数据缺失导致的低分」误读为「标的质地差」。
+try:
+    _cov = (stats.get("factor_coverage") or {})
+    if _cov:
+        _cov_labels = {"kline": "K线/技术指标", "fund": "基本面字段",
+                       "news": "消息面", "theme": "题材解析", "amount": "成交额"}
+        _cov_rows = ""
+        _cov_warn = []
+        for _dk, _dl in _cov_labels.items():
+            if _dk not in _cov:
+                continue
+            _v = float(_cov.get(_dk) or 0)
+            _pct = _v * 100
+            _col = "#a3e635" if _v >= 0.90 else ("#fbbf24" if _v >= 0.75 else "#f87171")
+            if _v < 0.90:
+                _cov_warn.append(f"{_dl} {_pct:.0f}%")
+            _cov_rows += (f'<tr><td style="padding:4px 10px;color:#cbd5e1;">{_dl}</td>'
+                          f'<td style="padding:4px 10px;text-align:right;color:{_col};font-weight:700;">{_pct:.1f}%</td>'
+                          f'<td style="padding:4px 10px;color:#64748b;font-size:11px;">'
+                          f'{"达标" if _v >= 0.90 else "低于 90% 阈值"}</td></tr>')
+        _cov_note = ("全部维度达标。" if not _cov_warn
+                     else "⚠️ 低于 90% 阈值：" + "、".join(_cov_warn) + "（该维评分含兜底成分，解读请谨慎）")
+        html_parts.append(f'''
+    <!-- v3.2 P1-1 因子数据覆盖率（H3） -->
+    <div class="section-block" style="margin:24px 0;padding:16px 20px;background:#0f172a;border:1px solid #334155;border-radius:12px;">
+        <div style="font-size:14px;font-weight:800;color:#a3e635;margin-bottom:6px;">🧪 因子数据覆盖率（{total_stocks} 只）</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:10px;line-height:1.7;">
+            口径：各维度「数据真实获取（非兜底降档）」的个股占比。兜底=接口失败/字段缺失时按缺省档给分，
+            非标的质量信号。TOP{_POOL_N} 扩池后新增标的接口成功率是本区块的监控对象。
+        </div>
+        <table style="width:100%;max-width:520px;border-collapse:collapse;font-size:12px;">
+            <thead><tr style="background:#1e293b;">
+                <th style="padding:4px 10px;text-align:left;color:#94a3b8;">维度</th>
+                <th style="padding:4px 10px;text-align:right;color:#94a3b8;">非兜底覆盖</th>
+                <th style="padding:4px 10px;text-align:left;color:#94a3b8;">状态</th>
+            </tr></thead>
+            <tbody>{_cov_rows}</tbody>
+        </table>
+        <div style="font-size:11px;color:#94a3b8;margin-top:8px;line-height:1.7;">{_cov_note}</div>
+    </div>''')
+except Exception as _ce:
+    pass
+
 
 # ===== v2.41 P0-4 推荐跟踪与胜率 (真实K线回填) =====
 try:
