@@ -2222,12 +2222,12 @@ def score_theme(name, sector, pct, turnover, all_top200_sectors,
     if sub_match:
         sub_label, sub_score = sub_match
         intrinsic = sub_score
-        reasons = [f"细分题材:{sub_label}(内禀{intrinsic})"]
+        reasons = [f"细分题材:{sub_label}(内禀{intrinsic*2})"]  # v3.3 问题2: 量纲→0-10(内禀先验×2)
     else:
         # v2.46: 无细分条目时优先展示真实申万二级行业名(如大金重工→风电设备),
         #   不再一律显示主题大类 label(旧行为导致"综合/其他"泛滥)
         sub_label = sw_l2 or theme["label"]
-        reasons = [f"板块:{sub_label}(内禀{intrinsic})"]
+        reasons = [f"板块:{sub_label}(内禀{intrinsic*2})"]  # v3.3 问题2: 量纲→0-10(内禀先验×2)
 
     # ============================================================
     # 因子1: 题材板块动量 (0-5) —— 成分股近20/10/5日中位动量构造
@@ -2249,9 +2249,9 @@ def score_theme(name, sector, pct, turnover, all_top200_sectors,
     n_cons = agg.get(20, {}).get("n", 0) if agg else 0
     M = _sector_momentum_score(mom20, mom10, mom5)
     if mom20 is not None:
-        reasons.append(f"板块动量因子 {M:.2f}/5 (近20日中位{mom20:+.1f}%, 上涨占比{up_ratio20:.0%}, {n_cons}只样本)")
+        reasons.append(f"板块动量因子 {M*2:.2f}/10 (近20日中位{mom20:+.1f}%, 上涨占比{up_ratio20:.0%}, {n_cons}只样本)")  # v3.3 问题2: 量纲→0-10
     else:
-        reasons.append("板块动量样本不足, 因子取中性2.50")
+        reasons.append("板块动量样本不足, 因子取中性5.00")
 
     # ============================================================
     # 因子2: 成交额排名 (0-5) —— 个股成交额在TOP200全市场的百分位
@@ -2259,7 +2259,7 @@ def score_theme(name, sector, pct, turnover, all_top200_sectors,
     _tp = turnover_pct_map.get(code, 0.5) if turnover_pct_map else 0.5
     T = _turnover_rank_score(_tp)
     _rank_pct = int((1 - _tp) * 100)
-    reasons.append(f"成交额排名因子 {T:.2f}/5 (成交额位于全市场前{_rank_pct}%)")
+    reasons.append(f"成交额排名因子 {T*2:.2f}/10 (成交额位于全市场前{_rank_pct}%)")  # v3.3 问题2: 量纲→0-10
 
     # ============================================================
     # 因子3: 情绪确认 (0-5) —— 个股背离 + 今日单日 + 新浪板块 + 涨停验证
@@ -3927,12 +3927,12 @@ def main():
                + s_vol_pulse * W_VOL_PULSE + s_overbought * W_OVERBOUGHT
                + s_theme_int * W_THEME_INT + s_attn * W_ATTENTION)
         _scale = 1.0 / max(0.5, 1.0 - W_SECTOR_W)
-        total = round(_w9 * _scale * 4, 2)
+        total = round(_w9 * _scale * 20, 2)  # v3.3 问题2: 量纲升级 每维满分10/总分满分100 (×20 替代 ×4)
 
-        if total >= 17: rating, advice = "S", "优先买入，可重仓"
-        elif total >= 13: rating, advice = "A", "逢低加仓，重点关注"
-        elif total >= 9: rating, advice = "B", "波段操作，轻仓参与"
-        elif total >= 5: rating, advice = "C", "观望，不新开仓"
+        if total >= 85: rating, advice = "S", "优先买入，可重仓"
+        elif total >= 65: rating, advice = "A", "逢低加仓，重点关注"
+        elif total >= 45: rating, advice = "B", "波段操作，轻仓参与"
+        elif total >= 25: rating, advice = "C", "观望，不新开仓"
         else: rating, advice = "D", "坚决回避，立即卖出"
         
         em = {"S":"🌟","A":"🔥","B":"📊","C":"👀","D":"⚠️"}[rating]

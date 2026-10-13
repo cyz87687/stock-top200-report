@@ -30,6 +30,16 @@ _data_date = str(data.get("date") or datetime.now().strftime('%Y-%m-%d'))[:10]
 out = sys.argv[2] if len(sys.argv) > 2 else f"top200_report_{_data_date}.html"
 
 results = data["results"]
+# v3.3 问题2: 评分量纲升级「每维满分10 / 总分满分100」——score_* 内部仍为 0-5，
+#   此处统一 ×2 映射到 0-10 展示；total 已由后端 step2/apply_sector_momentum ×20。
+_SCORE_KEYS10 = ("score_fund", "score_news", "score_tech", "score_theme", "score_oversold60",
+                 "score_bias60", "score_rsi_rev", "score_vol_pulse", "score_overbought",
+                 "score_theme_intrinsic", "score_attention", "score_sector")
+for _r in results:
+    for _k in _SCORE_KEYS10:
+        _v = _r.get(_k)
+        if isinstance(_v, (int, float)):
+            _r[_k] = round(float(_v) * 2, 2)
 stats = data.get("stats", {})
 market_breadth = stats.get("market_breadth")  # 大盘赚钱效应 (v2.7 新增)
 market_review = data.get("market_review") or {}  # v2.11 盘面复盘点评(数据驱动)
@@ -103,6 +113,54 @@ _has_sector = any(x.get('score_sector') is not None for x in results)
 _has_10d = any(x.get('score_oversold60') is not None for x in results)
 _ver_tag = (f"{REPORT_VER} · 十维" if _has_10d
             else (f"{REPORT_VER} · 五维" if _has_sector else f"{REPORT_VER} · 四维"))
+
+# v3.3 问题1优化: 十维评分明细矩阵（10维独立并列清晰呈现，含板块动量）
+# ⚠️ _DIM_MAX 默认 5（与当前评分实现一致: 十维均为 0-5 制）。
+#    若问题2确认改为「每维0-10 / 总分100」制，仅需将下方 _DIM_MAX 改为 10，
+#    后端 step2/apply_sector_momentum 的总分缩放 ×4 改为 ×10、评级门槛同步放大即可。
+_DIM_MAX = 10  # v3.3 问题2: 量纲升级为「每维满分10 / 总分满分100」(后端 ×20, 前端 ×2 展示)
+_DIM_DEFS = [
+    ("基本面", "score_fund", 0.18, False),
+    ("消息面", "score_news", 0.18, False),
+    ("板块动量", "score_sector", 0.10, True),   # optional: 未跑 apply_sector_momentum 时为 None
+    ("超跌60反转", "score_oversold60", 0.12, False),
+    ("乖离低位", "score_bias60", 0.10, False),
+    ("RSI反转", "score_rsi_rev", 0.06, False),
+    ("量能反向", "score_vol_pulse", 0.10, False),
+    ("超买反向", "score_overbought", 0.06, False),
+    ("题材内禀", "score_theme_intrinsic", 0.05, False),
+    ("关注度", "score_attention", 0.05, False),
+]
+
+
+def _dim_matrix_html(r):
+    """个股十维评分明细矩阵：10个维度独立成行（维度名+权重+分数条+加权贡献）。
+    板块动量可选（optional），缺失时显示「—」而非 0，避免误导。"""
+    has_sec = r.get("score_sector") is not None
+    rows = []
+    for label, key, w, optional in _DIM_DEFS:
+        v = r.get(key)
+        if v is None:
+            bar = '<div class="dm-bar"><span style="width:0%"></span></div>'
+            val = '—'
+            contrib = '—'
+        else:
+            pct = max(0.0, min(100.0, float(v) / _DIM_MAX * 100.0))
+            bar = f'<div class="dm-bar"><span style="width:{pct:.1f}%"></span></div>'
+            val = f"{float(v):.2f}"
+            contrib = f"{float(v) * w:.2f}"
+        rows.append(
+            f'<div class="dm-row">'
+            f'<span class="dm-name">{label}<i>×{w:.0%}</i></span>'
+            f'{bar}'
+            f'<span class="dm-val">{val}</span>'
+            f'<span class="dm-contrib">{contrib}</span>'
+            f'</div>'
+        )
+    return ('<div class="dim-matrix">'
+            f'<div class="dm-head">📊 十维评分明细 · 每维满分 {_DIM_MAX} · 权重×分数=加权贡献</div>'
+            + ''.join(rows)
+            + '</div>')
 # 评分层版本以 scored json 的 model 字段为准（权重变更自下一次全新评分跑生效，
 # 重跑历史数据时页头如实显示该数据当时的模型版本，不虚标）
 _SCORER_VER = str(data.get("model") or ("v3.0-10dim (全市场回测先验 + AI + sector-momentum[evidence])"
@@ -214,9 +272,9 @@ def build_portfolio(results, n=5):
             dims = [r["score_news"], r["score_tech"], r["score_fund"], r.get("score_theme", 0)]
             if r.get("score_sector") is not None:
                 dims.append(r["score_sector"])
-        if min(dims) >= 3:
+        if min(dims) >= 6:
             score_diversity = 1
-        if min(dims) >= 4:
+        if min(dims) >= 8:
             score_diversity = 2
         composite = r["total"] + score_diversity * 0.5
         if 40 <= position <= 80:
@@ -803,6 +861,15 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
 .stock-detail .dim-card .dim-title {font-size:11px;color:#94a3b8;margin-bottom:6px;}
 .stock-detail .dim-card .dim-score {font-size:15px;font-weight:700;margin-right:8px;}
 .stock-detail .dim-card .dim-detail {font-size:11px;color:#94a3b8;line-height:1.6;margin-top:6px;}
+.stock-detail .dim-matrix {margin-top:12px;padding-top:10px;border-top:1px dashed #334155;}
+.stock-detail .dim-matrix .dm-head {font-size:11px;color:#cbd5e1;font-weight:700;margin-bottom:8px;}
+.stock-detail .dim-matrix .dm-row {display:grid;grid-template-columns:104px 1fr 42px 42px;align-items:center;gap:8px;margin:3px 0;font-size:11px;}
+.stock-detail .dim-matrix .dm-name {color:#94a3b8;white-space:nowrap;}
+.stock-detail .dim-matrix .dm-name i {color:#64748b;font-style:normal;font-size:10px;margin-left:4px;}
+.stock-detail .dim-matrix .dm-bar {height:8px;background:#1e293b;border-radius:4px;overflow:hidden;}
+.stock-detail .dim-matrix .dm-bar span {display:block;height:100%;background:linear-gradient(90deg,#38bdf8,#22d3ee);border-radius:4px;}
+.stock-detail .dim-matrix .dm-val {color:#e2e8f0;font-weight:700;text-align:right;}
+.stock-detail .dim-matrix .dm-contrib {color:#fbbf24;font-weight:700;text-align:right;}
 
 /* A5 深度卡片折叠: A级默认收起明细, 点击展开 */
 .stock-detail.collapsed .sd-body {display:none;}
@@ -1590,7 +1657,7 @@ for idx, r in enumerate(top20):
     score_sustain = r.get("score_sustain")
     sustain_note = r.get("sustain_note", "")
     cyclic_tag = "周期股" if r.get("is_cyclic") else ("存储模组" if r.get("is_storage_mod") else "")
-    sustain_str = (f"持续性:{score_sustain:.2f}/5 {sustain_note}" if score_sustain is not None else (sustain_note or "")) + (f" [{cyclic_tag}]" if cyclic_tag else "")
+    sustain_str = (f"持续性:{score_sustain:.2f}/10 {sustain_note}" if score_sustain is not None else (sustain_note or "")) + (f" [{cyclic_tag}]" if cyclic_tag else "")
     fund_detail = (', '.join(fund_reasons[:2]) if fund_reasons else '数据不足') + (f" · {sustain_str}" if sustain_str else "")
 
     # v2.30: AI增强层 — 业绩一/二阶导 + AI赋分徽标
@@ -1621,13 +1688,13 @@ for idx, r in enumerate(top20):
     justification = []
     if r['score_news'] >= 4: justification.append("消息面强劲")
     elif r['score_news'] <= 1: justification.append("消息面疲弱")
-    if _tech_disp >= 4: justification.append("技术面看多")
+    if _tech_disp >= 8: justification.append("技术面看多")
     elif _tech_disp <= 1: justification.append("技术面承压")
     if rsi_state == "超买": justification.append("RSI超买注意回调")
     elif rsi_state == "超卖": justification.append("RSI超卖存反弹")
     if r['score_fund'] >= 4: justification.append("估值吸引力强")
     elif r['score_fund'] <= 1: justification.append("估值偏高")
-    if _theme_disp >= 4: justification.append("主线题材热度高")
+    if _theme_disp >= 8: justification.append("主线题材热度高")
     elif _theme_disp <= 1: justification.append("题材冷门")
     if not justification: justification = ["各维度均衡"]
 
@@ -1681,13 +1748,13 @@ for idx, r in enumerate(top20):
             _ai_note += f" | {r.get('ai_theme_label','')}"
     _theme_detail = (", ".join(theme_reasons[:3]) if theme_reasons else "数据不足") + _ai_note
     if _is10:
-        _badge_html = (f"<span>🏷️ {r['score_news']:.2f}/5消息 · {r['score_fund']:.2f}/5基本 · "
+        _badge_html = (f"<span>🏷️ {r['score_news']:.2f}/10消息 · {r['score_fund']:.2f}/10基本 · "
                        f"超跌60 {r['score_oversold60']:.2f} · 乖离 {r['score_bias60']:.2f} · "
                        f"RSI反 {r['score_rsi_rev']:.2f} · 量能反 {r['score_vol_pulse']:.2f} · "
                        f"超买反 {r['score_overbought']:.2f} · 内禀 {r.get('score_theme_intrinsic', 0):.2f} · "
                        f"关注 {r.get('score_attention', 0):.2f}</span>")
         _tech_card_html = (f'<div class="dim-card">'
-                           f'<div class="dim-title">📈 技术块·五拆解 ({_tech_disp:.2f}/5)</div>'
+                           f'<div class="dim-title">📈 技术块·五拆解 ({_tech_disp:.2f}/10)</div>'
                            f'<div class="dim-score">{_tech_disp:.2f}</div>'
                            f'<div class="dim-detail">超跌60反转 {r["score_oversold60"]:.2f} · 乖离低位 {r["score_bias60"]:.2f} · '
                            f'RSI反转 {r["score_rsi_rev"]:.2f} · 量能反向 {r["score_vol_pulse"]:.2f} · '
@@ -1695,20 +1762,20 @@ for idx, r in enumerate(top20):
                            f'分位: {tech.get("position","N/A")}%{f" · {factor_info}" if factor_info else ""} · {tech.get("reason","")}</div>'
                            f'</div>')
         _theme_card_html = (f'<div class="dim-card">'
-                            f'<div class="dim-title">🔥 题材块·双拆解 ({_theme_disp:.2f}/5){f" · {sub_theme}" if sub_theme else ""}</div>'
+                            f'<div class="dim-title">🔥 题材块·双拆解 ({_theme_disp:.2f}/10){f" · {sub_theme}" if sub_theme else ""}</div>'
                             f'<div class="dim-score">{_theme_disp:.2f}</div>'
                             f'<div class="dim-detail">内禀 {r.get("score_theme_intrinsic", 0):.2f} · 关注度 {r.get("score_attention", 0):.2f} · {_theme_detail}</div>'
                             f'</div>')
     else:
-        _badge_html = (f"<span>🏷️ {r['score_news']:.2f}/5消息 · {r['score_tech']:.2f}/5技术 · "
-                       f"{r['score_fund']:.2f}/5基本 · {r.get('score_theme',0):.2f}/5热度</span>")
+        _badge_html = (f"<span>🏷️ {r['score_news']:.2f}/10消息 · {r['score_tech']:.2f}/10技术 · "
+                       f"{r['score_fund']:.2f}/10基本 · {r.get('score_theme',0):.2f}/10热度</span>")
         _tech_card_html = (f'<div class="dim-card">'
-                           f'<div class="dim-title">📈 技术面 ({r["score_tech"]:.2f}/5)</div>'
+                           f'<div class="dim-title">📈 技术面 ({r["score_tech"]:.2f}/10)</div>'
                            f'<div class="dim-score">{r["score_tech"]:.2f}</div>'
                            f'<div class="dim-detail">趋势: {tech.get("trend","N/A")} · 分位: {tech.get("position","N/A")}%{f" · {factor_info}" if factor_info else ""} · {tech.get("reason","")}</div>'
                            f'</div>')
         _theme_card_html = (f'<div class="dim-card">'
-                            f'<div class="dim-title">🔥 题材热度 ({r.get("score_theme",0):.2f}/5){f" · {sub_theme}" if sub_theme else ""}</div>'
+                            f'<div class="dim-title">🔥 题材热度 ({r.get("score_theme",0):.2f}/10){f" · {sub_theme}" if sub_theme else ""}</div>'
                             f'<div class="dim-score">{r.get("score_theme",0):.2f}</div>'
                             f'<div class="dim-detail">{_theme_detail}</div>'
                             f'</div>')
@@ -1737,18 +1804,20 @@ for idx, r in enumerate(top20):
             </div>
             <div class="dim-row">
                 <div class="dim-card">
-                    <div class="dim-title">📰 消息面 ({r['score_news']:.2f}/5)</div>
+                    <div class="dim-title">📰 消息面 ({r['score_news']:.2f}/10)</div>
                     <div class="dim-score">{r['score_news']:.2f}</div>
                     <div class="dim-detail">{news_detail}</div>
                 </div>
                 {_tech_card_html}
                 <div class="dim-card">
-                    <div class="dim-title">📊 基本面 ({r['score_fund']:.2f}/5)</div>
+                    <div class="dim-title">📊 基本面 ({r['score_fund']:.2f}/10)</div>
                     <div class="dim-score">{r['score_fund']:.2f}</div>
                     <div class="dim-detail">{fund_detail}{deriv_str}</div>
                 </div>
                 {_theme_card_html}
             </div>''')
+    # v3.3 问题1优化: 十维评分明细矩阵（10维独立并列，含板块动量；布局合理）
+    html_parts.append(_dim_matrix_html(r))
 
     if risk_html:
         html_parts.append(f'''
@@ -2500,7 +2569,7 @@ def generate_research_analysis(r):
             comp_parts.append(f"<b>技术储备：</b>{profile['patents']}。")
 
         # 结合评分数据补充市场表现
-        comp_parts.append(f"<b>市场表现：</b>题材热度({score_theme:.2f}/5)、基本面({score_fund:.2f}/5)、消息面({score_news:.2f}/5)、技术面({score_tech:.2f}/5)，")
+        comp_parts.append(f"<b>市场表现：</b>题材热度({score_theme:.2f}/10)、基本面({score_fund:.2f}/10)、消息面({score_news:.2f}/10)、技术面({score_tech:.2f}/10)，")
         if growth and growth > 50:
             comp_parts.append(f"预期增速<b>+{growth:.0f}%</b>，")
         if fwd_pe and fwd_pe > 0:
@@ -2523,18 +2592,18 @@ def generate_research_analysis(r):
 
         # 评分维度竞争力
         dim_strengths = []
-        if score_theme >= 4:
-            dim_strengths.append(f"题材热度突出({score_theme:.2f}/5)，处于市场主线风口")
-        if score_fund >= 4:
-            dim_strengths.append(f"基本面扎实({score_fund:.2f}/5)，估值具备吸引力")
-        elif score_fund <= 2 and pe > 80:
-            dim_strengths.append(f"当前PE({pe:.0f}x)偏高，基本面评分({score_fund:.2f}/5)有待提升")
-        if score_news >= 4:
-            dim_strengths.append(f"消息面强劲({score_news:.2f}/5)，利好催化密集")
-        if score_tech >= 4:
-            dim_strengths.append(f"技术面看多({score_tech:.2f}/5)，处于强势趋势")
-        elif score_tech <= 2:
-            dim_strengths.append(f"技术面承压({score_tech:.2f}/5)，短期趋势偏弱")
+        if score_theme >= 8:
+            dim_strengths.append(f"题材热度突出({score_theme:.2f}/10)，处于市场主线风口")
+        if score_fund >= 8:
+            dim_strengths.append(f"基本面扎实({score_fund:.2f}/10)，估值具备吸引力")
+        elif score_fund <= 4 and pe > 80:
+            dim_strengths.append(f"当前PE({pe:.0f}x)偏高，基本面评分({score_fund:.2f}/10)有待提升")
+        if score_news >= 8:
+            dim_strengths.append(f"消息面强劲({score_news:.2f}/10)，利好催化密集")
+        if score_tech >= 8:
+            dim_strengths.append(f"技术面看多({score_tech:.2f}/10)，处于强势趋势")
+        elif score_tech <= 4:
+            dim_strengths.append(f"技术面承压({score_tech:.2f}/10)，短期趋势偏弱")
 
         if dim_strengths:
             comp_parts.append("；".join(dim_strengths) + "。")
@@ -2581,7 +2650,7 @@ def generate_research_analysis(r):
         risk_items.insert(0, "业绩负增长，盈利能力存疑")
     if fwd_pe and fwd_pe > 80:
         risk_items.insert(0, f"前瞻PE({fwd_pe:.0f}x)极高，透支未来增长预期")
-    if score_tech <= 2:
+    if score_tech <= 4:
         risk_items.insert(0, "技术面弱势，短期下行压力")
     if turnover < 8:
         risk_items.insert(0, "流动性偏低，大资金进出困难")
@@ -2637,11 +2706,11 @@ def generate_research_analysis(r):
         value_parts.append(f"技术分位{position:.0f}%处于高位，短期回调风险大。")
 
     # 综合建议
-    if rating == "S" and score_fund >= 4 and score_theme >= 4:
+    if rating == "S" and score_fund >= 8 and score_theme >= 8:
         value_parts.append("<b>综合判断：基本面与题材共振，建议逢低重点配置。</b>")
     elif rating == "S":
         value_parts.append("<b>综合判断：多维度表现优异，建议重点关注逢低布局。</b>")
-    elif score_theme >= 4 and score_fund >= 3:
+    elif score_theme >= 8 and score_fund >= 6:
         value_parts.append("<b>综合判断：题材与基本面均衡，适合波段操作逢低参与。</b>")
     elif growth and growth > 100:
         value_parts.append("<b>综合判断：高成长驱动，关注业绩兑现节奏与估值消化。</b>")
@@ -2887,7 +2956,7 @@ for idx, r in enumerate(results):
             _score_tips.append("板块动量")
     score_colors = ["#ef4444", "#f97316", "#f59e0b", "#3b82f6", "#22c55e",
                     "#ef4444", "#f97316", "#f59e0b", "#3b82f6", "#22c55e"]
-    scores_html = "".join([f'<div class="s-score" style="background:{score_colors[min(int(v),4)]}" title="{_score_tips[k] if k < len(_score_tips) else ""}">{v}</div>'
+    scores_html = "".join([f'<div class="s-score" style="background:{score_colors[min(int(v/2),4)]}" title="{_score_tips[k] if k < len(_score_tips) else ""}">{v}</div>'
                            for k, v in enumerate(scores)])
 
     # 板块动量列: 申万二级板块 60/10 日动量排名与涨幅
@@ -3679,10 +3748,10 @@ function initExpandableRows() {
             const themeText = row.dataset.themeText || '无';
             detailRow.innerHTML = '<td colspan="11"><div class="detail-content" style="background:#0f172a;border-radius:8px;padding:16px;margin:4px;">' +
                 '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;font-size:11px;">' +
-                '<div><div style="color:#94a3b8;margin-bottom:4px;">📰 消息面(' + newsScore + '/5)</div><div style="color:#e2e8f0;">' + newsText + '</div></div>' +
-                '<div><div style="color:#94a3b8;margin-bottom:4px;">📈 技术面(' + techScore + '/5)</div><div style="color:#e2e8f0;">' + techText + '</div></div>' +
-                '<div><div style="color:#94a3b8;margin-bottom:4px;">📊 基本面(' + fundScore + '/5)</div><div style="color:#e2e8f0;">' + fundText + '</div></div>' +
-                '<div><div style="color:#94a3b8;margin-bottom:4px;">🔥 题材热度(' + themeScore + '/5)</div><div style="color:#e2e8f0;">' + themeText + '</div></div>' +
+                '<div><div style="color:#94a3b8;margin-bottom:4px;">📰 消息面(' + newsScore + '/10)</div><div style="color:#e2e8f0;">' + newsText + '</div></div>' +
+                '<div><div style="color:#94a3b8;margin-bottom:4px;">📈 技术面(' + techScore + '/10)</div><div style="color:#e2e8f0;">' + techText + '</div></div>' +
+                '<div><div style="color:#94a3b8;margin-bottom:4px;">📊 基本面(' + fundScore + '/10)</div><div style="color:#e2e8f0;">' + fundText + '</div></div>' +
+                '<div><div style="color:#94a3b8;margin-bottom:4px;">🔥 题材热度(' + themeScore + '/10)</div><div style="color:#e2e8f0;">' + themeText + '</div></div>' +
                 '</div></div></td>';
             row.parentNode.insertBefore(detailRow, row.nextSibling);
         }
