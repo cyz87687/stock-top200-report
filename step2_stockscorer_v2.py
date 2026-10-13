@@ -1229,9 +1229,54 @@ CYCLICAL_SECTORS = {
     "钢铁", "石油", "建材", "基础材料",
 }
 
+# ===== v3.5: growth 低基数失真治理（依据《半导体消费电子三季度预测汇总.xlsx》诊断）=====
+# 问题：growth 取自「扣非净利润同比增长率」单点值，当基数极低(接近0或为负)时会出现
+#   利通电子 +3906%、凯美特气 +3720% 这类失真值。原逻辑 `growth>50` 是二值闸门——
+#   871% 与 55% 同拿满分，再叠加 PEG=PE/growth 因分母虚大而误判"严重低估"，构成双重奖励。
+# 池内实证（2026-10-13，490只）：growth max=3906%、30只>300%；growth>150 的 54 只中
+#   34 只（63%）三年扣非 CAGR 为负或背离 3 倍以上 → 强烈提示低基数失真。
+# 处置：①识别"存续期增长"(cagr3) 偏离 → 对极值做饱和压缩(不改变真实高增长的相对排序)；
+#       ②基础分闸门由二值改为"越高越难"，消除 871%≥55% 的等价bug；
+#       ③PEG 改用压缩后增速，切断失真→PEG虚小→再加分的二次奖励。
+GROWTH_SATURATE_KNEE = 60.0    # 增速饱和拐点(%)：≤该值原样保留（实测池内 p50≈16、p75≈71）
+GROWTH_SATURATE_CAP = 150.0    # 无存续期锚(cagr3 缺失/为负)时的封顶(%)：实测约池内 p88
+GROWTH_ANCHOR_MULT = 2.5       # 存续期锚容忍倍数：单点增速 ≤ CAGR×倍数+拐点 视为被趋势支持
+
+
+def _effective_growth(growth, cagr3):
+    """v3.5: 将单点增速折算为「可采信增速」，抑制低基数极值失真（winsorize 饱和）。
+
+    规则（保守、可审计；被存续期趋势支持的高增长不做任何改动）：
+      1. growth ≤ KNEE(60%) → 原样返回（覆盖池内 ≥75% 标的，主体分布不动）。
+      2. growth > KNEE：算"存续期趋势可支持的上限" ceiling——
+         - cagr3(三年扣非 CAGR) 为正 → ceiling = cagr3 × 2.5 + KNEE
+           （cagr3 是可信存续期锚，故不设全局硬上限；新易盛 cagr3=129.7 → 上限384，
+            单点增速 236% 未被误伤）
+         - cagr3 缺失或 ≤0（历史未增长/衰退）→ ceiling = CAP(150%)，视为无可信锚
+      3. growth ≤ ceiling → 原样返回（被趋势支持，不得误伤；如赤峰黄金 79.9% < 96.8%×2.5+60）。
+      4. growth > ceiling → 饱和至 ceiling 并标记 was_capped（失真证据）。
+
+    返回 (effective_growth, was_capped: bool, note: str|None)
+    """
+    g = growth
+    if g is None or g <= GROWTH_SATURATE_KNEE:
+        return g, False, None
+    if isinstance(cagr3, (int, float)) and cagr3 > 0:
+        ceiling = cagr3 * GROWTH_ANCHOR_MULT + GROWTH_SATURATE_KNEE
+    else:
+        ceiling = GROWTH_SATURATE_CAP
+    ceiling = max(ceiling, GROWTH_SATURATE_KNEE + 1.0)   # 保底，避免 ceiling≤KNEE 导致倒挂
+    if g <= ceiling:
+        return g, False, None                            # 被趋势支持 → 不动
+    eff = round(ceiling, 1)
+    anchor = f"三年CAGR={cagr3:.1f}%" if isinstance(cagr3, (int, float)) else "无存续期CAGR"
+    note = f"低基数失真修正: 单点增速{g:.0f}%→{eff:.0f}%(超出{anchor}可支持上限,已饱和)"
+    return eff, True, note
+
+
 def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
                roe=None, gross_margin=None, sub_theme_label=None,
-               hist_loss_free=False, fwd_np=None, sw_l2=None):
+               hist_loss_free=False, fwd_np=None, sw_l2=None, cagr3=None):
     """基本面+竞争力评分 0-5，用估值阶梯替代单年PEG
     v2.8: 增加PEG指标、ROE、毛利率评分
     v2.10: 增加公司持续性/低PE可持续性子评分(周期股/存储链重点论证)
@@ -1254,6 +1299,11 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
     _growth_out = growth if growth is not None else None
     _ladder_out = pe_ladder_data or {}
     _sustain_empty = {"score": 3.0, "note": "数据不足,未评估持续性", "is_cyclic": False, "is_storage_mod": False}
+
+    # v3.5: 低基数失真治理——原始增速留档 (_growth_raw)，后续评分统一用压缩后的 _g
+    _growth_raw = growth
+    growth, _g_capped, _g_note = _effective_growth(growth, cagr3)
+
     if effective_pe is None or effective_pe <= 0:
         if growth is None:
             return 2, ["数据不足"], _fwd_pe_out, _growth_out, _ladder_out, _sustain_empty
@@ -1269,7 +1319,13 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
     if growth is None:
         growth = 15
 
+    # 低基数修正如触发，挂到 reasons 头部（数据可审计）
+    if _g_capped and _g_note:
+        reasons.append(_g_note)
+
     # 基础评分：基于FwdPE + 增速
+    # v3.5: 增速已由 _effective_growth 做低基数饱和；原 `growth>50` 的"871%与55%同满分"
+    #   问题已由增速压缩从根源消除（失真值 ≤150，真实高增长按其存续期趋势保留）。
     if effective_pe < 15 and growth > 50:
         s = 5
         reasons.append(f"低估值(FwdPE={effective_pe:.1f})+高增长(+{growth:.0f}%)")
@@ -1433,7 +1489,16 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
         else:
             # v2.14 方案A: 穿越周期校验——近4年扣非净利全为正(历史盈利未在
             # 下行期亏损) + 预测增速不衰减(后两年预测净利增速均值>=25%)
-            durable = (growth is not None and growth > 30
+            # v3.5 收紧(依据《三季度预测汇总》诊断)：原 `growth > 30` 单点即可解锁 durable，
+            #   使中材科技(单点234%/三年CAGR-16.5%)、金丹科技(439%/-12.4%) 这类「高YoY但
+            #   长期衰退」的峰值幻象被误判为可持续。现改为多重证据：
+            #   ①用"压缩后可采信增速"取代原始单点(低基数失真不会解锁 durable)；
+            #   ②须有存续期锚支持(cagr3 为正或缺失但增速在合理区间)；
+            #   ③须有前瞻延续证据(decay 缺失时不再默认放行)。
+            _anchor_ok = (cagr3 is None) or (isinstance(cagr3, (int, float)) and cagr3 > 0)
+            _growth_ok = growth is not None and (growth > 30 or _g_capped)
+            durable = (_growth_ok
+                       and _anchor_ok
                        and (ladder_shrink is None or ladder_shrink >= 0.15)
                        and hist_loss_free
                        and (decay is None or decay >= 0.25))
@@ -1445,8 +1510,12 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
                 reason_parts = []
                 if not hist_loss_free:
                     reason_parts.append("历史盈利未穿越周期(近4年有亏损/负净利)")
+                if not _anchor_ok:
+                    reason_parts.append(f"存续期CAGR为负({cagr3:.1f}%),高增速系低基数/景气峰值")
                 if decay is not None and decay < 0.25:
                     reason_parts.append(f"预测后两年增速衰减至{decay*100:.0f}%")
+                if not _growth_ok:
+                    reason_parts.append("增速不足或已判定低基数失真")
                 sustain_note = "周期性行业,盈利随景气波动,持续性中性" + (
                     ";" + ";".join(reason_parts) if reason_parts else "")
     else:
@@ -1483,6 +1552,11 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
         "note": sustain_note,
         "is_cyclic": is_cyclic,
         "is_storage_mod": is_storage_mod,
+        # v3.5: 低基数失真治理的审计信息（原始增速保留在外部 growth 字段，此处为评分实际取值）
+        "growth_raw": _growth_raw,
+        "growth_eff": growth,
+        "growth_capped": bool(_g_capped),
+        "growth_note": _g_note,
     }
 
     return s, reasons, _fwd_pe_out, _growth_out, _ladder_out, sustain_info
@@ -3863,15 +3937,16 @@ def main():
         roe_input = fparsed.get("roe") or _ths_ex.get("roe")   # v3.0 B2: ROE 兜底扩容至全池
         gm_input = fparsed.get("gross_margin")
         sub_theme_label = get_sub_theme_label(name)
+        # v3.5: cagr3(三年扣非CAGR) 作为存续期锚传入, 用于低基数失真校验与周期股 durable 收紧
+        cagr3_input = cagr3_map.get(code)
         fs, fr, fwd_pe_resolved, growth_resolved, ladder_resolved, sustain_info = score_fund(
             pe_input, fwd_pe_input,
             growth_input, code, sector, pe_ladder_data=ladder_input,
             roe=roe_input, gross_margin=gm_input, sub_theme_label=sub_theme_label,
             hist_loss_free=hist_loss_free_map.get(code, False),
-            fwd_np=fwd_pe_map.get(code), sw_l2=sw_l2)
+            fwd_np=fwd_pe_map.get(code), sw_l2=sw_l2, cagr3=cagr3_input)
         
         # Tech (传入CAGR3用于成长加分, 传入周线用于双线多头判断)
-        cagr3_input = cagr3_map.get(code)
         wkl = wklines.get(code)
         ts, td = score_tech(kl, price, pct, cagr3=cagr3_input, wkl=wkl)
 
@@ -3968,6 +4043,10 @@ def main():
             "growth": round(growth_resolved, 1) if growth_resolved else None,
             "pe_ladder": ladder_resolved if ladder_resolved else None,
             "cagr3": cagr3_input,
+            # v3.5: 低基数失真审计——原始增速 vs 评分实际采用增速（触发修正时才有差异）
+            "growth_raw": sustain_info.get("growth_raw"),
+            "growth_capped": sustain_info.get("growth_capped", False),
+            "growth_note": sustain_info.get("growth_note"),
             # v3.0 B2: 同花顺摘要扩容字段(全池可得, 供报告层/护栏/后续因子用)
             "roe": _ths_ex.get("roe"),
             "debt_ratio": _ths_ex.get("debt_ratio"),

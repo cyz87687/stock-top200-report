@@ -1,6 +1,18 @@
 {
- "version": "v3.0-10dim",
+ "version": "v3.5-10dim",
  "fitted_at": "2026-10-13 10:30:00",
+ "model_logic": {
+  "rev": "v3.5-10dim",
+  "rev_at": "2026-10-14",
+  "change": "score_fund 低基数失真治理 + 周期股 durable 闸门收紧（仅改评分逻辑，权重未变）",
+  "detail": [
+   "新增 _effective_growth(): 单点增速(growth)超过 KNEE=60% 时按存续期锚压缩——有正 cagr3(三年扣非CAGR)则 ceiling=cagr3×2.5+60；否则 ceiling=CAP=150%。保留原始值于 growth_raw，触发时在 fund_reasons 头部挂审计说明",
+   "周期股/存储链 durable 判定新增 _anchor_ok: cagr3 为负(历史衰退)的高增速不再解锁「可持续」，避免景气峰值幻象",
+   "根因: 原 score_fund 基础分用 `effective_pe<15 and growth>50` 二值闸门(871% 与 55% 同拿满分)，且 PEG=pe/growth 分母虚大→误判严重低估加分，构成对低基数失真的二次奖励"
+  ],
+  "impact_2026-10-13_pool": "全池 490 只中 17 只(3.5%)基础分变化，基础分最大降幅 0.50 → 总分最大影响 1.80；评级越档 2 只(光库科技 A→B、凯美特气 B→C)",
+  "weight_change": false
+ },
  "target_horizon": 1,
  "method": "十维结构(2026-10-13)：保留池内 IC 已验证维度(fund/news/sector)；技术面/题材拆解为回测 Top5 因子+先验维度。新拆 7 维在 TOP200 池无历史截面 → 初始权重为全市场回测(factor-backtest, 2021-01~2026-09, 5019只, 630万事件)证据的先验映射；满 30+ 截面后由 --optimize-weights 重拟合。",
  "adopted": "prior_pending_10dim",
@@ -46,9 +58,10 @@
   "设计文档": "《因子排名与10维评分模型设计_2026-10-13.md》"
  },
  "notes": [
-  "十维总分 = Σ(score_i × w_i) × 4；step2 中间分无板块维度，按 (1−w_sector) 归一化保持 0-20 量纲",
+  "十维总分 = Σ(score_i × w_i) × 20（v3.3 起量纲升级为「每维满分10 / 总分满分100」；旧 ×4 为 20 分制, 已废弃）；step2 中间分无板块维度, 按 (1−w_sector) 归一化保持量纲",
   "新拆 7 维满 30+ 池内截面后跑 factor_eval.py --optimize-weights 重拟合（OPT_DIMS 已扩展至十维）",
   "旧五维权重文件(v2.41-ic)被本文件替代；step2/apply 内置旧五维→十维映射兼容历史数据重跑",
-  "⚠️ 本权重不是池内 IC 驱动产物，是全市场回测先验映射——报告层 ⚖️ 区块如实展示「先验·待池内验证」"
+  "⚠️ 本权重不是池内 IC 驱动产物，是全市场回测先验映射——报告层 ⚖️ 区块如实展示「先验·待池内验证」",
+  "v3.5(2026-10-14): model_logic 字段记录 score_fund 低基数失真治理（增速饱和压缩+周期股 durable 闸门收紧），仅改评分逻辑不改权重——权重仍是 v3.0-10dim 先验映射"
  ]
 }

@@ -214,8 +214,13 @@ def main():
     rc = Counter(r['rating'] for r in results)
     data['results'] = results
     _meta = _FW_META or {}
-    _ver_suffix = ", IC-driven weights" if _meta.get("adopted") == "ic_driven" else (
-        ", prior-pending (全市场回测先验, 池内 IC 积累中)" if _meta.get("version", "").startswith("v3.0") else "")
+    # v3.5: prior-pending 披露判定改为以 adopted 为准（原先依赖 version.startswith("v3.0")，
+    #   版本号一旦升级会静默关闭诚实披露——违反口径诚实纪律）。adopted=prior_pending_10dim/
+    #   prior/prior_weak 均属「先验」，只有 ic_driven 才是样本外验证通过。
+    _adopted = _meta.get("adopted", "")
+    _ver_suffix = ", IC-driven weights" if _adopted == "ic_driven" else (
+        ", prior-pending (全市场回测先验, 池内 IC 积累中)"
+        if _adopted.startswith("prior") or _meta.get("version", "").startswith("v3.0") else "")
     data['model'] = f"stock-scorer {SCORER_VER} (10-dim + AI + sector-momentum[{args.mode}]{_ver_suffix})"
     data['sector_momentum'] = {'date': mom_date, 'mode': args.mode,
                                'mom_long_days': mom.get('mom_long_days', 60),

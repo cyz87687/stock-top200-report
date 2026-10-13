@@ -108,7 +108,11 @@ model_str = data.get("model", "stock-scorer")
 #   P0-2 申万一级行业暴露偏离约束（等权口径 ≤max_l1_deviation_pp，超限顺延替补）
 #   P0-3 入池资格补全（停牌 pct==0&amount==0 / 次新 N 前缀或 K 线<60 → 标记不剔除）
 #   P1-1 因子数据覆盖率区块 · P1-3 池口径徽章+新入池 diff · P1-4 路线/资格筛选 · P1-5 区制标签
-REPORT_VER = "v3.2"
+# v3.3/v3.3.1: 量纲升级「每维满分10 / 总分满分100」(后端 ×20, 前端 ×2 展示) —— 页面 Hero/卡片/推荐/板块均分/20→/100 全量对齐
+# v3.4: 每日 AI 焦点池区块（替代 v3.1 已删除的观察池）
+# v3.5: score_fund 低基数失真治理 —— 增速饱和压缩审计展示（growth_raw→growth_eff）+ 周期股 durable 闸门收紧
+#   （注: v3.3~v3.4 报告层改动当时漏更本常量, 本次一并对齐; 线上页面此前显示的报告层版本号偏旧）
+REPORT_VER = "v3.5"
 _has_sector = any(x.get('score_sector') is not None for x in results)
 _has_10d = any(x.get('score_oversold60') is not None for x in results)
 _ver_tag = (f"{REPORT_VER} · 十维" if _has_10d
@@ -1842,6 +1846,21 @@ for idx, r in enumerate(top20):
                        'border-radius:3px;background:#fee2e2;color:#dc2626;margin-left:6px;cursor:help;">'
                        '⚠️基本面背离 ' + "·".join(_fund_flags) + '</span>')
 
+    # ===== v3.5 低基数失真修正审计徽标 =====
+    # 单点增速被 _effective_growth 饱和压缩时（growth_capped=True），如实展示原始→采用值，
+    # 让使用者看得出「该股的高增速已被判定为低基数失真」——数据可审计，非隐藏处理。
+    _lowbase_badge = ""
+    if r.get("growth_capped"):
+        _g_raw = r.get("growth_raw")
+        _g_eff = r.get("growth")
+        _raw_s = f"+{_g_raw:.0f}%" if isinstance(_g_raw, (int, float)) else "—"
+        _eff_s = f"+{_g_eff:.0f}%" if isinstance(_g_eff, (int, float)) else "—"
+        _lb_tip = r.get("growth_note") or "单点增速远超存续期趋势可支持水平，已按低基数失真饱和处理"
+        _lowbase_badge = ('<span title="' + _lb_tip.replace('"', "'") + '" '
+                          'style="font-size:11px;font-weight:700;padding:1px 6px;'
+                          'border-radius:3px;background:#fef3c7;color:#b45309;margin-left:6px;cursor:help;">'
+                          '📉低基数修正 ' + _raw_s + '→' + _eff_s + '</span>')
+
     # ===== v3.0 十维展示: 徽章行与维度卡片按数据口径自适应 =====
     _is10 = r.get("score_oversold60") is not None
     _tech_disp, _theme_disp = _dim_composites(r)
@@ -1890,7 +1909,7 @@ for idx, r in enumerate(top20):
             <div class="header-row">
                 <div class="rank" style="background:{rank_color}">#{i}</div>
                 <div>
-                    <div class="name">{r['name']}{change_tag}{ai_badge}{_risk_badge}</div>
+                    <div class="name">{r['name']}{change_tag}{ai_badge}{_risk_badge}{_lowbase_badge}</div>
                     <div class="code">{r['code']} · {sector_disp(r)}</div>
                 </div>
                 {_toggle}
@@ -3019,6 +3038,13 @@ for idx, r in enumerate(results):
     rating = r["rating"]
     fwd = f"{r['fwd_pe']:.0f}x" if r.get("fwd_pe") else "-"
     growth = f"{r['growth']:+.0f}%" if r.get("growth") else "-"
+    # v3.5: 低基数失真修正标记（全表可见）——增速被饱和压缩时加 ⚠ 与原始值 tooltip
+    _lb_mark = ""
+    if r.get("growth_capped"):
+        _gr = r.get("growth_raw")
+        _gr_s = f"{_gr:+.0f}%" if isinstance(_gr, (int, float)) else "?"
+        _lb_mark = (f'<span style="color:#b45309;cursor:help;" '
+                    f'title="低基数失真修正: 原始单点增速{_gr_s} 已按存续期趋势饱和至 {growth}">⚠</span>')
     ladder_val = r.get("pe_ladder")
     if ladder_val and isinstance(ladder_val, dict):
         yrs = sorted(ladder_val.keys())
@@ -3120,7 +3146,7 @@ for idx, r in enumerate(results):
                     <td class="s-scores col-scores">{scores_html}</td>
                     <td class="s-total col-total sticky-col col-total-sticky" data-value="{r['total']}" style="color:{RATING_COLORS[rating]}">{r['total']:.2f}</td>
                     <td class="s-rating col-rating" style="background:{RATING_BG[rating]};color:{RATING_COLORS[rating]}" data-value="{rating}">{rating}</td>
-                    <td class="s-pe col-pe" data-value="{r.get('pe',0)}">{pe}/{fwd} {ladder_t} {growth}</td>
+                    <td class="s-pe col-pe" data-value="{r.get('pe',0)}">{pe}/{fwd} {ladder_t} {growth}{_lb_mark}</td>
                     <td class="s-sector col-sub">{sub_theme_t if sub_theme_t else '-'}</td>
                     <td class="s-turnover col-turnover" data-value="{r.get('turnover',0)}">{turnover_yi:.0f}亿</td>
                 </tr>''')
