@@ -136,8 +136,13 @@ def main():
     data = json.load(open(scored, encoding='utf-8'))
     results = data.get('results', [])
     print(f"scored: {os.path.basename(scored)} | 板块动量日期: {mom_date} | 板块数: {len(sec_info)} | mode: {args.mode}")
-    print(f"权重: 消息{W_NEWS} 技术{W_TECH} 基本面{W_FUND} 题材{W_THEME_OLD if args.keep_weights else W_THEME_NEW} 板块动量{0.0 if args.keep_weights else W_SECTOR}"
-          f"{' (keep-weights: 板块分不并入总分)' if args.keep_weights else ''}")
+    # v3.2 fix: 原打印引用十维重构时已删除的旧变量(W_NEWS/W_TECH/W_FUND/W_THEME_OLD/W_THEME_NEW/W_SECTOR)
+    #   → 运行即 NameError（py_compile 查不出名字问题）。改为从 _FW 十维权重推导展示。
+    if args.keep_weights:
+        _wdisp = "keep-weights: 十维分不并入总分（仅写入板块字段）"
+    else:
+        _wdisp = " ".join(f"{k.replace('score_','')}={_FW[k]}" for k in _FW)
+    print(f"权重: {_wdisp}")
 
     hit = miss = 0
     for r in results:
@@ -216,9 +221,12 @@ def main():
                                'mom_long_days': mom.get('mom_long_days', 60),
                                'mom_short_days': mom.get('mom_short_days', 10),
                                'n_sectors': len(sec_info)}
-    data['weights'] = {'news': W_NEWS, 'tech': W_TECH, 'fund': W_FUND,
-                       'theme': W_THEME_OLD if args.keep_weights else W_THEME_NEW,
-                       'sector': 0.0 if args.keep_weights else W_SECTOR}
+    # v3.2 fix: 同上——原引用已删除的旧五维变量，改为十维权重映射输出
+    if args.keep_weights:
+        data['weights'] = dict(_FW)
+        data['weights_note'] = 'keep-weights: 板块分未并入总分'
+    else:
+        data['weights'] = dict(_FW)
     data['stats']['rating_dist'] = {k: rc.get(k, 0) for k in "SABCD"}
     # 板块维度排名(供报告展示)
     sec_scores = {}

@@ -1,0 +1,203 @@
+{
+ "date": "2026-10-13",
+ "momentum_date": "2026-10-13",
+ "top": 10,
+ "per_sector": 3,
+ "per_parent": 2,
+ "route_pool_map": {
+  "momentum": 200,
+  "reversal": 490
+ },
+ "momentum_route_weight": 0.5,
+ "portfolios": {
+  "momentum": {
+   "level_used": "L4 最终兜底: 60日动量前20",
+   "target_rule": "L0 严格: 60日动量第1 ∩ 10日动量前3",
+   "level_trace": [
+    {
+     "level": "L0 严格: 60日动量第1 ∩ 10日动量前3",
+     "n_sectors": 1,
+     "n_cands": 1,
+     "sectors": [
+      "出版"
+     ]
+    },
+    {
+     "level": "L1 放宽: 60日动量前3 ∩ 10日前5",
+     "n_sectors": 1,
+     "n_cands": 1,
+     "sectors": [
+      "出版"
+     ]
+    },
+    {
+     "level": "L2 再放宽: 60日前5 ∩ 10日前10",
+     "n_sectors": 2,
+     "n_cands": 3,
+     "sectors": [
+      "出版",
+      "影视院线"
+     ]
+    },
+    {
+     "level": "L3 兜底: 60日动量前10",
+     "n_sectors": 10,
+     "n_cands": 8,
+     "sectors": [
+      "农产品加工",
+      "出版",
+      "影视院线",
+      "房地产服务",
+      "教育",
+      "数字媒体",
+      "渔业",
+      "焦炭Ⅱ",
+      "电视广播Ⅱ",
+      "种植业"
+     ]
+    },
+    {
+     "level": "L4 最终兜底: 60日动量前20",
+     "n_sectors": 20,
+     "n_cands": 18,
+     "sectors": [
+      "个护用品",
+      "互联网电商",
+      "农产品加工",
+      "出版",
+      "医疗服务",
+      "广告营销",
+      "影视院线",
+      "房地产服务",
+      "摩托车及其他",
+      "教育",
+      "数字媒体",
+      "文娱用品"
+     ]
+    }
+   ],
+   "sectors": [
+    "个护用品",
+    "互联网电商",
+    "农产品加工",
+    "出版",
+    "医疗服务",
+    "广告营销",
+    "影视院线",
+    "房地产服务",
+    "摩托车及其他",
+    "教育",
+    "数字媒体",
+    "文娱用品",
+    "渔业",
+    "焦炭Ⅱ",
+    "煤炭开采",
+    "电视广播Ⅱ",
+    "种植业",
+    "贵金属",
+    "非白酒",
+    "饮料乳品"
+   ],
+   "n_candidates": 18,
+   "pool_used": 199,
+   "eligibility": {
+    "before": 200,
+    "after": 199,
+    "dropped": 1
+   },
+   "exposure": [],
+   "l1_capped": [],
+   "route_weight": 0.5,
+   "picks": []
+  },
+  "reversal": {
+   "level_used": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+   "target_rule": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+   "level_trace": [
+    {
+     "level": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+     "n_sectors": 2,
+     "n_cands": 75,
+     "sectors": [
+      "半导体",
+      "电子化学品Ⅱ"
+     ]
+    }
+   ],
+   "sectors": [
+    "半导体",
+    "电子化学品Ⅱ"
+   ],
+   "n_candidates": 75,
+   "pool_used": 489,
+   "eligibility": {
+    "before": 490,
+    "after": 489,
+    "dropped": 1
+   },
+   "exposure": [
+    {
+     "parent": "电子",
+     "n": 2,
+     "share": 1.0,
+     "base_share": 1.0,
+     "dev_pp": 0.0
+    }
+   ],
+   "l1_capped": [],
+   "route_weight": 1.0,
+   "picks": [
+    {
+     "name": "兆易创新",
+     "code": "sh603986",
+     "sector_l2": "半导体",
+     "parent": "电子",
+     "total": 18.18,
+     "rating": "S",
+     "adj_total": 18.18,
+     "amt_rank": 7,
+     "price": 306.22,
+     "pct_chg": -1.49,
+     "turnover_ratio": 4.645,
+     "circ_mv": 205387366094.0,
+     "rsi": 29.3,
+     "trend": "双线空头",
+     "sector_r60": 124,
+     "sector_r10": 123,
+     "sector_mom60": -26.16,
+     "sector_mom10": -15.66,
+     "score_sector": 3.28,
+     "score_news": 4.5,
+     "score_tech": 2.23,
+     "score_fund": 4.5,
+     "score_theme": 2.83
+    },
+    {
+     "name": "佰维存储",
+     "code": "sh688525",
+     "sector_l2": "半导体",
+     "parent": "电子",
+     "total": 17.54,
+     "rating": "S",
+     "adj_total": 17.54,
+     "amt_rank": 71,
+     "price": 171.72,
+     "pct_chg": -0.62,
+     "turnover_ratio": 3.473,
+     "circ_mv": 81881594818.0,
+     "rsi": 26.9,
+     "trend": "双线空头",
+     "sector_r60": 124,
+     "sector_r10": 123,
+     "sector_mom60": -26.16,
+     "sector_mom10": -15.66,
+     "score_sector": 3.28,
+     "score_news": 4.5,
+     "score_tech": 2.73,
+     "score_fund": 3.8,
+     "score_theme": 2.82
+    }
+   ]
+  }
+ }
+}

@@ -931,13 +931,28 @@ def main():
         return 1
 
     tdays, px = px_index(hist)
-    stale = [s["date"] for s in snaps if s["date"] not in set(tdays)]
-    aligned = [s for s in snaps if s["date"] in set(tdays)]
+    _tdset = set(tdays)
+    stale = [s["date"] for s in snaps if s["date"] not in _tdset]
+    aligned = [s for s in snaps if s["date"] in _tdset]
     aligned, stale_px = _drop_stale_price_snapshots(aligned)
     stale = stale + stale_px
     if stale:
-        print(f"🧹 剔除陈旧快照 {len(stale)} 个: 非交易日 {[d for d in stale if d not in stale_px]}"
-              f"{'，接口陈旧 ' + str(stale_px) if stale_px else ''}")
+        # v3.2 措辞修正: 原统一称「非交易日」不准确 —— 最新一日（如当日）常因尚无 T+h 后续价格
+        #   而未纳入交易日轴(回填日线止于上一交易日)，属「待 T+h 结算」而非假日；分开标注便于排查。
+        _max_td = max(tdays) if tdays else ""
+        _holiday, _pending = [], []
+        for _d in stale:
+            if _d in stale_px:
+                continue
+            (_pending if _d > _max_td else _holiday).append(_d)
+        _parts = []
+        if _holiday:
+            _parts.append(f"非交易日 {_holiday}")
+        if _pending:
+            _parts.append(f"待 T+h 结算(最新一日, 交易日轴止于 {_max_td}) {_pending}")
+        if stale_px:
+            _parts.append(f"接口陈旧 {stale_px}")
+        print(f"🧹 剔除陈旧快照 {len(stale)} 个: " + "；".join(_parts))
 
     # v3.0 A2: 池口径过滤 —— 扩池前后截面分布不同(市值/流动性下移), 混算会污染 IC 与权重复核
     _psize = lambda s: int(s.get("pool_size") or 200)

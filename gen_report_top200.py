@@ -93,7 +93,12 @@ model_str = data.get("model", "stock-scorer")
 #   3) 因子表/权重块/相关矩阵/维度徽章全部十维化, 对照行(旧五维口径)保留供趋势比对
 #   4) 工程职责分离: 因子回测(研究层) 与 每日复盘(生产层) 解耦,
 #      factor_eval.py 仅归每日 Actions 链路做 IC 数据登记, 复盘 finalize 不再调用
-REPORT_VER = "v3.0"
+# v3.2: P0/P1 优化落地（专业投资者 × 量化从业者双视角清单，见 P0P1优化细化清单_v3.2_2026-10-13.md）——
+#   P0-1 流动性地板接线（fetch normalize 打 liquid_ok；组合层按此过滤）
+#   P0-2 申万一级行业暴露偏离约束（等权口径 ≤max_l1_deviation_pp，超限顺延替补）
+#   P0-3 入池资格补全（停牌 pct==0&amount==0 / 次新 N 前缀或 K 线<60 → 标记不剔除）
+#   P1-1 因子数据覆盖率区块 · P1-3 池口径徽章+新入池 diff · P1-4 路线/资格筛选 · P1-5 区制标签
+REPORT_VER = "v3.2"
 _has_sector = any(x.get('score_sector') is not None for x in results)
 _has_10d = any(x.get('score_oversold60') is not None for x in results)
 _ver_tag = (f"{REPORT_VER} · 十维" if _has_10d
