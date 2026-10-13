@@ -121,7 +121,7 @@ def check_ten_dim_applied(scored_path):
         t = 0.0
         for k, w in W.items():
             t += float(r.get(k) or 0) * float(w)
-        return round(t * 4, 2)
+        return round(t * 20, 2)  # v3.3 问题2: 量纲升级 总分满分100 (×20 替代 ×4)
 
     # 抽前 20 只比对（apply 后 total 应≈十维加权）
     diff = 0
@@ -146,7 +146,7 @@ def main():
         scored = fs[0] if fs else None
 
     issues = 0
-    print("🔎 链路自检 (v3.2)")
+    print("🔎 链路自检 (v3.3)")
     print("── A) 未定义全局名扫描 ──")
     for fn in CRITICAL:
         p = os.path.join(HERE, fn)

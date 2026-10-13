@@ -188,21 +188,21 @@ def main():
                                + float(r.get('score_overbought') or 0) * _FW["score_overbought"]
                                + float(r.get('score_theme_intrinsic') or 0) * _FW["score_theme_intrinsic"]
                                + float(r.get('score_attention') or 0) * _FW["score_attention"]
-                               + score_sector * _FW["score_sector"]) * 4, 2)
+                               + score_sector * _FW["score_sector"]) * 20, 2)  # v3.3 问题2: ×20 (每维满分10/总分满分100)
             else:
                 total = round((float(r.get('score_news') or 0) * _FW["score_news"]
                                + float(r.get('score_tech') or 0) * (_FW["score_rsi_rev"] + _FW["score_vol_pulse"] + _FW["score_overbought"])
                                + float(r.get('score_fund') or 0) * _FW["score_fund"]
                                + float(r.get('score_theme') or 0) * (_FW["score_theme_intrinsic"] + _FW["score_attention"])
-                               + score_sector * _FW["score_sector"]) * 4, 2)
+                               + score_sector * _FW["score_sector"]) * 20, 2)
             r['total'] = total
-            if total >= 17:
+            if total >= 85:
                 rating, advice = "S", "优先买入，可重仓"
-            elif total >= 13:
+            elif total >= 65:
                 rating, advice = "A", "逢低加仓，重点关注"
-            elif total >= 9:
+            elif total >= 45:
                 rating, advice = "B", "波段操作，轻仓参与"
-            elif total >= 5:
+            elif total >= 25:
                 rating, advice = "C", "观望，不新开仓"
             else:
                 rating, advice = "D", "坚决回避，立即卖出"
