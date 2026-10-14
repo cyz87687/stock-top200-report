@@ -55,6 +55,8 @@ if [ ${#_args[@]} -gt 0 ]; then set -- "${_args[@]}"; else set --; fi
 SCORED="top200_scored_${BJ_DATE}.json"
 POOL="focus_pool_${BJ_DATE}.json"
 SEARCH="focus_pool_${BJ_DATE}.search.json"
+# v3.5.1: Q3 预测结构化表（parse_q3_forecast.py 产物，step2 读取；TTL 45 天）
+Q3_JSON="$(ls -t data/q3_forecast_*.json 2>/dev/null | head -1)"
 
 mark() { printf '\n\033[1;36m== %s ==\033[0m\n' "$1"; }
 ok()   { printf '  \033[32m✓\033[0m %s\n' "$1"; }
@@ -86,6 +88,35 @@ d = json.load(open(sys.argv[1], encoding='utf-8'))
 print(f"  焦点池 {len(d.get('focus') or [])} 只（池内 {d.get('n_in_pool')} / 池外 {d.get('n_out_pool')}；"
       f"机器源 {d.get('sources_used')}；AI补充 {d.get('agent_search',{}).get('n_additions',0)}）")
 PY
+  fi
+  # v3.5.1: Q3 预测表新鲜度（TTL 45 天，过期后 step2 自动忽略 → 景气加分静默失效）
+  if [ -f "$Q3_JSON" ]; then
+    "$PY" - "$Q3_JSON" <<'PY'
+import json, sys, time
+try:
+    d = json.load(open(sys.argv[1], encoding='utf-8'))
+    ts = d.get('parsed_at') or ''
+    age = None
+    for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d'):
+        try:
+            age = (time.time() - time.mktime(time.strptime(ts[:19], fmt))) / 86400
+            break
+        except Exception:
+            pass
+    n = len(d.get('data') or {})
+    if age is None:
+        print(f"  ! Q3预测表 {n} 只（解析时间无法解析: {ts}）")
+    elif age > 45:
+        print(f"  ✗ Q3预测表已过期 {age:.0f} 天（TTL 45）→ 景气加分已失效，请更新 Desktop/workbuddy项目/半导体消费电子三季度预测汇总.xlsx 后跑 parse_q3_forecast.py 并 push")
+    elif age > 35:
+        print(f"  ! Q3预测表 {age:.0f} 天后过期（{n} 只）→ 尽快更新 Excel 并重跑 parse_q3_forecast.py")
+    else:
+        print(f"  ✓ Q3预测表 {n} 只，{age:.0f} 天前解析（TTL 45 天内有效）")
+except Exception as e:
+    print(f"  Q3预测表检查失败: {e}")
+PY
+  else
+    warn "Q3预测表缺失（data/q3_forecast_*.json）→ 景气加分不生效；更新 Excel 后跑 parse_q3_forecast.py"
   fi
   ;;
 
@@ -135,13 +166,18 @@ push)
   git add -f focus_pool_*.json 2>/dev/null || true
   git rm --cached -q focus_pool_*.search.json 2>/dev/null || true
   git add -f fetch_focus_list.py gen_report_top200.py 2>/dev/null || true
+  # v3.5.1: Q3 预测链路文件（parse 脚本 + 结构化数据；growth 口径修复后的取数依赖）
+  git add -f parse_q3_forecast.py data/q3_forecast_*.json 2>/dev/null || true
   if git diff --cached --quiet; then
     echo "  无变更需要提交"; exit 0
   fi
   git commit -m "focus-pool: 每日AI焦点池 ${BJ_DATE}" || true
+  # v3.5.1: Q3 结构化表存在才传（空数组展开避免空串参数）
+  _q3_args=()
+  [ -n "$Q3_JSON" ] && [ -f "$Q3_JSON" ] && _q3_args+=("$Q3_JSON")
   # 首选 Git Data API（github.com:443 常被拦截时仍可用，且兼容 Actions 自动提交）
   _proxy="$(env | grep -iE '^https_proxy=' | head -1 | cut -d= -f2-)"
-  if HTTPS_PROXY="$_proxy" "$PY" push_via_api.py index.html $(ls -t top200_report_*.html 2>/dev/null | head -1) $POOL fetch_focus_list.py gen_report_top200.py 2>/dev/null; then
+  if HTTPS_PROXY="$_proxy" "$PY" push_via_api.py index.html $(ls -t top200_report_*.html 2>/dev/null | head -1) $POOL fetch_focus_list.py gen_report_top200.py parse_q3_forecast.py ${_q3_args[@]+"${_q3_args[@]}"} 2>/dev/null; then
     ok "经 Git Data API 推送成功"
   elif git push origin main; then
     ok "经 git push 推送成功"
