@@ -1,6 +1,6 @@
 {
  "date": "2026-10-12",
- "generated_at": "2026-10-13 16:29:49",
+ "generated_at": "2026-10-14 16:28:12",
  "method": {
   "name": "Rank IC（Spearman 秩相关，修正口径）",
   "formula": "IC(t→t+h) = Spearman(因子值_t 截面秩, 收益率 t→第h个后续交易日)",
@@ -15,7 +15,7 @@
   "bonferroni": "30 次检验（5因子×3周期），校正阈值 |NW t|≥3.08；宽松阈值 |t|≥2.0"
  },
  "n_snapshots": 69,
- "n_snapshots_raw": 77,
+ "n_snapshots_raw": 78,
  "stale_snapshots_dropped": [
   "2026-09-25",
   "2026-10-01",
@@ -24,6 +24,7 @@
   "2026-10-06",
   "2026-10-07",
   "2026-10-13",
+  "2026-10-14",
   "2026-09-10"
  ],
  "pool_filter": null,
@@ -2801,28 +2802,30 @@
  "recommendation_ic": {
   "horizons": {
    "1": {
-    "n": 3,
+    "n": 4,
     "dates": [
      "2026-10-08",
      "2026-10-09",
-     "2026-10-12"
+     "2026-10-12",
+     "2026-10-13"
     ],
     "ic_series": [
      -0.1201,
      -0.387,
-     -0.3647
+     -0.3429,
+     -0.1954
     ],
-    "ic_mean": -0.2906,
-    "ic_std": 0.1481,
-    "t_stat": -3.4,
-    "nw_t": -4.16,
+    "ic_mean": -0.2614,
+    "ic_std": 0.1248,
+    "t_stat": -4.19,
+    "nw_t": -4.84,
     "bonferroni_sig": true,
     "win_rate": 0.0,
-    "spread_mean": -2.27,
+    "spread_mean": -1.926,
     "subperiod": null,
     "verdict": "样本积累中",
     "verdict_color": "#94a3b8",
-    "verdict_note": "n=3<20"
+    "verdict_note": "n=4<20"
    },
    "5": {
     "n": 0,
@@ -2859,7 +2862,7 @@
   },
   "verdict": "样本积累中",
   "verdict_color": "#94a3b8",
-  "verdict_note": "各周期样本均 <20（最大 3）"
+  "verdict_note": "各周期样本均 <20（最大 4）"
  },
  "factor_correlation": {},
  "current_weights_composite_ic": {
@@ -2916,7 +2919,7 @@
   "score_attention": 0.05
  },
  "notes": [
-  "有效截面 69 个交易日（2026-06-26 ~ 2026-10-12），剔除非交易日陈旧快照 8 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差，需 --bootstrap-prices 回填）",
+  "有效截面 69 个交易日（2026-06-26 ~ 2026-10-12），剔除非交易日陈旧快照 9 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差，需 --bootstrap-prices 回填）",
   "IC 衡量排序能力而非绝对收益；分层多空为未扣成本毛利口径",
   "TOP200 为高换手关注度筛选池：动量/关注型因子的负向 IC 更可能反映'关注度脉冲后的均值回复'，而非因子构造错误；解读时须结合本池的选择机制",
   "历史截面来自 git 提交记录（含早期综合行业归类版本，v2.46 已修复）"
