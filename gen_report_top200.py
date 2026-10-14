@@ -108,7 +108,12 @@ model_str = data.get("model", "stock-scorer")
 #   P0-2 申万一级行业暴露偏离约束（等权口径 ≤max_l1_deviation_pp，超限顺延替补）
 #   P0-3 入池资格补全（停牌 pct==0&amount==0 / 次新 N 前缀或 K 线<60 → 标记不剔除）
 #   P1-1 因子数据覆盖率区块 · P1-3 池口径徽章+新入池 diff · P1-4 路线/资格筛选 · P1-5 区制标签
-REPORT_VER = "v3.2"
+# v3.3/v3.3.1: 量纲升级「每维满分10 / 总分满分100」(后端 ×20, 前端 ×2 展示) —— 页面 Hero/卡片/推荐/板块均分/20→/100 全量对齐
+# v3.4: 每日 AI 焦点池区块（替代 v3.1 已删除的观察池）
+# v3.5: score_fund 低基数失真治理 —— 增速饱和压缩审计展示（growth_raw→growth_eff）+ 周期股 durable 闸门收紧
+#   （注: v3.3~v3.4 报告层改动当时漏更本常量, 本次一并对齐; 线上页面此前显示的报告层版本号偏旧）
+# v3.5.1: growth 取数口径修复披露（年报→东财按报告期）+ Q3 预测景气加成审计徽标/全表列/覆盖率披露
+REPORT_VER = "v3.5.1"
 _has_sector = any(x.get('score_sector') is not None for x in results)
 _has_10d = any(x.get('score_oversold60') is not None for x in results)
 _ver_tag = (f"{REPORT_VER} · 十维" if _has_10d
@@ -1842,6 +1847,45 @@ for idx, r in enumerate(top20):
                        'border-radius:3px;background:#fee2e2;color:#dc2626;margin-left:6px;cursor:help;">'
                        '⚠️基本面背离 ' + "·".join(_fund_flags) + '</span>')
 
+    # ===== v3.5 低基数失真修正审计徽标 =====
+    # 单点增速被 _effective_growth 饱和压缩时（growth_capped=True），如实展示原始→采用值，
+    # 让使用者看得出「该股的高增速已被判定为低基数失真」——数据可审计，非隐藏处理。
+    _lowbase_badge = ""
+    if r.get("growth_capped"):
+        _g_raw = r.get("growth_raw")
+        _g_eff = r.get("growth")
+        _raw_s = f"+{_g_raw:.0f}%" if isinstance(_g_raw, (int, float)) else "—"
+        _eff_s = f"+{_g_eff:.0f}%" if isinstance(_g_eff, (int, float)) else "—"
+        _lb_tip = r.get("growth_note") or "单点增速远超存续期趋势可支持水平，已按低基数失真饱和处理"
+        _lowbase_badge = ('<span title="' + _lb_tip.replace('"', "'") + '" '
+                          'style="font-size:11px;font-weight:700;padding:1px 6px;'
+                          'border-radius:3px;background:#fef3c7;color:#b45309;margin-left:6px;cursor:help;">'
+                          '📉低基数修正 ' + _raw_s + '→' + _eff_s + '</span>')
+
+    # ===== v3.5.1 Q3 预测景气加成审计徽标 =====
+    # Q3 景气预测（手工汇总表，半导体/消费电子链）触发 score_fund 加分时如实展示：
+    #   加分档位 + 加速度 + 去重闸门(implied_h2) 依据，与低基数修正徽标同口径「可审计不隐藏」。
+    _q3_badge = ""
+    if (r.get("q3_bonus") or 0) > 0:
+        _qb = float(r.get("q3_bonus") or 0)
+        _q3_yoy_s = f"{r['q3_yoy']:+.0f}%" if isinstance(r.get("q3_yoy"), (int, float)) else "扭亏"
+        _q3_accel_s = f"{r['q3_accel']:+.0f}pt" if isinstance(r.get("q3_accel"), (int, float)) else "—"
+        _q3_ih2_s = f"{r['q3_implied_h2']:+.0f}%" if isinstance(r.get("q3_implied_h2"), (int, float)) else "无全年预测"
+        # v3.5.1 诚实性: Q3同比被低基数饱和时明示原始值（否则「加速度+0pt」会被误读为无加速）
+        _q3_sat_s = ""
+        _q3_raw, _q3_eff = r.get("q3_yoy_raw"), r.get("q3_yoy")
+        if (isinstance(_q3_raw, (int, float)) and isinstance(_q3_eff, (int, float))
+                and abs(_q3_raw - _q3_eff) > 1):
+            _q3_sat_s = f"；Q3原始同比{_q3_raw:+.0f}%，经低基数饱和后采用{_q3_eff:+.0f}%（加速度为饱和后口径）"
+        _q3_tip = (f"Q3预测景气加成 +{_qb:.1f}分(0-5分制, 传导总分+{_qb*0.18*20:.1f})；"
+                   f"Q3同比{_q3_yoy_s} 加速度{_q3_accel_s}{_q3_sat_s}；"
+                   f"机构全年预期隐含H2增速{_q3_ih2_s}（Q3预测超出机构预期部分才计入，防止与FwdPE双重计价）；"
+                   f"数据源：手工汇总表(半导体/消费电子Q3预测, TTL45天)")
+        _q3_badge = ('<span title="' + _q3_tip.replace('"', "'") + '" '
+                     'style="font-size:11px;font-weight:700;padding:1px 6px;'
+                     'border-radius:3px;background:#dcfce7;color:#15803d;margin-left:6px;cursor:help;">'
+                     '📈Q3景气 +' + f"{_qb:.1f}" + '</span>')
+
     # ===== v3.0 十维展示: 徽章行与维度卡片按数据口径自适应 =====
     _is10 = r.get("score_oversold60") is not None
     _tech_disp, _theme_disp = _dim_composites(r)
@@ -1890,7 +1934,7 @@ for idx, r in enumerate(top20):
             <div class="header-row">
                 <div class="rank" style="background:{rank_color}">#{i}</div>
                 <div>
-                    <div class="name">{r['name']}{change_tag}{ai_badge}{_risk_badge}</div>
+                    <div class="name">{r['name']}{change_tag}{ai_badge}{_risk_badge}{_lowbase_badge}{_q3_badge}</div>
                     <div class="code">{r['code']} · {sector_disp(r)}</div>
                 </div>
                 {_toggle}
@@ -3005,6 +3049,7 @@ html_parts.append('''
                     <th class="s-total sticky-col col-total-sticky" data-sort="total">总分 <span class="sort-arrow"></span></th>
                     <th class="s-rating col-rating">评级</th>
                     <th class="s-pe col-pe">PE(TTM)/Fwd/阶梯</th>
+                    <th class="s-q3 col-q3" title="Q3预测景气（手工汇总表·半导体/消费电子链·覆盖率约13%）：Q3同比+相对中报的加速度；命中且超出机构全年预期才计加分">Q3景气</th>
                     <th class="s-sector col-sub">细分题材</th>
                     <th class="s-turnover col-turnover" data-sort="turnover">成交额 <span class="sort-arrow"></span></th>
                 </tr>
@@ -3019,6 +3064,30 @@ for idx, r in enumerate(results):
     rating = r["rating"]
     fwd = f"{r['fwd_pe']:.0f}x" if r.get("fwd_pe") else "-"
     growth = f"{r['growth']:+.0f}%" if r.get("growth") else "-"
+    # v3.5: 低基数失真修正标记（全表可见）——增速被饱和压缩时加 ⚠ 与原始值 tooltip
+    _lb_mark = ""
+    if r.get("growth_capped"):
+        _gr = r.get("growth_raw")
+        _gr_s = f"{_gr:+.0f}%" if isinstance(_gr, (int, float)) else "?"
+        _lb_mark = (f'<span style="color:#b45309;cursor:help;" '
+                    f'title="低基数失真修正: 原始单点增速{_gr_s} 已按存续期趋势饱和至 {growth}">⚠</span>')
+    # v3.5.1: Q3 预测景气列 —— 仅当该股命中 Q3 手工预测表时渲染，否则 '-'（覆盖率 13.3%，不污染全表）
+    _q3_cell = "-"
+    if isinstance(r.get("q3_yoy"), (int, float)) or (r.get("q3_bonus") or 0) > 0:
+        _qy = f"{r['q3_yoy']:+.0f}%" if isinstance(r.get("q3_yoy"), (int, float)) else "扭亏"
+        _qacc = f"{r['q3_accel']:+.0f}pt" if isinstance(r.get("q3_accel"), (int, float)) else "—"
+        _qih2 = f"{r['q3_implied_h2']:+.0f}%" if isinstance(r.get("q3_implied_h2"), (int, float)) else "无全年预测"
+        _qbn = (r.get("q3_bonus") or 0)
+        _qcol = "#22c55e" if _qbn >= 0.6 else ("#a3e635" if _qbn > 0 else "#94a3b8")
+        # v3.5.1 诚实性: Q3同比被低基数饱和时 hover 附原始值
+        _qsat = ""
+        _qraw, _qeff = r.get("q3_yoy_raw"), r.get("q3_yoy")
+        if (isinstance(_qraw, (int, float)) and isinstance(_qeff, (int, float))
+                and abs(_qraw - _qeff) > 1):
+            _qsat = f" · 原始{_qraw:+.0f}%(已饱和)"
+        _q3_cell = (f"<span style='color:{_qcol};font-weight:700;' title='Q3预测同比{_qy} · 加速度{_qacc} · "
+                    f"机构预期隐含H2增速{_qih2}{_qsat} · 景气加成+{_qbn:.1f}分'>"
+                    f"{_qy}<span style='font-size:10px;color:#64748b;'> {_qacc}</span></span>")
     ladder_val = r.get("pe_ladder")
     if ladder_val and isinstance(ladder_val, dict):
         yrs = sorted(ladder_val.keys())
@@ -3120,7 +3189,8 @@ for idx, r in enumerate(results):
                     <td class="s-scores col-scores">{scores_html}</td>
                     <td class="s-total col-total sticky-col col-total-sticky" data-value="{r['total']}" style="color:{RATING_COLORS[rating]}">{r['total']:.2f}</td>
                     <td class="s-rating col-rating" style="background:{RATING_BG[rating]};color:{RATING_COLORS[rating]}" data-value="{rating}">{rating}</td>
-                    <td class="s-pe col-pe" data-value="{r.get('pe',0)}">{pe}/{fwd} {ladder_t} {growth}</td>
+                    <td class="s-pe col-pe" data-value="{r.get('pe',0)}">{pe}/{fwd} {ladder_t} {growth}{_lb_mark}</td>
+                    <td class="s-q3 col-q3">{_q3_cell}</td>
                     <td class="s-sector col-sub">{sub_theme_t if sub_theme_t else '-'}</td>
                     <td class="s-turnover col-turnover" data-value="{r.get('turnover',0)}">{turnover_yi:.0f}亿</td>
                 </tr>''')
@@ -3601,6 +3671,42 @@ except Exception as _ce:
     pass
 
 
+# ===== v3.5.1: growth 取数口径变更 + Q3 预测加成披露（诚实披露纪律）=====
+# 背景: 老大核查发现 growth 原取「按年度」摘要末行=最近年报，全池滞后半年以上
+#   （普冉股份年报口径 −38.7% vs 2026中报实际 +2994.08%）；
+#   且同比公式在负基数下符号反转（佰维存储扭亏 +2963% 被误判为 −2963%）。
+# 修复: 东财「按报告期」取各股最新已披露报告期扣非累计同比，官方口径 (cur−prev)/|prev|。
+#   Q3 预测为手工汇总表（半导体/消费电子链），覆盖率有限，仅作景气边际信号加分，
+#   非全年盈利预测输入；超出机构全年预期(implied_h2)部分才计分，防止与 FwdPE 双重计价。
+try:
+    _g_em = sum(1 for x in results if x.get("growth_src") == "em")
+    _g_q3 = sum(1 for x in results if isinstance(x.get("q3_yoy"), (int, float)) or (x.get("q3_bonus") or 0) > 0)
+    _g_q3b = sum(1 for x in results if (x.get("q3_bonus") or 0) > 0)
+    _g_cap = sum(1 for x in results if x.get("growth_capped"))
+    _g_neg_old = sum(1 for x in results
+                     if isinstance(x.get("growth_annual_ths"), (int, float)) and isinstance(x.get("growth"), (int, float))
+                     and (x["growth_annual_ths"] > 0) != (x["growth"] > 0))
+    html_parts.append(f'''
+    <!-- v3.5.1 growth 口径与 Q3 预测披露 -->
+    <div class="section-block" style="margin:24px 0;padding:16px 20px;background:#0f172a;border:1px solid #334155;border-radius:12px;">
+        <div style="font-size:14px;font-weight:800;color:#38bdf8;margin-bottom:6px;">📐 盈利取数口径与 Q3 预测加成说明（{total_stocks} 只）</div>
+        <div style="font-size:12px;color:#cbd5e1;line-height:1.9;">
+            ① <b style="color:#fbbf24;">增速口径 v3.5.1 起变更</b>：growth 改为各股<b>最新已披露报告期</b>（2026中报为主）扣非累计同比，
+            东财「按报告期」接口取数，官方口径 <code>(本期−上年同期)/|上年同期|</code>；
+            修复了旧口径「按年度摘要取最近年报」导致的全池滞后半年以上问题。<br>
+            ② <b>口径切换影响</b>：{_g_em}/{total_stocks} 只走东财新口径；其中 <b style="color:#f87171;">{_g_neg_old} 只增长方向与旧年报口径相反</b>；
+            {_g_cap} 只触发低基数失真饱和压缩（详情卡 📉 徽标可审计）。<br>
+            ③ <b>Q3 预测景气加成</b>：数据源为手工汇总表（半导体/消费电子链 105 只），
+            池内覆盖 <b>{_g_q3} 只（{_g_q3/total_stocks*100:.1f}%）</b>，实际获加分 <b style="color:#22c55e;">{_g_q3b} 只</b>（上限 +1.0 分/0-5 分制 → 总分 +3.6）。
+            加分条件：Q3 预测同比（经同样饱和处理）相对中报<b>加速</b>，且超出机构全年盈利预期隐含的 H2 增速
+            （否则视为已被 FwdPE 计价，不加分）——<b>只加分、不扣分</b>，Q3 为预测值非已披露事实。<br>
+            ④ 该表非程序化接口、TTL 45 天，未覆盖个股按原口径评分，不受影响。
+        </div>
+    </div>''')
+except Exception as _qe:
+    pass
+
+
 # ===== v2.41 P0-4 推荐跟踪与胜率 (真实K线回填) =====
 try:
     _tf = os.path.join(_ai_dir, "recommendation_track.json")
@@ -3718,6 +3824,7 @@ html_parts.append('''
     <div class="footer" id="sec-notes">
         <p style="color:#64748b;">📄 ''' + REPORT_VER + ''' 报告层 · ''' + _SCORER_VER + ''' 评分层 · 数据日期 ''' + date_str + ''' · 更新时间 ''' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '''</p>
         <p>📚 数据源：东方财富 + 腾讯K线 + 同花顺 + 新浪/乐股 · 全市场成交额排名 · 样本池 TOP''' + str(_POOL_N) + '''（覆盖 ''' + str(total_stocks) + ''' 只 / ''' + f'{_pool_cov:.0%}' + '''）</p>
+        <p>📐 盈利取数口径（v3.5.1 起）：growth = 各股最新已披露报告期（2026中报为主）扣非累计同比，东财按报告期接口、官方口径 (本期−上年同期)/|上年同期|；Q3 预测景气加成来自手工汇总表（半导体/消费电子链，池内覆盖约13%，超出机构全年预期部分才计分）</p>
         <p>🗒️ 点评来源：''' + _ai_src_label + '''（''' + html_mod.escape(_ai_src_tip) + '''）</p>
         <p>⚠️ 免责声明: 本报告由AI基于stock-scorer极简评分模型自动生成,仅供参考,不构成投资建议。投资有风险,入市需谨慎。</p>
         <p>评分模型 (''' + _SCORER_VER + '''): '''
@@ -3856,7 +3963,7 @@ function initExpandableRows() {
             const techText = row.dataset.techText || '';
             const fundText = row.dataset.fundText || '无';
             const themeText = row.dataset.themeText || '无';
-            detailRow.innerHTML = '<td colspan="11"><div class="detail-content" style="background:#0f172a;border-radius:8px;padding:16px;margin:4px;">' +
+            detailRow.innerHTML = '<td colspan="' + row.children.length + '"><div class="detail-content" style="background:#0f172a;border-radius:8px;padding:16px;margin:4px;">' +
                 '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;font-size:11px;">' +
                 '<div><div style="color:#94a3b8;margin-bottom:4px;">📰 消息面(' + newsScore + '/10)</div><div style="color:#e2e8f0;">' + newsText + '</div></div>' +
                 '<div><div style="color:#94a3b8;margin-bottom:4px;">📈 技术面(' + techScore + '/10)</div><div style="color:#e2e8f0;">' + techText + '</div></div>' +
