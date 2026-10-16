@@ -1,6 +1,6 @@
 {
  "date": "2026-10-12",
- "generated_at": "2026-10-16 13:45:17",
+ "generated_at": "2026-10-16 19:23:02",
  "method": {
   "name": "Rank IC（Spearman 秩相关，修正口径）",
   "formula": "IC(t→t+h) = Spearman(因子值_t 截面秩, 收益率 t→第h个后续交易日)",
@@ -2819,15 +2819,15 @@
      -0.3677,
      -0.1976,
      -0.1339,
-     -0.0337
+     -0.0552
     ],
-    "ic_mean": -0.2091,
-    "ic_std": 0.1406,
-    "t_stat": -3.64,
-    "nw_t": -3.99,
+    "ic_mean": -0.2127,
+    "ic_std": 0.1354,
+    "t_stat": -3.85,
+    "nw_t": -4.21,
     "bonferroni_sig": true,
     "win_rate": 0.0,
-    "spread_mean": -1.332,
+    "spread_mean": -1.393,
     "subperiod": null,
     "verdict": "样本积累中",
     "verdict_color": "#94a3b8",
@@ -2841,15 +2841,15 @@
     ],
     "ic_series": [
      -0.2555,
-     -0.2105
+     -0.1968
     ],
-    "ic_mean": -0.233,
-    "ic_std": 0.0318,
-    "t_stat": -10.35,
+    "ic_mean": -0.2261,
+    "ic_std": 0.0415,
+    "t_stat": -7.7,
     "nw_t": null,
     "bonferroni_sig": false,
     "win_rate": 0.0,
-    "spread_mean": -5.739,
+    "spread_mean": -1.652,
     "subperiod": null,
     "verdict": "样本积累中",
     "verdict_color": "#94a3b8",
