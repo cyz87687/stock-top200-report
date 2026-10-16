@@ -1537,13 +1537,17 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
 
     reasons = []
     _fwd_pe_out = effective_pe if (fwd_pe or code in KNOWN or effective_pe) else None
-    _growth_out = growth if growth is not None else None
     _ladder_out = pe_ladder_data or {}
     _sustain_empty = {"score": 3.0, "note": "数据不足,未评估持续性", "is_cyclic": False, "is_storage_mod": False}
 
     # v3.5: 低基数失真治理——原始增速留档 (_growth_raw)，后续评分统一用压缩后的 _g
     _growth_raw = growth
     growth, _g_capped, _g_note = _effective_growth(growth, cagr3)
+    # v3.5.2: _growth_out 必须是 effective 化【之后】的快照。v3.5 原快照取在压缩之前，
+    #   导致返回/落库的 growth 是原始值(兆易 796.9)——评分内部虽用压缩值 370 正确计分，
+    #   但报告徽章渲染成「+797%→+797%」(raw→raw 恒等)，低基数修正对使用者不可见。
+    #   本修复只改展示透传字段，不动评分逻辑（total/rating 逐只不变，可回归验证）。
+    _growth_out = growth if growth is not None else None
 
     if effective_pe is None or effective_pe <= 0:
         if growth is None:
