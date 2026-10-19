@@ -12,6 +12,8 @@
 import json
 import sys
 import os
+import re
+import math
 import glob
 import html as html_mod
 from datetime import datetime
@@ -113,7 +115,12 @@ model_str = data.get("model", "stock-scorer")
 # v3.5: score_fund 低基数失真治理 —— 增速饱和压缩审计展示（growth_raw→growth_eff）+ 周期股 durable 闸门收紧
 #   （注: v3.3~v3.4 报告层改动当时漏更本常量, 本次一并对齐; 线上页面此前显示的报告层版本号偏旧）
 # v3.5.1: growth 取数口径修复披露（年报→东财按报告期）+ Q3 预测景气加成审计徽标/全表列/覆盖率披露
-REPORT_VER = "v3.5.1"
+# v3.5.3: ① 删除过时的「📊 评分模型总结」区块（v2.40 五维静态文案与当日算法层市场总结重复且数据陈旧，
+#          头部 Hero 已有当日算法层总结；数据字段 ai_model_summary 保留由 enhance 注入但不渲染）
+#         ② 累计 IC 曲线修复 y 轴量程按单期 IC 值(±0.4)计算致累计值(±3.5)溢出 viewBox 被裁剪，
+#          改为按累计序列动态定量程 + nice ticks + 小屏 overflow-x 滚动适配
+#         ③ 区制标签日期数据驱动：用 factor_ic.json 有效截面区间覆盖 config 静态日期（易过期）
+REPORT_VER = "v3.5.3"
 _has_sector = any(x.get('score_sector') is not None for x in results)
 _has_10d = any(x.get('score_oversold60') is not None for x in results)
 _ver_tag = (f"{REPORT_VER} · 十维" if _has_10d
@@ -1113,7 +1120,20 @@ try:
 except Exception:
     pass
 
+# ===== v3.5.3: factor_ic.json 提前读取（供 P1-5 区制标签日期数据驱动）=====
+_ai_dir = os.path.dirname(os.path.abspath(__file__))
+_ic_path = os.path.join(_ai_dir, "factor_ic.json")
+_ic = None
+try:
+    if os.path.exists(_ic_path):
+        with open(_ic_path, "r", encoding="utf-8") as _f:
+            _ic = json.load(_f)
+except Exception as _e:
+    print(f"⚠️ 读取 factor_ic.json 失败: {_e}")
+
 # ===== v3.2 P1-5 区制标签（config.json regime_tag；数据驱动，无则不显示）=====
+# v3.5.3: 日期部分数据驱动 —— config 静态日期(人写, 易过期)用 factor_ic.json 的
+#         snapshot_range(有效截面区间)动态覆盖; _ic 缺失时保留 config 原值兜底。
 _regime_badge = ''
 try:
     _cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
@@ -1121,6 +1141,11 @@ try:
         _cfg = json.load(_cf)
     _rt = (_cfg.get("regime_tag") or "").strip()
     _rn = (_cfg.get("regime_note") or "").strip()
+    _sr = (_ic or {}).get("snapshot_range") or []
+    if len(_sr) == 2 and all(_sr):
+        _rt = (re.sub(r'（[^（）]*）', f'（截面区间 {_sr[0]}~{_sr[1]}）', _rt, count=1)
+               if re.search(r'（[^（）]*）', _rt) else _rt + f'（{_sr[0]}~{_sr[1]}）')
+        _rn = re.sub(r'2026-\d{2}(?:-\d{2})?~2026-\d{2}(?:-\d{2})?', f'{_sr[0]}~{_sr[1]}', _rn)
     if _rt:
         _regime_badge = ('<div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;'
                          'padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;'
@@ -1188,7 +1213,7 @@ html_parts.append(f'''
 # 数据纪律: 只采纳与当日数据日期一致的点评, 防止陈旧文件(如历史 ai_review_today.json)
 # 在当日 ai_assessment.json 缺失/损坏时冒充当日点评。不匹配则回退到模板文本。
 ai_review = {}
-_ai_dir = os.path.dirname(os.path.abspath(__file__))
+# (_ai_dir 已在 P1-5 区制标签前定义, 此处不再重复)
 for _cand in ("ai_assessment.json", "ai_review_today.json"):
     if ai_review:
         break
@@ -3217,35 +3242,18 @@ html_parts.append('''
 if _focus_pool.get("focus"):
     html_parts.append(_focus_pool_html(_focus_pool))
 
-# ===== v2.30 评分模型总结 (v2.44: 来源如实标注) =====
-_ams = data.get("ai_model_summary", "").strip()
-_model_ver = 'v2.40 (五维·含板块动量)' if any(x.get('score_sector') is not None for x in results) else 'v2.30 (四维)'
-# 兼容旧文案中的版本号
-_ams = _ams.replace('v2.30', 'v2.40').replace('四维', '五维') if any(x.get('score_sector') is not None for x in results) else _ams
-ai_model_html = ""
-if _ams:
-    ai_model_html = ('    <div class="ai-model-summary" style="margin:24px 0;padding:18px 20px;'
-                     'background:linear-gradient(135deg,#1e1b4b,#0f172a);border:1px solid #6d28d9;border-radius:12px;">'
-                     '<div style="font-size:15px;font-weight:800;color:#c4b5fd;margin-bottom:10px;">'
-                     '📊 评分模型总结 (' + _model_ver + ')'
-                     '<span style="font-size:11px;font-weight:400;color:' + _ai_src_color + ';margin-left:8px;">'
-                     '来源：' + _ai_src_label + '</span></div>'
-                     '<div style="font-size:13px;line-height:1.9;color:#e2e8f0;white-space:pre-wrap;">'
-                     + html_mod.escape(_ams) + '</div></div>')
-html_parts.append(ai_model_html)
+# ===== v3.5.3: 原「📊 评分模型总结」区块已删除 =====
+# 删除原因（老大巡检指示）：该区块读 data['ai_model_summary']（enhance 注入的 LLM 旧口径综述），
+# ① 内容为陈旧市场快照（如"成交1.45万亿/涨停41家"非当日数据），与头部 Hero 算法层当日总结矛盾；
+# ② 版本号标签硬编码 v2.40 五维（现为十维 v3.5.x），replace hack 已无意义。
+# 数据字段 ai_model_summary 仍由 enhance_scores.py 注入 scored 顶层（不影响其他消费方），仅不再渲染。
+# 头部 Hero 区的 mkt_phase/mkt_disc/赚钱效应/仓位建议为当日算法层总结，承担原区块的信息职能。
 
 # ===== v2.46 因子有效性评估（Rank IC）=====
 # 数据来源: factor_eval.py → factor_ic.json（每日随流水线更新；历史截面来自 git 提交记录）
 # 指标口径: IC = Spearman(因子值当日截面秩, 未来 h 交易日收益), h∈{1,5,20};
 #           t = mean(IC)/(std(IC)/√n), |t|≥2 视为统计显著; 样本<20 截面不判定。
-_ic_path = os.path.join(_ai_dir, "factor_ic.json")
-_ic = None
-try:
-    if os.path.exists(_ic_path):
-        with open(_ic_path, "r", encoding="utf-8") as _f:
-            _ic = json.load(_f)
-except Exception as _e:
-    print(f"⚠️ 读取 factor_ic.json 失败: {_e}")
+# (v3.5.3: _ic 读取已上移至 P1-5 区制标签之前, 使区制日期可数据驱动)
 
 # v2.47: 权重决策记录（factor_eval.py --optimize-weights 产出）
 _wf_path = os.path.join(_ai_dir, "factor_weights.json")
@@ -3533,41 +3541,55 @@ if _ic and _ic.get("factors"):
         </div>''')
 
     # 累计 IC 曲线（T+1，仅画样本≥20 的因子；不同因子等长序列才可同轴比较）
+    # v3.5.3 修复: 原实现 y 轴量程按【单期 IC 值】范围(±0.4)计算, 而 polyline 画的是【累计值】
+    #   (单期±0.4 × 68 截面累计可达 ±3.5) → 曲线大面积溢出 viewBox 被 SVG 裁剪, 页面只剩零碎片段。
+    #   现改为: 先算累计序列, 量程/nice ticks 全部按累计值动态生成; viewBox 加高(200→260),
+    #   小屏 min-width+overflow-x 滚动适配(不再缩成不可读), 网格文字 9→10px。
     _chart_svg = ""
     _series = []
     for _fk, _fv in _ic["factors"].items():
         _a = (_fv.get("horizons") or {}).get("1") or {}
         _s = _a.get("ic_series") or []
         if _a.get("n", 0) >= 20 and len(_s) >= 10:
-            _series.append((_fv.get("label", _fk), _s))
+            _cum, _acc = [], 0.0
+            for v in _s:
+                _acc += v
+                _cum.append(_acc)
+            _series.append((_fv.get("label", _fk), _cum))
     if len(_series) >= 2:
-        _W, _H, _PL, _PR, _PT, _PB = 680, 200, 44, 12, 12, 30
+        _W, _H, _PL, _PR, _PT, _PB = 680, 260, 46, 14, 14, 30
         _all = [v for _, s in _series for v in s]
-        _ymax = max(0.02, max(_all)); _ymin = min(-0.02, min(_all))
+        _ymax = max(0.05, max(_all)); _ymin = min(-0.05, min(_all))
         _n = max(len(s) for _, s in _series)
         _x = lambda i: _PL + (_W - _PL - _PR) * (i / max(1, _n - 1))
         _y = lambda v: _PT + (_H - _PT - _PB) * (1 - (v - _ymin) / (_ymax - _ymin))
-        _parts = [f'<svg viewBox="0 0 {_W} {_H}" style="width:100%;height:auto;">']
-        # 网格与零轴
-        for _gv in (-0.1, -0.05, 0.0, 0.05, 0.1):
-            if _ymin <= _gv <= _ymax:
-                _gy = _y(_gv)
-                _zero = abs(_gv) < 1e-9
-                _parts.append(f'<line x1="{_PL}" y1="{_gy:.1f}" x2="{_W-_PR}" y2="{_gy:.1f}" '
-                              f'stroke="{"#475569" if _zero else "#1e293b"}" stroke-width="{1.2 if _zero else 0.8}"/>')
-                _parts.append(f'<text x="{_PL-6}" y="{_gy+3:.1f}" fill="#64748b" font-size="9" '
-                              f'text-anchor="end">{_gv:+.2f}</text>')
+        # nice ticks: 在累计值范围内选 1/2/5×10^k 步长, 5~7 条网格
+        _span = _ymax - _ymin
+        _raw_step = _span / 5 if _span > 0 else 0.5
+        _mag = 10 ** math.floor(math.log10(_raw_step)) if _raw_step > 0 else 1.0
+        _step = _mag * (1 if _raw_step / _mag < 1.5 else (2 if _raw_step / _mag < 3 else 5))
+        _ticks, _t = [], math.floor(_ymin / _step) * _step
+        while _t <= _ymax + 1e-9:
+            if _t >= _ymin - 1e-9:
+                _ticks.append(_t)
+            _t += _step
+        _parts = [f'<svg viewBox="0 0 {_W} {_H}" style="width:100%;min-width:600px;height:auto;">']
+        # 网格与零轴（零轴加粗）
+        for _gv in _ticks:
+            _gy = _y(_gv)
+            _zero = abs(_gv) < 1e-9
+            _parts.append(f'<line x1="{_PL}" y1="{_gy:.1f}" x2="{_W-_PR}" y2="{_gy:.1f}" '
+                          f'stroke="{"#475569" if _zero else "#1e293b"}" stroke-width="{1.4 if _zero else 0.8}"/>')
+            _parts.append(f'<text x="{_PL-6}" y="{_gy+3:.1f}" fill="#64748b" font-size="10" '
+                          f'text-anchor="end">{_gv:+.2f}</text>')
         for _li, (_lab, _s) in enumerate(_series):
-            _cum, _acc = [], 0.0
-            for v in _s:
-                _acc += v; _cum.append(_acc)
-            _pts = " ".join(f"{_x(i):.1f},{_y(v):.1f}" for i, v in enumerate(_cum))
+            _pts = " ".join(f"{_x(i):.1f},{_y(v):.1f}" for i, v in enumerate(_s))
             _col = _IC_LINE_COLORS[_li % len(_IC_LINE_COLORS)]
             _parts.append(f'<polyline points="{_pts}" fill="none" stroke="{_col}" '
-                          f'stroke-width="1.6" opacity="0.92"/>')
-        _parts.append(f'<text x="{_PL}" y="{_H-8}" fill="#64748b" font-size="9">'
+                          f'stroke-width="1.8" opacity="0.92"/>')
+        _parts.append(f'<text x="{_PL}" y="{_H-8}" fill="#64748b" font-size="10">'
                       f'截面序列起点</text>')
-        _parts.append(f'<text x="{_W-_PR}" y="{_H-8}" fill="#64748b" font-size="9" '
+        _parts.append(f'<text x="{_W-_PR}" y="{_H-8}" fill="#64748b" font-size="10" '
                       f'text-anchor="end">最近截面</text></svg>')
         _chart_svg = "".join(_parts)
         _legend = " ".join(
@@ -3603,7 +3625,7 @@ if _ic and _ic.get("factors"):
             </tr></thead>
             <tbody>{_ic_rows}{_rec_row}</tbody>
         </table>
-        {f'<div style="margin-top:14px;"><div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">📈 累计 IC 曲线（T+1，按截面序号累计；曲线持续上行=因子稳定正向，下行=负向）</div>{_chart_svg}<div style="font-size:11px;margin-top:6px;">{_legend}</div></div>' if _chart_svg else ''}
+        {f'<div style="margin-top:14px;"><div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">📈 累计 IC 曲线（T+1，按截面序号累计；纵轴为累计 IC 值量程——曲线持续上行=因子稳定正向，下行=负向；窄屏可左右滑动）</div><div style="overflow-x:auto;">{_chart_svg}</div><div style="font-size:11px;margin-top:6px;">{_legend}</div></div>' if _chart_svg else ''}
         {_corr_html}
         {_wblock}
         <div style="font-size:11px;color:#f59e0b;margin-top:12px;padding:8px 10px;background:rgba(245,158,11,0.08);border-radius:6px;border-left:3px solid #f59e0b;line-height:1.7;">
