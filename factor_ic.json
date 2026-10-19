@@ -1,6 +1,6 @@
 {
  "date": "2026-10-12",
- "generated_at": "2026-10-16 19:23:02",
+ "generated_at": "2026-10-19 19:46:41",
  "method": {
   "name": "Rank IC（Spearman 秩相关，修正口径）",
   "formula": "IC(t→t+h) = Spearman(因子值_t 截面秩, 收益率 t→第h个后续交易日)",
@@ -15,7 +15,7 @@
   "bonferroni": "30 次检验（5因子×3周期），校正阈值 |NW t|≥3.08；宽松阈值 |t|≥2.0"
  },
  "n_snapshots": 69,
- "n_snapshots_raw": 80,
+ "n_snapshots_raw": 81,
  "stale_snapshots_dropped": [
   "2026-09-25",
   "2026-10-01",
@@ -27,6 +27,7 @@
   "2026-10-14",
   "2026-10-15",
   "2026-10-16",
+  "2026-10-19",
   "2026-09-10"
  ],
  "pool_filter": null,
@@ -2804,56 +2805,60 @@
  "recommendation_ic": {
   "horizons": {
    "1": {
-    "n": 6,
+    "n": 7,
     "dates": [
      "2026-10-08",
      "2026-10-09",
      "2026-10-12",
      "2026-10-13",
      "2026-10-14",
-     "2026-10-15"
+     "2026-10-15",
+     "2026-10-16"
     ],
     "ic_series": [
      -0.1348,
      -0.387,
      -0.3677,
-     -0.1976,
+     -0.1966,
      -0.1339,
-     -0.0552
+     -0.0337,
+     0.1078
     ],
-    "ic_mean": -0.2127,
-    "ic_std": 0.1354,
-    "t_stat": -3.85,
-    "nw_t": -4.21,
-    "bonferroni_sig": true,
-    "win_rate": 0.0,
-    "spread_mean": -1.393,
+    "ic_mean": -0.1637,
+    "ic_std": 0.1755,
+    "t_stat": -2.47,
+    "nw_t": -2.67,
+    "bonferroni_sig": false,
+    "win_rate": 14.3,
+    "spread_mean": -0.725,
     "subperiod": null,
     "verdict": "样本积累中",
     "verdict_color": "#94a3b8",
-    "verdict_note": "n=6<20"
+    "verdict_note": "n=7<20"
    },
    "5": {
-    "n": 2,
+    "n": 3,
     "dates": [
      "2026-10-08",
-     "2026-10-09"
+     "2026-10-09",
+     "2026-10-12"
     ],
     "ic_series": [
      -0.2555,
-     -0.1968
+     -0.2105,
+     -0.5758
     ],
-    "ic_mean": -0.2261,
-    "ic_std": 0.0415,
-    "t_stat": -7.7,
-    "nw_t": null,
-    "bonferroni_sig": false,
+    "ic_mean": -0.3473,
+    "ic_std": 0.1992,
+    "t_stat": -3.02,
+    "nw_t": -6.69,
+    "bonferroni_sig": true,
     "win_rate": 0.0,
-    "spread_mean": -1.652,
+    "spread_mean": -5.739,
     "subperiod": null,
     "verdict": "样本积累中",
     "verdict_color": "#94a3b8",
-    "verdict_note": "n=2<20"
+    "verdict_note": "n=3<20"
    },
    "20": {
     "n": 0,
@@ -2874,7 +2879,7 @@
   },
   "verdict": "样本积累中",
   "verdict_color": "#94a3b8",
-  "verdict_note": "各周期样本均 <20（最大 6）"
+  "verdict_note": "各周期样本均 <20（最大 7）"
  },
  "factor_correlation": {},
  "current_weights_composite_ic": {
@@ -2931,7 +2936,7 @@
   "score_attention": 0.05
  },
  "notes": [
-  "有效截面 69 个交易日（2026-06-26 ~ 2026-10-12），剔除非交易日陈旧快照 11 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差，需 --bootstrap-prices 回填）",
+  "有效截面 69 个交易日（2026-06-26 ~ 2026-10-12），剔除非交易日陈旧快照 12 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差，需 --bootstrap-prices 回填）",
   "IC 衡量排序能力而非绝对收益；分层多空为未扣成本毛利口径",
   "TOP200 为高换手关注度筛选池：动量/关注型因子的负向 IC 更可能反映'关注度脉冲后的均值回复'，而非因子构造错误；解读时须结合本池的选择机制",
   "历史截面来自 git 提交记录（含早期综合行业归类版本，v2.46 已修复）"
