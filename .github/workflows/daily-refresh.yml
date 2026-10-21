@@ -50,6 +50,14 @@ jobs:
           echo "=== Refresh started at $(date -u '+%Y-%m-%d %H:%M:%S UTC') ===" > $LOG
           MAX_RETRIES=3
           RETRY_DELAY=30
+          # 【2026-10-21 修复】数据新鲜度失败单独用更长退避。
+          # 事故: 15:31 准点触发时个股行情已更新(亨通 51.45 -1.19%), 但上证指数日线
+          #   仍停在上一交易日 → check_data_fresh 判 stale。原来与 fetch 共用 30s 退避,
+          #   3 次尝试 3 分钟内全部打完(15:31/15:32/15:34) 即放弃, 当日 0 产出。
+          #   收盘后指数日线接口有数分钟至十几分钟延迟, 必须给足窗口。
+          # 现改为 5 分钟退避 × 3 次 = 最多等 10 分钟(15:31 触发 → 最晚 15:44 判定),
+          #   job timeout 90 分钟, 余量充足; 真假日仍会在 10 分钟后干净失败。
+          STALE_RETRY_DELAY=300
           SUCCESS=0
 
           # --- 幂等守卫 (防重复跑) ---
@@ -82,7 +90,8 @@ jobs:
             # 背景: 假日(09-25/10-01~07)与接口故障(09-10)日照常产出陈旧 scored json,
             #   污染 Rank IC 交易日对齐。指数日线日期 < 当日, 或价格与上一交易日
             #   ≥80% 相同 → 判定陈旧。
-            #   可重试: 收盘后指数日线偶有几分钟延迟, 30s 后重试通常恢复;
+            #   可重试: 收盘后指数日线偶有数分钟至十几分钟延迟, 用 STALE_RETRY_DELAY
+            #   (5 分钟) 退避重试, 最多等 10 分钟通常恢复;
             #   真假日则 3 次尝试后干净失败(不写评分数据), 由 17:30 补偿 cron 或
             #   次日任务兜底。延迟跨午夜的 run 同样会被拒 —— 宁可缺一天,
             #   不发布"数据日期≠发布日期"的错标报告(已知限制, 见 README)。
@@ -92,7 +101,7 @@ jobs:
             else
               echo "[$(date -u '+%H:%M:%S')] ❌ Stale/holiday data (attempt $ATTEMPT/$MAX_RETRIES)" >> $LOG
               echo "result=stale_data" >> $GITHUB_OUTPUT
-              [ $ATTEMPT -lt $MAX_RETRIES ] && sleep $RETRY_DELAY && continue
+              [ $ATTEMPT -lt $MAX_RETRIES ] && sleep $STALE_RETRY_DELAY && continue
               break
             fi
 

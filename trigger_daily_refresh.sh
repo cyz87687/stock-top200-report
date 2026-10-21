@@ -58,6 +58,41 @@ if [ "${HTTP_CODE}" = "200" ]; then
     exit 0
 fi
 
+# ---- 2.5 指数日线就绪守卫 (2026-10-21 新增) ----
+# 事故: 15:31 准点触发时个股行情已收盘更新, 但上证指数日线接口仍返回上一交易日,
+#       check_data_fresh.py 判 stale, workflow 重试窗口过短 → 当日 0 产出。
+# 策略: 触发前先探上证指数日线最新日期; 未到今日则每 60s 轮询, 最多等
+#       IDX_WAIT_MAX 分钟(默认 15)。超时仍触发(由 workflow 内 10 分钟退避接管),
+#       探测本身失败不阻塞触发。
+IDX_WAIT_MAX=${IDX_WAIT_MAX:-15}
+IDX_URL="https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh000001,day,,,3,qfq"
+_waited=0
+while :; do
+    IDX_LAST=$(curl -s --connect-timeout 10 --max-time 20 "${IDX_URL}" 2>/dev/null \
+        | /Users/yzreal/.workbuddy/binaries/python/envs/default/bin/python -c "
+import sys,json
+try:
+    d=json.load(sys.stdin)['data']['sh000001']
+    k=d.get('day') or d.get('qfqday') or []
+    print(k[-1][0] if k else '')
+except Exception:
+    print('')
+" 2>/dev/null)
+
+    if [ "${IDX_LAST}" = "${BJ_TODAY}" ]; then
+        echo "  指数日线已就绪: ${IDX_LAST}"
+        break
+    fi
+    if [ ${_waited} -ge $((IDX_WAIT_MAX * 60)) ]; then
+        echo "  ⚠️  指数日线等待 ${IDX_WAIT_MAX} 分钟仍未到 ${BJ_TODAY} (当前: ${IDX_LAST:-探测失败})"
+        echo "      仍继续触发, 交由 workflow 内退避重试接管"
+        break
+    fi
+    echo "  ⏳ 指数日线仍为 ${IDX_LAST:-未知}, 等待中 (${_waited}s / $((IDX_WAIT_MAX * 60))s) ..."
+    sleep 60
+    _waited=$((_waited + 60))
+done
+
 # ---- 3. 未产出 → 触发 workflow_dispatch ----
 echo "  ⏳ 当日数据缺失, 触发 workflow_dispatch ..."
 TRIGGER_OUT=$(gh workflow run "${WORKFLOW}" --repo "${REPO}" --ref main 2>&1)
