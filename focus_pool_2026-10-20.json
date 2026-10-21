@@ -1,6 +1,6 @@
 {
  "date": "2026-10-20",
- "generated_at": "2026-10-20 15:45:51",
+ "generated_at": "2026-10-21 09:10:29",
  "title": "每日 AI 焦点池",
  "method": "机器源(东财人气榜/涨跌停池/强势股池) + 本地AI联网检索(题材催化/公告/政策/龙虎榜)",
  "generated_by": "fetch_focus_list.py (互联网搜索: 东财人气榜/涨跌停池/强势股池 + Agent 检索)",
@@ -10,8 +10,8 @@
   "dt_pool": 0,
   "strong_pool": 20
  },
- "n_raw": 68,
- "elapsed_s": 5.0,
+ "n_raw": 63,
+ "elapsed_s": 1.4,
  "agent_search": {
   "merged": false,
   "n_additions": 0
@@ -29,26 +29,25 @@
     "强势股池",
     "涨停池"
    ],
-   "reason": "东财人气榜第7位；涨停4连板 首板09:25；强势股池（60日新高且近期多次涨停）",
+   "reason": "东财人气榜第8位；涨停4连板 首板09:25；强势股池（60日新高且近期多次涨停）",
    "ai_reason": "",
    "rank": 1,
    "in_main_pool": true,
    "sector": "计算机软件",
    "rating": "C",
-   "total": 31.71,
+   "total": 36.75,
    "price": 26.61,
    "pct_chg": 10.0
   },
   {
-   "name": "东安动力",
-   "code": "sh600178",
+   "name": "海洋王",
+   "code": "sz002724",
    "score": 4.5,
    "sources": [
     "人气榜",
-    "强势股池",
     "涨停池"
    ],
-   "reason": "东财人气榜第6位；涨停3连板 首板09:25；强势股池（60日新高且近期多次涨停）",
+   "reason": "东财人气榜第4位；涨停3连板 首板09:30",
    "ai_reason": "",
    "rank": 2,
    "in_main_pool": false,
@@ -66,7 +65,7 @@
     "人气榜",
     "涨停池"
    ],
-   "reason": "东财人气榜第10位；涨停3连板 首板09:25",
+   "reason": "东财人气榜第5位；涨停3连板 首板09:25",
    "ai_reason": "",
    "rank": 3,
    "in_main_pool": false,
@@ -77,14 +76,15 @@
    "pct_chg": null
   },
   {
-   "name": "海洋王",
-   "code": "sz002724",
+   "name": "东安动力",
+   "code": "sh600178",
    "score": 4.5,
    "sources": [
     "人气榜",
+    "强势股池",
     "涨停池"
    ],
-   "reason": "东财人气榜第15位；涨停3连板 首板09:30",
+   "reason": "东财人气榜第9位；涨停3连板 首板09:25；强势股池（60日新高且近期多次涨停）",
    "ai_reason": "",
    "rank": 4,
    "in_main_pool": false,
@@ -102,7 +102,7 @@
     "人气榜",
     "涨停池"
    ],
-   "reason": "东财人气榜第21位；涨停3连板 首板09:30",
+   "reason": "东财人气榜第16位；涨停3连板 首板09:30",
    "ai_reason": "",
    "rank": 5,
    "in_main_pool": false,
@@ -117,9 +117,10 @@
    "code": "sh600148",
    "score": 4.5,
    "sources": [
+    "人气榜",
     "涨停池"
    ],
-   "reason": "涨停3连板 首板09:30",
+   "reason": "东财人气榜第29位；涨停3连板 首板09:30",
    "ai_reason": "",
    "rank": 6,
    "in_main_pool": false,
@@ -138,13 +139,13 @@
     "强势股池",
     "涨停池"
    ],
-   "reason": "东财人气榜第5位；涨停2连板 首板09:34；强势股池（60日新高且近期多次涨停）",
+   "reason": "东财人气榜第7位；涨停2连板 首板09:34；强势股池（60日新高且近期多次涨停）",
    "ai_reason": "",
    "rank": 7,
    "in_main_pool": true,
    "sector": "高端制造",
-   "rating": "C",
-   "total": 40.35,
+   "rating": "B",
+   "total": 52.95,
    "price": 16.16,
    "pct_chg": 10.01
   },
@@ -168,24 +169,6 @@
    "pct_chg": 20.0
   },
   {
-   "name": "科森科技",
-   "code": "sh603626",
-   "score": 4.0,
-   "sources": [
-    "人气榜",
-    "涨停池"
-   ],
-   "reason": "东财人气榜第20位；涨停2连板 首板09:44",
-   "ai_reason": "",
-   "rank": 9,
-   "in_main_pool": true,
-   "sector": "电子制造",
-   "rating": "C",
-   "total": 41.43,
-   "price": 24.43,
-   "pct_chg": 9.99
-  },
-  {
    "name": "海正药业",
    "code": "sh600267",
    "score": 4.0,
@@ -194,15 +177,52 @@
     "强势股池",
     "涨停池"
    ],
-   "reason": "东财人气榜第30位；涨停2连板 首板09:30；强势股池（近期多次涨停）",
+   "reason": "东财人气榜第12位；涨停2连板 首板09:30；强势股池（近期多次涨停）",
    "ai_reason": "",
-   "rank": 10,
+   "rank": 9,
    "in_main_pool": true,
    "sector": "医药生物",
    "rating": "B",
    "total": 46.01,
    "price": 13.27,
    "pct_chg": 10.03
+  },
+  {
+   "name": "福莱新材",
+   "code": "sh605488",
+   "score": 4.0,
+   "sources": [
+    "人气榜",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第17位；涨停2连板 首板09:30；强势股池（近期多次涨停）",
+   "ai_reason": "",
+   "rank": 10,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "科森科技",
+   "code": "sh603626",
+   "score": 4.0,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第18位；涨停2连板 首板09:44",
+   "ai_reason": "",
+   "rank": 11,
+   "in_main_pool": true,
+   "sector": "电子制造",
+   "rating": "C",
+   "total": 44.17,
+   "price": 24.43,
+   "pct_chg": 9.99
   },
   {
    "name": "慕思股份",
@@ -212,24 +232,6 @@
     "涨停池"
    ],
    "reason": "涨停2连板 首板09:30",
-   "ai_reason": "",
-   "rank": 11,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "福莱新材",
-   "code": "sh605488",
-   "score": 4.0,
-   "sources": [
-    "强势股池",
-    "涨停池"
-   ],
-   "reason": "涨停2连板 首板09:30；强势股池（近期多次涨停）",
    "ai_reason": "",
    "rank": 12,
    "in_main_pool": false,
@@ -254,7 +256,7 @@
    "in_main_pool": true,
    "sector": "家电制造",
    "rating": "C",
-   "total": 31.56,
+   "total": 36.85,
    "price": 20.56,
    "pct_chg": 10.01
   },
@@ -266,27 +268,9 @@
     "人气榜",
     "涨停池"
    ],
-   "reason": "东财人气榜第13位；涨停 首板09:25",
+   "reason": "东财人气榜第10位；涨停 首板09:25",
    "ai_reason": "",
    "rank": 14,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "粤 传 媒",
-   "code": "sz002181",
-   "score": 3.5,
-   "sources": [
-    "人气榜",
-    "涨停池"
-   ],
-   "reason": "东财人气榜第16位；涨停 首板09:30",
-   "ai_reason": "",
-   "rank": 15,
    "in_main_pool": false,
    "sector": null,
    "rating": null,
@@ -302,9 +286,63 @@
     "人气榜",
     "涨停池"
    ],
-   "reason": "东财人气榜第24位；涨停 首板09:37",
+   "reason": "东财人气榜第14位；涨停 首板09:37",
+   "ai_reason": "",
+   "rank": 15,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "粤 传 媒",
+   "code": "sz002181",
+   "score": 3.5,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第15位；涨停 首板09:30",
    "ai_reason": "",
    "rank": 16,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "骏亚科技",
+   "code": "sh603386",
+   "score": 3.5,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第25位；涨停 首板09:36",
+   "ai_reason": "",
+   "rank": 17,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "日海智能",
+   "code": "sz002313",
+   "score": 3.5,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第27位；涨停 首板09:40",
+   "ai_reason": "",
+   "rank": 18,
    "in_main_pool": false,
    "sector": null,
    "rating": null,
@@ -322,7 +360,7 @@
    ],
    "reason": "涨停 首板09:25；强势股池（60日新高）",
    "ai_reason": "",
-   "rank": 17,
+   "rank": 19,
    "in_main_pool": false,
    "sector": null,
    "rating": null,
@@ -339,7 +377,7 @@
    ],
    "reason": "涨停 首板09:25",
    "ai_reason": "",
-   "rank": 18,
+   "rank": 20,
    "in_main_pool": false,
    "sector": null,
    "rating": null,
@@ -356,7 +394,7 @@
    ],
    "reason": "涨停 首板09:30",
    "ai_reason": "",
-   "rank": 19,
+   "rank": 21,
    "in_main_pool": false,
    "sector": null,
    "rating": null,
@@ -373,7 +411,7 @@
    ],
    "reason": "涨停 首板09:31",
    "ai_reason": "",
-   "rank": 20,
+   "rank": 22,
    "in_main_pool": false,
    "sector": null,
    "rating": null,
@@ -390,24 +428,7 @@
    ],
    "reason": "涨停 首板09:34",
    "ai_reason": "",
-   "rank": 21,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "骏亚科技",
-   "code": "sh603386",
-   "score": 3.5,
-   "sources": [
-    "涨停池"
-   ],
-   "reason": "涨停 首板09:36",
-   "ai_reason": "",
-   "rank": 22,
+   "rank": 23,
    "in_main_pool": false,
    "sector": null,
    "rating": null,
@@ -424,23 +445,6 @@
     "涨停池"
    ],
    "reason": "涨停 首板09:39；强势股池（60日新高）",
-   "ai_reason": "",
-   "rank": 23,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "日海智能",
-   "code": "sz002313",
-   "score": 3.5,
-   "sources": [
-    "涨停池"
-   ],
-   "reason": "涨停 首板09:40",
    "ai_reason": "",
    "rank": 24,
    "in_main_pool": false,
@@ -475,7 +479,7 @@
     "人气榜",
     "涨停池"
    ],
-   "reason": "东财人气榜第19位；涨停2连板 首板14:20",
+   "reason": "东财人气榜第20位；涨停2连板 首板14:20",
    "ai_reason": "",
    "rank": 26,
    "in_main_pool": true,
@@ -490,22 +494,23 @@
    "code": "sh603119",
    "score": 3.0,
    "sources": [
+    "人气榜",
     "强势股池",
     "涨停池"
    ],
-   "reason": "涨停2连板 首板10:03；强势股池（近期多次涨停）",
+   "reason": "东财人气榜第24位；涨停2连板 首板10:03；强势股池（近期多次涨停）",
    "ai_reason": "",
    "rank": 27,
    "in_main_pool": true,
    "sector": "汽车",
    "rating": "B",
-   "total": 51.73,
+   "total": 56.95,
    "price": 50.46,
    "pct_chg": 10.01
   },
   {
-   "name": "宇树科技-W",
-   "code": "sh688836",
+   "name": "云南锗业",
+   "code": "sz002428",
    "score": 2.9,
    "sources": [
     "人气榜"
@@ -514,11 +519,11 @@
    "ai_reason": "",
    "rank": 28,
    "in_main_pool": true,
-   "sector": "高端制造",
-   "rating": "B",
-   "total": 46.75,
-   "price": 526.03,
-   "pct_chg": 6.07
+   "sector": "有色资源",
+   "rating": "A",
+   "total": 71.63,
+   "price": 78.92,
+   "pct_chg": 2.88
   },
   {
    "name": "长盈精密",
@@ -534,26 +539,26 @@
    "in_main_pool": true,
    "sector": "电子制造",
    "rating": "B",
-   "total": 56.87,
+   "total": 58.53,
    "price": 24.67,
    "pct_chg": 19.99
   },
   {
-   "name": "新华传媒",
-   "code": "sh600825",
-   "score": 2.7,
+   "name": "宇树科技-W",
+   "code": "sh688836",
+   "score": 2.5,
    "sources": [
     "人气榜"
    ],
-   "reason": "东财人气榜第4位",
+   "reason": "东财人气榜第6位",
    "ai_reason": "",
    "rank": 30,
    "in_main_pool": true,
-   "sector": "传媒娱乐",
-   "rating": "C",
-   "total": 25.52,
-   "price": 15.19,
-   "pct_chg": -2.5
+   "sector": "高端制造",
+   "rating": "B",
+   "total": 59.35,
+   "price": 526.03,
+   "pct_chg": 6.07
   },
   {
    "name": "南威软件",
@@ -564,51 +569,32 @@
     "强势股池",
     "涨停池"
    ],
-   "reason": "东财人气榜第14位；涨停 首板14:13；强势股池（60日新高且近期多次涨停）",
+   "reason": "东财人气榜第13位；涨停 首板14:13；强势股池（60日新高且近期多次涨停）",
    "ai_reason": "",
    "rank": 31,
    "in_main_pool": true,
    "sector": "计算机软件",
    "rating": "C",
-   "total": 29.83,
+   "total": 42.43,
    "price": 8.89,
    "pct_chg": 10.03
   },
   {
-   "name": "百洋股份",
-   "code": "sz002696",
+   "name": "移远通信",
+   "code": "sh603236",
    "score": 2.5,
    "sources": [
     "人气榜",
-    "强势股池",
     "涨停池"
    ],
-   "reason": "东财人气榜第18位；涨停 首板13:40；强势股池（近期多次涨停）",
+   "reason": "东财人气榜第19位；涨停 首板10:04",
    "ai_reason": "",
    "rank": 32,
    "in_main_pool": true,
-   "sector": "农业",
-   "rating": "C",
-   "total": 31.75,
-   "price": 9.56,
-   "pct_chg": 10.01
-  },
-  {
-   "name": "瑞芯微",
-   "code": "sh603893",
-   "score": 2.5,
-   "sources": [
-    "人气榜",
-    "涨停池"
-   ],
-   "reason": "东财人气榜第25位；涨停 首板10:49",
-   "ai_reason": "",
-   "rank": 33,
-   "in_main_pool": true,
    "sector": "AI/半导体",
    "rating": "B",
-   "total": 61.9,
-   "price": 189.04,
+   "total": 60.43,
+   "price": 76.11,
    "pct_chg": 10.0
   },
   {
@@ -619,9 +605,9 @@
     "人气榜",
     "涨停池"
    ],
-   "reason": "东财人气榜第26位；涨停 首板13:26",
+   "reason": "东财人气榜第21位；涨停 首板13:26",
    "ai_reason": "",
-   "rank": 34,
+   "rank": 33,
    "in_main_pool": false,
    "sector": null,
    "rating": null,
@@ -637,33 +623,15 @@
     "人气榜",
     "涨停池"
    ],
-   "reason": "东财人气榜第27位；涨停 首板10:39",
+   "reason": "东财人气榜第22位；涨停 首板10:39",
    "ai_reason": "",
-   "rank": 35,
+   "rank": 34,
    "in_main_pool": true,
    "sector": "医药生物",
    "rating": "B",
-   "total": 51.32,
+   "total": 56.72,
    "price": 21.79,
    "pct_chg": 19.99
-  },
-  {
-   "name": "移远通信",
-   "code": "sh603236",
-   "score": 2.5,
-   "sources": [
-    "人气榜",
-    "涨停池"
-   ],
-   "reason": "东财人气榜第28位；涨停 首板10:04",
-   "ai_reason": "",
-   "rank": 36,
-   "in_main_pool": true,
-   "sector": "AI/半导体",
-   "rating": "B",
-   "total": 56.15,
-   "price": 76.11,
-   "pct_chg": 10.0
   },
   {
    "name": "赛摩智能",
@@ -674,15 +642,52 @@
     "强势股池",
     "涨停池"
    ],
-   "reason": "东财人气榜第29位；涨停 首板10:06；强势股池（60日新高）",
+   "reason": "东财人气榜第23位；涨停 首板10:06；强势股池（60日新高）",
    "ai_reason": "",
-   "rank": 37,
+   "rank": 35,
    "in_main_pool": false,
    "sector": null,
    "rating": null,
    "total": null,
    "price": null,
    "pct_chg": null
+  },
+  {
+   "name": "百洋股份",
+   "code": "sz002696",
+   "score": 2.5,
+   "sources": [
+    "人气榜",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第26位；涨停 首板13:40；强势股池（近期多次涨停）",
+   "ai_reason": "",
+   "rank": 36,
+   "in_main_pool": true,
+   "sector": "农业",
+   "rating": "C",
+   "total": 26.24,
+   "price": 9.56,
+   "pct_chg": 10.01
+  },
+  {
+   "name": "瑞芯微",
+   "code": "sh603893",
+   "score": 2.5,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第28位；涨停 首板10:49",
+   "ai_reason": "",
+   "rank": 37,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "A",
+   "total": 68.74,
+   "price": 189.04,
+   "pct_chg": 10.0
   },
   {
    "name": "永达股份",
@@ -715,7 +720,7 @@
    "in_main_pool": true,
    "sector": "电子制造",
    "rating": "B",
-   "total": 45.61,
+   "total": 51.05,
    "price": 38.26,
    "pct_chg": 10.01
   },

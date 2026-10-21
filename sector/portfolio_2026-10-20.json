@@ -131,7 +131,7 @@
      "pct_chg": 0,
      "turnover_ratio": 3.518,
      "circ_mv": 169339198464.0,
-     "rsi": 23.3,
+     "rsi": 23.2,
      "trend": "双线空头",
      "sector_r60": 4,
      "sector_r10": 119,
@@ -194,6 +194,31 @@
      "score_theme": 2.45
     },
     {
+     "name": "风语筑",
+     "code": "sh603466",
+     "sector_l2": "数字媒体",
+     "parent": "传媒",
+     "total": 39.09,
+     "rating": "C",
+     "adj_total": 19.55,
+     "amt_rank": 102,
+     "price": 14.23,
+     "pct_chg": 7.23,
+     "turnover_ratio": 23.947,
+     "circ_mv": 8464458848.0,
+     "rsi": 63.6,
+     "trend": "日线多头",
+     "sector_r60": 3,
+     "sector_r10": 1,
+     "sector_mom60": 25.68,
+     "sector_mom10": 7.52,
+     "score_sector": 0.6,
+     "score_news": 1.5,
+     "score_tech": 3.83,
+     "score_fund": 3.7,
+     "score_theme": 4.04
+    },
+    {
      "name": "博纳影业",
      "code": "sz001330",
      "sector_l2": "影视院线",
@@ -217,31 +242,6 @@
      "score_tech": 3.58,
      "score_fund": 3.4,
      "score_theme": 3.57
-    },
-    {
-     "name": "中文在线",
-     "code": "sz300364",
-     "sector_l2": "出版",
-     "parent": "传媒",
-     "total": 34.3,
-     "rating": "C",
-     "adj_total": 17.15,
-     "amt_rank": 144,
-     "price": 24.27,
-     "pct_chg": 2.23,
-     "turnover_ratio": 10.67,
-     "circ_mv": 16044549041.0,
-     "rsi": 49.3,
-     "trend": "双线多头",
-     "sector_r60": 1,
-     "sector_r10": 4,
-     "sector_mom60": 26.03,
-     "sector_mom10": 5.97,
-     "score_sector": 0.42,
-     "score_news": 0.0,
-     "score_tech": 4.3,
-     "score_fund": 2.2,
-     "score_theme": 3.45
     },
     {
      "name": "长城军工",
@@ -285,7 +285,7 @@
     {
      "level": "L1 放宽: 60日排名>70 ∩ 10日排名>70",
      "n_sectors": 25,
-     "n_cands": 169,
+     "n_cands": 170,
      "sectors": [
       "专业工程",
       "乘用车",
@@ -329,7 +329,7 @@
     "非金属材料Ⅱ",
     "风电设备"
    ],
-   "n_candidates": 169,
+   "n_candidates": 170,
    "pool_used": 490,
    "eligibility": {
     "before": 490,
@@ -341,15 +341,15 @@
      "parent": "电子",
      "n": 2,
      "share": 0.25,
-     "base_share": 0.544,
-     "dev_pp": -29.4
+     "base_share": 0.541,
+     "dev_pp": -29.1
     },
     {
      "parent": "电力设备",
      "n": 2,
      "share": 0.25,
-     "base_share": 0.178,
-     "dev_pp": 7.2
+     "base_share": 0.176,
+     "dev_pp": 7.4
     },
     {
      "parent": "有色金属",
@@ -391,6 +391,14 @@
      "base_share": 0.012
     },
     {
+     "name": "联瑞新材",
+     "code": "sh688300",
+     "parent": "基础化工",
+     "reason": "l1_deviation",
+     "would_share": 0.1,
+     "base_share": 0.006
+    },
+    {
      "name": "中国巨石",
      "code": "sh600176",
      "parent": "建筑材料",
@@ -420,7 +428,7 @@
      "parent": "通信",
      "reason": "l1_deviation",
      "would_share": 0.1,
-     "base_share": 0.012
+     "base_share": 0.018
     },
     {
      "name": "赛力斯",
@@ -463,6 +471,14 @@
      "base_share": 0.012
     },
     {
+     "name": "石药创新",
+     "code": "sz300765",
+     "parent": "医药生物",
+     "reason": "l1_deviation",
+     "would_share": 0.2,
+     "base_share": 0.059
+    },
+    {
      "name": "江淮汽车",
      "code": "sh600418",
      "parent": "汽车",
@@ -479,14 +495,6 @@
      "base_share": 0.059
     },
     {
-     "name": "石药创新",
-     "code": "sz300765",
-     "parent": "医药生物",
-     "reason": "l1_deviation",
-     "would_share": 0.2,
-     "base_share": 0.059
-    },
-    {
      "name": "百济神州",
      "code": "sh688235",
      "parent": "医药生物",
@@ -495,20 +503,20 @@
      "base_share": 0.059
     },
     {
-     "name": "联瑞新材",
-     "code": "sh688300",
-     "parent": "基础化工",
-     "reason": "l1_deviation",
-     "would_share": 0.1,
-     "base_share": 0.006
-    },
-    {
      "name": "润建股份",
      "code": "sz002929",
      "parent": "通信",
      "reason": "l1_deviation",
      "would_share": 0.1,
-     "base_share": 0.012
+     "base_share": 0.018
+    },
+    {
+     "name": "翰宇药业",
+     "code": "sz300199",
+     "parent": "医药生物",
+     "reason": "l1_deviation",
+     "would_share": 0.2,
+     "base_share": 0.059
     },
     {
      "name": "科伦药业",
@@ -519,8 +527,8 @@
      "base_share": 0.059
     },
     {
-     "name": "翰宇药业",
-     "code": "sz300199",
+     "name": "莱美药业",
+     "code": "sz300006",
      "parent": "医药生物",
      "reason": "l1_deviation",
      "would_share": 0.2,
@@ -559,12 +567,12 @@
      "base_share": 0.059
     },
     {
-     "name": "莱美药业",
-     "code": "sz300006",
-     "parent": "医药生物",
+     "name": "中国移动",
+     "code": "sh600941",
+     "parent": "通信",
      "reason": "l1_deviation",
-     "would_share": 0.2,
-     "base_share": 0.059
+     "would_share": 0.1,
+     "base_share": 0.018
     }
    ],
    "route_weight": 1.0,
@@ -574,9 +582,9 @@
      "code": "sh603986",
      "sector_l2": "半导体",
      "parent": "电子",
-     "total": 89.82,
+     "total": 93.42,
      "rating": "S",
-     "adj_total": 89.82,
+     "adj_total": 93.42,
      "amt_rank": 7,
      "price": 282.43,
      "pct_chg": 0,
@@ -589,7 +597,7 @@
      "sector_mom60": -6.74,
      "sector_mom10": -16.23,
      "score_sector": 3.28,
-     "score_news": 4.0,
+     "score_news": 5.0,
      "score_tech": 2.23,
      "score_fund": 4.7,
      "score_theme": 3.01
@@ -633,14 +641,14 @@
      "turnover_ratio": 2.986,
      "circ_mv": 100197569215.0,
      "rsi": 26.0,
-     "trend": "双线空头",
+     "trend": "日线空头",
      "sector_r60": 119,
      "sector_r10": 123,
      "sector_mom60": -6.74,
      "sector_mom10": -16.23,
      "score_sector": 3.28,
      "score_news": 4.5,
-     "score_tech": 2.23,
+     "score_tech": 2.55,
      "score_fund": 5.0,
      "score_theme": 2.52
     },
@@ -658,41 +666,16 @@
      "turnover_ratio": 1.786,
      "circ_mv": 93055731816.0,
      "rsi": 29.7,
-     "trend": "双线空头",
+     "trend": "日线空头",
      "sector_r60": 87,
      "sector_r10": 96,
      "sector_mom60": 3.02,
      "sector_mom10": -6.01,
      "score_sector": 3.28,
      "score_news": 4.5,
-     "score_tech": 1.73,
+     "score_tech": 2.05,
      "score_fund": 5.0,
      "score_theme": 2.59
-    },
-    {
-     "name": "中钨高新",
-     "code": "sz000657",
-     "sector_l2": "小金属",
-     "parent": "有色金属",
-     "total": 82.43,
-     "rating": "A",
-     "adj_total": 82.43,
-     "amt_rank": 123,
-     "price": 43.81,
-     "pct_chg": 2.38,
-     "turnover_ratio": 2.872,
-     "circ_mv": 63675732427.0,
-     "rsi": 25.2,
-     "trend": "双线空头",
-     "sector_r60": 116,
-     "sector_r10": 109,
-     "sector_mom60": -4.63,
-     "sector_mom10": -8.88,
-     "score_sector": 3.28,
-     "score_news": 3.5,
-     "score_tech": 1.73,
-     "score_fund": 4.7,
-     "score_theme": 2.48
     },
     {
      "name": "赣锋锂业",
@@ -708,16 +691,41 @@
      "turnover_ratio": 3.899,
      "circ_mv": 45789758141.0,
      "rsi": 23.9,
-     "trend": "双线空头",
+     "trend": "日线空头",
      "sector_r60": 124,
      "sector_r10": 117,
      "sector_mom60": -12.2,
      "sector_mom10": -10.62,
      "score_sector": 3.28,
      "score_news": 4.5,
-     "score_tech": 2.94,
+     "score_tech": 3.25,
      "score_fund": 4.3,
      "score_theme": 2.15
+    },
+    {
+     "name": "厦门钨业",
+     "code": "sh600549",
+     "sector_l2": "小金属",
+     "parent": "有色金属",
+     "total": 78.71,
+     "rating": "A",
+     "adj_total": 78.71,
+     "amt_rank": 311,
+     "price": 36.94,
+     "pct_chg": 0.9,
+     "turnover_ratio": 1.653,
+     "circ_mv": 57402247341.0,
+     "rsi": 22.5,
+     "trend": "双线空头",
+     "sector_r60": 116,
+     "sector_r10": 109,
+     "sector_mom60": -4.63,
+     "sector_mom10": -8.88,
+     "score_sector": 3.28,
+     "score_news": 3.0,
+     "score_tech": 1.73,
+     "score_fund": 4.7,
+     "score_theme": 2.04
     },
     {
      "name": "宏和科技",
