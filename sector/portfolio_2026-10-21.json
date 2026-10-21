@@ -1,0 +1,470 @@
+{
+ "date": "2026-10-21",
+ "momentum_date": "2026-10-21",
+ "top": 10,
+ "per_sector": 3,
+ "per_parent": 2,
+ "route_pool_map": {
+  "momentum": 200,
+  "reversal": 491
+ },
+ "momentum_route_weight": 0.5,
+ "portfolios": {
+  "momentum": {
+   "level_used": "L4 最终兜底: 60日动量前20",
+   "target_rule": "L0 严格: 60日动量第1 ∩ 10日动量前3",
+   "level_trace": [
+    {
+     "level": "L0 严格: 60日动量第1 ∩ 10日动量前3",
+     "n_sectors": 1,
+     "n_cands": 2,
+     "sectors": [
+      "出版"
+     ]
+    },
+    {
+     "level": "L1 放宽: 60日动量前3 ∩ 10日前5",
+     "n_sectors": 3,
+     "n_cands": 5,
+     "sectors": [
+      "出版",
+      "影视院线",
+      "数字媒体"
+     ]
+    },
+    {
+     "level": "L2 再放宽: 60日前5 ∩ 10日前10",
+     "n_sectors": 4,
+     "n_cands": 5,
+     "sectors": [
+      "出版",
+      "影视院线",
+      "数字媒体",
+      "照明设备Ⅱ"
+     ]
+    },
+    {
+     "level": "L3 兜底: 60日动量前10",
+     "n_sectors": 10,
+     "n_cands": 7,
+     "sectors": [
+      "农产品加工",
+      "出版",
+      "地面兵装Ⅱ",
+      "影视院线",
+      "房地产服务",
+      "教育",
+      "数字媒体",
+      "照明设备Ⅱ",
+      "种植业",
+      "装修装饰Ⅱ"
+     ]
+    },
+    {
+     "level": "L4 最终兜底: 60日动量前20",
+     "n_sectors": 20,
+     "n_cands": 29,
+     "sectors": [
+      "元件",
+      "农产品加工",
+      "出版",
+      "厨卫电器",
+      "国有大型银行Ⅱ",
+      "地面兵装Ⅱ",
+      "家居用品",
+      "小家电",
+      "广告营销",
+      "影视院线",
+      "房地产服务",
+      "教育"
+     ]
+    }
+   ],
+   "sectors": [
+    "元件",
+    "农产品加工",
+    "出版",
+    "厨卫电器",
+    "国有大型银行Ⅱ",
+    "地面兵装Ⅱ",
+    "家居用品",
+    "小家电",
+    "广告营销",
+    "影视院线",
+    "房地产服务",
+    "教育",
+    "数字媒体",
+    "文娱用品",
+    "渔业",
+    "焦炭Ⅱ",
+    "照明设备Ⅱ",
+    "电视广播Ⅱ",
+    "种植业",
+    "装修装饰Ⅱ"
+   ],
+   "n_candidates": 29,
+   "pool_used": 200,
+   "eligibility": {
+    "before": 200,
+    "after": 200,
+    "dropped": 0
+   },
+   "exposure": [
+    {
+     "parent": "电子",
+     "n": 2,
+     "share": 0.286,
+     "base_share": 0.655,
+     "dev_pp": -36.9
+    },
+    {
+     "parent": "传媒",
+     "n": 2,
+     "share": 0.286,
+     "base_share": 0.241,
+     "dev_pp": 4.4
+    },
+    {
+     "parent": "农林牧渔",
+     "n": 1,
+     "share": 0.143,
+     "base_share": 0.034,
+     "dev_pp": 10.8
+    },
+    {
+     "parent": "银行",
+     "n": 1,
+     "share": 0.143,
+     "base_share": 0.034,
+     "dev_pp": 10.8
+    },
+    {
+     "parent": "国防军工",
+     "n": 1,
+     "share": 0.143,
+     "base_share": 0.034,
+     "dev_pp": 10.8
+    }
+   ],
+   "l1_capped": [],
+   "route_weight": 0.5,
+   "picks": [
+    {
+     "name": "东山精密",
+     "code": "sz002384",
+     "sector_l2": "元件",
+     "parent": "电子",
+     "total": 87.48,
+     "rating": "S",
+     "adj_total": 43.74,
+     "amt_rank": 9,
+     "price": 123.17,
+     "pct_chg": 0.83,
+     "turnover_ratio": 3.648,
+     "circ_mv": 170753246622.0,
+     "rsi": 24.3,
+     "trend": "双线空头",
+     "sector_r60": 13,
+     "sector_r10": 109,
+     "sector_mom60": 15.82,
+     "sector_mom10": -8.33,
+     "score_sector": 2.08,
+     "score_news": 4.0,
+     "score_tech": 2.23,
+     "score_fund": 5.0,
+     "score_theme": 2.75
+    },
+    {
+     "name": "生益科技",
+     "code": "sh600183",
+     "sector_l2": "元件",
+     "parent": "电子",
+     "total": 83.11,
+     "rating": "A",
+     "adj_total": 41.55,
+     "amt_rank": 6,
+     "price": 118.99,
+     "pct_chg": 1.5,
+     "turnover_ratio": 2.493,
+     "circ_mv": 286973996494.0,
+     "rsi": 37.9,
+     "trend": "双线空头",
+     "sector_r60": 13,
+     "sector_r10": 109,
+     "sector_mom60": 15.82,
+     "sector_mom10": -8.33,
+     "score_sector": 2.08,
+     "score_news": 5.0,
+     "score_tech": 2.58,
+     "score_fund": 5.0,
+     "score_theme": 2.92
+    },
+    {
+     "name": "蓝色光标",
+     "code": "sz300058",
+     "sector_l2": "广告营销",
+     "parent": "传媒",
+     "total": 43.02,
+     "rating": "C",
+     "adj_total": 21.51,
+     "amt_rank": 163,
+     "price": 12.22,
+     "pct_chg": 0.16,
+     "turnover_ratio": 3.611,
+     "circ_mv": 42500308046.0,
+     "rsi": 43.0,
+     "trend": "双线空头",
+     "sector_r60": 15,
+     "sector_r10": 7,
+     "sector_mom60": 15.45,
+     "sector_mom10": 3.18,
+     "score_sector": 1.36,
+     "score_news": 0.0,
+     "score_tech": 1.44,
+     "score_fund": 1.82,
+     "score_theme": 2.57
+    },
+    {
+     "name": "天娱数科",
+     "code": "sz002354",
+     "sector_l2": "广告营销",
+     "parent": "传媒",
+     "total": 38.67,
+     "rating": "C",
+     "adj_total": 19.34,
+     "amt_rank": 57,
+     "price": 7.91,
+     "pct_chg": 3.0,
+     "turnover_ratio": 20.242,
+     "circ_mv": 12869520792.0,
+     "rsi": 55.9,
+     "trend": "周线空头",
+     "sector_r60": 15,
+     "sector_r10": 7,
+     "sector_mom60": 15.45,
+     "sector_mom10": 3.18,
+     "score_sector": 1.36,
+     "score_news": 0.8,
+     "score_tech": 2.19,
+     "score_fund": 1.9,
+     "score_theme": 3.64
+    },
+    {
+     "name": "金健米业",
+     "code": "sh600127",
+     "sector_l2": "农产品加工",
+     "parent": "农林牧渔",
+     "total": 34.33,
+     "rating": "C",
+     "adj_total": 17.16,
+     "amt_rank": 55,
+     "price": 13.61,
+     "pct_chg": 2.79,
+     "turnover_ratio": 30.702,
+     "circ_mv": 8734669597.0,
+     "rsi": 50.8,
+     "trend": "周线多头",
+     "sector_r60": 8,
+     "sector_r10": 35,
+     "sector_mom60": 19.47,
+     "sector_mom10": -2.45,
+     "score_sector": 1.56,
+     "score_news": 0.5,
+     "score_tech": 3.38,
+     "score_fund": 0.6,
+     "score_theme": 3.16
+    },
+    {
+     "name": "XD农业银",
+     "code": "sh601288",
+     "sector_l2": "国有大型银行Ⅱ",
+     "parent": "银行",
+     "total": 32.89,
+     "rating": "C",
+     "adj_total": 16.45,
+     "amt_rank": 66,
+     "price": 7.29,
+     "pct_chg": 0.14,
+     "turnover_ratio": 0.107,
+     "circ_mv": 2327290296564.0,
+     "rsi": 68.0,
+     "trend": "双线多头",
+     "sector_r60": 12,
+     "sector_r10": 4,
+     "sector_mom60": 16.3,
+     "sector_mom10": 5.17,
+     "score_sector": 1.2,
+     "score_news": 1.0,
+     "score_tech": 4.05,
+     "score_fund": 1.82,
+     "score_theme": 2.92
+    },
+    {
+     "name": "长城军工",
+     "code": "sh601606",
+     "sector_l2": "地面兵装Ⅱ",
+     "parent": "国防军工",
+     "total": 28.9,
+     "rating": "C",
+     "adj_total": 14.45,
+     "amt_rank": 172,
+     "price": 32.46,
+     "pct_chg": 1.53,
+     "turnover_ratio": 6.258,
+     "circ_mv": 23508453864.0,
+     "rsi": 52.5,
+     "trend": "金叉",
+     "sector_r60": 6,
+     "sector_r10": 5,
+     "sector_mom60": 23.4,
+     "sector_mom10": 4.49,
+     "score_sector": 0.84,
+     "score_news": 0.0,
+     "score_tech": 3.12,
+     "score_fund": 0.6,
+     "score_theme": 3.09
+    }
+   ]
+  },
+  "reversal": {
+   "level_used": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+   "target_rule": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+   "level_trace": [
+    {
+     "level": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+     "n_sectors": 3,
+     "n_cands": 73,
+     "sectors": [
+      "半导体",
+      "电子化学品Ⅱ",
+      "能源金属"
+     ]
+    }
+   ],
+   "sectors": [
+    "半导体",
+    "电子化学品Ⅱ",
+    "能源金属"
+   ],
+   "n_candidates": 73,
+   "pool_used": 490,
+   "eligibility": {
+    "before": 491,
+    "after": 490,
+    "dropped": 1
+   },
+   "exposure": [
+    {
+     "parent": "电子",
+     "n": 2,
+     "share": 0.667,
+     "base_share": 0.959,
+     "dev_pp": -29.2
+    },
+    {
+     "parent": "有色金属",
+     "n": 1,
+     "share": 0.333,
+     "base_share": 0.041,
+     "dev_pp": 29.2
+    }
+   ],
+   "l1_capped": [
+    {
+     "name": "天齐锂业",
+     "code": "sz002466",
+     "parent": "有色金属",
+     "reason": "l1_deviation",
+     "would_share": 0.2,
+     "base_share": 0.041
+    },
+    {
+     "name": "赣锋锂业",
+     "code": "sz002460",
+     "parent": "有色金属",
+     "reason": "l1_deviation",
+     "would_share": 0.2,
+     "base_share": 0.041
+    }
+   ],
+   "route_weight": 1.0,
+   "picks": [
+    {
+     "name": "兆易创新",
+     "code": "sh603986",
+     "sector_l2": "半导体",
+     "parent": "电子",
+     "total": 91.64,
+     "rating": "S",
+     "adj_total": 91.64,
+     "amt_rank": 5,
+     "price": 288.02,
+     "pct_chg": 1.98,
+     "turnover_ratio": 4.069,
+     "circ_mv": 193180292543.0,
+     "rsi": 29.7,
+     "trend": "双线空头",
+     "sector_r60": 123,
+     "sector_r10": 123,
+     "sector_mom60": -15.04,
+     "sector_mom10": -13.57,
+     "score_sector": 3.28,
+     "score_news": 4.5,
+     "score_tech": 2.23,
+     "score_fund": 4.7,
+     "score_theme": 3.2
+    },
+    {
+     "name": "长川科技",
+     "code": "sz300604",
+     "sector_l2": "半导体",
+     "parent": "电子",
+     "total": 91.16,
+     "rating": "S",
+     "adj_total": 91.16,
+     "amt_rank": 60,
+     "price": 202.14,
+     "pct_chg": -0.57,
+     "turnover_ratio": 2.516,
+     "circ_mv": 99620956378.0,
+     "rsi": 25.7,
+     "trend": "双线空头",
+     "sector_r60": 123,
+     "sector_r10": 123,
+     "sector_mom60": -15.04,
+     "sector_mom10": -13.57,
+     "score_sector": 3.28,
+     "score_news": 4.5,
+     "score_tech": 2.23,
+     "score_fund": 5.0,
+     "score_theme": 2.53
+    },
+    {
+     "name": "华友钴业",
+     "code": "sh603799",
+     "sector_l2": "能源金属",
+     "parent": "有色金属",
+     "total": 80.98,
+     "rating": "A",
+     "adj_total": 80.98,
+     "amt_rank": 270,
+     "price": 31.74,
+     "pct_chg": -1.61,
+     "turnover_ratio": 1.684,
+     "circ_mv": 59912652433.0,
+     "rsi": 28.3,
+     "trend": "双线空头",
+     "sector_r60": 124,
+     "sector_r10": 122,
+     "sector_mom60": -18.54,
+     "sector_mom10": -12.37,
+     "score_sector": 3.28,
+     "score_news": 4.5,
+     "score_tech": 1.73,
+     "score_fund": 4.1,
+     "score_theme": 2.11
+    }
+   ]
+  }
+ }
+}
