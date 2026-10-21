@@ -25,7 +25,12 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # 【2026-10-21 调整 90→120】事故: run 39576745437 中 step2 耗时 78 分钟
+    # (海外 runner 拉腾讯/东财 491只K线极慢), 后续 5 步仅 5 分钟, 却在
+    # track_recommendations 阶段撞上 90 分钟硬超时被 cancelled → push 步骤被 skip,
+    # 结果「数据已算出但没上线」。预算必须覆盖最坏情况: 78(step2)+10(stale退避)
+    # +15(后续) ≈ 103 分钟, 故提到 120 分钟留余量。
+    timeout-minutes: 120
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -114,10 +119,14 @@ jobs:
             fi
 
             echo "[$(date -u '+%H:%M:%S')] Running step2_stockscorer_v2.py ..." >> $LOG
-            if python3 step2_stockscorer_v2.py "$INPUT_JSON" >> $LOG 2>&1; then
+            # 【2026-10-21 加超时保护】step2 是耗时大头(海外 runner 拉 491 只K线 + 财务,
+            #   实测 78 分钟)。加 5400s(90min) 硬上限: 保证即使极端劣化也留出
+            #   后续 6 步(AI评估/板块/组合/跟踪/因子/报告/push 约 15 分钟)的预算,
+            #   避免重演 run 39576745437「算了 78 分钟却没推上去」。
+            if timeout 5400 python3 step2_stockscorer_v2.py "$INPUT_JSON" >> $LOG 2>&1; then
               echo "[$(date -u '+%H:%M:%S')] ✅ Scoring succeeded" >> $LOG
             else
-              echo "[$(date -u '+%H:%M:%S')] ❌ Scoring failed" >> $LOG
+              echo "[$(date -u '+%H:%M:%S')] ❌ Scoring failed/timeout(5400s)" >> $LOG
               [ $ATTEMPT -lt $MAX_RETRIES ] && sleep $RETRY_DELAY && continue
               break
             fi
@@ -182,10 +191,14 @@ jobs:
             # ⚠️ 必须在 gen_report_top200.py 之前运行: 报告层会读取 recommendation_track.json
             #    渲染「📊 推荐跟踪 · 胜率验证」区块, 故需先记录当日快照并回填历史 T+N。
             echo "[$(date -u '+%H:%M:%S')] Running track_recommendations.py (snapshot + T+N backfill) ..." >> $LOG
-            if python3 track_recommendations.py "$SCORED_JSON" >> $LOG 2>&1; then
+            # 【2026-10-21 加超时保护】该步会回填历史 T+N 收益(需联网拉历史K线),
+            #   实测在海外 runner 上曾挂住 7 分钟以上且零输出。若它卡死会挤占
+            #   后续 gen_report/push 的预算(见 run 39576745437 被 90min 硬杀的教训)。
+            #   设 600s 上限: 超时仅跳过跟踪(报告降级为上一快照), 不阻塞主线出稿推送。
+            if timeout 600 python3 track_recommendations.py "$SCORED_JSON" >> $LOG 2>&1; then
               echo "[$(date -u '+%H:%M:%S')] ✅ Recommendation tracking updated" >> $LOG
             else
-              echo "[$(date -u '+%H:%M:%S')] ⚠️ Recommendation tracking failed, report will show last snapshot" >> $LOG
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ Recommendation tracking failed/timeout(600s), report will show last snapshot" >> $LOG
             fi
 
             # Step 3.96: 因子有效性评估 (Rank IC) → factor_ic.json + factor_history.json
