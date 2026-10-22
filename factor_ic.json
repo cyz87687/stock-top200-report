@@ -1,6 +1,6 @@
 {
- "date": "2026-10-21",
- "generated_at": "2026-10-22 11:50:20",
+ "date": "2026-10-22",
+ "generated_at": "2026-10-22 14:39:26",
  "method": {
   "name": "Rank IC（Spearman 秩相关，修正口径）",
   "formula": "IC(t→t+h) = Spearman(因子值_t 截面秩, 收益率 t→第h个后续交易日)",
@@ -14,8 +14,8 @@
   "quantile_spread": "每截面按因子分 5 组，头部组均值收益 − 尾部组均值收益（未扣成本，毛利口径）",
   "bonferroni": "30 次检验（5因子×3周期），校正阈值 |NW t|≥3.08；宽松阈值 |t|≥2.0"
  },
- "n_snapshots": 76,
- "n_snapshots_raw": 83,
+ "n_snapshots": 77,
+ "n_snapshots_raw": 84,
  "stale_snapshots_dropped": [
   "2026-09-25",
   "2026-10-01",
@@ -32,7 +32,7 @@
  ],
  "snapshot_range": [
   "2026-06-26",
-  "2026-10-21"
+  "2026-10-22"
  ],
  "snapshot_dates": [
   "2026-06-26",
@@ -110,7 +110,8 @@
   "2026-10-16",
   "2026-10-19",
   "2026-10-20",
-  "2026-10-21"
+  "2026-10-21",
+  "2026-10-22"
  ],
  "price_backfill": {
   "available": true,
@@ -3248,7 +3249,7 @@
  "recommendation_ic": {
   "horizons": {
    "1": {
-    "n": 9,
+    "n": 10,
     "dates": [
      "2026-10-08",
      "2026-10-09",
@@ -3258,7 +3259,8 @@
      "2026-10-15",
      "2026-10-16",
      "2026-10-19",
-     "2026-10-20"
+     "2026-10-20",
+     "2026-10-21"
     ],
     "ic_series": [
      -0.1348,
@@ -3269,47 +3271,55 @@
      -0.022,
      0.1109,
      -0.1404,
-     0.0717
+     0.0717,
+     -0.095
     ],
-    "ic_mean": -0.1305,
-    "ic_std": 0.1685,
-    "t_stat": -2.32,
-    "nw_t": -2.47,
+    "ic_mean": -0.127,
+    "ic_std": 0.1592,
+    "t_stat": -2.52,
+    "nw_t": -2.66,
     "bonferroni_sig": false,
-    "win_rate": 22.2,
-    "spread_mean": -0.717,
-    "subperiod": null,
+    "win_rate": 20.0,
+    "spread_mean": -0.872,
+    "subperiod": {
+     "first_half_mean": -0.239,
+     "second_half_mean": -0.015,
+     "sign_stable_pct": 80.0,
+     "regime_shift": false
+    },
     "verdict": "样本积累中",
     "verdict_color": "#94a3b8",
-    "verdict_note": "n=9<20"
+    "verdict_note": "n=10<20"
    },
    "5": {
-    "n": 5,
+    "n": 6,
     "dates": [
      "2026-10-08",
      "2026-10-09",
      "2026-10-12",
      "2026-10-13",
-     "2026-10-14"
+     "2026-10-14",
+     "2026-10-15"
     ],
     "ic_series": [
      -0.2555,
      -0.2105,
      -0.5758,
      0.003,
-     0.0679
+     0.0679,
+     0.1034
     ],
-    "ic_mean": -0.1942,
-    "ic_std": 0.2536,
-    "t_stat": -1.71,
-    "nw_t": -2.85,
+    "ic_mean": -0.1446,
+    "ic_std": 0.2573,
+    "t_stat": -1.38,
+    "nw_t": -1.66,
     "bonferroni_sig": false,
-    "win_rate": 40.0,
-    "spread_mean": -2.742,
+    "win_rate": 50.0,
+    "spread_mean": -1.807,
     "subperiod": null,
     "verdict": "样本积累中",
     "verdict_color": "#94a3b8",
-    "verdict_note": "n=5<20"
+    "verdict_note": "n=6<20"
    },
    "20": {
     "n": 0,
@@ -3330,152 +3340,152 @@
   },
   "verdict": "样本积累中",
   "verdict_color": "#94a3b8",
-  "verdict_note": "各周期样本均 <20（最大 9）"
+  "verdict_note": "各周期样本均 <20（最大 10）"
  },
  "factor_correlation": {
   "score_fund|score_news": {
-   "mean": 0.187,
-   "n": 7
+   "mean": 0.192,
+   "n": 8
   },
   "score_fund|score_oversold60": {
-   "mean": 0.308,
-   "n": 7
+   "mean": 0.315,
+   "n": 8
   },
   "score_fund|score_bias60": {
-   "mean": 0.374,
-   "n": 7
+   "mean": 0.376,
+   "n": 8
   },
   "score_fund|score_rsi_rev": {
-   "mean": 0.398,
-   "n": 7
+   "mean": 0.4,
+   "n": 8
   },
   "score_fund|score_vol_pulse": {
-   "mean": 0.226,
-   "n": 7
+   "mean": 0.23,
+   "n": 8
   },
   "score_fund|score_overbought": {
-   "mean": 0.269,
-   "n": 7
+   "mean": 0.266,
+   "n": 8
   },
   "score_fund|score_theme_intrinsic": {
-   "mean": 0.245,
-   "n": 7
+   "mean": 0.249,
+   "n": 8
   },
   "score_fund|score_attention": {
    "mean": 0.145,
-   "n": 7
+   "n": 8
   },
   "score_news|score_oversold60": {
-   "mean": 0.352,
-   "n": 7
+   "mean": 0.36,
+   "n": 8
   },
   "score_news|score_bias60": {
-   "mean": 0.352,
-   "n": 7
+   "mean": 0.359,
+   "n": 8
   },
   "score_news|score_rsi_rev": {
    "mean": 0.302,
-   "n": 7
+   "n": 8
   },
   "score_news|score_vol_pulse": {
-   "mean": 0.211,
-   "n": 7
+   "mean": 0.206,
+   "n": 8
   },
   "score_news|score_overbought": {
-   "mean": 0.101,
-   "n": 7
+   "mean": 0.094,
+   "n": 8
   },
   "score_news|score_theme_intrinsic": {
-   "mean": 0.251,
-   "n": 7
+   "mean": 0.246,
+   "n": 8
   },
   "score_news|score_attention": {
-   "mean": 0.372,
-   "n": 7
+   "mean": 0.379,
+   "n": 8
   },
   "score_oversold60|score_bias60": {
-   "mean": 0.839,
-   "n": 7
+   "mean": 0.837,
+   "n": 8
   },
   "score_oversold60|score_rsi_rev": {
-   "mean": 0.752,
-   "n": 7
+   "mean": 0.749,
+   "n": 8
   },
   "score_oversold60|score_vol_pulse": {
    "mean": 0.42,
-   "n": 7
+   "n": 8
   },
   "score_oversold60|score_overbought": {
    "mean": 0.394,
-   "n": 7
+   "n": 8
   },
   "score_oversold60|score_theme_intrinsic": {
-   "mean": 0.373,
-   "n": 7
+   "mean": 0.375,
+   "n": 8
   },
   "score_oversold60|score_attention": {
-   "mean": 0.146,
-   "n": 7
+   "mean": 0.145,
+   "n": 8
   },
   "score_bias60|score_rsi_rev": {
    "mean": 0.889,
-   "n": 7
+   "n": 8
   },
   "score_bias60|score_vol_pulse": {
-   "mean": 0.537,
-   "n": 7
+   "mean": 0.546,
+   "n": 8
   },
   "score_bias60|score_overbought": {
    "mean": 0.474,
-   "n": 7
+   "n": 8
   },
   "score_bias60|score_theme_intrinsic": {
-   "mean": 0.357,
-   "n": 7
+   "mean": 0.355,
+   "n": 8
   },
   "score_bias60|score_attention": {
-   "mean": 0.135,
-   "n": 7
+   "mean": 0.134,
+   "n": 8
   },
   "score_rsi_rev|score_vol_pulse": {
-   "mean": 0.629,
-   "n": 7
+   "mean": 0.636,
+   "n": 8
   },
   "score_rsi_rev|score_overbought": {
-   "mean": 0.646,
-   "n": 7
+   "mean": 0.642,
+   "n": 8
   },
   "score_rsi_rev|score_theme_intrinsic": {
-   "mean": 0.37,
-   "n": 7
+   "mean": 0.361,
+   "n": 8
   },
   "score_rsi_rev|score_attention": {
-   "mean": 0.115,
-   "n": 7
+   "mean": 0.111,
+   "n": 8
   },
   "score_vol_pulse|score_overbought": {
-   "mean": 0.468,
-   "n": 7
+   "mean": 0.472,
+   "n": 8
   },
   "score_vol_pulse|score_theme_intrinsic": {
-   "mean": 0.268,
-   "n": 7
+   "mean": 0.258,
+   "n": 8
   },
   "score_vol_pulse|score_attention": {
-   "mean": 0.078,
-   "n": 7
+   "mean": 0.076,
+   "n": 8
   },
   "score_overbought|score_theme_intrinsic": {
-   "mean": 0.29,
-   "n": 7
+   "mean": 0.273,
+   "n": 8
   },
   "score_overbought|score_attention": {
-   "mean": 0.004,
-   "n": 7
+   "mean": 0.001,
+   "n": 8
   },
   "score_theme_intrinsic|score_attention": {
-   "mean": 0.191,
-   "n": 7
+   "mean": 0.189,
+   "n": 8
   }
  },
  "current_weights_composite_ic": {
@@ -3556,7 +3566,7 @@
   "score_attention": 0.05
  },
  "notes": [
-  "有效截面 76 个交易日（2026-06-26 ~ 2026-10-21），剔除非交易日陈旧快照 7 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差；价格 store 日常自动增量刷新，--bootstrap-prices 全量重建）",
+  "有效截面 77 个交易日（2026-06-26 ~ 2026-10-22），剔除非交易日陈旧快照 7 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差；价格 store 日常自动增量刷新，--bootstrap-prices 全量重建）",
   "IC 衡量排序能力而非绝对收益；分层多空为未扣成本毛利口径",
   "TOP200 为高换手关注度筛选池：动量/关注型因子的负向 IC 更可能反映'关注度脉冲后的均值回复'，而非因子构造错误；解读时须结合本池的选择机制",
   "历史截面来自 git 提交记录（含早期综合行业归类版本，v2.46 已修复）"
