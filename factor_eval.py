@@ -478,6 +478,81 @@ def merge_snapshot_prices(hist):
     return changed
 
 
+def refresh_price_tail(hist, verbose=True):
+    """价格 store 落后最新快照时**增量**抓取缺失尾部（日常自愈，无需手动 --bootstrap-prices）。
+
+    背景：日常登记只 upsert 截面、不刷新 prices store；若长期不跑 --bootstrap-prices，
+    最新截面会因缺前向价格被整体剔除（曾致 10-13~10-21 连续 7 个截面未入 IC 计算，
+    页面停留在旧 snapshot_range）。本函数在每次跑 factor_eval 时自动补齐。
+
+    · 触发条件：prices.dates[-1] < 最新快照日期（存在未回填的交易日快照）；
+    · 抓取范围：历史全部出现过的代码，need = clamp(缺口日历天数+12, 30, PX_NEED) 根；
+    · 只追加 dates[-1] 之后的新交易日，并顺带填补已有日期上的 None 空洞（不覆盖旧值）；
+    · 接口失败保留旧值；无新交易日则原样返回。返回 bool 表示是否有更新。
+    """
+    p = hist.get("prices") or {}
+    dates, px = p.get("dates") or [], p.get("px") or {}
+    if not dates or not px:
+        return False                      # 无 store → 走 --bootstrap-prices 全量重建
+    snaps = [s for s in hist.get("snapshots", []) if s.get("rows")]
+    if not snaps:
+        return False
+    last_snap = max(s["date"] for s in snaps)
+    if last_snap <= dates[-1]:
+        return False                      # store 已覆盖最新快照，零成本跳过
+    codes = sorted({str(r["code"]) for s in snaps for r in s["rows"]
+                    if r.get("code") and len(str(r["code"])) == 6})
+    try:
+        gap = (datetime.strptime(last_snap, "%Y-%m-%d")
+               - datetime.strptime(dates[-1], "%Y-%m-%d")).days
+    except ValueError:
+        gap = 7
+    need = min(PX_NEED, max(30, gap + 12))
+    tail = {}
+    n_ok = n_fail = 0
+    for i, c in enumerate(codes):
+        sym = _symbol(c)
+        if not sym:
+            continue
+        kl = _fetch_qfq(sym, need=need)
+        if kl:
+            tail[c] = dict(kl)
+            n_ok += 1
+        else:
+            n_fail += 1
+        if verbose and (i + 1) % 200 == 0:
+            print(f"   价格尾部增量进度 {i + 1}/{len(codes)}（成功 {n_ok} 失败 {n_fail}）")
+        time.sleep(0.02)
+    added = sorted({d for m in tail.values() for d in m if d > dates[-1]})
+    if not added:
+        if verbose:
+            print(f"⚠️ 价格尾部无新交易日（成功 {n_ok} 失败 {n_fail}），保留旧 store")
+        return False
+    aidx = {d: len(dates) + k for k, d in enumerate(added)}
+    didx_old = {d: i for i, d in enumerate(dates)}
+    for arr in px.values():
+        arr.extend([None] * len(added))
+    for c, m in tail.items():
+        arr = px.get(c)
+        if arr is None:                   # 新出现代码：按全局日期轴对齐（前置日期留空）
+            arr = [None] * len(dates) + [None] * len(added)
+            px[c] = arr
+        for d, v in m.items():
+            j = aidx.get(d, didx_old.get(d))
+            if j is not None and j < len(arr) and arr[j] is None and v:
+                arr[j] = v
+    hist["prices"] = {
+        "fetched_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "dates": dates + added,
+        "px": px,
+        "n_codes": len(px),
+    }
+    if verbose:
+        print(f"📈 价格尾部增量完成: +{len(added)} 个交易日（{added[0]} ~ {added[-1]}），"
+              f"覆盖 {len(px)} 只（新抓 {n_ok} 失败 {n_fail}）")
+    return True
+
+
 # ---------------------------------------------------------------- IC 计算（修正口径）
 def _fwd_returns(snapshots, h, tdays, px, max_base_idx=None):
     """生成 (date_t, date_t+h, {code: ret%}) —— t 日**全部** TOP200 个股的第 h 个后续交易日收益。
@@ -921,9 +996,11 @@ def main():
             print(f"⚠️ {os.path.basename(p)} 解析失败: {str(e)[:60]}")
     if merge_snapshot_prices(hist):
         pass
-    if n_added:
+    _px_refreshed = refresh_price_tail(hist)
+    if n_added or _px_refreshed:
         save_history(hist)
-        print(f"📚 历史截面更新: 新增/覆盖 {n_added} 个（现有 {len(hist['snapshots'])} 个）")
+        if n_added:
+            print(f"📚 历史截面更新: 新增/覆盖 {n_added} 个（现有 {len(hist['snapshots'])} 个）")
 
     snaps = [s for s in hist.get("snapshots", []) if s.get("rows")]
     if len(snaps) < 3:
@@ -1035,7 +1112,7 @@ def main():
         "active_weights": w_now,
         "notes": [
             f"有效截面 {len(aligned)} 个交易日（{aligned[0]['date']} ~ {aligned[-1]['date']}），"
-            f"剔除非交易日陈旧快照 {len(stale)} 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差，需 --bootstrap-prices 回填）",
+            f"剔除非交易日陈旧快照 {len(stale)} 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差；价格 store 日常自动增量刷新，--bootstrap-prices 全量重建）",
             "IC 衡量排序能力而非绝对收益；分层多空为未扣成本毛利口径",
             "TOP200 为高换手关注度筛选池：动量/关注型因子的负向 IC 更可能反映'关注度脉冲后的均值回复'，"
             "而非因子构造错误；解读时须结合本池的选择机制",

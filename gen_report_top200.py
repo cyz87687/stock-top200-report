@@ -120,7 +120,9 @@ model_str = data.get("model", "stock-scorer")
 #         ② 累计 IC 曲线修复 y 轴量程按单期 IC 值(±0.4)计算致累计值(±3.5)溢出 viewBox 被裁剪，
 #          改为按累计序列动态定量程 + nice ticks + 小屏 overflow-x 滚动适配
 #         ③ 区制标签日期数据驱动：用 factor_ic.json 有效截面区间覆盖 config 静态日期（易过期）
-REPORT_VER = "v3.5.3"
+# v3.5.4: ④ 「解读须知」样本区间文案数据驱动（原硬编码 2026-06-26~10-12 约3.5个月，
+#          价格回填停更 7 个交易日期间与实际数据脱节；现由 snapshot_range 动态生成）
+REPORT_VER = "v3.5.4"
 _has_sector = any(x.get('score_sector') is not None for x in results)
 _has_10d = any(x.get('score_oversold60') is not None for x in results)
 _ver_tag = (f"{REPORT_VER} · 十维" if _has_10d
@@ -3599,6 +3601,18 @@ if _ic and _ic.get("factors"):
             for _li, (_lab, _s) in enumerate(_series))
 
     _ic_notes = " ".join(str(x) for x in (_ic.get("notes") or []))
+    # v3.5.4: 样本区间文案数据驱动（原硬编码「2026-06-26~10-12 约3.5个月」随截面增长过期，
+    #   价格回填停更事故期间曾与实际数据相差 7 个交易日；现从 snapshot_range 动态生成）
+    _ic_sr = _ic.get("snapshot_range") or ["?", "?"]
+    _ic_end_short = str(_ic_sr[1])[5:] if len(str(_ic_sr[1])) >= 7 else str(_ic_sr[1])
+    try:
+        from datetime import date as _span_date
+        _span_days = (_span_date.fromisoformat(str(_ic_sr[1]))
+                      - _span_date.fromisoformat(str(_ic_sr[0]))).days
+        _ic_span_note = (f"样本区间 {_ic_sr[0]}~{_ic_end_short} 约 {round(_span_days / 30.44, 1)} 个月，"
+                         f"子区间稳定性已披露于表中「半期」行，无制度切换；")
+    except Exception:
+        _ic_span_note = "子区间稳定性已披露于表中「半期」行，无制度切换；"
     html_parts.append(f'''
     <!-- v2.46 因子有效性评估（Rank IC） -->
     <div class="section-block" style="margin:24px 0;padding:18px 20px;background:#0f172a;border:1px solid #334155;border-radius:12px;">
@@ -3640,7 +3654,7 @@ if _ic and _ic.get("factors"):
             处理方式是<b>降权/反向而非删除</b>；
             ④ IC 衡量<b>排序能力</b>而非绝对收益，分层多空为未扣成本毛利口径；
             ⑤ 历史截面取自 git 提交记录（含早期行业归类缺陷版本，v2.46 已修复）；
-            样本区间 2026-06-26~10-12 约 3.5 个月，子区间稳定性已披露于表中「半期」行，无制度切换；
+            {_ic_span_note}
             ⑥ 投资有风险，本区块仅供研究与教育，不构成投资建议。
         </div>
         <div style="font-size:10px;color:#475569;margin-top:8px;">数据说明：{html_mod.escape(_ic_notes[:400])}</div>

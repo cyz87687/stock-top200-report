@@ -300,7 +300,9 @@ def backfill(track):
                         rec["excess"][str(h)] = round(ret - b_ret, 2)
                         filled_ex += 1
             else:
-                rec["rets"][str(h)] = None
+                # 未成熟(或数据源尾部滞后少一天)时保留旧值: 已回填收益不因源抖动被清空
+                # （实测 10-21 晚本地跑时K线源尾部止于10-20, 曾把10-14的T+5/10-20的T+1覆写成None）
+                rec["rets"].setdefault(str(h), None)
     save_track(track)
     print(f"✅ 回填完成: {filled} 个收益点, {filled_ex} 个超额收益点")
     return track
