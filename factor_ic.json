@@ -1,6 +1,6 @@
 {
  "date": "2026-10-22",
- "generated_at": "2026-10-24 00:22:03",
+ "generated_at": "2026-10-24 00:39:28",
  "method": {
   "name": "Rank IC（Spearman 秩相关，修正口径）",
   "formula": "IC(t→t+h) = Spearman(因子值_t 截面秩, 收益率 t→第h个后续交易日)",
@@ -1740,7 +1740,7 @@
    },
    "verdict": "样本积累中",
    "verdict_color": "#94a3b8",
-   "verdict_note": "各周期样本均 <20（最大 7）"
+   "verdict_note": "n=3<20（T+5·小样本）"
   },
   "score_rsi_rev": {
    "label": "RSI反转",
@@ -1820,7 +1820,7 @@
    },
    "verdict": "样本积累中",
    "verdict_color": "#94a3b8",
-   "verdict_note": "各周期样本均 <20（最大 7）"
+   "verdict_note": "n=3<20（T+5·小样本）"
   },
   "score_vol_pulse": {
    "label": "量能反向",
@@ -1877,9 +1877,9 @@
      "win_rate": 66.7,
      "spread_mean": 0.891,
      "subperiod": null,
-     "verdict": "样本积累中",
-     "verdict_color": "#94a3b8",
-     "verdict_note": "n=3<20"
+     "verdict": "正向·小样本(待确认)",
+     "verdict_color": "#f59e0b",
+     "verdict_note": "IC=+0.076，NW t=2.17，胜率=66.7%，n=3<20；方向为正待更多样本确认"
     },
     "20": {
      "n": 0,
@@ -1898,9 +1898,9 @@
      "verdict_note": "n=0<20"
     }
    },
-   "verdict": "样本积累中",
-   "verdict_color": "#94a3b8",
-   "verdict_note": "各周期样本均 <20（最大 7）"
+   "verdict": "正向·小样本(待确认)",
+   "verdict_color": "#f59e0b",
+   "verdict_note": "IC=+0.076，NW t=2.17，胜率=66.7%，n=3<20；方向为正待更多样本确认（T+5·小样本）"
   },
   "score_overbought": {
    "label": "超买反向",
@@ -2037,9 +2037,9 @@
      "win_rate": 0.0,
      "spread_mean": -0.24,
      "subperiod": null,
-     "verdict": "样本积累中",
-     "verdict_color": "#94a3b8",
-     "verdict_note": "n=3<20"
+     "verdict": "⚠️显著跑输·小样本",
+     "verdict_color": "#ef4444",
+     "verdict_note": "IC=-0.085，NW t=-7.13，胜率=0.0%，n=3<20；方向性负alpha警示（样本未达标，待确认）"
     },
     "20": {
      "n": 0,
@@ -2058,9 +2058,9 @@
      "verdict_note": "n=0<20"
     }
    },
-   "verdict": "样本积累中",
-   "verdict_color": "#94a3b8",
-   "verdict_note": "各周期样本均 <20（最大 7）"
+   "verdict": "⚠️显著跑输·小样本",
+   "verdict_color": "#ef4444",
+   "verdict_note": "IC=-0.085，NW t=-7.13，胜率=0.0%，n=3<20；方向性负alpha警示（样本未达标，待确认）（T+5·小样本）"
   },
   "score_attention": {
    "label": "关注度相对",
@@ -2117,9 +2117,9 @@
      "win_rate": 0.0,
      "spread_mean": -2.692,
      "subperiod": null,
-     "verdict": "样本积累中",
-     "verdict_color": "#94a3b8",
-     "verdict_note": "n=3<20"
+     "verdict": "⚠️显著跑输·小样本",
+     "verdict_color": "#ef4444",
+     "verdict_note": "IC=-0.106，NW t=-6.6，胜率=0.0%，n=3<20；方向性负alpha警示（样本未达标，待确认）"
     },
     "20": {
      "n": 0,
@@ -2138,9 +2138,9 @@
      "verdict_note": "n=0<20"
     }
    },
-   "verdict": "样本积累中",
-   "verdict_color": "#94a3b8",
-   "verdict_note": "各周期样本均 <20（最大 7）"
+   "verdict": "⚠️显著跑输·小样本",
+   "verdict_color": "#ef4444",
+   "verdict_note": "IC=-0.106，NW t=-6.6，胜率=0.0%，n=3<20；方向性负alpha警示（样本未达标，待确认）（T+5·小样本）"
   },
   "score_sector": {
    "label": "板块动量",
@@ -2270,7 +2270,7 @@
    },
    "verdict": "样本积累中",
    "verdict_color": "#94a3b8",
-   "verdict_note": "各周期样本均 <20（最大 17）"
+   "verdict_note": "n=13<20（T+5·小样本）"
   },
   "score_theme": {
    "label": "题材热度（已拆解·对照）",
@@ -3290,9 +3290,9 @@
      "sign_stable_pct": 72.7,
      "regime_shift": true
     },
-    "verdict": "样本积累中",
-    "verdict_color": "#94a3b8",
-    "verdict_note": "n=11<20"
+    "verdict": "⚠️显著跑输·小样本",
+    "verdict_color": "#ef4444",
+    "verdict_note": "IC=-0.107，NW t=-2.17，胜率=27.3%，n=11<20；方向性负alpha警示（样本未达标，待确认）"
    },
    "5": {
     "n": 7,
@@ -3343,9 +3343,9 @@
     "verdict_note": "n=0<20"
    }
   },
-  "verdict": "样本积累中",
-  "verdict_color": "#94a3b8",
-  "verdict_note": "各周期样本均 <20（最大 11）"
+  "verdict": "⚠️显著跑输·小样本",
+  "verdict_color": "#ef4444",
+  "verdict_note": "IC=-0.107，NW t=-2.17，胜率=27.3%，n=11<20；方向性负alpha警示（样本未达标，待确认）（T+1·小样本）"
  },
  "factor_correlation": {
   "score_fund|score_news": {
@@ -3493,6 +3493,35 @@
    "n": 8
   }
  },
+ "collinearity": {
+  "threshold": 0.7,
+  "high_corr_pairs": [
+   {
+    "pair": "score_bias60|score_rsi_rev",
+    "corr": 0.889
+   },
+   {
+    "pair": "score_oversold60|score_bias60",
+    "corr": 0.837
+   },
+   {
+    "pair": "score_oversold60|score_rsi_rev",
+    "corr": 0.749
+   }
+  ],
+  "n_high_corr_pairs": 3,
+  "note": "存在 3 对高共线因子（|corr|≥0.7），多重计权会虚增该主题综合权重、并使 IC 驱动权重不稳定；建议正交化/分组降权（top: score_bias60|score_rsi_rev=0.889, score_oversold60|score_bias60=0.837, score_oversold60|score_rsi_rev=0.749）"
+ },
+ "risk_gate": {
+  "level": "high_risk",
+  "triggered": [
+   "推荐组合 T+1 IC=-0.107（NW t=-2.17）显著为负 → 历史推荐跑输基准池",
+   "推荐组合 T+1 胜率仅 27.3%（<40%）",
+   "综合总分 T+1 IC=+0.018（NW t=1.24）未见显著正预测力",
+   "存在 3 对高共线因子，综合权重虚增风险"
+  ],
+  "advice": "⚠️ 建议观望/不机械跟单：实测推荐跑输，综合分无显著正预测力；仅基本面 score_fund 经 Bonferroni 验证有效（T+5 IC=+0.075）。可切『基本面主导』口径或等待 OOS 样本积累后再启用综合排序。"
+ },
  "current_weights_composite_ic": {
   "1": {
    "n": 7,
@@ -3575,147 +3604,5 @@
   "IC 衡量排序能力而非绝对收益；分层多空为未扣成本毛利口径",
   "TOP200 为高换手关注度筛选池：动量/关注型因子的负向 IC 更可能反映'关注度脉冲后的均值回复'，而非因子构造错误；解读时须结合本池的选择机制",
   "历史截面来自 git 提交记录（含早期综合行业归类版本，v2.46 已修复）"
- ],
- "weight_optimization": {
-  "version": "v3.1-10dim-ic",
-  "fitted_at": "2026-10-24 00:22:03",
-  "target_horizon": 1,
-  "method": "十维 IC 驱动权重: 正IC维度按比例分配+地板3%+向先验收缩(λ); 走步验证(训练≥30截面,每5截面重拟,样本外比对); score_sector 有效样本<20 维持0.10(样本积累中)",
-  "weights": {
-   "score_fund": 0.18,
-   "score_news": 0.18,
-   "score_oversold60": 0.12,
-   "score_bias60": 0.1,
-   "score_rsi_rev": 0.06,
-   "score_vol_pulse": 0.1,
-   "score_overbought": 0.06,
-   "score_theme_intrinsic": 0.05,
-   "score_attention": 0.05,
-   "score_sector": 0.1
-  },
-  "prior_weights": {
-   "score_fund": 0.18,
-   "score_news": 0.18,
-   "score_oversold60": 0.12,
-   "score_bias60": 0.1,
-   "score_rsi_rev": 0.06,
-   "score_vol_pulse": 0.1,
-   "score_overbought": 0.06,
-   "score_theme_intrinsic": 0.05,
-   "score_attention": 0.05,
-   "score_sector": 0.1
-  },
-  "adopted": "prior",
-  "walkforward": {
-   "n_oos_dates": 0,
-   "oos_ic_prior": null,
-   "oos_ic_new": null,
-   "oos_t_new": null,
-   "lambda": null,
-   "note": "十维池内截面 8 < MIN_TRAIN(30)，样本外观测不足 → 维持先验权重（每日重估登记，满 30 后自动启用走步验证）"
-  },
-  "full_period_composite_ic": {
-   "prior": {
-    "1": {
-     "n": 7,
-     "ic_mean": -0.0214,
-     "nw_t": -0.34,
-     "win_rate": 57.1
-    },
-    "5": {
-     "n": 3,
-     "ic_mean": -0.0112,
-     "nw_t": -0.35,
-     "win_rate": 66.7
-    },
-    "20": {
-     "n": 0,
-     "ic_mean": null,
-     "nw_t": null,
-     "win_rate": null
-    }
-   },
-   "lam_best": {
-    "1": {
-     "n": 7,
-     "ic_mean": -0.0214,
-     "nw_t": -0.34,
-     "win_rate": 57.1
-    },
-    "5": {
-     "n": 3,
-     "ic_mean": -0.0112,
-     "nw_t": -0.35,
-     "win_rate": 66.7
-    },
-    "20": {
-     "n": 0,
-     "ic_mean": null,
-     "nw_t": null,
-     "win_rate": null
-    }
-   }
-  },
-  "factor_ic_target_h": {
-   "score_fund": -0.0216,
-   "score_news": -0.0129,
-   "score_oversold60": -0.0252,
-   "score_bias60": 0.0132,
-   "score_rsi_rev": -0.0098,
-   "score_vol_pulse": -0.0019,
-   "score_overbought": -0.0287,
-   "score_theme_intrinsic": -0.0457,
-   "score_attention": -0.0302
-  },
-  "lambda_scan": [
-   {
-    "lambda": 0.0,
-    "n_oos": 0,
-    "oos_ic_mean": null,
-    "oos_t": null,
-    "oos_win_rate": null
-   },
-   {
-    "lambda": 0.2,
-    "n_oos": 0,
-    "oos_ic_mean": null,
-    "oos_t": null,
-    "oos_win_rate": null
-   },
-   {
-    "lambda": 0.4,
-    "n_oos": 0,
-    "oos_ic_mean": null,
-    "oos_t": null,
-    "oos_win_rate": null
-   },
-   {
-    "lambda": 0.6,
-    "n_oos": 0,
-    "oos_ic_mean": null,
-    "oos_t": null,
-    "oos_win_rate": null
-   },
-   {
-    "lambda": 0.8,
-    "n_oos": 0,
-    "oos_ic_mean": null,
-    "oos_t": null,
-    "oos_win_rate": null
-   },
-   {
-    "lambda": 1.0,
-    "n_oos": 0,
-    "oos_ic_mean": null,
-    "oos_t": null,
-    "oos_win_rate": null
-   }
-  ],
-  "notes": [
-   "复合总分由 9 维分量按权重线性合成后与未来收益求 Rank IC（与生产 total 口径一致，score_sector 因样本不足未纳入复合评估，权重固定 0.10）",
-   "训练窗因子 IC 仅使用基准快照 T+1 收益完整落在训练窗内的观测，避免边界泄漏",
-   "样本外日期集合对先验与 IC 驱动权重完全相同，公平比对",
-   "先验权重与生产同源（factor_weights.json prior_weights），拟合失败时回退该先验"
-  ]
- }
+ ]
 }

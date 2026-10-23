@@ -40,7 +40,21 @@
     "meltdown_coverage": 0.9
   },
   "workflow": {
-    "timeout_minutes": 90,
+    "timeout_minutes": 300,
     "step_warn_ratio": 1.5
+  },
+  "monitoring": {
+    "stale_data_alert": {
+      "enabled": true,
+      "max_stale_trading_days": 1,
+      "note": "指数日线最新交易日落后北京当日>1个交易日即判定停更；本地兜底链路(run_daily_local.sh)为可靠主路径，Actions 海外 runner 慢易超时"
+    },
+    "ic_alert": {
+      "enabled": true,
+      "recommendation_ic_nw_t_hi": -2.0,
+      "recommendation_win_rate_lo": 40,
+      "composite_ic_nw_t_lo": 2.0,
+      "note": "预测力安全门阈值(与 factor_eval._risk_gate 同源)：推荐组合 T+1 NW t≤-2 或 胜率<40% → high_risk(不机械跟单)；综合分 NW t<2 → 无显著正预测力"
+    }
   }
 }

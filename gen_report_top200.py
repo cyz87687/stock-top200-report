@@ -3640,6 +3640,35 @@ if _ic and _ic.get("factors"):
                          f"子区间稳定性已披露于表中「半期」行，无制度切换；")
     except Exception:
         _ic_span_note = "子区间稳定性已披露于表中「半期」行，无制度切换；"
+
+    # ===== v3.6（量化审计 P0）：预测力安全门横幅 —— 投资者一眼看到能否机械跟单 =====
+    _gate = _ic.get("risk_gate") or {}
+    _collin = _ic.get("collinearity") or {}
+    _gate_level = _gate.get("level", "caution")
+    _gate_color = "#ef4444" if _gate_level == "high_risk" else "#f59e0b"
+    _gate_title = ("🔴 高风险 · 建议观望/不机械跟单" if _gate_level == "high_risk"
+                   else "🟡 谨慎 · 预测力证据不足")
+    _trig_items = "".join(
+        '<li style="margin:3px 0;">' + html_mod.escape(str(t)) + '</li>'
+        for t in (_gate.get("triggered") or []))
+    _trig_ul = ('<ul style="margin:4px 0 8px 18px;padding:0;font-size:11px;color:#cbd5e1;'
+                'line-height:1.8;">' + _trig_items + '</ul>') if _trig_items else ''
+    _advice = html_mod.escape(str(_gate.get("advice") or ""))
+    _collin_note = (html_mod.escape(str(_collin.get("note") or ""))
+                    if _collin.get("n_high_corr_pairs") else '')
+    _collin_div = ('<div style="font-size:11px;color:#f59e0b;margin-top:8px;">⚠️ 共线性：'
+                   + _collin_note + '</div>') if _collin_note else ''
+    _risk_banner = (
+        '<div style="margin:12px 0 16px;padding:12px 16px;background:' + _gate_color
+        + '14;border:1px solid ' + _gate_color + '55;border-left:4px solid ' + _gate_color
+        + ';border-radius:8px;">'
+        '<div style="font-size:13px;font-weight:800;color:' + _gate_color + ';margin-bottom:6px;">'
+        '🛡️ 预测力安全门：' + _gate_title + '</div>'
+        + _trig_ul
+        + '<div style="font-size:12px;color:#e2e8f0;line-height:1.7;"><b>建议：</b>'
+        + _advice + '</div>'
+        + _collin_div
+        + '</div>')
     html_parts.append(f'''
     <!-- v2.46 因子有效性评估（Rank IC） -->
     <div class="section-block" style="margin:24px 0;padding:18px 20px;background:#0f172a;border:1px solid #334155;border-radius:12px;">
@@ -3656,6 +3685,7 @@ if _ic and _ic.get("factors"):
             剔除非交易日/接口陈旧快照 {len(_ic.get("stale_snapshots_dropped") or [])} 个，
             价格回填 {(_ic.get("price_backfill") or {}).get("n_codes") or "—"} 只 × {(_ic.get("price_backfill") or {}).get("n_trading_days") or "—"} 个交易日）。
         </div>
+        {_risk_banner}
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
             <thead><tr style="background:#1e293b;">
                 <th style="padding:6px 10px;text-align:left;color:#94a3b8;font-weight:600;">因子</th>

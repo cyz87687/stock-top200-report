@@ -648,12 +648,24 @@ def _eval_factor(snapshots, field, tdays, px, max_base_idx=None):
 
 
 def _verdict_h(agg):
-    """单周期有效性判定（以 Newey-West t 为主口径）。"""
+    """单周期有效性判定（以 Newey-West t 为主口径）。
+    v3.6（量化审计 P0）：小样本不再掩盖强信号——即便 n<MIN_SAMPLE，只要 |NW t|≥T_LOOSE
+    就如实标注方向性警示（负 alpha 红色告警），仅弱信号才报「样本积累中」。"""
     n = agg.get("n") or 0
-    if n < MIN_SAMPLE:
-        return "样本积累中", "#94a3b8", f"n={n}<{MIN_SAMPLE}"
     ic = agg.get("ic_mean")
     t = agg.get("nw_t")
+    wr = agg.get("win_rate")
+    if n < MIN_SAMPLE:
+        strong = t is not None and abs(t) >= T_LOOSE
+        if strong and ic is not None:
+            wr_s = f"，胜率={wr}%" if wr is not None else ""
+            if ic < 0:
+                return ("⚠️显著跑输·小样本", "#ef4444",
+                        f"IC={ic:+.3f}，NW t={t}{wr_s}，n={n}<{MIN_SAMPLE}；"
+                        f"方向性负alpha警示（样本未达标，待确认）")
+            return ("正向·小样本(待确认)", "#f59e0b",
+                    f"IC={ic:+.3f}，NW t={t}{wr_s}，n={n}<{MIN_SAMPLE}；方向为正待更多样本确认")
+        return "样本积累中", "#94a3b8", f"n={n}<{MIN_SAMPLE}"
     if ic is None:
         return "数据不足", "#94a3b8", "观测不足"
     aic = abs(ic)
@@ -674,21 +686,88 @@ def _verdict_h(agg):
 
 
 def _overall_verdict(horizons):
-    """综合判定: 取 |NW t| 最大且样本达标的周期。"""
-    best, best_t = None, -1.0
+    """综合判定: 优先取 |NW t| 最大且样本达标的周期。
+    v3.6（量化审计 P0）：若全部周期 n<MIN_SAMPLE，回退到 |NW t| 最大的周期做方向性
+    警示——不把 -2.66 这类强负信号藏进「样本积累中」。"""
+    best, best_t, best_h = None, -1.0, None
     for h in HORIZONS:
         a = horizons.get(str(h)) or {}
         if (a.get("n") or 0) < MIN_SAMPLE:
             continue
         t = a.get("nw_t")
         if t is not None and abs(t) > abs(best_t):
-            best, best_t = a, t
-    if best is None:
-        n_max = max((horizons.get(str(h)) or {}).get("n") or 0 for h in HORIZONS)
-        return "样本积累中", "#94a3b8", f"各周期样本均 <{MIN_SAMPLE}（最大 {n_max}）"
-    lab, col, note = _verdict_h(best)
-    hh = next(h for h in HORIZONS if (horizons.get(str(h)) or {}) is best)
-    return lab, col, note + f"（T+{hh}）"
+            best, best_t, best_h = a, t, h
+    if best is not None:
+        lab, col, note = _verdict_h(best)
+        return lab, col, note + f"（T+{best_h}）"
+    cand, cand_t, cand_h = None, -1.0, None
+    for h in HORIZONS:
+        a = horizons.get(str(h)) or {}
+        t = a.get("nw_t")
+        if t is not None and abs(t) > abs(cand_t):
+            cand, cand_t, cand_h = a, t, h
+    if cand is not None:
+        lab, col, note = _verdict_h(cand)
+        return lab, col, note + f"（T+{cand_h}·小样本）"
+    n_max = max((horizons.get(str(h)) or {}).get("n") or 0 for h in HORIZONS)
+    return "样本积累中", "#94a3b8", f"各周期样本均 <{MIN_SAMPLE}（最大 {n_max}）"
+
+
+def _collinearity_summary(corr, thr=0.7):
+    """共线性收敛（量化审计 P0）：识别 |corr|≥thr 的高共线因子对。
+    反转类因子（超跌/乖离/RSI/量能/超买）历史上两两相关达 0.75~0.89，重复计权会
+    虚增该主题在综合分的占比，并使 IC 驱动权重不稳定。"""
+    pairs = []
+    for k, v in (corr or {}).items():
+        if "|" not in k:
+            continue
+        m = v.get("mean") if isinstance(v, dict) else v
+        if isinstance(m, (int, float)) and abs(m) >= thr:
+            pairs.append({"pair": k, "corr": round(m, 3)})
+    pairs.sort(key=lambda x: -abs(x["corr"]))
+    return {
+        "threshold": thr,
+        "high_corr_pairs": pairs,
+        "n_high_corr_pairs": len(pairs),
+        "note": (f"存在 {len(pairs)} 对高共线因子（|corr|≥{thr}），多重计权会虚增该主题综合权重、"
+                 f"并使 IC 驱动权重不稳定；建议正交化/分组降权（top: "
+                 + (", ".join(f"{p['pair']}={p['corr']}" for p in pairs[:3]) or "无") + "）")
+        if pairs else f"未见 |corr|≥{thr} 的高共线因子对",
+    }
+
+
+def _risk_gate(rec_ic, factors, collinearity):
+    """预测力安全门（量化审计 P0）：基于实测 IC 决定「能否机械跟单」。
+    规则（数据驱动、非拟合）：
+      · 推荐组合 T+1 IC 显著为负（NW t≤-T_LOOSE）→ high_risk（历史推荐跑输）
+      · 推荐组合 T+1 胜率 <40% → 记录风险
+      · 综合总分无显著正 IC（NW t<T_LOOSE）→ 不可作独立 alpha 源
+    """
+    gate = {"level": "caution", "triggered": [], "advice": ""}
+    rh = ((rec_ic or {}).get("horizons") or {}) if isinstance(rec_ic, dict) else {}
+    rec_h1 = rh.get("1") or {}
+    ric, rt, rwr = rec_h1.get("ic_mean"), rec_h1.get("nw_t"), rec_h1.get("win_rate")
+    if ric is not None and rt is not None and rt <= -T_LOOSE:
+        gate["level"] = "high_risk"
+        gate["triggered"].append(
+            f"推荐组合 T+1 IC={ric:+.3f}（NW t={rt}）显著为负 → 历史推荐跑输基准池")
+    if rwr is not None and rwr < 40:
+        gate["triggered"].append(f"推荐组合 T+1 胜率仅 {rwr}%（<40%）")
+    tot_h1 = (((factors or {}).get("total") or {}).get("horizons") or {}).get("1") or {}
+    if tot_h1.get("ic_mean") is not None and (tot_h1.get("nw_t") or 0) < T_LOOSE:
+        gate["triggered"].append(
+            f"综合总分 T+1 IC={tot_h1['ic_mean']:+.3f}（NW t={tot_h1.get('nw_t')}）未见显著正预测力")
+    if (collinearity or {}).get("n_high_corr_pairs", 0) > 0:
+        gate["triggered"].append(
+            f"存在 {collinearity['n_high_corr_pairs']} 对高共线因子，综合权重虚增风险")
+    if gate["level"] == "high_risk":
+        gate["advice"] = ("⚠️ 建议观望/不机械跟单：实测推荐跑输，综合分无显著正预测力；"
+                          "仅基本面 score_fund 经 Bonferroni 验证有效（T+5 IC=+0.075）。"
+                          "可切『基本面主导』口径或等待 OOS 样本积累后再启用综合排序。")
+    else:
+        gate["advice"] = ("谨慎：预测力证据不足。建议以基本面维度为主、控制仓位，"
+                          "勿把综合分当独立 alpha 源。")
+    return gate
 
 
 def _eval_recommendations(tdays=None, px=None):
@@ -1088,6 +1167,10 @@ def main():
         w4 = {k: float(w_now[k]) for k in OPT_DIMS}
         current_cmp = {str(h): _composite_ic(aligned, w4, h, tdays, px) for h in HORIZONS}
 
+    # v3.6（量化审计 P0）：共线性收敛 + 预测力安全门
+    collin = _collinearity_summary(corr)
+    gate = _risk_gate(rec_ic, factors, collin)
+
     out = {
         "date": aligned[-1]["date"],
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -1116,6 +1199,8 @@ def main():
         "factors": factors,
         "recommendation_ic": rec_ic,
         "factor_correlation": corr,
+        "collinearity": collin,
+        "risk_gate": gate,
         "current_weights_composite_ic": current_cmp,
         "active_weights": w_now,
         "notes": [
