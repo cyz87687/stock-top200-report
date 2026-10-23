@@ -120,7 +120,11 @@ model_str = data.get("model", "stock-scorer")
 #         ② 累计 IC 曲线修复 y 轴量程按单期 IC 值(±0.4)计算致累计值(±3.5)溢出 viewBox 被裁剪，
 #          改为按累计序列动态定量程 + nice ticks + 小屏 overflow-x 滚动适配
 #         ③ 区制标签日期数据驱动：用 factor_ic.json 有效截面区间覆盖 config 静态日期（易过期）
-REPORT_VER = "v3.5.3"
+# v3.5.4: ④ 「解读须知」样本区间文案数据驱动（原硬编码 2026-06-26~10-12 约3.5个月，
+#          价格回填停更 7 个交易日期间与实际数据脱节；现由 snapshot_range 动态生成）
+# v3.5.5: ⑤ ⚖️ 权重区块展示「每日重估登记」状态（fitted_at/池内十维截面数/距门槛差距），
+#          --optimize-weights 接入每日链路（workflow+本地）；样本不足自动维持先验并刷新记录
+REPORT_VER = "v3.5.5"
 _has_sector = any(x.get('score_sector') is not None for x in results)
 _has_10d = any(x.get('score_oversold60') is not None for x in results)
 _ver_tag = (f"{REPORT_VER} · 十维" if _has_10d
@@ -3460,7 +3464,7 @@ if _ic and _ic.get("factors"):
         _is_10d = len(_wn) >= 10
         _adopt_txt = ('<b style="color:#a3e635;">已采用（样本外验证通过）</b>'
                       if _adopted_ok else
-                      ('<b style="color:#f59e0b;">十维先验映射（全市场回测证据 · 待池内 IC 复验）</b>'
+                      ('<b style="color:#f59e0b;">十维先验映射（全市场回测证据 · 每日重估登记 · 待池内 IC 复验）</b>'
                        if _is_10d else
                        '<b style="color:#f59e0b;">维持先验（样本外未达采用门槛）</b>'))
         # "三周期全改善且 NW t≥3" 由数据推导，避免权重文件更新后断言失实
@@ -3501,12 +3505,37 @@ if _ic and _ic.get("factors"):
                     但全部 λ≥0.2 均优于先验，"IC 驱动优于先验"的结论对 λ 选择不敏感。
                 </div>''')
         else:
+            # v3.5.5: 文案数据驱动 —— 十维截面在 TOP 池已有积累(非"无历史截面"),
+            #   如实展示当前池内截面数/门槛差距/最近重估时间, 满 30 后自动切走步验证摘要
+            _fit_at = _wmeta.get("fitted_at") or "—"
+            _n_10d = _wmeta.get("n_pool_snapshots_10dim")
+            if _n_10d is None:
+                try:
+                    _hist_p = os.path.join(_ai_dir, "factor_history.json")
+                    if os.path.exists(_hist_p):
+                        with open(_hist_p, "r", encoding="utf-8") as _hf:
+                            _hs = json.load(_hf)
+                        _need = set(OPT_DIMS) if 'OPT_DIMS' in dir() else {"score_fund", "score_news", "score_oversold60", "score_bias60", "score_rsi_rev", "score_vol_pulse", "score_overbought", "score_theme_intrinsic", "score_attention"}
+                        _cur_pool = max((int(s.get("pool_size") or 200) for s in _hs.get("snapshots", [])), default=200)
+                        _n_10d = sum(1 for s in _hs.get("snapshots", [])
+                                     if int(s.get("pool_size") or 200) == _cur_pool
+                                     and sum(1 for r in (s.get("rows") or [])
+                                             if all(isinstance(r.get(f), (int, float)) for f in _need)) >= 5)
+                except Exception:
+                    _n_10d = None
+            _gap = (30 - _n_10d) if isinstance(_n_10d, int) else None
+            _prog = (f'当前池内十维截面 <b style="color:#e2e8f0;">{_n_10d}</b> 个'
+                     f'（门槛 30，还差 <b style="color:#e2e8f0;">{_gap}</b> 个 ≈ {_gap} 个交易日）'
+                     if isinstance(_n_10d, int) else
+                     '当前池内十维截面数未读到（factor_history.json 缺失）')
             _wf_html = (f'''
                 <div style="font-size:11px;color:#f59e0b;margin-top:8px;line-height:1.7;padding:8px 10px;background:rgba(245,158,11,0.08);border-radius:6px;">
-                    📈 <b>样本外走步验证：待池内积累</b> —— 十维新维度（超跌60/乖离/RSI反转/量能反向/超买反向/题材内禀/关注度）
-                    在 TOP{_POOL_N} 池<b>无历史截面快照</b>，当前权重为全市场回测（2021-01~2026-09，5019 只，630 万事件）证据的
-                    先验映射；满 30+ 截面后由 <code style="color:#e2e8f0;">factor_eval.py --optimize-weights</code>
-                    重拟合，届时本区块自动展示走步验证摘要（OOS 复合 IC 对比 / λ 扫描 / 胜率）。
+                    📈 <b>样本外走步验证：每日重估登记中（维持先验）</b> —— {_prog}；
+                    当前权重为全市场回测（2021-01~2026-09，5019 只，630 万事件）证据的先验映射，
+                    <code style="color:#e2e8f0;">factor_eval.py --optimize-weights</code> 已接入每日链路：
+                    每个收盘后自动重估并刷新本记录（最近重估 <b style="color:#e2e8f0;">{_fit_at}</b>），
+                    样本不足时自动维持先验；满 30 截面且样本外复合 IC 优于先验 +0.005 才落档 IC 驱动权重，
+                    届时本区块自动展示走步验证摘要（OOS 复合 IC 对比 / λ 扫描 / 胜率）。
                 </div>''')
         _method_txt = (
             '方法：以 Rank IC 实证反向配置权重 —— 仅 IC&gt;0 的维度按 IC 比例分配，负向维度降至地板；'
@@ -3599,6 +3628,18 @@ if _ic and _ic.get("factors"):
             for _li, (_lab, _s) in enumerate(_series))
 
     _ic_notes = " ".join(str(x) for x in (_ic.get("notes") or []))
+    # v3.5.4: 样本区间文案数据驱动（原硬编码「2026-06-26~10-12 约3.5个月」随截面增长过期，
+    #   价格回填停更事故期间曾与实际数据相差 7 个交易日；现从 snapshot_range 动态生成）
+    _ic_sr = _ic.get("snapshot_range") or ["?", "?"]
+    _ic_end_short = str(_ic_sr[1])[5:] if len(str(_ic_sr[1])) >= 7 else str(_ic_sr[1])
+    try:
+        from datetime import date as _span_date
+        _span_days = (_span_date.fromisoformat(str(_ic_sr[1]))
+                      - _span_date.fromisoformat(str(_ic_sr[0]))).days
+        _ic_span_note = (f"样本区间 {_ic_sr[0]}~{_ic_end_short} 约 {round(_span_days / 30.44, 1)} 个月，"
+                         f"子区间稳定性已披露于表中「半期」行，无制度切换；")
+    except Exception:
+        _ic_span_note = "子区间稳定性已披露于表中「半期」行，无制度切换；"
     html_parts.append(f'''
     <!-- v2.46 因子有效性评估（Rank IC） -->
     <div class="section-block" style="margin:24px 0;padding:18px 20px;background:#0f172a;border:1px solid #334155;border-radius:12px;">
@@ -3640,7 +3681,7 @@ if _ic and _ic.get("factors"):
             处理方式是<b>降权/反向而非删除</b>；
             ④ IC 衡量<b>排序能力</b>而非绝对收益，分层多空为未扣成本毛利口径；
             ⑤ 历史截面取自 git 提交记录（含早期行业归类缺陷版本，v2.46 已修复）；
-            样本区间 2026-06-26~10-12 约 3.5 个月，子区间稳定性已披露于表中「半期」行，无制度切换；
+            {_ic_span_note}
             ⑥ 投资有风险，本区块仅供研究与教育，不构成投资建议。
         </div>
         <div style="font-size:10px;color:#475569;margin-top:8px;">数据说明：{html_mod.escape(_ic_notes[:400])}</div>

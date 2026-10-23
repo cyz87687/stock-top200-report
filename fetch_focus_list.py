@@ -81,13 +81,72 @@ def _norm_hhmmss(v):
 # ---------------------------------------------------------------
 # 机器源：akshare 封装（单源 try/except，失败降级）
 # ---------------------------------------------------------------
+def _hot_rank_rows_fallback(n=30):
+    """人气榜降级通道：emappdata 排名 + 新浪行情补名称。
+
+    背景: ak.stock_hot_rank_em() 内部第二步要打 push2.eastmoney.com 取名称/涨跌幅，
+    该域名在本地网络常被拒连(RemoteDisconnected)，会导致整个「人气榜」源失败。
+    此处只依赖 emappdata(实测可用) 拿排名，再用 hq.sinajs.cn 补名称，
+    保证人气榜这一机器源不因二次行情接口被拦而丢失。
+    """
+    import requests
+    r = requests.post('https://emappdata.eastmoney.com/stockrank/getAllCurrentList',
+                      json={"appId": "appId01",
+                            "globalId": "786e4c21-70dc-435a-93bb-38",
+                            "marketType": "", "pageNo": 1, "pageSize": max(n, 100)},
+                      timeout=15)
+    rows = (r.json() or {}).get('data') or []
+    if not rows:
+        return []
+    rows = rows[:n]
+    secids = []
+    for it in rows:
+        sc = str(it.get('sc') or '')          # SZ300750 / SH600519
+        c6 = norm_code6(sc)
+        if c6:
+            secids.append(market_prefix(c6) + c6)
+    name_map = {}
+    try:
+        s = requests.Session()
+        s.headers.update({'Referer': 'https://finance.sina.com.cn',
+                          'User-Agent': 'Mozilla/5.0'})
+        for i in range(0, len(secids), 40):
+            rr = s.get('https://hq.sinajs.cn/list=' + ','.join(secids[i:i + 40]),
+                       timeout=15)
+            rr.encoding = 'gbk'
+            for line in rr.text.strip().split('\n'):
+                if '="' not in line:
+                    continue
+                key = line.split('="')[0].split('_')[-1]        # sz300750
+                nm = line.split('="')[1].split(',')[0]
+                if nm:
+                    name_map[key] = nm
+    except Exception:
+        pass
+    out = []
+    for it in rows:
+        c6 = norm_code6(it.get('sc'))
+        if not c6:
+            continue
+        rank = int(it.get('rk') or 0) or (len(out) + 1)
+        out.append({'name': name_map.get(market_prefix(c6) + c6, ''),
+                    'code': c6,
+                    'score': max(0.5, (n - rank + 1) / n * 3.0),
+                    'reason': f"东财人气榜第{rank}位",
+                    'sources': ['人气榜']})
+    return out
+
+
 def src_hot_rank(n=30):
     """东财人气榜 → [{name, code, rank, score, reason}]
 
     注意: 东财人气榜排名列名为「当前排名」(旧版曾为「序号」), 做兼容取值。
     """
     import akshare as ak
-    df = ak.stock_hot_rank_em()
+    try:
+        df = ak.stock_hot_rank_em()
+    except Exception:
+        return _hot_rank_rows_fallback(n)
     out = []
     if df is None or df.empty:
         return out
