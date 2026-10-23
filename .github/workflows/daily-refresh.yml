@@ -29,8 +29,9 @@ jobs:
     # (海外 runner 拉腾讯/东财 491只K线极慢), 后续 5 步仅 5 分钟, 却在
     # track_recommendations 阶段撞上 90 分钟硬超时被 cancelled → push 步骤被 skip,
     # 结果「数据已算出但没上线」。预算必须覆盖最坏情况: 78(step2)+10(stale退避)
-    # +15(后续) ≈ 103 分钟, 故提到 120 分钟留余量。
-    timeout-minutes: 120
+    # +15(后续) ≈ 103 分钟。海外 runner 抓取腾讯/东财慢, 120 分钟仍会撞墙(10-23 三次
+    # cancelled 实证)。提到 300 分钟留足余量; 真正可靠路径是本地 run_daily_local.sh 兜底。
+    timeout-minutes: 300
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
