@@ -891,6 +891,11 @@ def optimize_weights(snaps, tdays, px):
         else:
             wf_note = (f"样本外复合 IC {best['mean']:+.4f} 未显著优于先验 {prior_m if prior_m is not None else float('nan'):+.4f}"
                        f" → 维持先验权重（防过拟合）")
+    else:
+        # v3.5.5: 样本不足(十维池内截面 < MIN_TRAIN=30 → OOS 观测 < 8)时如实登记,
+        # 避免显示误导性的 nan 比对; 每日重估仍刷新 fitted_at 供页面展示
+        wf_note = (f"十维池内截面 {len(dates)} < MIN_TRAIN({MIN_TRAIN})，样本外观测不足 → "
+                   f"维持先验权重（每日重估登记，满 30 后自动启用走步验证）")
 
     # 组装十维权重（9 维 × 0.90 + 板块动量固定 0.10）
     w10 = {k: round(v * (1 - W_SECTOR_FIXED), 3) for k, v in final_w4.items()}
@@ -1042,13 +1047,16 @@ def main():
         if len(aligned) < 3:
             print(f"❌ 该口径截面不足（{len(aligned)}），无法计算 IC")
             return 1
-    elif do_opt:
-        # E3: 权重复核默认只用当前池口径(最大 pool_size 组), 防新旧池混合拟合
-        _cur = max(pool_sizes) if pool_sizes else 200
-        _before = len(aligned)
-        aligned = [s for s in aligned if _psize(s) == _cur]
-        print(f"🔍 权重复核自动过滤至当前池口径 pool_size={_cur}: {_before} → {len(aligned)} 个截面"
-              f"（历史口径 {pool_sizes}; --pool-filter 可指定其他口径做诊断）")
+    # E3: 权重复核默认只用当前池口径(最大 pool_size 组), 防新旧池混合拟合。
+    # ⚠️ v3.5.5: 该过滤只作用于 optimize_weights 输入, 不得收缩主 IC 评估的 aligned——
+    # 因子有效性评估需要全口径历史连续性(77+ 截面), 否则报告层 IC 显著性/半期稳定性
+    # 会随每日 --optimize-weights 调用缩水到当前池的几个截面。
+    _opt_aligned = aligned
+    if do_opt and pool_sizes:
+        _cur = max(pool_sizes)
+        _opt_aligned = [s for s in aligned if _psize(s) == _cur]
+        print(f"🔍 权重复核使用当前池口径 pool_size={_cur}: {len(aligned)} → {len(_opt_aligned)} 个截面"
+              f"（历史口径 {pool_sizes}; IC 评估仍用全口径 {len(aligned)} 个）")
 
     # 因子 IC
     factors = {}
@@ -1121,7 +1129,7 @@ def main():
     }
 
     if do_opt:
-        result, w10 = optimize_weights(aligned, tdays, px)
+        result, w10 = optimize_weights(_opt_aligned, tdays, px)
         if result is None:
             print("\n⚖️ 权重重拟合跳过（无十维快照字段，维持现权重）")
         else:

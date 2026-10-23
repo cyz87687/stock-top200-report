@@ -1,6 +1,6 @@
 {
  "date": "2026-10-22",
- "generated_at": "2026-10-22 14:39:32",
+ "generated_at": "2026-10-22 17:32:54",
  "title": "每日 AI 焦点池",
  "method": "机器源(东财人气榜/涨跌停池/强势股池) + 本地AI联网检索(题材催化/公告/政策/龙虎榜)",
  "generated_by": "fetch_focus_list.py (互联网搜索: 东财人气榜/涨跌停池/强势股池 + Agent 检索)",
@@ -10,65 +10,68 @@
   "dt_pool": 0,
   "strong_pool": 20
  },
- "n_raw": 47,
- "elapsed_s": 5.0,
+ "n_raw": 66,
+ "elapsed_s": 1.2,
  "agent_search": {
-  "merged": false,
-  "n_additions": 0
+  "merged": true,
+  "n_additions": 36
  },
- "ai_summary": "",
- "n_in_pool": 19,
- "n_out_pool": 21,
+ "ai_summary": "10/22放量杀跌（沪指-1.48%、创业板-4.37%失守2600点，成交1.53万亿放量994亿），算力硬件「易中天」全线重挫（新易盛-12.28%、中际旭创-8.76%、天孚通信-8.37%）；唯一逆势主线为人形机器人（特斯拉Optimus首批量产机下线+英伟达GTC升级Isaac平台+宇树H2-X发布+首批6项国标获批），电机/减速器/传动件批量涨停；午后存储与先进封装局部反攻（集邦预估Q4 DRAM合约价环比+20%，华天科技直线涨停封单超200万手）；银行/运营商防御，军工兵装高标抱团。",
+ "n_in_pool": 15,
+ "n_out_pool": 25,
  "focus": [
   {
    "name": "海洋王",
    "code": "sz002724",
-   "score": 5.5,
+   "score": 8.5,
    "sources": [
+    "agent_search",
     "人气榜",
     "强势股池",
     "涨停池"
    ],
-   "reason": "东财人气榜第6位；涨停5连板 首板09:25；强势股池（60日新高且近期多次涨停）",
-   "ai_reason": "",
+   "reason": "东财人气榜第4位；涨停5连板 首板09:25；强势股池（60日新高且近期多次涨停）；[联网检索·龙虎榜] 军工/特种照明5连板收11.21元，与大盘背离的最高标；龙虎榜营业部合计净买7817.48万、深股通净买570.37万，但机构专用净卖出827.94万，公司披露二季度单季扭亏。",
+   "ai_reason": "军工/特种照明5连板收11.21元，与大盘背离的最高标；龙虎榜营业部合计净买7817.48万、深股通净买570.37万，但机构专用净卖出827.94万，公司披露二季度单季扭亏。",
    "rank": 1,
-   "in_main_pool": true,
-   "sector": "家电制造",
-   "rating": "C",
-   "total": 31.96,
-   "price": 11.21,
-   "pct_chg": 10.01
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
   },
   {
    "name": "大业股份",
    "code": "sh603278",
-   "score": 5.5,
+   "score": 8.5,
    "sources": [
+    "agent_search",
     "人气榜",
     "强势股池",
     "涨停池"
    ],
-   "reason": "东财人气榜第13位；涨停5连板 首板09:30；强势股池（60日新高且近期多次涨停）",
-   "ai_reason": "",
+   "reason": "东财人气榜第15位；涨停5连板 首板09:30；强势股池（60日新高且近期多次涨停）；[联网检索·公告] 人形机器人腱绳概念5连板收14.51元，当日最高标之一；风险明确——公司公告称机器人腱绳尚未批量生产、未产生收益，主业仍为胎圈钢丝，10/16以来累涨46.39%且滚动PE为负，纯情绪博弈。",
+   "ai_reason": "人形机器人腱绳概念5连板收14.51元，当日最高标之一；风险明确——公司公告称机器人腱绳尚未批量生产、未产生收益，主业仍为胎圈钢丝，10/16以来累涨46.39%且滚动PE为负，纯情绪博弈。",
    "rank": 2,
-   "in_main_pool": true,
-   "sector": "高端制造",
-   "rating": "C",
-   "total": 29.52,
-   "price": 14.51,
-   "pct_chg": 10.01
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
   },
   {
    "name": "三峡新材",
    "code": "sh600293",
-   "score": 4.5,
+   "score": 7.5,
    "sources": [
+    "agent_search",
     "人气榜",
     "强势股池",
     "涨停池"
    ],
-   "reason": "东财人气榜第17位；涨停3连板 首板09:25；强势股池（60日新高且近期多次涨停）",
-   "ai_reason": "",
+   "reason": "东财人气榜第21位；涨停3连板 首板09:25；强势股池（60日新高且近期多次涨停）；[联网检索·题材催化] 6天4板收5.23元涨停(+10.11%)，浮法玻璃/建材低价股，属弱市中低位资金试错方向，连板梯队位置靠前。",
+   "ai_reason": "6天4板收5.23元涨停(+10.11%)，浮法玻璃/建材低价股，属弱市中低位资金试错方向，连板梯队位置靠前。",
    "rank": 3,
    "in_main_pool": false,
    "sector": null,
@@ -80,144 +83,16 @@
   {
    "name": "星光股份",
    "code": "sz002076",
-   "score": 4.5,
+   "score": 7.5,
    "sources": [
+    "agent_search",
     "人气榜",
     "强势股池",
     "涨停池"
    ],
-   "reason": "东财人气榜第21位；涨停3连板 首板09:25；强势股池（60日新高且近期多次涨停）",
-   "ai_reason": "",
+   "reason": "东财人气榜第29位；涨停3连板 首板09:25；强势股池（60日新高且近期多次涨停）；[联网检索·题材催化] 5天4板收2.70元涨停(+10.20%)，数据要素/LED低价股，是数据要素板块退潮后少数仍封板的高标。",
+   "ai_reason": "5天4板收2.70元涨停(+10.20%)，数据要素/LED低价股，是数据要素板块退潮后少数仍封板的高标。",
    "rank": 4,
-   "in_main_pool": true,
-   "sector": "家电制造",
-   "rating": "C",
-   "total": 28.58,
-   "price": 2.7,
-   "pct_chg": 10.2
-  },
-  {
-   "name": "海量数据",
-   "code": "sh603138",
-   "score": 4.0,
-   "sources": [
-    "人气榜",
-    "强势股池",
-    "涨停池"
-   ],
-   "reason": "东财人气榜第18位；涨停2连板 首板09:25；强势股池（60日新高且近期多次涨停）",
-   "ai_reason": "",
-   "rank": 5,
-   "in_main_pool": true,
-   "sector": "计算机软件",
-   "rating": "C",
-   "total": 32.39,
-   "price": 16.92,
-   "pct_chg": 10.01
-  },
-  {
-   "name": "出版传媒",
-   "code": "sh601999",
-   "score": 4.0,
-   "sources": [
-    "人气榜",
-    "强势股池",
-    "涨停池"
-   ],
-   "reason": "东财人气榜第26位；涨停2连板 首板09:30；强势股池（60日新高且近期多次涨停）",
-   "ai_reason": "",
-   "rank": 6,
-   "in_main_pool": true,
-   "sector": "传媒娱乐",
-   "rating": "C",
-   "total": 27.36,
-   "price": 8.58,
-   "pct_chg": 10.0
-  },
-  {
-   "name": "哈空调",
-   "code": "sh600202",
-   "score": 4.0,
-   "sources": [
-    "强势股池",
-    "涨停池"
-   ],
-   "reason": "涨停2连板 首板09:31；强势股池（近期多次涨停）",
-   "ai_reason": "",
-   "rank": 7,
-   "in_main_pool": true,
-   "sector": "高端制造",
-   "rating": "C",
-   "total": 26.33,
-   "price": 6.13,
-   "pct_chg": 10.05
-  },
-  {
-   "name": "冰山冷热",
-   "code": "sz000530",
-   "score": 3.5,
-   "sources": [
-    "人气榜",
-    "强势股池",
-    "涨停池"
-   ],
-   "reason": "东财人气榜第3位；涨停 首板09:30；强势股池（60日新高且近期多次涨停）",
-   "ai_reason": "",
-   "rank": 8,
-   "in_main_pool": true,
-   "sector": "高端制造",
-   "rating": "C",
-   "total": 28.5,
-   "price": 9.49,
-   "pct_chg": 9.96
-  },
-  {
-   "name": "沈鼓集团",
-   "code": "sh601091",
-   "score": 3.5,
-   "sources": [
-    "人气榜",
-    "涨停池"
-   ],
-   "reason": "东财人气榜第4位；涨停 首板09:37",
-   "ai_reason": "",
-   "rank": 9,
-   "in_main_pool": true,
-   "sector": "综合",
-   "rating": "B",
-   "total": 55.17,
-   "price": 21.58,
-   "pct_chg": 9.99
-  },
-  {
-   "name": "襄阳轴承",
-   "code": "sz000678",
-   "score": 3.5,
-   "sources": [
-    "人气榜",
-    "涨停池"
-   ],
-   "reason": "东财人气榜第10位；涨停 首板09:49",
-   "ai_reason": "",
-   "rank": 10,
-   "in_main_pool": true,
-   "sector": "汽车",
-   "rating": "C",
-   "total": 36.36,
-   "price": 12.03,
-   "pct_chg": 9.96
-  },
-  {
-   "name": "大洋电机",
-   "code": "sz002249",
-   "score": 3.5,
-   "sources": [
-    "人气榜",
-    "涨停池"
-   ],
-   "reason": "东财人气榜第11位；涨停 首板09:36",
-   "ai_reason": "",
-   "rank": 11,
    "in_main_pool": false,
    "sector": null,
    "rating": null,
@@ -226,16 +101,134 @@
    "pct_chg": null
   },
   {
-   "name": "山河智能",
-   "code": "sz002097",
-   "score": 3.5,
+   "name": "海量数据",
+   "code": "sh603138",
+   "score": 7.0,
    "sources": [
+    "agent_search",
+    "人气榜",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第17位；涨停2连板 首板09:25；强势股池（60日新高且近期多次涨停）；[联网检索·题材催化] 数据要素2连板收16.92元涨停(+10.01%)，数据库/数据要素核心标的；但板块指数当日跌3.47%、主力净流出55.15亿，属退潮中的余温。",
+   "ai_reason": "数据要素2连板收16.92元涨停(+10.01%)，数据库/数据要素核心标的；但板块指数当日跌3.47%、主力净流出55.15亿，属退潮中的余温。",
+   "rank": 5,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "出版传媒",
+   "code": "sh601999",
+   "score": 7.0,
+   "sources": [
+    "agent_search",
+    "人气榜",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第30位；涨停2连板 首板09:30；强势股池（60日新高且近期多次涨停）；[联网检索·政策] 5天3板收8.58元涨停(+10.00%)，为传媒板块当日唯一涨停股（板块整体跌4.78%），广电「十五五」规划支持微短剧出海但板块未获资金响应，属逆势孤板。",
+   "ai_reason": "5天3板收8.58元涨停(+10.00%)，为传媒板块当日唯一涨停股（板块整体跌4.78%），广电「十五五」规划支持微短剧出海但板块未获资金响应，属逆势孤板。",
+   "rank": 6,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "哈空调",
+   "code": "sh600202",
+   "score": 7.0,
+   "sources": [
+    "agent_search",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "涨停2连板 首板09:31；强势股池（近期多次涨停）；[联网检索·题材催化] 2连板收6.13元涨停(+10.05%)，空冷设备/核电配套，属弱市中低位连板梯队。",
+   "ai_reason": "2连板收6.13元涨停(+10.05%)，空冷设备/核电配套，属弱市中低位连板梯队。",
+   "rank": 7,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "冰山冷热",
+   "code": "sz000530",
+   "score": 6.5,
+   "sources": [
+    "agent_search",
+    "人气榜",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第3位；涨停 首板09:30；强势股池（60日新高且近期多次涨停）；[联网检索·题材催化] 收9.49元涨停(+9.97%)、换手率45.41%居前，制冷设备/冰雪产业方向，弱市中的低位题材接力品种。",
+   "ai_reason": "收9.49元涨停(+9.97%)、换手率45.41%居前，制冷设备/冰雪产业方向，弱市中的低位题材接力品种。",
+   "rank": 8,
+   "in_main_pool": true,
+   "sector": "高端制造",
+   "rating": "C",
+   "total": 29.6,
+   "price": 8.63,
+   "pct_chg": 5.63
+  },
+  {
+   "name": "沈鼓集团",
+   "code": "sh601091",
+   "score": 6.5,
+   "sources": [
+    "agent_search",
     "人气榜",
     "涨停池"
    ],
-   "reason": "东财人气榜第16位；涨停 首板09:44",
-   "ai_reason": "",
-   "rank": 12,
+   "reason": "东财人气榜第5位；涨停 首板09:37；[联网检索·题材催化] 收21.58元涨停(+9.99%)、换手率48.25%居全市场前列，高端装备/透平机械，工程机械与装备出海方向最强换手标的。",
+   "ai_reason": "收21.58元涨停(+9.99%)、换手率48.25%居全市场前列，高端装备/透平机械，工程机械与装备出海方向最强换手标的。",
+   "rank": 9,
+   "in_main_pool": true,
+   "sector": "综合",
+   "rating": "B",
+   "total": 50.38,
+   "price": 19.62,
+   "pct_chg": 3.81
+  },
+  {
+   "name": "襄阳轴承",
+   "code": "sz000678",
+   "score": 6.5,
+   "sources": [
+    "agent_search",
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第12位；涨停 首板09:49；[联网检索·题材催化] 轴承/传动件标的，收12.03元涨停(+9.96%)，人形机器人关节轴承配套逻辑，为当日机器人链首板梯队。",
+   "ai_reason": "轴承/传动件标的，收12.03元涨停(+9.96%)，人形机器人关节轴承配套逻辑，为当日机器人链首板梯队。",
+   "rank": 10,
+   "in_main_pool": true,
+   "sector": "汽车",
+   "rating": "C",
+   "total": 36.8,
+   "price": 10.94,
+   "pct_chg": -2.41
+  },
+  {
+   "name": "大洋电机",
+   "code": "sz002249",
+   "score": 6.5,
+   "sources": [
+    "agent_search",
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第24位；涨停 首板09:36；[联网检索·题材催化] 电机板块涨停收7.06元(+9.97%)，人形机器人无框力矩电机方向跟风主力，属机器人链低位补涨品种。",
+   "ai_reason": "电机板块涨停收7.06元(+9.97%)，人形机器人无框力矩电机方向跟风主力，属机器人链低位补涨品种。",
+   "rank": 11,
    "in_main_pool": false,
    "sector": null,
    "rating": null,
@@ -246,14 +239,32 @@
   {
    "name": "兆威机电",
    "code": "sz003021",
-   "score": 3.5,
+   "score": 6.5,
    "sources": [
-    "人气榜",
+    "agent_search",
     "强势股池",
     "涨停池"
    ],
-   "reason": "东财人气榜第20位；涨停 首板09:30；强势股池（近期多次涨停）",
-   "ai_reason": "",
+   "reason": "涨停 首板09:30；强势股池（近期多次涨停）；[联网检索·龙虎榜] 一字涨停收83.39元、4天2板累涨约36%，市场按「物理AI卖铲人」（灵巧手作数据采集入口）定价；近三日机构净买1921.65万、北向净买1.23亿，但滚动PE已达约104倍且H1净利同比下滑约三成，10/29三季报为首个检验点。",
+   "ai_reason": "一字涨停收83.39元、4天2板累涨约36%，市场按「物理AI卖铲人」（灵巧手作数据采集入口）定价；近三日机构净买1921.65万、北向净买1.23亿，但滚动PE已达约104倍且H1净利同比下滑约三成，10/29三季报为首个检验点。",
+   "rank": 12,
+   "in_main_pool": true,
+   "sector": "电力设备",
+   "rating": "C",
+   "total": 34.0,
+   "price": 75.81,
+   "pct_chg": 4.46
+  },
+  {
+   "name": "华阳智能",
+   "code": "sz301502",
+   "score": 6.5,
+   "sources": [
+    "agent_search",
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:36；[联网检索·题材催化] 20CM涨停收54.00元，微特电机标的，人形机器人执行器方向20cm弹性品种。",
+   "ai_reason": "20CM涨停收54.00元，微特电机标的，人形机器人执行器方向20cm弹性品种。",
    "rank": 13,
    "in_main_pool": false,
    "sector": null,
@@ -265,39 +276,406 @@
   {
    "name": "鸣志电器",
    "code": "sh603728",
-   "score": 3.5,
+   "score": 6.5,
    "sources": [
-    "人气榜",
+    "agent_search",
     "涨停池"
    ],
-   "reason": "东财人气榜第23位；涨停 首板09:43",
-   "ai_reason": "",
+   "reason": "涨停 首板09:43；[联网检索·题材催化] 空心杯电机/步进电机龙头，收54.47元涨停(+10.00%)，为Optimus量产链核心执行器标的；但当日游资净流出1.71亿、占成交额16.66%，封板资金结构偏弱。",
+   "ai_reason": "空心杯电机/步进电机龙头，收54.47元涨停(+10.00%)，为Optimus量产链核心执行器标的；但当日游资净流出1.71亿、占成交额16.66%，封板资金结构偏弱。",
    "rank": 14,
-   "in_main_pool": true,
-   "sector": "电力设备",
-   "rating": "C",
-   "total": 43.36,
-   "price": 54.47,
-   "pct_chg": 10.0
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
   },
   {
-   "name": "北新路桥",
-   "code": "sz002307",
-   "score": 3.5,
+   "name": "南方路机",
+   "code": "sh603280",
+   "score": 6.5,
    "sources": [
-    "人气榜",
+    "agent_search",
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:43；[联网检索·题材催化] 工程机械涨停收29.06元(+9.99%)，与山河智能构成当日工程机械双封板，属逆势活跃方向。",
+   "ai_reason": "工程机械涨停收29.06元(+9.99%)，与山河智能构成当日工程机械双封板，属逆势活跃方向。",
+   "rank": 15,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "山河智能",
+   "code": "sz002097",
+   "score": 6.5,
+   "sources": [
+    "agent_search",
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:44；[联网检索·题材催化] 工程机械涨停收7.26元，与南方路机同步封板，逻辑偏装备出海与俄乌重建预期（无直接公司公告支撑，属市场解读）。",
+   "ai_reason": "工程机械涨停收7.26元，与南方路机同步封板，逻辑偏装备出海与俄乌重建预期（无直接公司公告支撑，属市场解读）。",
+   "rank": 16,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "华天科技",
+   "code": "sz002185",
+   "score": 6.0,
+   "sources": [
+    "agent_search",
+    "人气榜"
+   ],
+   "reason": "东财人气榜第1位；[联网检索·题材催化] 午后直线拉板、买一封单超200万手，但收盘涨9.12%报15.55元未能封住（涨停价15.675元）；集成电路封测龙头，H1营收105.11亿(+35.09%)、净利8.13亿(+259.15%)，存储器封装受益DRAM涨价，为普跌日存储链反攻的情绪龙头；当日游资净流出5.49亿、占成交额15.91%，反抽持续性存疑。",
+   "ai_reason": "午后直线拉板、买一封单超200万手，但收盘涨9.12%报15.55元未能封住（涨停价15.675元）；集成电路封测龙头，H1营收105.11亿(+35.09%)、净利8.13亿(+259.15%)，存储器封装受益DRAM涨价，为普跌日存储链反攻的情绪龙头；当日游资净流出5.49亿、占成交额15.91%，反抽持续性存疑。",
+   "rank": 17,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "A",
+   "total": 80.2,
+   "price": 14.25,
+   "pct_chg": -0.7
+  },
+  {
+   "name": "上海九百",
+   "code": "sh600838",
+   "score": 6.0,
+   "sources": [
+    "agent_search",
     "强势股池",
     "涨停池"
    ],
-   "reason": "东财人气榜第28位；涨停 首板09:30；强势股池（60日新高）",
-   "ai_reason": "",
-   "rank": 15,
+   "reason": "涨停2连板 首板10:52；强势股池（60日新高且近期多次涨停）；[联网检索·题材催化] 2连板收10.00元涨停(+10.01%)，上海国资商业股，属弱市资金抱团低位国资题材。",
+   "ai_reason": "2连板收10.00元涨停(+10.01%)，上海国资商业股，属弱市资金抱团低位国资题材。",
+   "rank": 18,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "云汉芯城",
+   "code": "sz301563",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·龙虎榜] 20CM涨停收110.35元(+16.16%)，龙虎榜净买8094万，开源证券西安西大街量化打板席位单笔净买1.038亿、两机构专用席位合计净买3359万，为当日存储/元器件方向资金最强标的。",
+   "ai_reason": "20CM涨停收110.35元(+16.16%)，龙虎榜净买8094万，开源证券西安西大街量化打板席位单笔净买1.038亿、两机构专用席位合计净买3359万，为当日存储/元器件方向资金最强标的。",
+   "rank": 19,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "大普微",
+   "code": "sz301666",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·题材催化] 存储主控/企业级SSD标的，午后随存储链直线冲高涨超13%，收356.00元(+6.27%)，为DRAM涨价链弹性品种。",
+   "ai_reason": "存储主控/企业级SSD标的，午后随存储链直线冲高涨超13%，收356.00元(+6.27%)，为DRAM涨价链弹性品种。",
+   "rank": 20,
    "in_main_pool": true,
-   "sector": "综合",
-   "rating": "C",
-   "total": 33.95,
-   "price": 3.39,
-   "pct_chg": 10.06
+   "sector": "AI/半导体",
+   "rating": "A",
+   "total": 70.42,
+   "price": 335.0,
+   "pct_chg": 3.72
+  },
+  {
+   "name": "赛象科技",
+   "code": "sz002337",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·题材催化] 橡机+机器人概念，盘中一度封板但收盘仅+5.09%报4.75元，炸板显示资金接力不足，仅作机器人链分歧观察样本。",
+   "ai_reason": "橡机+机器人概念，盘中一度封板但收盘仅+5.09%报4.75元，炸板显示资金接力不足，仅作机器人链分歧观察样本。",
+   "rank": 21,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "天孚通信",
+   "code": "sz300394",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·题材催化] 光器件/CPO配套，收197.00元跌8.37%，与中际旭创、新易盛合计较年内高点回撤均超56%，属光通信链杀跌重灾区。",
+   "ai_reason": "光器件/CPO配套，收197.00元跌8.37%，与中际旭创、新易盛合计较年内高点回撤均超56%，属光通信链杀跌重灾区。",
+   "rank": 22,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "A",
+   "total": 77.68,
+   "price": 214.98,
+   "pct_chg": 5.1
+  },
+  {
+   "name": "生益科技",
+   "code": "sh600183",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·公告] 10/22公告拟回购2-3亿元、回购价上限207.99元/股用于员工持股或股权激励；覆铜板龙头，当日随PCB链下跌7.34%报110.26元，回购提供边际支撑。",
+   "ai_reason": "10/22公告拟回购2-3亿元、回购价上限207.99元/股用于员工持股或股权激励；覆铜板龙头，当日随PCB链下跌7.34%报110.26元，回购提供边际支撑。",
+   "rank": 23,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "A",
+   "total": 83.11,
+   "price": 118.99,
+   "pct_chg": 1.5
+  },
+  {
+   "name": "长川科技",
+   "code": "sz300604",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·公告] 10/22披露前三季度业绩预告：净利17.15-18.15亿元、同比+98.17%~109.73%，扣非同比+111.39%~124.07%，主因半导体设备订单充裕与规模效应；当日仍随大盘跌1.68%。",
+   "ai_reason": "10/22披露前三季度业绩预告：净利17.15-18.15亿元、同比+98.17%~109.73%，扣非同比+111.39%~124.07%，主因半导体设备订单充裕与规模效应；当日仍随大盘跌1.68%。",
+   "rank": 24,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "S",
+   "total": 91.16,
+   "price": 202.14,
+   "pct_chg": -0.57
+  },
+  {
+   "name": "光力科技",
+   "code": "sz300480",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·公告] 前三季度营收7.24亿(+57.29%)、净利1.31亿(+259.80%)，半导体（划片机）收入大幅增加，业绩兑现但当日跌3.85%报26.45元。",
+   "ai_reason": "前三季度营收7.24亿(+57.29%)、净利1.31亿(+259.80%)，半导体（划片机）收入大幅增加，业绩兑现但当日跌3.85%报26.45元。",
+   "rank": 25,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "光智科技",
+   "code": "sz300489",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·公告] 子公司安徽光智中标「先导(青岛)光电子产业园产线及配套系统项目」，合同含税11.14亿元、2026/12/30前交付投产；但当日大跌12.94%报224.02元，利好未获资金响应。",
+   "ai_reason": "子公司安徽光智中标「先导(青岛)光电子产业园产线及配套系统项目」，合同含税11.14亿元、2026/12/30前交付投产；但当日大跌12.94%报224.02元，利好未获资金响应。",
+   "rank": 26,
+   "in_main_pool": true,
+   "sector": "电子面板",
+   "rating": "B",
+   "total": 61.22,
+   "price": 257.33,
+   "pct_chg": 6.78
+  },
+  {
+   "name": "华锐精密",
+   "code": "sh688059",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·公告] 前三季度业绩预告净利3.00-3.40亿元、同比+118.27%~147.37%，碳化钨高价下成功提价带动毛利率改善，属刀具涨价链业绩兑现标的；当日跌5.27%。",
+   "ai_reason": "前三季度业绩预告净利3.00-3.40亿元、同比+118.27%~147.37%，碳化钨高价下成功提价带动毛利率改善，属刀具涨价链业绩兑现标的；当日跌5.27%。",
+   "rank": 27,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "多氟多",
+   "code": "sz002407",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·公告] 前三季度营收109.27亿(+62.39%)、净利5.92亿(+658.72%)，Q3单季净利8035.50万(+200.68%)，六氟磷酸锂涨价弹性兑现；当日跌6.67%报23.52元。",
+   "ai_reason": "前三季度营收109.27亿(+62.39%)、净利5.92亿(+658.72%)，Q3单季净利8035.50万(+200.68%)，六氟磷酸锂涨价弹性兑现；当日跌6.67%报23.52元。",
+   "rank": 28,
+   "in_main_pool": true,
+   "sector": "化工",
+   "rating": "A",
+   "total": 72.79,
+   "price": 25.2,
+   "pct_chg": -0.94
+  },
+  {
+   "name": "华润微",
+   "code": "sh688396",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·题材催化] 功率半导体，午后随半导体反抽涨0.95%报51.00元，为科创芯片方向逆势翻红品种，反映资金在跌深半导体中选择低估值大市值承接。",
+   "ai_reason": "功率半导体，午后随半导体反抽涨0.95%报51.00元，为科创芯片方向逆势翻红品种，反映资金在跌深半导体中选择低估值大市值承接。",
+   "rank": 29,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "东土科技",
+   "code": "sz300353",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·政策] 工业互联网/工业AI标的，八部门《产业基础能力提升「十五五」规划》推动AI赋能产业基础，其为创业板人工智能ETF成分中少数逆势上涨股（+0.38%）。",
+   "ai_reason": "工业互联网/工业AI标的，八部门《产业基础能力提升「十五五」规划》推动AI赋能产业基础，其为创业板人工智能ETF成分中少数逆势上涨股（+0.38%）。",
+   "rank": 30,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "新易盛",
+   "code": "sz300502",
+   "score": 5.5,
+   "sources": [
+    "agent_search",
+    "人气榜"
+   ],
+   "reason": "东财人气榜第6位；[联网检索·公告] CPO权重，收258.01元大跌12.28%，主力净卖出21.17亿居全市场首位，较年内高点回撤超56%；公司回应生产经营正常、800G/1.6T订单交付有序，属超跌核心观察标的。",
+   "ai_reason": "CPO权重，收258.01元大跌12.28%，主力净卖出21.17亿居全市场首位，较年内高点回撤超56%；公司回应生产经营正常、800G/1.6T订单交付有序，属超跌核心观察标的。",
+   "rank": 31,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "S",
+   "total": 91.66,
+   "price": 294.12,
+   "pct_chg": -1.36
+  },
+  {
+   "name": "湖南天雁",
+   "code": "sh600698",
+   "score": 5.5,
+   "sources": [
+    "agent_search",
+    "涨停池"
+   ],
+   "reason": "涨停 首板10:44；[联网检索·题材催化] 收7.59元涨停(+10.00%)，中兵系/兵装重组概念，跟随海洋王构成军工局部强势，兵装重组板块涨幅居前。",
+   "ai_reason": "收7.59元涨停(+10.00%)，中兵系/兵装重组概念，跟随海洋王构成军工局部强势，兵装重组板块涨幅居前。",
+   "rank": 32,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "奕帆传动",
+   "code": "sz301023",
+   "score": 5.5,
+   "sources": [
+    "agent_search",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "涨停 首板11:10；强势股池（60日新高）；[联网检索·题材催化] 20CM涨停收32.48元(+19.98%)，机器人传动件/减速器方向弹性最大的品种，直接受益Optimus量产与减速器概念净流入8.19亿居题材首位。",
+   "ai_reason": "20CM涨停收32.48元(+19.98%)，机器人传动件/减速器方向弹性最大的品种，直接受益Optimus量产与减速器概念净流入8.19亿居题材首位。",
+   "rank": 33,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "中际旭创",
+   "code": "sz300308",
+   "score": 5.300000000000001,
+   "sources": [
+    "agent_search",
+    "人气榜"
+   ],
+   "reason": "东财人气榜第8位；[联网检索·题材催化] 光模块龙头，收590.11元跌8.76%，单日成交173亿居A股第一，是创业板指失守2600点的核心拖累；CPO「易中天」集体重挫后为判断成长股情绪修复的先行指标。",
+   "ai_reason": "光模块龙头，收590.11元跌8.76%，单日成交173亿居A股第一，是创业板指失守2600点的核心拖累；CPO「易中天」集体重挫后为判断成长股情绪修复的先行指标。",
+   "rank": 34,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "A",
+   "total": 83.75,
+   "price": 646.77,
+   "pct_chg": -0.17
+  },
+  {
+   "name": "德明利",
+   "code": "sz001309",
+   "score": 5.0,
+   "sources": [
+    "agent_search",
+    "人气榜"
+   ],
+   "reason": "东财人气榜第11位；[联网检索·题材催化] 午后由跌转涨、日内振幅近12%，收243.17元(+4.00%)，存储模组直接对标Q4 DRAM合约价环比+20%；但当日游资净流出1.5亿，属超跌反抽性质。",
+   "ai_reason": "午后由跌转涨、日内振幅近12%，收243.17元(+4.00%)，存储模组直接对标Q4 DRAM合约价环比+20%；但当日游资净流出1.5亿，属超跌反抽性质。",
+   "rank": 35,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "A",
+   "total": 79.31,
+   "price": 233.81,
+   "pct_chg": 6.5
+  },
+  {
+   "name": "工商银行",
+   "code": "sh601398",
+   "score": 4.8,
+   "sources": [
+    "agent_search",
+    "人气榜"
+   ],
+   "reason": "东财人气榜第13位；[联网检索·题材催化] 权重防御标杆，收8.59元涨1.66%并创历史新高，红利资产成为指数杀跌中的避风港，反映当日风险偏好收缩至极值。",
+   "ai_reason": "权重防御标杆，收8.59元涨1.66%并创历史新高，红利资产成为指数杀跌中的避风港，反映当日风险偏好收缩至极值。",
+   "rank": 36,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
   },
   {
    "name": "南矿集团",
@@ -308,7 +686,25 @@
    ],
    "reason": "涨停 首板09:25",
    "ai_reason": "",
-   "rank": 16,
+   "rank": 37,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "北新路桥",
+   "code": "sz002307",
+   "score": 3.5,
+   "sources": [
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:30；强势股池（60日新高）",
+   "ai_reason": "",
+   "rank": 38,
    "in_main_pool": false,
    "sector": null,
    "rating": null,
@@ -326,13 +722,13 @@
    ],
    "reason": "涨停 首板09:31；强势股池（60日新高）",
    "ai_reason": "",
-   "rank": 17,
+   "rank": 39,
    "in_main_pool": true,
    "sector": "化工",
    "rating": "C",
-   "total": 32.97,
-   "price": 19.92,
-   "pct_chg": 20.0
+   "total": 44.53,
+   "price": 16.6,
+   "pct_chg": 15.6
   },
   {
    "name": "林州重机",
@@ -343,390 +739,6 @@
     "涨停池"
    ],
    "reason": "涨停 首板09:31；强势股池（60日新高）",
-   "ai_reason": "",
-   "rank": 18,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "阳光照明",
-   "code": "sh600261",
-   "score": 3.5,
-   "sources": [
-    "强势股池",
-    "涨停池"
-   ],
-   "reason": "涨停 首板09:32；强势股池（60日新高）",
-   "ai_reason": "",
-   "rank": 19,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "赛福天",
-   "code": "sh603028",
-   "score": 3.5,
-   "sources": [
-    "强势股池",
-    "涨停池"
-   ],
-   "reason": "涨停 首板09:32；强势股池（60日新高）",
-   "ai_reason": "",
-   "rank": 20,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "安乃达",
-   "code": "sh603350",
-   "score": 3.5,
-   "sources": [
-    "强势股池",
-    "涨停池"
-   ],
-   "reason": "涨停 首板09:34；强势股池（60日新高）",
-   "ai_reason": "",
-   "rank": 21,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "华阳智能",
-   "code": "sz301502",
-   "score": 3.5,
-   "sources": [
-    "涨停池"
-   ],
-   "reason": "涨停 首板09:36",
-   "ai_reason": "",
-   "rank": 22,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "南方路机",
-   "code": "sh603280",
-   "score": 3.5,
-   "sources": [
-    "涨停池"
-   ],
-   "reason": "涨停 首板09:43",
-   "ai_reason": "",
-   "rank": 23,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "正裕工业",
-   "code": "sh603089",
-   "score": 3.5,
-   "sources": [
-    "涨停池"
-   ],
-   "reason": "涨停 首板09:48",
-   "ai_reason": "",
-   "rank": 24,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "华天科技",
-   "code": "sz002185",
-   "score": 3.0,
-   "sources": [
-    "人气榜"
-   ],
-   "reason": "东财人气榜第1位",
-   "ai_reason": "",
-   "rank": 25,
-   "in_main_pool": true,
-   "sector": "AI/半导体",
-   "rating": "A",
-   "total": 79.36,
-   "price": 15.55,
-   "pct_chg": 9.12
-  },
-  {
-   "name": "天洋新材",
-   "code": "sh603330",
-   "score": 3.0,
-   "sources": [
-    "人气榜",
-    "强势股池",
-    "涨停池"
-   ],
-   "reason": "东财人气榜第15位；涨停2连板 首板13:54；强势股池（近期多次涨停）",
-   "ai_reason": "",
-   "rank": 26,
-   "in_main_pool": true,
-   "sector": "化工",
-   "rating": "C",
-   "total": 38.97,
-   "price": 11.1,
-   "pct_chg": 10.01
-  },
-  {
-   "name": "上海九百",
-   "code": "sh600838",
-   "score": 3.0,
-   "sources": [
-    "人气榜",
-    "强势股池",
-    "涨停池"
-   ],
-   "reason": "东财人气榜第25位；涨停2连板 首板10:52；强势股池（60日新高且近期多次涨停）",
-   "ai_reason": "",
-   "rank": 27,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "宁德时代",
-   "code": "sz300750",
-   "score": 2.9,
-   "sources": [
-    "人气榜"
-   ],
-   "reason": "东财人气榜第2位",
-   "ai_reason": "",
-   "rank": 28,
-   "in_main_pool": true,
-   "sector": "新能源",
-   "rating": "S",
-   "total": 86.07,
-   "price": 220.41,
-   "pct_chg": -3.29
-  },
-  {
-   "name": "新易盛",
-   "code": "sz300502",
-   "score": 2.6,
-   "sources": [
-    "人气榜"
-   ],
-   "reason": "东财人气榜第5位",
-   "ai_reason": "",
-   "rank": 29,
-   "in_main_pool": true,
-   "sector": "AI/半导体",
-   "rating": "A",
-   "total": 77.26,
-   "price": 258.01,
-   "pct_chg": -12.28
-  },
-  {
-   "name": "长城电工",
-   "code": "sh600192",
-   "score": 2.5,
-   "sources": [
-    "人气榜",
-    "涨停池"
-   ],
-   "reason": "东财人气榜第27位；涨停 首板10:24",
-   "ai_reason": "",
-   "rank": 30,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "湖南天雁",
-   "code": "sh600698",
-   "score": 2.5,
-   "sources": [
-    "人气榜",
-    "涨停池"
-   ],
-   "reason": "东财人气榜第30位；涨停 首板10:44",
-   "ai_reason": "",
-   "rank": 31,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "奕帆传动",
-   "code": "sz301023",
-   "score": 2.5,
-   "sources": [
-    "强势股池",
-    "涨停池"
-   ],
-   "reason": "涨停 首板11:10；强势股池（60日新高）",
-   "ai_reason": "",
-   "rank": 32,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "多伦科技",
-   "code": "sh603528",
-   "score": 2.5,
-   "sources": [
-    "涨停池"
-   ],
-   "reason": "涨停 首板13:04",
-   "ai_reason": "",
-   "rank": 33,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "睿能科技",
-   "code": "sh603933",
-   "score": 2.5,
-   "sources": [
-    "涨停池"
-   ],
-   "reason": "涨停 首板13:59",
-   "ai_reason": "",
-   "rank": 34,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "芯瑞达",
-   "code": "sz002983",
-   "score": 2.5,
-   "sources": [
-    "涨停池"
-   ],
-   "reason": "涨停 首板14:35",
-   "ai_reason": "",
-   "rank": 35,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "华新精科",
-   "code": "sh603370",
-   "score": 2.5,
-   "sources": [
-    "涨停池"
-   ],
-   "reason": "涨停 首板14:53",
-   "ai_reason": "",
-   "rank": 36,
-   "in_main_pool": false,
-   "sector": null,
-   "rating": null,
-   "total": null,
-   "price": null,
-   "pct_chg": null
-  },
-  {
-   "name": "中际旭创",
-   "code": "sz300308",
-   "score": 2.4000000000000004,
-   "sources": [
-    "人气榜"
-   ],
-   "reason": "东财人气榜第7位",
-   "ai_reason": "",
-   "rank": 37,
-   "in_main_pool": true,
-   "sector": "AI/半导体",
-   "rating": "A",
-   "total": 76.56,
-   "price": 590.11,
-   "pct_chg": -8.76
-  },
-  {
-   "name": "九阳股份",
-   "code": "sz002242",
-   "score": 2.3000000000000003,
-   "sources": [
-    "人气榜"
-   ],
-   "reason": "东财人气榜第8位",
-   "ai_reason": "",
-   "rank": 38,
-   "in_main_pool": true,
-   "sector": "家电制造",
-   "rating": "D",
-   "total": 21.34,
-   "price": 21.71,
-   "pct_chg": -4.02
-  },
-  {
-   "name": "新华传媒",
-   "code": "sh600825",
-   "score": 2.1999999999999997,
-   "sources": [
-    "人气榜"
-   ],
-   "reason": "东财人气榜第9位",
-   "ai_reason": "",
-   "rank": 39,
-   "in_main_pool": true,
-   "sector": "传媒娱乐",
-   "rating": "C",
-   "total": 25.73,
-   "price": 14.55,
-   "pct_chg": -10.02
-  },
-  {
-   "name": "巨能股份",
-   "code": "bj920578",
-   "score": 2.0,
-   "sources": [
-    "强势股池"
-   ],
-   "reason": "强势股池（60日新高）",
    "ai_reason": "",
    "rank": 40,
    "in_main_pool": false,

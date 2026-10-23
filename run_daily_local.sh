@@ -123,10 +123,10 @@ else
   echo "[$(date '+%H:%M:%S')] ⚠️ Recommendation tracking failed" >> "$LOG"
 fi
 
-# Step 3.96: Factor IC
-echo "[$(date '+%H:%M:%S')] Running factor_eval.py ..." >> "$LOG"
-if $PY factor_eval.py >> "$LOG" 2>&1; then
-  echo "[$(date '+%H:%M:%S')] ✅ Factor IC evaluation updated" >> "$LOG"
+# Step 3.96: Factor IC + 十维权重每日重估 (v3.5.5)
+echo "[$(date '+%H:%M:%S')] Running factor_eval.py (Rank IC + daily weight re-estimation) ..." >> "$LOG"
+if $PY factor_eval.py --optimize-weights >> "$LOG" 2>&1; then
+  echo "[$(date '+%H:%M:%S')] ✅ Factor IC + weight re-estimation updated" >> "$LOG"
 else
   echo "[$(date '+%H:%M:%S')] ⚠️ Factor IC evaluation failed" >> "$LOG"
 fi

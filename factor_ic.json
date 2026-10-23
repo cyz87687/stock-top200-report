@@ -1,6 +1,6 @@
 {
  "date": "2026-10-22",
- "generated_at": "2026-10-22 14:39:26",
+ "generated_at": "2026-10-23 08:49:58",
  "method": {
   "name": "Rank IC（Spearman 秩相关，修正口径）",
   "formula": "IC(t→t+h) = Spearman(因子值_t 截面秩, 收益率 t→第h个后续交易日)",
@@ -3556,19 +3556,161 @@
  "active_weights": {
   "score_fund": 0.18,
   "score_news": 0.18,
-  "score_sector": 0.1,
   "score_oversold60": 0.12,
   "score_bias60": 0.1,
   "score_rsi_rev": 0.06,
   "score_vol_pulse": 0.1,
   "score_overbought": 0.06,
   "score_theme_intrinsic": 0.05,
-  "score_attention": 0.05
+  "score_attention": 0.05,
+  "score_sector": 0.1
  },
  "notes": [
   "有效截面 77 个交易日（2026-06-26 ~ 2026-10-22），剔除非交易日陈旧快照 7 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差；价格 store 日常自动增量刷新，--bootstrap-prices 全量重建）",
   "IC 衡量排序能力而非绝对收益；分层多空为未扣成本毛利口径",
   "TOP200 为高换手关注度筛选池：动量/关注型因子的负向 IC 更可能反映'关注度脉冲后的均值回复'，而非因子构造错误；解读时须结合本池的选择机制",
   "历史截面来自 git 提交记录（含早期综合行业归类版本，v2.46 已修复）"
- ]
+ ],
+ "weight_optimization": {
+  "version": "v3.1-10dim-ic",
+  "fitted_at": "2026-10-23 08:49:58",
+  "target_horizon": 1,
+  "method": "十维 IC 驱动权重: 正IC维度按比例分配+地板3%+向先验收缩(λ); 走步验证(训练≥30截面,每5截面重拟,样本外比对); score_sector 有效样本<20 维持0.10(样本积累中)",
+  "weights": {
+   "score_fund": 0.18,
+   "score_news": 0.18,
+   "score_oversold60": 0.12,
+   "score_bias60": 0.1,
+   "score_rsi_rev": 0.06,
+   "score_vol_pulse": 0.1,
+   "score_overbought": 0.06,
+   "score_theme_intrinsic": 0.05,
+   "score_attention": 0.05,
+   "score_sector": 0.1
+  },
+  "prior_weights": {
+   "score_fund": 0.18,
+   "score_news": 0.18,
+   "score_oversold60": 0.12,
+   "score_bias60": 0.1,
+   "score_rsi_rev": 0.06,
+   "score_vol_pulse": 0.1,
+   "score_overbought": 0.06,
+   "score_theme_intrinsic": 0.05,
+   "score_attention": 0.05,
+   "score_sector": 0.1
+  },
+  "adopted": "prior",
+  "walkforward": {
+   "n_oos_dates": 0,
+   "oos_ic_prior": null,
+   "oos_ic_new": null,
+   "oos_t_new": null,
+   "lambda": null,
+   "note": "十维池内截面 8 < MIN_TRAIN(30)，样本外观测不足 → 维持先验权重（每日重估登记，满 30 后自动启用走步验证）"
+  },
+  "full_period_composite_ic": {
+   "prior": {
+    "1": {
+     "n": 7,
+     "ic_mean": -0.0214,
+     "nw_t": -0.34,
+     "win_rate": 57.1
+    },
+    "5": {
+     "n": 3,
+     "ic_mean": -0.0112,
+     "nw_t": -0.35,
+     "win_rate": 66.7
+    },
+    "20": {
+     "n": 0,
+     "ic_mean": null,
+     "nw_t": null,
+     "win_rate": null
+    }
+   },
+   "lam_best": {
+    "1": {
+     "n": 7,
+     "ic_mean": -0.0214,
+     "nw_t": -0.34,
+     "win_rate": 57.1
+    },
+    "5": {
+     "n": 3,
+     "ic_mean": -0.0112,
+     "nw_t": -0.35,
+     "win_rate": 66.7
+    },
+    "20": {
+     "n": 0,
+     "ic_mean": null,
+     "nw_t": null,
+     "win_rate": null
+    }
+   }
+  },
+  "factor_ic_target_h": {
+   "score_fund": -0.0216,
+   "score_news": -0.0129,
+   "score_oversold60": -0.0252,
+   "score_bias60": 0.0132,
+   "score_rsi_rev": -0.0098,
+   "score_vol_pulse": -0.0019,
+   "score_overbought": -0.0287,
+   "score_theme_intrinsic": -0.0457,
+   "score_attention": -0.0302
+  },
+  "lambda_scan": [
+   {
+    "lambda": 0.0,
+    "n_oos": 0,
+    "oos_ic_mean": null,
+    "oos_t": null,
+    "oos_win_rate": null
+   },
+   {
+    "lambda": 0.2,
+    "n_oos": 0,
+    "oos_ic_mean": null,
+    "oos_t": null,
+    "oos_win_rate": null
+   },
+   {
+    "lambda": 0.4,
+    "n_oos": 0,
+    "oos_ic_mean": null,
+    "oos_t": null,
+    "oos_win_rate": null
+   },
+   {
+    "lambda": 0.6,
+    "n_oos": 0,
+    "oos_ic_mean": null,
+    "oos_t": null,
+    "oos_win_rate": null
+   },
+   {
+    "lambda": 0.8,
+    "n_oos": 0,
+    "oos_ic_mean": null,
+    "oos_t": null,
+    "oos_win_rate": null
+   },
+   {
+    "lambda": 1.0,
+    "n_oos": 0,
+    "oos_ic_mean": null,
+    "oos_t": null,
+    "oos_win_rate": null
+   }
+  ],
+  "notes": [
+   "复合总分由 9 维分量按权重线性合成后与未来收益求 Rank IC（与生产 total 口径一致，score_sector 因样本不足未纳入复合评估，权重固定 0.10）",
+   "训练窗因子 IC 仅使用基准快照 T+1 收益完整落在训练窗内的观测，避免边界泄漏",
+   "样本外日期集合对先验与 IC 驱动权重完全相同，公平比对",
+   "先验权重与生产同源（factor_weights.json prior_weights），拟合失败时回退该先验"
+  ]
+ }
 }

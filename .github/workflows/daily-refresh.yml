@@ -208,9 +208,12 @@ jobs:
             # ⚠️ 必须在 gen_report_top200.py 之前运行: 报告层渲染「📐 因子有效性评估」区块。
             #    因子历史逐日追加到 factor_history.json(随仓库分发), 本地首次可用
             #    `python3 factor_eval.py --bootstrap-from-git` 从 git 历史引导(Actions 无历史)。
-            echo "[$(date -u '+%H:%M:%S')] Running factor_eval.py (Rank IC) ..." >> $LOG
-            if python3 factor_eval.py >> $LOG 2>&1; then
-              echo "[$(date -u '+%H:%M:%S')] ✅ Factor IC evaluation updated" >> $LOG
+            echo "[$(date -u '+%H:%M:%S')] Running factor_eval.py (Rank IC + daily weight re-estimation) ..." >> $LOG
+            # 【v3.5.5 十维权重每日重估】--optimize-weights 每日走步验证:
+            #   池内十维截面 < MIN_TRAIN(30) 时 OOS 观测不足 → 自动维持先验并刷新 fitted_at/scan 记录;
+            #   满 30 且 OOS 复合 IC 优于先验 +0.005 才落档 IC 驱动权重(防过拟合纪律不变)。
+            if python3 factor_eval.py --optimize-weights >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Factor IC + weight re-estimation updated" >> $LOG
             else
               echo "[$(date -u '+%H:%M:%S')] ⚠️ Factor IC evaluation failed, report will omit IC section" >> $LOG
             fi
@@ -315,7 +318,9 @@ jobs:
           git add -f focus_pool_*.json
           git add -f recommendation_track.json
           git add -f factor_history.json factor_ic.json
-          git add -f sector/sw_map.json sector/sector_momentum_latest.json sector/portfolio_*.json
+          git add -f sector/sw_map.json sector/sector_momentum_latest.json sector/portfolio_*.json sector/portfolio_report_*.html
+          # 【v3.5.5】factor_weights.json 每日由 --optimize-weights 重估写入, 必须随链路推送
+          git add -f factor_weights.json
           git add enhance_scores.py gen_report_top200.py generate_ai_assessment.py factor_eval.py
           git add sector_momentum_daily.py apply_sector_momentum.py pick_portfolio.py gen_portfolio_report.py fetch_sw_map.py selfcheck_pipeline.py
           # 记录 prune 产生的删除(仅限已跟踪的历史报告/评分/组合文件)
