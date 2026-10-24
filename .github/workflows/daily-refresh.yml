@@ -25,7 +25,13 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # 【2026-10-21 调整 90→120】事故: run 39576745437 中 step2 耗时 78 分钟
+    # (海外 runner 拉腾讯/东财 491只K线极慢), 后续 5 步仅 5 分钟, 却在
+    # track_recommendations 阶段撞上 90 分钟硬超时被 cancelled → push 步骤被 skip,
+    # 结果「数据已算出但没上线」。预算必须覆盖最坏情况: 78(step2)+10(stale退避)
+    # +15(后续) ≈ 103 分钟。海外 runner 抓取腾讯/东财慢, 120 分钟仍会撞墙(10-23 三次
+    # cancelled 实证)。提到 300 分钟留足余量; 真正可靠路径是本地 run_daily_local.sh 兜底。
+    timeout-minutes: 300
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,6 +56,14 @@ jobs:
           echo "=== Refresh started at $(date -u '+%Y-%m-%d %H:%M:%S UTC') ===" > $LOG
           MAX_RETRIES=3
           RETRY_DELAY=30
+          # 【2026-10-21 修复】数据新鲜度失败单独用更长退避。
+          # 事故: 15:31 准点触发时个股行情已更新(亨通 51.45 -1.19%), 但上证指数日线
+          #   仍停在上一交易日 → check_data_fresh 判 stale。原来与 fetch 共用 30s 退避,
+          #   3 次尝试 3 分钟内全部打完(15:31/15:32/15:34) 即放弃, 当日 0 产出。
+          #   收盘后指数日线接口有数分钟至十几分钟延迟, 必须给足窗口。
+          # 现改为 5 分钟退避 × 3 次 = 最多等 10 分钟(15:31 触发 → 最晚 15:44 判定),
+          #   job timeout 90 分钟, 余量充足; 真假日仍会在 10 分钟后干净失败。
+          STALE_RETRY_DELAY=300
           SUCCESS=0
 
           # --- 幂等守卫 (防重复跑) ---
@@ -82,7 +96,8 @@ jobs:
             # 背景: 假日(09-25/10-01~07)与接口故障(09-10)日照常产出陈旧 scored json,
             #   污染 Rank IC 交易日对齐。指数日线日期 < 当日, 或价格与上一交易日
             #   ≥80% 相同 → 判定陈旧。
-            #   可重试: 收盘后指数日线偶有几分钟延迟, 30s 后重试通常恢复;
+            #   可重试: 收盘后指数日线偶有数分钟至十几分钟延迟, 用 STALE_RETRY_DELAY
+            #   (5 分钟) 退避重试, 最多等 10 分钟通常恢复;
             #   真假日则 3 次尝试后干净失败(不写评分数据), 由 17:30 补偿 cron 或
             #   次日任务兜底。延迟跨午夜的 run 同样会被拒 —— 宁可缺一天,
             #   不发布"数据日期≠发布日期"的错标报告(已知限制, 见 README)。
@@ -92,7 +107,7 @@ jobs:
             else
               echo "[$(date -u '+%H:%M:%S')] ❌ Stale/holiday data (attempt $ATTEMPT/$MAX_RETRIES)" >> $LOG
               echo "result=stale_data" >> $GITHUB_OUTPUT
-              [ $ATTEMPT -lt $MAX_RETRIES ] && sleep $RETRY_DELAY && continue
+              [ $ATTEMPT -lt $MAX_RETRIES ] && sleep $STALE_RETRY_DELAY && continue
               break
             fi
 
@@ -105,10 +120,14 @@ jobs:
             fi
 
             echo "[$(date -u '+%H:%M:%S')] Running step2_stockscorer_v2.py ..." >> $LOG
-            if python3 step2_stockscorer_v2.py "$INPUT_JSON" >> $LOG 2>&1; then
+            # 【2026-10-21 加超时保护】step2 是耗时大头(海外 runner 拉 491 只K线 + 财务,
+            #   实测 78 分钟)。加 5400s(90min) 硬上限: 保证即使极端劣化也留出
+            #   后续 6 步(AI评估/板块/组合/跟踪/因子/报告/push 约 15 分钟)的预算,
+            #   避免重演 run 39576745437「算了 78 分钟却没推上去」。
+            if timeout 5400 python3 step2_stockscorer_v2.py "$INPUT_JSON" >> $LOG 2>&1; then
               echo "[$(date -u '+%H:%M:%S')] ✅ Scoring succeeded" >> $LOG
             else
-              echo "[$(date -u '+%H:%M:%S')] ❌ Scoring failed" >> $LOG
+              echo "[$(date -u '+%H:%M:%S')] ❌ Scoring failed/timeout(5400s)" >> $LOG
               [ $ATTEMPT -lt $MAX_RETRIES ] && sleep $RETRY_DELAY && continue
               break
             fi
@@ -173,10 +192,14 @@ jobs:
             # ⚠️ 必须在 gen_report_top200.py 之前运行: 报告层会读取 recommendation_track.json
             #    渲染「📊 推荐跟踪 · 胜率验证」区块, 故需先记录当日快照并回填历史 T+N。
             echo "[$(date -u '+%H:%M:%S')] Running track_recommendations.py (snapshot + T+N backfill) ..." >> $LOG
-            if python3 track_recommendations.py "$SCORED_JSON" >> $LOG 2>&1; then
+            # 【2026-10-21 加超时保护】该步会回填历史 T+N 收益(需联网拉历史K线),
+            #   实测在海外 runner 上曾挂住 7 分钟以上且零输出。若它卡死会挤占
+            #   后续 gen_report/push 的预算(见 run 39576745437 被 90min 硬杀的教训)。
+            #   设 600s 上限: 超时仅跳过跟踪(报告降级为上一快照), 不阻塞主线出稿推送。
+            if timeout 600 python3 track_recommendations.py "$SCORED_JSON" >> $LOG 2>&1; then
               echo "[$(date -u '+%H:%M:%S')] ✅ Recommendation tracking updated" >> $LOG
             else
-              echo "[$(date -u '+%H:%M:%S')] ⚠️ Recommendation tracking failed, report will show last snapshot" >> $LOG
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ Recommendation tracking failed/timeout(600s), report will show last snapshot" >> $LOG
             fi
 
             # Step 3.96: 因子有效性评估 (Rank IC) → factor_ic.json + factor_history.json
@@ -186,9 +209,12 @@ jobs:
             # ⚠️ 必须在 gen_report_top200.py 之前运行: 报告层渲染「📐 因子有效性评估」区块。
             #    因子历史逐日追加到 factor_history.json(随仓库分发), 本地首次可用
             #    `python3 factor_eval.py --bootstrap-from-git` 从 git 历史引导(Actions 无历史)。
-            echo "[$(date -u '+%H:%M:%S')] Running factor_eval.py (Rank IC) ..." >> $LOG
-            if python3 factor_eval.py >> $LOG 2>&1; then
-              echo "[$(date -u '+%H:%M:%S')] ✅ Factor IC evaluation updated" >> $LOG
+            echo "[$(date -u '+%H:%M:%S')] Running factor_eval.py (Rank IC + daily weight re-estimation) ..." >> $LOG
+            # 【v3.5.5 十维权重每日重估】--optimize-weights 每日走步验证:
+            #   池内十维截面 < MIN_TRAIN(30) 时 OOS 观测不足 → 自动维持先验并刷新 fitted_at/scan 记录;
+            #   满 30 且 OOS 复合 IC 优于先验 +0.005 才落档 IC 驱动权重(防过拟合纪律不变)。
+            if python3 factor_eval.py --optimize-weights >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Factor IC + weight re-estimation updated" >> $LOG
             else
               echo "[$(date -u '+%H:%M:%S')] ⚠️ Factor IC evaluation failed, report will omit IC section" >> $LOG
             fi
@@ -293,7 +319,9 @@ jobs:
           git add -f focus_pool_*.json
           git add -f recommendation_track.json
           git add -f factor_history.json factor_ic.json
-          git add -f sector/sw_map.json sector/sector_momentum_latest.json sector/portfolio_*.json
+          git add -f sector/sw_map.json sector/sector_momentum_latest.json sector/portfolio_*.json sector/portfolio_report_*.html
+          # 【v3.5.5】factor_weights.json 每日由 --optimize-weights 重估写入, 必须随链路推送
+          git add -f factor_weights.json
           git add enhance_scores.py gen_report_top200.py generate_ai_assessment.py factor_eval.py
           git add sector_momentum_daily.py apply_sector_momentum.py pick_portfolio.py gen_portfolio_report.py fetch_sw_map.py selfcheck_pipeline.py
           # 记录 prune 产生的删除(仅限已跟踪的历史报告/评分/组合文件)

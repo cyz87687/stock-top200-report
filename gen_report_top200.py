@@ -94,8 +94,10 @@ model_str = data.get("model", "stock-scorer")
 #   P0-1 IC 交易日对齐: 剔除非交易日/接口陈旧快照(实测 09-10/09-25/10-01~07 七次事故)
 #   P0-2 IC 全样本收益: 回填全市场前复权日线, 消除 TOP200 留存偏差(T+20 流失 34%)
 #   P0-3 IC Newey-West + Bonferroni: 重叠窗口 t 值虚高修正, 15 次检验校正阈值 |NW t|≥2.97
-#   P0-4 IC 驱动权重: factor_weights.json 走步验证(样本外复合IC 0.0248→0.0445),
-#        基本面/消息面加权, 题材/技术降至地板, 板块动量维持(样本积累中)
+#   P0-4 IC 驱动权重: factor_weights.json 走步验证机制已就绪，
+#        ⚠️ 2026-10-24 实测更正: 十维池内截面 8 < MIN_TRAIN(30)，样本外观测为 0，
+#        实际 adopted=prior（IC 驱动权重从未落档）。原此处"样本外复合IC 0.0248→0.0445"
+#        为旧五维期文案，已删以免误读。
 #   P1 子区间稳定性/因子相关矩阵/workflow 数据新鲜度守卫(check_data_fresh.py)
 # v3.0: 十维评分模型（据全市场回测 Top5 因子拆解五维，见 因子排名与10维评分模型设计_2026-10-13.md）——
 #   1) 五维 → 十维: 技术面拆为超跌60反转/乖离低位/RSI反转/量能反向/超买反向(旧tech权重按0.06:0.10:0.06映射),
@@ -124,10 +126,11 @@ model_str = data.get("model", "stock-scorer")
 #          价格回填停更 7 个交易日期间与实际数据脱节；现由 snapshot_range 动态生成）
 # v3.5.5: ⑤ ⚖️ 权重区块展示「每日重估登记」状态（fitted_at/池内十维截面数/距门槛差距），
 #          --optimize-weights 接入每日链路（workflow+本地）；样本不足自动维持先验并刷新记录
-REPORT_VER = "v3.5.5"
+# v3.6: ⑥ 主口径由「十维均摊」切换为「基本面主导(v3.6-fund-led)」，版本标识同步
+REPORT_VER = "v3.6"
 _has_sector = any(x.get('score_sector') is not None for x in results)
 _has_10d = any(x.get('score_oversold60') is not None for x in results)
-_ver_tag = (f"{REPORT_VER} · 十维" if _has_10d
+_ver_tag = (f"{REPORT_VER} · 基本面主导" if _has_10d
             else (f"{REPORT_VER} · 五维" if _has_sector else f"{REPORT_VER} · 四维"))
 
 # v3.3 问题1优化: 十维评分明细矩阵（10维独立并列清晰呈现，含板块动量）
@@ -135,17 +138,42 @@ _ver_tag = (f"{REPORT_VER} · 十维" if _has_10d
 #    若问题2确认改为「每维0-10 / 总分100」制，仅需将下方 _DIM_MAX 改为 10，
 #    后端 step2/apply_sector_momentum 的总分缩放 ×4 改为 ×10、评级门槛同步放大即可。
 _DIM_MAX = 10  # v3.3 问题2: 量纲升级为「每维满分10 / 总分满分100」(后端 ×20, 前端 ×2 展示)
+
+
+def _load_dim_weights():
+    """从 factor_weights.json 读十维权重，供维度矩阵与文案使用。
+    v3.6 起禁止在此硬编码权重：口径切换（v3.1-10dim-ic → v3.6-fund-led）时
+    硬编码会让页面展示的权重与后端实际评分权重脱节，形成"页面说 18%、实际按 34% 算"
+    的静默口径漂移。失败时回退 v3.6 先验。"""
+    _fb = {"score_fund": 0.34, "score_news": 0.22, "score_sector": 0.10,
+           "score_oversold60": 0.055, "score_bias60": 0.055, "score_rsi_rev": 0.055,
+           "score_vol_pulse": 0.055, "score_overbought": 0.02,
+           "score_theme_intrinsic": 0.08, "score_attention": 0.02}
+    try:
+        _p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "factor_weights.json")
+        with open(_p, encoding="utf-8") as _f:
+            _w = (json.load(_f) or {}).get("weights") or {}
+        if all(k in _w for k in _fb):
+            _v = {k: float(_w[k]) for k in _fb}
+            if abs(sum(_v.values()) - 1.0) <= 0.02 and all(x >= 0 for x in _v.values()):
+                return _v
+    except Exception:
+        pass
+    return _fb
+
+
+_DIM_W = _load_dim_weights()
 _DIM_DEFS = [
-    ("基本面", "score_fund", 0.18, False),
-    ("消息面", "score_news", 0.18, False),
-    ("板块动量", "score_sector", 0.10, True),   # optional: 未跑 apply_sector_momentum 时为 None
-    ("超跌60反转", "score_oversold60", 0.12, False),
-    ("乖离低位", "score_bias60", 0.10, False),
-    ("RSI反转", "score_rsi_rev", 0.06, False),
-    ("量能反向", "score_vol_pulse", 0.10, False),
-    ("超买反向", "score_overbought", 0.06, False),
-    ("题材内禀", "score_theme_intrinsic", 0.05, False),
-    ("关注度", "score_attention", 0.05, False),
+    ("基本面", "score_fund", _DIM_W["score_fund"], False),
+    ("消息面", "score_news", _DIM_W["score_news"], False),
+    ("板块动量", "score_sector", _DIM_W["score_sector"], True),   # optional: 未跑 apply_sector_momentum 时为 None
+    ("超跌60反转", "score_oversold60", _DIM_W["score_oversold60"], False),
+    ("乖离低位", "score_bias60", _DIM_W["score_bias60"], False),
+    ("RSI反转", "score_rsi_rev", _DIM_W["score_rsi_rev"], False),
+    ("量能反向", "score_vol_pulse", _DIM_W["score_vol_pulse"], False),
+    ("超买反向", "score_overbought", _DIM_W["score_overbought"], False),
+    ("题材内禀", "score_theme_intrinsic", _DIM_W["score_theme_intrinsic"], False),
+    ("关注度", "score_attention", _DIM_W["score_attention"], False),
 ]
 
 
@@ -230,16 +258,23 @@ def _quantile_ratings(items):
 
 # ===== v3.0 十维/五维自适应展示复合分 =====
 # 十维数据的叙述层(评级理由/S&A深度分析)仍按"技术块/题材块"口径表述,
-# 复合分按十维权重加权还原, 保证与真实计分结构一致而非简单等权:
-#   技术块 = (0.12×超跌60 + 0.10×乖离 + 0.06×RSI反 + 0.10×量能反 + 0.06×超买反) / 0.44
-#   题材块 = (内禀 + 关注度) / 2  (旧 theme 权重对半映射口径)
+# 复合分按当前十维权重加权还原, 保证与真实计分结构一致而非简单等权。
+# v3.6: 权重改为读 _DIM_W（factor_weights.json），禁止硬编码——
+#   旧写法把反转块硬编码为 0.12/0.10/0.06/0.10/0.06 合计 0.44，
+#   口径切换到 v3.6(反转块各 0.055 + 超买 0.02)后会算错复合分。
+_TECH_BLOCK_KEYS = ("score_oversold60", "score_bias60", "score_rsi_rev",
+                    "score_vol_pulse", "score_overbought")
+_TECH_BLOCK_W = sum(_DIM_W[k] for k in _TECH_BLOCK_KEYS) or 1.0
+
+
 def _dim_composites(r):
-    """→ (tech_disp, theme_disp): 十维按权重加权复合, 旧五维直接取原字段"""
+    """→ (tech_disp, theme_disp): 十维按当前权重加权复合, 旧五维直接取原字段"""
     if r.get("score_oversold60") is not None:
-        _tw = 0.12 * r["score_oversold60"] + 0.10 * r["score_bias60"] + 0.06 * r["score_rsi_rev"] \
-            + 0.10 * r["score_vol_pulse"] + 0.06 * r["score_overbought"]
-        _th = (r.get("score_theme_intrinsic", 0) + r.get("score_attention", 0)) / 2
-        return _tw / 0.44, _th
+        _tw = sum(_DIM_W[k] * float(r.get(k) or 0) for k in _TECH_BLOCK_KEYS)
+        _ti, _ta = _DIM_W["score_theme_intrinsic"], _DIM_W["score_attention"]
+        _th = ((float(r.get("score_theme_intrinsic") or 0) * _ti
+                + float(r.get("score_attention") or 0) * _ta) / ((_ti + _ta) or 1.0))
+        return _tw / _TECH_BLOCK_W, _th
     return r.get("score_tech", 0), r.get("score_theme", 0)
 _rating_abs_orig = {r["code"]: r["rating"] for r in results}
 _new_rating = _quantile_ratings(results)
@@ -1906,7 +1941,7 @@ for idx, r in enumerate(top20):
         if (isinstance(_q3_raw, (int, float)) and isinstance(_q3_eff, (int, float))
                 and abs(_q3_raw - _q3_eff) > 1):
             _q3_sat_s = f"；Q3原始同比{_q3_raw:+.0f}%，经低基数饱和后采用{_q3_eff:+.0f}%（加速度为饱和后口径）"
-        _q3_tip = (f"Q3预测景气加成 +{_qb:.1f}分(0-5分制, 传导总分+{_qb*0.18*20:.1f})；"
+        _q3_tip = (f"Q3预测景气加成 +{_qb:.1f}分(0-5分制, 传导总分+{_qb*_DIM_W['score_fund']*20:.1f})；"
                    f"Q3同比{_q3_yoy_s} 加速度{_q3_accel_s}{_q3_sat_s}；"
                    f"机构全年预期隐含H2增速{_q3_ih2_s}（Q3预测超出机构预期部分才计入，防止与FwdPE双重计价）；"
                    f"数据源：手工汇总表(半导体/消费电子Q3预测, TTL45天)")
@@ -3331,6 +3366,38 @@ if _ic and _ic.get("factors"):
                     f'background:{_rv}22;color:{_rv};cursor:help;white-space:nowrap;">'
                     f'{html_mod.escape(str(_rec_ic.get("verdict") or "—"))}</span></td></tr>')
 
+    # ===== v3.6 可交易 IC 行（t+1 开盘买入，消除前视偏差，扣 20bp 往返成本）=====
+    _tr = _ic.get("tradable_ic")
+    _tr_row = ""
+    if _tr:
+        _trh = _tr.get("horizons") or {}
+        _trv = _tr.get("verdict_color", "#94a3b8")
+        _tcells = ""
+        for _h in (1, 5, 20):
+            _a = _trh.get(str(_h)) or {}
+            if not _a.get("n"):
+                _tcells += ('<td style="padding:6px 10px;color:#475569;text-align:center;">未到期</td>')
+                continue
+            _icv, _t = _a.get("ic_mean"), _a.get("nw_t")
+            _c = "#ef4444" if (_icv or 0) > 0 else ("#22c55e" if (_icv or 0) < 0 else "#94a3b8")
+            _lm, _lm_g = _a.get("long_mean"), _a.get("gross_ic_mean")
+            _lm_s = (f'<div style="font-size:10px;color:#64748b;margin-top:2px;">'
+                     f'头组净收益 {_lm:+.2f}%</div>') if isinstance(_lm, (int, float)) else ""
+            _tcells += (f'<td style="padding:6px 10px;text-align:center;">'
+                        f'<div style="color:{_c};font-size:13px;">{_icv:+.3f}</div>'
+                        f'<div style="font-size:10px;color:#64748b;margin-top:2px;">'
+                        f'NW t={_t:+.2f} · n={_a.get("n")}</div>{_lm_s}</td>')
+        _tr_row = (f'<tr style="background:rgba(56,189,248,0.06);">'
+                   f'<td style="padding:6px 10px;font-weight:700;color:#7dd3fc;white-space:nowrap;">'
+                   f'⚡ 综合分（可交易口径）'
+                   f'<div style="font-size:10px;color:#64748b;margin-top:2px;">T+1 开盘买入·扣{_tr.get("cost_bps_roundtrip", 0):.0f}bp</div></td>'
+                   f'{_tcells}'
+                   f'<td style="padding:6px 10px;text-align:center;">'
+                   f'<span title="{html_mod.escape(str(_tr.get("verdict_note") or ""))}" '
+                   f'style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px;'
+                   f'background:{_trv}22;color:{_trv};cursor:help;white-space:nowrap;">'
+                   f'{html_mod.escape(str(_tr.get("verdict") or "—"))}</span></td></tr>')
+
     # ===== v2.47 因子间截面相关矩阵（披露"五维"实际独立信息量）=====
     _corr = _ic.get("factor_correlation") or {}
     _corr_html = ""
@@ -3640,6 +3707,64 @@ if _ic and _ic.get("factors"):
                          f"子区间稳定性已披露于表中「半期」行，无制度切换；")
     except Exception:
         _ic_span_note = "子区间稳定性已披露于表中「半期」行，无制度切换；"
+
+    # ===== v3.6（量化审计 P0）：预测力安全门横幅 —— 投资者一眼看到能否机械跟单 =====
+    _gate = _ic.get("risk_gate") or {}
+    _collin = _ic.get("collinearity") or {}
+    _gate_level = _gate.get("level", "caution")
+    _gate_color = "#ef4444" if _gate_level == "high_risk" else "#f59e0b"
+    _gate_title = ("🔴 高风险 · 建议观望/不机械跟单" if _gate_level == "high_risk"
+                   else "🟡 谨慎 · 预测力证据不足")
+    _trig_items = "".join(
+        '<li style="margin:3px 0;">' + html_mod.escape(str(t)) + '</li>'
+        for t in (_gate.get("triggered") or []))
+    _trig_ul = ('<ul style="margin:4px 0 8px 18px;padding:0;font-size:11px;color:#cbd5e1;'
+                'line-height:1.8;">' + _trig_items + '</ul>') if _trig_items else ''
+    _advice = html_mod.escape(str(_gate.get("advice") or ""))
+    _collin_note = (html_mod.escape(str(_collin.get("note") or ""))
+                    if _collin.get("n_high_corr_pairs") else '')
+    _collin_div = ('<div style="font-size:11px;color:#f59e0b;margin-top:8px;">⚠️ 共线性：'
+                   + _collin_note + '</div>') if _collin_note else ''
+    # v3.6（P0）：选股池体检 —— 比评分权重更根本的问题：池子里装的是什么
+    _pe = _ic.get("pool_excess") or {}
+    _pe_div = ''
+    if _pe.get("median_excess_pct") is not None:
+        _pe_med = float(_pe["median_excess_pct"])
+        _pe_neg = _pe.get("neg_ratio_pct")
+        _pe_hop = _pe.get("hop")
+        _pe_col = "#ef4444" if _pe_med < -1.0 else ("#f59e0b" if _pe_med < 0 else "#22c55e")
+        _pe_head = ("🔴 池子选错了" if _pe_med < -1.0 else
+                    ("🟡 池子略偏弱" if _pe_med < 0 else "🟢 池子未见负超额"))
+        _pe_div = (
+            '<div style="margin:12px 0 16px;padding:12px 16px;background:' + _pe_col
+            + '10;border:1px solid ' + _pe_col + '45;border-left:4px solid ' + _pe_col
+            + ';border-radius:8px;">'
+            '<div style="font-size:13px;font-weight:800;color:' + _pe_col + ';margin-bottom:6px;">'
+            '🧺 选股池体检：' + _pe_head + '</div>'
+            '<div style="font-size:12px;color:#e2e8f0;line-height:1.8;">'
+            '对本池做「池内 vs 全市场价格池」的截面对照：过去 <b>' + str(_pe.get("n_days"))
+            + '</b> 个入场日、持有 ' + str(_pe_hop) + ' 个交易日后，'
+            '池内个股涨跌<b style="color:' + _pe_col + ';">中位数比全池低 '
+            + f'{abs(_pe_med):.2f}' + ' 个百分点</b>（均值 '
+            + f'{_pe.get("mean_excess_pct"):+.2f}' + 'pct），'
+            + f'<b>{_pe_neg}%</b> 的入场日跑输。'
+            '<br><b>含义：</b>「成交额 TOP 榜」本质是<b>高换手关注度脉冲</b>的集合，'
+            '这批股票在脉冲退潮后系统性回吐。这意味着——'
+            '<b style="color:#fbbf24;">即使因子加权再精妙，也只是在这个负 alpha 集合内部做相对排序</b>；'
+            '头组跑赢池均值也不等于绝对盈利。该问题<b>无法靠调权重解决</b>，需改造入选规则'
+            '（见下方改进建议）。'
+            '</div></div>')
+    _risk_banner = (
+        '<div style="margin:12px 0 16px;padding:12px 16px;background:' + _gate_color
+        + '14;border:1px solid ' + _gate_color + '55;border-left:4px solid ' + _gate_color
+        + ';border-radius:8px;">'
+        '<div style="font-size:13px;font-weight:800;color:' + _gate_color + ';margin-bottom:6px;">'
+        '🛡️ 预测力安全门：' + _gate_title + '</div>'
+        + _trig_ul
+        + '<div style="font-size:12px;color:#e2e8f0;line-height:1.7;"><b>建议：</b>'
+        + _advice + '</div>'
+        + _collin_div
+        + '</div>') + _pe_div
     html_parts.append(f'''
     <!-- v2.46 因子有效性评估（Rank IC） -->
     <div class="section-block" style="margin:24px 0;padding:18px 20px;background:#0f172a;border:1px solid #334155;border-radius:12px;">
@@ -3656,6 +3781,7 @@ if _ic and _ic.get("factors"):
             剔除非交易日/接口陈旧快照 {len(_ic.get("stale_snapshots_dropped") or [])} 个，
             价格回填 {(_ic.get("price_backfill") or {}).get("n_codes") or "—"} 只 × {(_ic.get("price_backfill") or {}).get("n_trading_days") or "—"} 个交易日）。
         </div>
+        {_risk_banner}
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
             <thead><tr style="background:#1e293b;">
                 <th style="padding:6px 10px;text-align:left;color:#94a3b8;font-weight:600;">因子</th>
@@ -3664,7 +3790,7 @@ if _ic and _ic.get("factors"):
                 <th style="padding:6px 10px;color:#94a3b8;font-weight:600;">T+20（一月）</th>
                 <th style="padding:6px 10px;color:#94a3b8;font-weight:600;">有效性判定</th>
             </tr></thead>
-            <tbody>{_ic_rows}{_rec_row}</tbody>
+            <tbody>{_ic_rows}{_rec_row}{_tr_row}</tbody>
         </table>
         {f'<div style="margin-top:14px;"><div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">📈 累计 IC 曲线（T+1，按截面序号累计；纵轴为累计 IC 值量程——曲线持续上行=因子稳定正向，下行=负向；窄屏可左右滑动）</div><div style="overflow-x:auto;">{_chart_svg}</div><div style="font-size:11px;margin-top:6px;">{_legend}</div></div>' if _chart_svg else ''}
         {_corr_html}
@@ -3891,7 +4017,18 @@ html_parts.append('''
         <p>🗒️ 点评来源：''' + _ai_src_label + '''（''' + html_mod.escape(_ai_src_tip) + '''）</p>
         <p>⚠️ 免责声明: 本报告由AI基于stock-scorer极简评分模型自动生成,仅供参考,不构成投资建议。投资有风险,入市需谨慎。</p>
         <p>评分模型 (''' + _SCORER_VER + '''): '''
-        + ('十维 — 基本面18% + 消息面18% + 板块动量10% + 超跌60反转12% + 乖离低位10% + RSI反转6% + 量能反向10% + 超买反向6% + 题材内禀5% + 关注度5%（据全市场回测 Top5 因子拆解五维；新维度池内截面<30，权重先验·待池内验证）；'
+        + ('十维·基本面主导（v3.6-fund-led）— 基本面' + f'{_DIM_W["score_fund"]:.0%}'
+           + ' + 消息面' + f'{_DIM_W["score_news"]:.0%}'
+           + ' + 板块动量' + f'{_DIM_W["score_sector"]:.0%}'
+           + ' + 超跌60反转' + f'{_DIM_W["score_oversold60"]:.1%}'
+           + ' + 乖离低位' + f'{_DIM_W["score_bias60"]:.1%}'
+           + ' + RSI反转' + f'{_DIM_W["score_rsi_rev"]:.1%}'
+           + ' + 量能反向' + f'{_DIM_W["score_vol_pulse"]:.1%}'
+           + ' + 超买反向' + f'{_DIM_W["score_overbought"]:.0%}'
+           + ' + 题材内禀' + f'{_DIM_W["score_theme_intrinsic"]:.0%}'
+           + ' + 关注度' + f'{_DIM_W["score_attention"]:.0%}'
+           + '（2026-10-24 口径切换：以全样本可验证维度为主，反转块等权压缩以消除 0.742~0.889 共线性虚增；'
+           + '超买/关注度有效截面仅 9 个降至 2% 地板；池内十维截面<30 仍属先验·待 IC 复验）；'
            if _has_10d else
            ('基本面30% + 题材热度18% + 消息面20%(AI赋分) + 技术面20% + 板块动量12%(申万二级板块60日/10日动量排名, 按6:4合成)；'
             if _has_sector else

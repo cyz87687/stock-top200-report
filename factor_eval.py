@@ -89,11 +89,11 @@ FACTORS = [
 OPT_DIMS = ["score_fund", "score_news", "score_oversold60", "score_bias60",
             "score_rsi_rev", "score_vol_pulse", "score_overbought",
             "score_theme_intrinsic", "score_attention"]
-# 十维先验（与 factor_weights.json v3.0-10dim 一致；运行时会优先读该文件 prior_weights）
-PRIOR_W10 = {"score_fund": 0.18, "score_news": 0.18, "score_oversold60": 0.12,
-             "score_bias60": 0.10, "score_rsi_rev": 0.06, "score_vol_pulse": 0.10,
-             "score_overbought": 0.06, "score_theme_intrinsic": 0.05,
-             "score_attention": 0.05}   # 合计0.90，sector 固定0.10补足
+# 十维先验（与 factor_weights.json v3.6-fund-led 一致；运行时会优先读该文件 prior_weights）
+PRIOR_W10 = {"score_fund": 0.34, "score_news": 0.22, "score_oversold60": 0.055,
+             "score_bias60": 0.055, "score_rsi_rev": 0.055, "score_vol_pulse": 0.055,
+             "score_overbought": 0.02, "score_theme_intrinsic": 0.08,
+             "score_attention": 0.02}   # 合计0.90，sector 固定0.10补足
 W_SECTOR_FIXED = 0.10              # score_sector 固定权重（样本积累中）
 W_FLOOR = 0.03                     # 单维度地板（十维下保持维度意义；3%≈旧五维5%量纲）
 TARGET_H = 1                       # 权重优化目标周期
@@ -351,8 +351,11 @@ def bootstrap_from_git():
 
 
 # ---------------------------------------------------------------- 价格回填（P0-2）
-def _fetch_qfq(sym, need=PX_NEED):
-    """腾讯前复权日线 → [(date, close)]；多域名轮询，WAF 页自动换域。"""
+def _fetch_qfq(sym, need=PX_NEED, with_open=False):
+    """腾讯前复权日线 → [(date, close)]；with_open=True 时 → [(date, open, close)]。
+    多域名轮询，WAF 页自动换域。
+    注：腾讯 qfqday 原始行 = [日期, 开, 收, 高, 低, 量]，开盘价一直可取，此前只取收盘。
+    """
     for _host in TQ_HOSTS:
         url = f"{_host}/appstock/app/fqkline/get?param={sym},day,,,{need},qfq"
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
@@ -373,7 +376,10 @@ def _fetch_qfq(sym, need=PX_NEED):
             out = []
             for k in raw_kl:
                 try:
-                    out.append((k[0], float(k[2])))
+                    if with_open:
+                        out.append((k[0], float(k[1]), float(k[2])))
+                    else:
+                        out.append((k[0], float(k[2])))
                 except Exception:
                     continue
             if out:
@@ -400,7 +406,9 @@ def bootstrap_prices():
     old = hist.get("prices") or {}
     old_dates = old.get("dates") or []
     old_px = old.get("px") or {}
+    old_op = old.get("opens") or {}
     px_series = {}          # code -> {date: close}
+    op_series = {}          # code -> {date: open}  （v3.6 可交易 IC 用）
     n_ok = n_fail = n_skip = 0
     for i, c in enumerate(codes):
         sym = _symbol(c)
@@ -411,30 +419,37 @@ def bootstrap_prices():
             print(f"   回填进度 {i + 1}/{len(codes)}（成功 {n_ok} 失败 {n_fail}）")
         # 已有且覆盖到最新交易日则跳过（增量场景）
         prev = old_px.get(c)
-        kl = _fetch_qfq(sym)
+        kl = _fetch_qfq(sym, with_open=True)
         if not kl:
             # 保留旧数据（接口偶发失败不丢历史）
             if prev:
                 px_series[c] = {d: v for d, v in zip(old_dates, prev) if v is not None}
+                _po = old_op.get(c)
+                if _po:
+                    op_series[c] = {d: v for d, v in zip(old_dates, _po) if v is not None}
                 n_skip += 1
             else:
                 n_fail += 1
             continue
-        px_series[c] = dict(kl)
+        px_series[c] = {d: cl for d, op, cl in kl}
+        op_series[c] = {d: op for d, op, cl in kl if op}
         n_ok += 1
         time.sleep(0.03)
 
     all_dates = sorted({d for m in px_series.values() for d in m})
     px_compact = {c: [m.get(d) for d in all_dates] for c, m in px_series.items()}
+    op_compact = {c: [m.get(d) for d in all_dates] for c, m in op_series.items()}
     hist["prices"] = {
         "fetched_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "dates": all_dates,
         "px": px_compact,
+        "opens": op_compact,
         "n_codes": len(px_compact),
+        "n_open_codes": len(op_compact),
     }
     save_history(hist)
     print(f"✅ 价格回填完成: {len(px_compact)} 只（新抓 {n_ok}，保留旧 {n_skip}，失败 {n_fail}）"
-          f"，交易日 {len(all_dates)} 个（{all_dates[0]} ~ {all_dates[-1]}）")
+          f"，含开盘价 {len(op_compact)} 只，交易日 {len(all_dates)} 个（{all_dates[0]} ~ {all_dates[-1]}）")
     return 0
 
 
@@ -454,6 +469,17 @@ def px_index(hist):
         for r in s.get("rows", []):
             px.setdefault(r["code"], {})[s["date"]] = r["price"]
     return sorted({s["date"] for s in snaps}), px
+
+
+def open_index(hist):
+    """→ {code: {date: open}}（v3.6 可交易 IC 用；无 opens 字段时返回空 dict）。"""
+    p = hist.get("prices") or {}
+    dates = p.get("dates") or []
+    op_raw = p.get("opens") or {}
+    if not (dates and op_raw):
+        return {}
+    return {c: {d: v for d, v in zip(dates, arr) if v is not None}
+            for c, arr in op_raw.items()}
 
 
 def merge_snapshot_prices(hist):
@@ -476,6 +502,97 @@ def merge_snapshot_prices(hist):
                 arr[i] = r["price"]
                 changed = True
     return changed
+
+
+def refresh_price_tail(hist, verbose=True):
+    """价格 store 落后最新快照时**增量**抓取缺失尾部（日常自愈，无需手动 --bootstrap-prices）。
+
+    背景：日常登记只 upsert 截面、不刷新 prices store；若长期不跑 --bootstrap-prices，
+    最新截面会因缺前向价格被整体剔除（曾致 10-13~10-21 连续 7 个截面未入 IC 计算，
+    页面停留在旧 snapshot_range）。本函数在每次跑 factor_eval 时自动补齐。
+
+    · 触发条件：prices.dates[-1] < 最新快照日期（存在未回填的交易日快照）；
+    · 抓取范围：历史全部出现过的代码，need = clamp(缺口日历天数+12, 30, PX_NEED) 根；
+    · 只追加 dates[-1] 之后的新交易日，并顺带填补已有日期上的 None 空洞（不覆盖旧值）；
+    · 接口失败保留旧值；无新交易日则原样返回。返回 bool 表示是否有更新。
+    """
+    p = hist.get("prices") or {}
+    dates, px = p.get("dates") or [], p.get("px") or {}
+    opens = p.get("opens") or {}
+    if not dates or not px:
+        return False                      # 无 store → 走 --bootstrap-prices 全量重建
+    snaps = [s for s in hist.get("snapshots", []) if s.get("rows")]
+    if not snaps:
+        return False
+    last_snap = max(s["date"] for s in snaps)
+    if last_snap <= dates[-1]:
+        return False                      # store 已覆盖最新快照，零成本跳过
+    codes = sorted({str(r["code"]) for s in snaps for r in s["rows"]
+                    if r.get("code") and len(str(r["code"])) == 6})
+    try:
+        gap = (datetime.strptime(last_snap, "%Y-%m-%d")
+               - datetime.strptime(dates[-1], "%Y-%m-%d")).days
+    except ValueError:
+        gap = 7
+    need = min(PX_NEED, max(30, gap + 12))
+    tail = {}          # code -> {date: close}
+    tail_op = {}       # code -> {date: open}（v3.6 可交易 IC）
+    n_ok = n_fail = 0
+    for i, c in enumerate(codes):
+        sym = _symbol(c)
+        if not sym:
+            continue
+        kl = _fetch_qfq(sym, need=need, with_open=True)
+        if kl:
+            tail[c] = {d: cl for d, op, cl in kl}
+            tail_op[c] = {d: op for d, op, cl in kl if op}
+            n_ok += 1
+        else:
+            n_fail += 1
+        if verbose and (i + 1) % 200 == 0:
+            print(f"   价格尾部增量进度 {i + 1}/{len(codes)}（成功 {n_ok} 失败 {n_fail}）")
+        time.sleep(0.02)
+    added = sorted({d for m in tail.values() for d in m if d > dates[-1]})
+    if not added:
+        if verbose:
+            print(f"⚠️ 价格尾部无新交易日（成功 {n_ok} 失败 {n_fail}），保留旧 store")
+        return False
+    aidx = {d: len(dates) + k for k, d in enumerate(added)}
+    didx_old = {d: i for i, d in enumerate(dates)}
+    for arr in px.values():
+        arr.extend([None] * len(added))
+    for arr in opens.values():
+        arr.extend([None] * len(added))
+    for c, m in tail.items():
+        arr = px.get(c)
+        if arr is None:                   # 新出现代码：按全局日期轴对齐（前置日期留空）
+            arr = [None] * len(dates) + [None] * len(added)
+            px[c] = arr
+        for d, v in m.items():
+            j = aidx.get(d, didx_old.get(d))
+            if j is not None and j < len(arr) and arr[j] is None and v:
+                arr[j] = v
+    for c, m in tail_op.items():
+        oarr = opens.get(c)
+        if oarr is None:
+            oarr = [None] * len(dates) + [None] * len(added)
+            opens[c] = oarr
+        for d, v in m.items():
+            j = aidx.get(d, didx_old.get(d))
+            if j is not None and j < len(oarr) and oarr[j] is None and v:
+                oarr[j] = v
+    hist["prices"] = {
+        "fetched_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "dates": dates + added,
+        "px": px,
+        "opens": opens,
+        "n_codes": len(px),
+        "n_open_codes": len(opens),
+    }
+    if verbose:
+        print(f"📈 价格尾部增量完成: +{len(added)} 个交易日（{added[0]} ~ {added[-1]}），"
+              f"覆盖 {len(px)} 只（含开盘价 {len(opens)}，新抓 {n_ok} 失败 {n_fail}）")
+    return True
 
 
 # ---------------------------------------------------------------- IC 计算（修正口径）
@@ -573,12 +690,24 @@ def _eval_factor(snapshots, field, tdays, px, max_base_idx=None):
 
 
 def _verdict_h(agg):
-    """单周期有效性判定（以 Newey-West t 为主口径）。"""
+    """单周期有效性判定（以 Newey-West t 为主口径）。
+    v3.6（量化审计 P0）：小样本不再掩盖强信号——即便 n<MIN_SAMPLE，只要 |NW t|≥T_LOOSE
+    就如实标注方向性警示（负 alpha 红色告警），仅弱信号才报「样本积累中」。"""
     n = agg.get("n") or 0
-    if n < MIN_SAMPLE:
-        return "样本积累中", "#94a3b8", f"n={n}<{MIN_SAMPLE}"
     ic = agg.get("ic_mean")
     t = agg.get("nw_t")
+    wr = agg.get("win_rate")
+    if n < MIN_SAMPLE:
+        strong = t is not None and abs(t) >= T_LOOSE
+        if strong and ic is not None:
+            wr_s = f"，胜率={wr}%" if wr is not None else ""
+            if ic < 0:
+                return ("⚠️显著跑输·小样本", "#ef4444",
+                        f"IC={ic:+.3f}，NW t={t}{wr_s}，n={n}<{MIN_SAMPLE}；"
+                        f"方向性负alpha警示（样本未达标，待确认）")
+            return ("正向·小样本(待确认)", "#f59e0b",
+                    f"IC={ic:+.3f}，NW t={t}{wr_s}，n={n}<{MIN_SAMPLE}；方向为正待更多样本确认")
+        return "样本积累中", "#94a3b8", f"n={n}<{MIN_SAMPLE}"
     if ic is None:
         return "数据不足", "#94a3b8", "观测不足"
     aic = abs(ic)
@@ -599,21 +728,233 @@ def _verdict_h(agg):
 
 
 def _overall_verdict(horizons):
-    """综合判定: 取 |NW t| 最大且样本达标的周期。"""
-    best, best_t = None, -1.0
+    """综合判定: 优先取 |NW t| 最大且样本达标的周期。
+    v3.6（量化审计 P0）：若全部周期 n<MIN_SAMPLE，回退到 |NW t| 最大的周期做方向性
+    警示——不把 -2.66 这类强负信号藏进「样本积累中」。"""
+    best, best_t, best_h = None, -1.0, None
     for h in HORIZONS:
         a = horizons.get(str(h)) or {}
         if (a.get("n") or 0) < MIN_SAMPLE:
             continue
         t = a.get("nw_t")
         if t is not None and abs(t) > abs(best_t):
-            best, best_t = a, t
-    if best is None:
-        n_max = max((horizons.get(str(h)) or {}).get("n") or 0 for h in HORIZONS)
-        return "样本积累中", "#94a3b8", f"各周期样本均 <{MIN_SAMPLE}（最大 {n_max}）"
-    lab, col, note = _verdict_h(best)
-    hh = next(h for h in HORIZONS if (horizons.get(str(h)) or {}) is best)
-    return lab, col, note + f"（T+{hh}）"
+            best, best_t, best_h = a, t, h
+    if best is not None:
+        lab, col, note = _verdict_h(best)
+        return lab, col, note + f"（T+{best_h}）"
+    cand, cand_t, cand_h = None, -1.0, None
+    for h in HORIZONS:
+        a = horizons.get(str(h)) or {}
+        t = a.get("nw_t")
+        if t is not None and abs(t) > abs(cand_t):
+            cand, cand_t, cand_h = a, t, h
+    if cand is not None:
+        lab, col, note = _verdict_h(cand)
+        return lab, col, note + f"（T+{cand_h}·小样本）"
+    n_max = max((horizons.get(str(h)) or {}).get("n") or 0 for h in HORIZONS)
+    return "样本积累中", "#94a3b8", f"各周期样本均 <{MIN_SAMPLE}（最大 {n_max}）"
+
+
+def _collinearity_summary(corr, thr=0.7):
+    """共线性收敛（量化审计 P0）：识别 |corr|≥thr 的高共线因子对。
+    反转类因子（超跌/乖离/RSI/量能/超买）历史上两两相关达 0.75~0.89，重复计权会
+    虚增该主题在综合分的占比，并使 IC 驱动权重不稳定。"""
+    pairs = []
+    for k, v in (corr or {}).items():
+        if "|" not in k:
+            continue
+        m = v.get("mean") if isinstance(v, dict) else v
+        if isinstance(m, (int, float)) and abs(m) >= thr:
+            pairs.append({"pair": k, "corr": round(m, 3)})
+    pairs.sort(key=lambda x: -abs(x["corr"]))
+    return {
+        "threshold": thr,
+        "high_corr_pairs": pairs,
+        "n_high_corr_pairs": len(pairs),
+        "note": (f"存在 {len(pairs)} 对高共线因子（|corr|≥{thr}），多重计权会虚增该主题综合权重、"
+                 f"并使 IC 驱动权重不稳定；建议正交化/分组降权（top: "
+                 + (", ".join(f"{p['pair']}={p['corr']}" for p in pairs[:3]) or "无") + "）")
+        if pairs else f"未见 |corr|≥{thr} 的高共线因子对",
+    }
+
+
+def _eval_pool_excess(snapshots, tdays, px, hop=20, min_n=20):
+    """池子负超额体检（v3.6 P0）：本池「成交额 TOP 榜」本身是否是一个负 alpha 集合。
+
+    动机：数轮审计都在纠结算分权重，却没人问「池子里装的是什么」。若池内成分
+    系统性跑输全池，则任何精妙的因子加权都只是在负 alpha 集合里做相对排序，
+    头组跑赢池均值也仍是绝对亏损。
+
+    口径：对每个快照日 d0，取池内全部个股与价格池全池个股，分别计算
+    d0 → d0+hop 的中位涨跌幅，差值即「池内相对全池的截面超额」。
+    注意：px 结构为 {code: {date_str: price}}（非按 index 的列表）。
+
+    返回 {n_days, median_excess_pct, mean_excess_pct, neg_ratio_pct, hop, verdict}
+    """
+    exs = []
+    for s in snapshots:
+        d0 = s["date"]
+        i0 = tdays.index(d0) if d0 in tdays else None
+        if i0 is None or i0 + hop >= len(tdays):
+            continue
+        d1 = tdays[i0 + hop]
+        pv, av = [], []
+        for r in s["rows"]:
+            m = px.get(r["code"])
+            if not m:
+                continue
+            p0, p1 = m.get(d0), m.get(d1)
+            if p0 and p1 and p0 > 0:
+                pv.append(p1 / p0 - 1.0)
+        for m in px.values():
+            if not m:
+                continue
+            p0, p1 = m.get(d0), m.get(d1)
+            if p0 and p1 and p0 > 0:
+                av.append(p1 / p0 - 1.0)
+        if len(pv) < min_n or len(av) < min_n:
+            continue
+        pv.sort(); av.sort()
+        def _med(a):
+            n = len(a)
+            return a[n // 2] if n % 2 else (a[n // 2 - 1] + a[n // 2]) / 2.0
+        exs.append(_med(pv) - _med(av))
+    if not exs:
+        return {"n_days": 0, "median_excess_pct": None, "mean_excess_pct": None,
+                "neg_ratio_pct": None, "hop": hop, "verdict": "样本不足"}
+    exs.sort()
+    n = len(exs)
+    med = exs[n // 2] if n % 2 else (exs[n // 2 - 1] + exs[n // 2]) / 2.0
+    neg = 100.0 * sum(1 for v in exs if v < 0) / n
+    if med < -0.02 and neg >= 75:
+        verdict = "负超额·稳定"
+    elif med < -0.01:
+        verdict = "负超额·偏弱"
+    elif med > 0.01:
+        verdict = "正超额"
+    else:
+        verdict = "中性"
+    return {"n_days": n,
+            "median_excess_pct": round(med * 100, 2),
+            "mean_excess_pct": round(sum(exs) / n * 100, 2),
+            "neg_ratio_pct": round(neg, 1),
+            "hop": hop,
+            "verdict": verdict}
+
+
+def _risk_gate(rec_ic, factors, collinearity, tradable=None, pool_excess=None):
+    """预测力安全门（量化审计 P0/P1）：基于实测 IC 决定「能否机械跟单」。
+    规则（数据驱动、非拟合）：
+      · 可交易口径 IC 不显著（|NW t|<T_LOOSE）→ 无可靠可执行 alpha
+      · 推荐组合 T+1 IC 显著为负（NW t≤-T_LOOSE）→ high_risk（历史推荐跑输）
+      · 推荐组合 T+1 胜率 <40% → 记录风险
+      · 综合总分无显著正 IC（NW t<T_LOOSE）→ 不可作独立 alpha 源
+      · v3.6：池子本身系统性负超额 → high_risk（选股池选错，权重再优也无解）
+    """
+    gate = {"level": "caution", "triggered": [], "advice": ""}
+    rh = ((rec_ic or {}).get("horizons") or {}) if isinstance(rec_ic, dict) else {}
+    rec_h1 = rh.get("1") or {}
+    ric, rt, rwr = rec_h1.get("ic_mean"), rec_h1.get("nw_t"), rec_h1.get("win_rate")
+    if ric is not None and rt is not None and rt <= -T_LOOSE:
+        gate["level"] = "high_risk"
+        gate["triggered"].append(
+            f"推荐组合 T+1 IC={ric:+.3f}（NW t={rt}）显著为负 → 历史推荐跑输基准池")
+    if rwr is not None and rwr < 40:
+        gate["triggered"].append(f"推荐组合 T+1 胜率仅 {rwr}%（<40%）")
+    tot_h1 = (((factors or {}).get("total") or {}).get("horizons") or {}).get("1") or {}
+    if tot_h1.get("ic_mean") is not None and (tot_h1.get("nw_t") or 0) < T_LOOSE:
+        gate["triggered"].append(
+            f"综合总分 T+1 IC={tot_h1['ic_mean']:+.3f}（NW t={tot_h1.get('nw_t')}）未见显著正预测力")
+    # v3.6（P1）：可交易口径 —— 前视修正后是否还有 alpha
+    if tradable:
+        _th = (tradable.get("horizons") or {}).get("1") or {}
+        _tic, _tt = _th.get("ic_mean"), _th.get("nw_t")
+        _lm = _th.get("long_mean")
+        if _tic is not None and _tt is not None and abs(_tt) < T_LOOSE:
+            gate["triggered"].append(
+                f"可交易口径（T+1 开盘买入扣{_th.get('cost_bps', 0):.0f}bp）IC={_tic:+.3f}"
+                f"（NW t={_tt}）不显著 → 前视修正后无可执行 alpha")
+        if isinstance(_lm, (int, float)) and _lm < 0:
+            gate["triggered"].append(
+                f"可交易口径头部组净收益 {_lm:+.2f}%（持有 T+1）为负 → 买前排不赚钱")
+    # v3.6（P0）：池子层面的负超额 —— 比评分权重更根本
+    if pool_excess and pool_excess.get("median_excess_pct") is not None:
+        _pe, _pn = pool_excess["median_excess_pct"], pool_excess.get("neg_ratio_pct")
+        if _pe < -1.0:
+            gate["level"] = "high_risk"
+            gate["triggered"].append(
+                f"选股池本身系统性负超额：池内中位涨跌较全池低 {_pe:+.2f}pct"
+                f"（持有 {pool_excess.get('hop')} 日，{_pn}% 的入场日跑输）"
+                f"→ 池子选错了，任何因子加权都只是在负 alpha 集合内做相对排序")
+    if (collinearity or {}).get("n_high_corr_pairs", 0) > 0:
+        gate["triggered"].append(
+            f"存在 {collinearity['n_high_corr_pairs']} 对高共线因子，综合权重虚增风险")
+    if gate["level"] == "high_risk":
+        gate["advice"] = ("⚠️ 建议观望/不机械跟单：实测推荐跑输，综合分无显著正预测力；"
+                          "仅基本面 score_fund 经 Bonferroni 验证有效（T+5 IC=+0.075）。"
+                          "已切『基本面主导』口径（v3.6-fund-led），但须注意选股池本身的负超额问题——"
+                          "该问题无法靠调权重解决，需改造入选规则。")
+    else:
+        gate["advice"] = ("谨慎：预测力证据不足。建议以基本面维度为主、控制仓位，"
+                          "勿把综合分当独立 alpha 源。")
+    return gate
+
+
+def _eval_tradable_ic(snapshots, hops, tdays, px, opens, cost_bps=0.0):
+    """可交易 IC（v3.6 量化审计 P1）：修正"收盘价买入"的前视偏差。
+
+    背景：日评分在 t 日收盘后（15:30）才产出，IC 却用 t 日收盘价作买入价 —— 该价格在
+    信号生成时已不可成交。真实可执行口径为 t+1 开盘买入，持有 h 个交易日后开盘卖出。
+
+    参数
+      hops      : 持有交易日数列表，例如 [1, 5, 20]
+      cost_bps  : 往返总成本（bps），从每笔收益中扣减（佣金+印花+冲击合成值）
+    返回 {str(h): agg}，口径与 _agg_stats 一致，另附 cost_bps 与 base='open_next'。
+    """
+    tidx = {d: i for i, d in enumerate(tdays)}
+    out = {}
+    for h in hops:
+        ics, spreads, dates, heads = [], [], [], []
+        for s in snapshots:
+            d0 = s["date"]
+            if d0 not in tidx:
+                continue
+            i_buy = tidx[d0] + 1          # t+1 开盘买入
+            i_sell = i_buy + h            # 持有 h 日后开盘卖出
+            if i_sell >= len(tdays):
+                continue
+            d_buy, d_sell = tdays[i_buy], tdays[i_sell]
+            fv, rv = [], []
+            for r in s["rows"]:
+                c = r["code"]
+                val = r.get("total")
+                mo = opens.get(c)
+                if not isinstance(val, (int, float)) or not mo:
+                    continue
+                p0, p1 = mo.get(d_buy), mo.get(d_sell)
+                if p0 and p1 and p0 > 0:
+                    fv.append(val)
+                    rv.append((p1 - p0) / p0 * 100.0 - cost_bps / 100.0)
+            ic = rank_ic(fv, rv)
+            if ic is not None:
+                ics.append(ic)
+                spreads.append(_quantile_spread(fv, rv))
+                # 头组（因子最高的 1/QUANTILES）平均收益 —— 单边多头真实可得
+                nq = len(fv)
+                g = max(1, nq // QUANTILES)
+                order = sorted(range(nq), key=lambda i: -fv[i])
+                _hm = _mean([rv[i] for i in order[:g]])
+                if _hm is not None:
+                    heads.append(_hm)
+                dates.append(d0)
+        a = _agg_stats(ics, spreads, dates, h)
+        a["base"] = "open_next"
+        a["cost_bps"] = cost_bps
+        # v3.6: spread 为多空价差（头组−尾组），双边成本相互抵消故扣费前后不变；
+        # long_mean 才是单边多头（只买头组）的净收益，投资者真实可得。
+        a["long_mean"] = round(_mean(heads), 3) if heads else None
+        out[str(h)] = a
+    return out
 
 
 def _eval_recommendations(tdays=None, px=None):
@@ -816,6 +1157,11 @@ def optimize_weights(snaps, tdays, px):
         else:
             wf_note = (f"样本外复合 IC {best['mean']:+.4f} 未显著优于先验 {prior_m if prior_m is not None else float('nan'):+.4f}"
                        f" → 维持先验权重（防过拟合）")
+    else:
+        # v3.5.5: 样本不足(十维池内截面 < MIN_TRAIN=30 → OOS 观测 < 8)时如实登记,
+        # 避免显示误导性的 nan 比对; 每日重估仍刷新 fitted_at 供页面展示
+        wf_note = (f"十维池内截面 {len(dates)} < MIN_TRAIN({MIN_TRAIN})，样本外观测不足 → "
+                   f"维持先验权重（每日重估登记，满 30 后自动启用走步验证）")
 
     # 组装十维权重（9 维 × 0.90 + 板块动量固定 0.10）
     w10 = {k: round(v * (1 - W_SECTOR_FIXED), 3) for k, v in final_w4.items()}
@@ -830,11 +1176,11 @@ def optimize_weights(snaps, tdays, px):
     prior10["score_sector"] = W_SECTOR_FIXED
 
     result = {
-        "version": "v3.1-10dim-ic",
+        "version": "v3.6-fund-led",
         "fitted_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "target_horizon": TARGET_H,
-        "method": ("十维 IC 驱动权重: 正IC维度按比例分配+地板3%+向先验收缩(λ); "
-                   "走步验证(训练≥30截面,每5截面重拟,样本外比对); "
+        "method": ("v3.6 基本面主导: 以全样本可验证维度为主(fund/news)，反转块等权压缩消除共线性虚增，"
+                   "小样本维度降至地板; 走步验证(训练≥30截面,每5截面重拟,样本外比对); "
                    "score_sector 有效样本<20 维持0.10(样本积累中)"),
         "weights": w10,
         "prior_weights": prior10,
@@ -921,9 +1267,11 @@ def main():
             print(f"⚠️ {os.path.basename(p)} 解析失败: {str(e)[:60]}")
     if merge_snapshot_prices(hist):
         pass
-    if n_added:
+    _px_refreshed = refresh_price_tail(hist)
+    if n_added or _px_refreshed:
         save_history(hist)
-        print(f"📚 历史截面更新: 新增/覆盖 {n_added} 个（现有 {len(hist['snapshots'])} 个）")
+        if n_added:
+            print(f"📚 历史截面更新: 新增/覆盖 {n_added} 个（现有 {len(hist['snapshots'])} 个）")
 
     snaps = [s for s in hist.get("snapshots", []) if s.get("rows")]
     if len(snaps) < 3:
@@ -931,6 +1279,7 @@ def main():
         return 1
 
     tdays, px = px_index(hist)
+    opens = open_index(hist)
     _tdset = set(tdays)
     stale = [s["date"] for s in snaps if s["date"] not in _tdset]
     aligned = [s for s in snaps if s["date"] in _tdset]
@@ -965,13 +1314,16 @@ def main():
         if len(aligned) < 3:
             print(f"❌ 该口径截面不足（{len(aligned)}），无法计算 IC")
             return 1
-    elif do_opt:
-        # E3: 权重复核默认只用当前池口径(最大 pool_size 组), 防新旧池混合拟合
-        _cur = max(pool_sizes) if pool_sizes else 200
-        _before = len(aligned)
-        aligned = [s for s in aligned if _psize(s) == _cur]
-        print(f"🔍 权重复核自动过滤至当前池口径 pool_size={_cur}: {_before} → {len(aligned)} 个截面"
-              f"（历史口径 {pool_sizes}; --pool-filter 可指定其他口径做诊断）")
+    # E3: 权重复核默认只用当前池口径(最大 pool_size 组), 防新旧池混合拟合。
+    # ⚠️ v3.5.5: 该过滤只作用于 optimize_weights 输入, 不得收缩主 IC 评估的 aligned——
+    # 因子有效性评估需要全口径历史连续性(77+ 截面), 否则报告层 IC 显著性/半期稳定性
+    # 会随每日 --optimize-weights 调用缩水到当前池的几个截面。
+    _opt_aligned = aligned
+    if do_opt and pool_sizes:
+        _cur = max(pool_sizes)
+        _opt_aligned = [s for s in aligned if _psize(s) == _cur]
+        print(f"🔍 权重复核使用当前池口径 pool_size={_cur}: {len(aligned)} → {len(_opt_aligned)} 个截面"
+              f"（历史口径 {pool_sizes}; IC 评估仍用全口径 {len(aligned)} 个）")
 
     # 因子 IC
     factors = {}
@@ -996,12 +1348,46 @@ def main():
 
     corr = _factor_corr(aligned)
 
+    # v3.6（量化审计 P1）：可交易 IC —— t+1 开盘买入，消除"t 日收盘买入"前视偏差
+    TRADABLE_COST_BPS = 20.0          # 往返 20bp（佣金+印花+冲击合成下界）
+    tradable = None
+    if opens:
+        # 构造只含 total 的最小行集合，复用同一个 _eval_tradable_ic
+        _tr_snaps = [{"date": s["date"],
+                      "rows": [{"code": r["code"], "total": r.get("total")} for r in s["rows"]]}
+                     for s in aligned]
+        _tr_gross = _eval_tradable_ic(_tr_snaps, list(HORIZONS), tdays, px, opens, cost_bps=0.0)
+        _tr_net = _eval_tradable_ic(_tr_snaps, list(HORIZONS), tdays, px, opens,
+                                    cost_bps=TRADABLE_COST_BPS)
+        for h in HORIZONS:
+            _g, _n = _tr_gross[str(h)], _tr_net[str(h)]
+            v, c_, note = _verdict_h(_n)
+            _n["verdict"], _n["verdict_color"], _n["verdict_note"] = v, c_, note
+            _n["gross_ic_mean"] = _g.get("ic_mean")
+            _n["gross_nw_t"] = _g.get("nw_t")
+            _n["gross_spread_mean"] = _g.get("spread_mean")
+        tradable = {
+            "base": "t+1 开盘买入 / 持有 h 日后开盘卖出（可执行口径）",
+            "cost_bps_roundtrip": TRADABLE_COST_BPS,
+            "horizons": _tr_net,
+            "note": ("前视修正：日评分于 t 日收盘后生成，原 IC 用 t 日收盘价买入不可成交；"
+                     "本口径改为 t+1 开盘买入。gross=未扣成本，net=扣 {:.0f}bp 往返成本。"
+                     .format(TRADABLE_COST_BPS)),
+        }
+        _tv, _tc, _tn = _overall_verdict(_tr_net)
+        tradable["verdict"], tradable["verdict_color"], tradable["verdict_note"] = _tv, _tc, _tn
+
     # 当前生效权重 vs 先验的复合 IC（若权重文件存在）
     w_now, w_meta = load_weights()
     current_cmp = None
     if w_now:
         w4 = {k: float(w_now[k]) for k in OPT_DIMS}
         current_cmp = {str(h): _composite_ic(aligned, w4, h, tdays, px) for h in HORIZONS}
+
+    # v3.6（量化审计 P0）：共线性收敛 + 池子负超额体检 + 预测力安全门
+    collin = _collinearity_summary(corr)
+    pool_excess = _eval_pool_excess(aligned, tdays, px, hop=20)
+    gate = _risk_gate(rec_ic, factors, collin, tradable, pool_excess)
 
     out = {
         "date": aligned[-1]["date"],
@@ -1030,21 +1416,29 @@ def main():
         },
         "factors": factors,
         "recommendation_ic": rec_ic,
+        "tradable_ic": tradable,
+        "pool_excess": pool_excess,
         "factor_correlation": corr,
+        "collinearity": collin,
+        "risk_gate": gate,
         "current_weights_composite_ic": current_cmp,
         "active_weights": w_now,
         "notes": [
             f"有效截面 {len(aligned)} 个交易日（{aligned[0]['date']} ~ {aligned[-1]['date']}），"
-            f"剔除非交易日陈旧快照 {len(stale)} 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差，需 --bootstrap-prices 回填）",
+            f"剔除非交易日陈旧快照 {len(stale)} 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差；价格 store 日常自动增量刷新，--bootstrap-prices 全量重建）",
             "IC 衡量排序能力而非绝对收益；分层多空为未扣成本毛利口径",
             "TOP200 为高换手关注度筛选池：动量/关注型因子的负向 IC 更可能反映'关注度脉冲后的均值回复'，"
             "而非因子构造错误；解读时须结合本池的选择机制",
+            "⚠️ total 的 IC 使用历史快照中「当时实际产出的 total 字段」，跨越 4→5→10 维三次口径变更，"
+            "故 total IC 是分段混合口径的加权结果，不代表当前 v3.6 权重的真实预测力；"
+            "评估当前权重应看 current_weights_composite_ic（按现权重重算）与 tradable_ic。",
+            "v3.6-fund-led 口径自 2026-10-24 生效，需累计 ≥20 个新截面后 current_weights_composite_ic 才具参考意义。",
             "历史截面来自 git 提交记录（含早期综合行业归类版本，v2.46 已修复）",
         ],
     }
 
     if do_opt:
-        result, w10 = optimize_weights(aligned, tdays, px)
+        result, w10 = optimize_weights(_opt_aligned, tdays, px)
         if result is None:
             print("\n⚖️ 权重重拟合跳过（无十维快照字段，维持现权重）")
         else:

@@ -34,11 +34,14 @@ KLINES_N = 120
 # ⚠️ 新拆 7 维在 TOP200 池无历史截面快照 → 初始权重为全市场回测先验映射，
 #   元数据标注 prior_pending；满 30+ 截面后由 factor_eval.py --optimize-weights 重拟合。
 WEIGHTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "factor_weights.json")
+# v3.6-fund-led (2026-10-24 口径切换)：基本面主导，反转块等权压缩以消除共线性虚增。
+# 切换依据见 factor_weights.json → regime_switch；回退先验必须与之同步，
+# 否则 load_factor_weights 失败时会静默退回旧十维均摊口径。
 _W_PRIOR_10D = {
-    "score_fund": 0.18, "score_news": 0.18, "score_sector": 0.10,
-    "score_oversold60": 0.12, "score_bias60": 0.10, "score_rsi_rev": 0.06,
-    "score_vol_pulse": 0.10, "score_overbought": 0.06,
-    "score_theme_intrinsic": 0.05, "score_attention": 0.05,
+    "score_fund": 0.34, "score_news": 0.22, "score_sector": 0.10,
+    "score_oversold60": 0.055, "score_bias60": 0.055, "score_rsi_rev": 0.055,
+    "score_vol_pulse": 0.055, "score_overbought": 0.02,
+    "score_theme_intrinsic": 0.08, "score_attention": 0.02,
 }
 # 旧五维(v2.41-ic) → 十维映射：tech 拆 3 维、theme 拆 2 维，按十维先验比例缩放
 _W_MAP_FROM_5D = {
