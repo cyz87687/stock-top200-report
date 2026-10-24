@@ -89,11 +89,11 @@ FACTORS = [
 OPT_DIMS = ["score_fund", "score_news", "score_oversold60", "score_bias60",
             "score_rsi_rev", "score_vol_pulse", "score_overbought",
             "score_theme_intrinsic", "score_attention"]
-# 十维先验（与 factor_weights.json v3.0-10dim 一致；运行时会优先读该文件 prior_weights）
-PRIOR_W10 = {"score_fund": 0.18, "score_news": 0.18, "score_oversold60": 0.12,
-             "score_bias60": 0.10, "score_rsi_rev": 0.06, "score_vol_pulse": 0.10,
-             "score_overbought": 0.06, "score_theme_intrinsic": 0.05,
-             "score_attention": 0.05}   # 合计0.90，sector 固定0.10补足
+# 十维先验（与 factor_weights.json v3.6-fund-led 一致；运行时会优先读该文件 prior_weights）
+PRIOR_W10 = {"score_fund": 0.34, "score_news": 0.22, "score_oversold60": 0.055,
+             "score_bias60": 0.055, "score_rsi_rev": 0.055, "score_vol_pulse": 0.055,
+             "score_overbought": 0.02, "score_theme_intrinsic": 0.08,
+             "score_attention": 0.02}   # 合计0.90，sector 固定0.10补足
 W_SECTOR_FIXED = 0.10              # score_sector 固定权重（样本积累中）
 W_FLOOR = 0.03                     # 单维度地板（十维下保持维度意义；3%≈旧五维5%量纲）
 TARGET_H = 1                       # 权重优化目标周期
@@ -778,13 +778,78 @@ def _collinearity_summary(corr, thr=0.7):
     }
 
 
-def _risk_gate(rec_ic, factors, collinearity, tradable=None):
+def _eval_pool_excess(snapshots, tdays, px, hop=20, min_n=20):
+    """池子负超额体检（v3.6 P0）：本池「成交额 TOP 榜」本身是否是一个负 alpha 集合。
+
+    动机：数轮审计都在纠结算分权重，却没人问「池子里装的是什么」。若池内成分
+    系统性跑输全池，则任何精妙的因子加权都只是在负 alpha 集合里做相对排序，
+    头组跑赢池均值也仍是绝对亏损。
+
+    口径：对每个快照日 d0，取池内全部个股与价格池全池个股，分别计算
+    d0 → d0+hop 的中位涨跌幅，差值即「池内相对全池的截面超额」。
+    注意：px 结构为 {code: {date_str: price}}（非按 index 的列表）。
+
+    返回 {n_days, median_excess_pct, mean_excess_pct, neg_ratio_pct, hop, verdict}
+    """
+    exs = []
+    for s in snapshots:
+        d0 = s["date"]
+        i0 = tdays.index(d0) if d0 in tdays else None
+        if i0 is None or i0 + hop >= len(tdays):
+            continue
+        d1 = tdays[i0 + hop]
+        pv, av = [], []
+        for r in s["rows"]:
+            m = px.get(r["code"])
+            if not m:
+                continue
+            p0, p1 = m.get(d0), m.get(d1)
+            if p0 and p1 and p0 > 0:
+                pv.append(p1 / p0 - 1.0)
+        for m in px.values():
+            if not m:
+                continue
+            p0, p1 = m.get(d0), m.get(d1)
+            if p0 and p1 and p0 > 0:
+                av.append(p1 / p0 - 1.0)
+        if len(pv) < min_n or len(av) < min_n:
+            continue
+        pv.sort(); av.sort()
+        def _med(a):
+            n = len(a)
+            return a[n // 2] if n % 2 else (a[n // 2 - 1] + a[n // 2]) / 2.0
+        exs.append(_med(pv) - _med(av))
+    if not exs:
+        return {"n_days": 0, "median_excess_pct": None, "mean_excess_pct": None,
+                "neg_ratio_pct": None, "hop": hop, "verdict": "样本不足"}
+    exs.sort()
+    n = len(exs)
+    med = exs[n // 2] if n % 2 else (exs[n // 2 - 1] + exs[n // 2]) / 2.0
+    neg = 100.0 * sum(1 for v in exs if v < 0) / n
+    if med < -0.02 and neg >= 75:
+        verdict = "负超额·稳定"
+    elif med < -0.01:
+        verdict = "负超额·偏弱"
+    elif med > 0.01:
+        verdict = "正超额"
+    else:
+        verdict = "中性"
+    return {"n_days": n,
+            "median_excess_pct": round(med * 100, 2),
+            "mean_excess_pct": round(sum(exs) / n * 100, 2),
+            "neg_ratio_pct": round(neg, 1),
+            "hop": hop,
+            "verdict": verdict}
+
+
+def _risk_gate(rec_ic, factors, collinearity, tradable=None, pool_excess=None):
     """预测力安全门（量化审计 P0/P1）：基于实测 IC 决定「能否机械跟单」。
     规则（数据驱动、非拟合）：
       · 可交易口径 IC 不显著（|NW t|<T_LOOSE）→ 无可靠可执行 alpha
       · 推荐组合 T+1 IC 显著为负（NW t≤-T_LOOSE）→ high_risk（历史推荐跑输）
       · 推荐组合 T+1 胜率 <40% → 记录风险
       · 综合总分无显著正 IC（NW t<T_LOOSE）→ 不可作独立 alpha 源
+      · v3.6：池子本身系统性负超额 → high_risk（选股池选错，权重再优也无解）
     """
     gate = {"level": "caution", "triggered": [], "advice": ""}
     rh = ((rec_ic or {}).get("horizons") or {}) if isinstance(rec_ic, dict) else {}
@@ -812,13 +877,23 @@ def _risk_gate(rec_ic, factors, collinearity, tradable=None):
         if isinstance(_lm, (int, float)) and _lm < 0:
             gate["triggered"].append(
                 f"可交易口径头部组净收益 {_lm:+.2f}%（持有 T+1）为负 → 买前排不赚钱")
+    # v3.6（P0）：池子层面的负超额 —— 比评分权重更根本
+    if pool_excess and pool_excess.get("median_excess_pct") is not None:
+        _pe, _pn = pool_excess["median_excess_pct"], pool_excess.get("neg_ratio_pct")
+        if _pe < -1.0:
+            gate["level"] = "high_risk"
+            gate["triggered"].append(
+                f"选股池本身系统性负超额：池内中位涨跌较全池低 {_pe:+.2f}pct"
+                f"（持有 {pool_excess.get('hop')} 日，{_pn}% 的入场日跑输）"
+                f"→ 池子选错了，任何因子加权都只是在负 alpha 集合内做相对排序")
     if (collinearity or {}).get("n_high_corr_pairs", 0) > 0:
         gate["triggered"].append(
             f"存在 {collinearity['n_high_corr_pairs']} 对高共线因子，综合权重虚增风险")
     if gate["level"] == "high_risk":
         gate["advice"] = ("⚠️ 建议观望/不机械跟单：实测推荐跑输，综合分无显著正预测力；"
                           "仅基本面 score_fund 经 Bonferroni 验证有效（T+5 IC=+0.075）。"
-                          "可切『基本面主导』口径或等待 OOS 样本积累后再启用综合排序。")
+                          "已切『基本面主导』口径（v3.6-fund-led），但须注意选股池本身的负超额问题——"
+                          "该问题无法靠调权重解决，需改造入选规则。")
     else:
         gate["advice"] = ("谨慎：预测力证据不足。建议以基本面维度为主、控制仓位，"
                           "勿把综合分当独立 alpha 源。")
@@ -1101,11 +1176,11 @@ def optimize_weights(snaps, tdays, px):
     prior10["score_sector"] = W_SECTOR_FIXED
 
     result = {
-        "version": "v3.1-10dim-ic",
+        "version": "v3.6-fund-led",
         "fitted_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "target_horizon": TARGET_H,
-        "method": ("十维 IC 驱动权重: 正IC维度按比例分配+地板3%+向先验收缩(λ); "
-                   "走步验证(训练≥30截面,每5截面重拟,样本外比对); "
+        "method": ("v3.6 基本面主导: 以全样本可验证维度为主(fund/news)，反转块等权压缩消除共线性虚增，"
+                   "小样本维度降至地板; 走步验证(训练≥30截面,每5截面重拟,样本外比对); "
                    "score_sector 有效样本<20 维持0.10(样本积累中)"),
         "weights": w10,
         "prior_weights": prior10,
@@ -1309,9 +1384,10 @@ def main():
         w4 = {k: float(w_now[k]) for k in OPT_DIMS}
         current_cmp = {str(h): _composite_ic(aligned, w4, h, tdays, px) for h in HORIZONS}
 
-    # v3.6（量化审计 P0）：共线性收敛 + 预测力安全门
+    # v3.6（量化审计 P0）：共线性收敛 + 池子负超额体检 + 预测力安全门
     collin = _collinearity_summary(corr)
-    gate = _risk_gate(rec_ic, factors, collin, tradable)
+    pool_excess = _eval_pool_excess(aligned, tdays, px, hop=20)
+    gate = _risk_gate(rec_ic, factors, collin, tradable, pool_excess)
 
     out = {
         "date": aligned[-1]["date"],
@@ -1341,6 +1417,7 @@ def main():
         "factors": factors,
         "recommendation_ic": rec_ic,
         "tradable_ic": tradable,
+        "pool_excess": pool_excess,
         "factor_correlation": corr,
         "collinearity": collin,
         "risk_gate": gate,
@@ -1352,6 +1429,10 @@ def main():
             "IC 衡量排序能力而非绝对收益；分层多空为未扣成本毛利口径",
             "TOP200 为高换手关注度筛选池：动量/关注型因子的负向 IC 更可能反映'关注度脉冲后的均值回复'，"
             "而非因子构造错误；解读时须结合本池的选择机制",
+            "⚠️ total 的 IC 使用历史快照中「当时实际产出的 total 字段」，跨越 4→5→10 维三次口径变更，"
+            "故 total IC 是分段混合口径的加权结果，不代表当前 v3.6 权重的真实预测力；"
+            "评估当前权重应看 current_weights_composite_ic（按现权重重算）与 tradable_ic。",
+            "v3.6-fund-led 口径自 2026-10-24 生效，需累计 ≥20 个新截面后 current_weights_composite_ic 才具参考意义。",
             "历史截面来自 git 提交记录（含早期综合行业归类版本，v2.46 已修复）",
         ],
     }

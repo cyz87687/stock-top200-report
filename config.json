@@ -27,8 +27,8 @@
     "exclude_suspended": true
   },
   "dual_pool_compare": false,
-  "regime_tag": "下跌市验证（截面区间 2026-06-26~2026-10-12）",
-  "regime_note": "扩池结论（反转路线 TOP500 占优）来自 2026-06-26~2026-10-12 单一下跌市回测；上涨市数据积累后须强制复盘，不得直接外推。渲染层已改为用 factor_ic.json 有效截面区间动态覆盖本静态值。",
+  "regime_tag": "下跌市验证（截面区间 2026-06-26~2026-10-23）",
+  "regime_note": "v3.6 口径切换：主口径由 ten-dim 均摊改为 fund-led(基本面34%/消息22%)。切换依据为 79 截面可交易口径回测 + 67 组权重邻域扫描；配对检验 h1 t=0.13/h5 t=1.52 不显著，改善幅度在噪声范围内，切换主因为共线性治理而非超额提升。渲染层已改为用 factor_ic.json 有效截面区间动态覆盖本静态值。",
   "regime_review_trigger": "累计 ≥20 个上涨市交易日（上证 20 日均线向上且中位涨幅>0）后重跑 backtest_universe.py 并复核扩池结论",
   "fetch": {
     "pages": 15,
@@ -55,6 +55,13 @@
       "recommendation_win_rate_lo": 40,
       "composite_ic_nw_t_lo": 2.0,
       "note": "预测力安全门阈值(与 factor_eval._risk_gate 同源)：推荐组合 T+1 NW t≤-2 或 胜率<40% → high_risk(不机械跟单)；综合分 NW t<2 → 无显著正预测力"
+    },
+    "pool_excess_alert": {
+      "enabled": true,
+      "median_excess_pct_lo": -1.0,
+      "neg_ratio_pct_hi": 75,
+      "hop_days": 20,
+      "note": "选股池负超额体检(与 factor_eval._eval_pool_excess 同源)：池内 vs 全池中位涨跌差 < -1.0pct 且跑输入场日占比 ≥75% → 判定『池子选错了』，进入 high_risk。该问题无法靠调权重解决，需改造入选规则（成交额排序会系统性选中高换手关注度脉冲，脉冲退潮后回吐）"
     }
   }
 }

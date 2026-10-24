@@ -33,13 +33,12 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SECTOR_DIR = os.path.join(HERE, 'sector')
 MAP_PATH = os.path.join(SECTOR_DIR, 'sw_map.json')
 
-# v3.0-10dim: 十维先验（全市场回测证据的先验映射；fund/news/sector 为池内 IC 已验证，
-#   新拆 5 维 + 2 先验维标注 prior_pending，满 30+ 截面后 --optimize-weights 重拟合）
+# v3.6-fund-led: 基本面主导先验（与 factor_weights.json weights 同源，回退时必须一致）
 _W_PRIOR_10D = {
-    "score_fund": 0.18, "score_news": 0.18, "score_sector": 0.10,
-    "score_oversold60": 0.12, "score_bias60": 0.10, "score_rsi_rev": 0.06,
-    "score_vol_pulse": 0.10, "score_overbought": 0.06,
-    "score_theme_intrinsic": 0.05, "score_attention": 0.05,
+    "score_fund": 0.34, "score_news": 0.22, "score_sector": 0.10,
+    "score_oversold60": 0.055, "score_bias60": 0.055, "score_rsi_rev": 0.055,
+    "score_vol_pulse": 0.055, "score_overbought": 0.02,
+    "score_theme_intrinsic": 0.08, "score_attention": 0.02,
 }
 # 旧五维 → 十维映射（兼容历史 scored json 重跑）
 _W_MAP_FROM_5D = {

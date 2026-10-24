@@ -4,7 +4,7 @@
 实现 4 项增强：
   1) 基本面新增「业绩一阶导(增速)」与「业绩二阶导(加速度)」分项并显性披露
   2) 根据 AI 题材分析结论，对 消息面 / 题材热度 因子赋分（题材级覆盖+混合）
-  3) 按权重 (消息20% 技术20% 基本面30% 题材30%) × 4 重算总分与评级
+  3) 回写增强后的维度分，按十维权重（读 factor_weights.json）×20 重算百分制总分与评级
   4) AI 的 commentary / watch_directions / model_summary 由 ai_assessment.json 注入报告
 
 用法: python3 enhance_scores.py [scored_json] [ai_assessment_json]
@@ -19,6 +19,55 @@ import sys
 import glob
 
 W_NEWS, W_TECH, W_FUND, W_THEME = 0.20, 0.20, 0.30, 0.30
+
+# v3.6: 十维权重的兜底先验（与 factor_weights.json 同源）。
+# 计算 total 必须走十维公式，禁止再用旧的四维 0-20 量纲公式——
+# 否则单独重跑本脚本会把 total 打回 20 分制，与 apply_sector_momentum 的
+# 百分制十维口径冲突（历史事故：页面出现 11~18 与 28~93 两套量纲并存）。
+_W_PRIOR_10D = {
+    "score_fund": 0.34, "score_news": 0.22, "score_sector": 0.10,
+    "score_oversold60": 0.055, "score_bias60": 0.055, "score_rsi_rev": 0.055,
+    "score_vol_pulse": 0.055, "score_overbought": 0.02,
+    "score_theme_intrinsic": 0.08, "score_attention": 0.02,
+}
+
+
+def _load_w10():
+    """读 factor_weights.json 的 weights（十维）；失败回退兜底先验。"""
+    try:
+        p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "factor_weights.json")
+        with open(p, encoding="utf-8") as f:
+            w = (json.load(f) or {}).get("weights") or {}
+        if all(k in w for k in _W_PRIOR_10D):
+            vals = {k: float(w[k]) for k in _W_PRIOR_10D}
+            if abs(sum(vals.values()) - 1.0) <= 0.02 and all(v >= 0 for v in vals.values()):
+                return vals
+    except Exception:
+        pass
+    return dict(_W_PRIOR_10D)
+
+
+def _calc_total_10d(r):
+    """按十维权重重算百分制 total（与 apply_sector_momentum 的 <has_10d> 分支一致）。"""
+    w = _load_w10()
+    s = 0.0
+    for k, v in w.items():
+        if v <= 0:
+            continue
+        s += float(r.get(k) or 0) * v
+    return round(s * 20, 2)
+
+
+def _rate_100(total):
+    if total >= 85:
+        return "S", "优先买入，可重仓"
+    if total >= 65:
+        return "A", "逢低加仓，重点关注"
+    if total >= 45:
+        return "B", "波段操作，轻仓参与"
+    if total >= 25:
+        return "C", "观望，不新开仓"
+    return "D", "坚决回避，立即卖出"
 
 
 def _clamp(x, lo=0.0, hi=5.0):
@@ -140,25 +189,12 @@ def main():
                 _day_mod = 0.0
         ai_theme = _clamp(ai_theme + _day_mod)
 
-        # ---- 3) 重算总分与评级 ----
-        total = round((ai_news * W_NEWS + tech * W_TECH + new_fund * W_FUND + ai_theme * W_THEME) * 4, 2)
-        if total >= 17:
-            rating, advice = "S", "优先买入，可重仓"
-        elif total >= 13:
-            rating, advice = "A", "逢低加仓，重点关注"
-        elif total >= 9:
-            rating, advice = "B", "波段操作，轻仓参与"
-        elif total >= 5:
-            rating, advice = "C", "观望，不新开仓"
-        else:
-            rating, advice = "D", "坚决回避，立即卖出"
-
+        # ---- 3) 回写增强后的维度分，再用十维公式重算总分与评级 ----
         r["score_fund"] = round(new_fund, 2)
         r["score_news"] = round(ai_news, 2)
         r["score_theme"] = round(ai_theme, 2)
-        r["total"] = total
-        r["rating"] = rating
-        r["advice"] = advice
+        total = _calc_total_10d(r)
+        rating, advice = _rate_100(total)
         r["fund_detail"] = {
             "deriv1_growth": growth, "deriv1_score": round(d1, 2),
             "cagr3": cagr3, "deriv2_delta": (round(delta, 1) if delta is not None else None),

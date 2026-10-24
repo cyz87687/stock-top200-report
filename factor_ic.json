@@ -1,6 +1,6 @@
 {
  "date": "2026-10-23",
- "generated_at": "2026-10-24 14:12:26",
+ "generated_at": "2026-10-24 14:37:36",
  "method": {
   "name": "Rank IC（Spearman 秩相关，修正口径）",
   "formula": "IC(t→t+h) = Spearman(因子值_t 截面秩, 收益率 t→第h个后续交易日)",
@@ -3916,13 +3916,21 @@
   "verdict_color": "#94a3b8",
   "verdict_note": "各周期样本均 <20（最大 76）"
  },
+ "pool_excess": {
+  "n_days": 58,
+  "median_excess_pct": -5.08,
+  "mean_excess_pct": -8.04,
+  "neg_ratio_pct": 96.6,
+  "hop": 20,
+  "verdict": "负超额·稳定"
+ },
  "factor_correlation": {
   "score_fund|score_news": {
-   "mean": 0.188,
+   "mean": 0.186,
    "n": 9
   },
   "score_fund|score_oversold60": {
-   "mean": 0.315,
+   "mean": 0.314,
    "n": 9
   },
   "score_fund|score_bias60": {
@@ -3934,7 +3942,7 @@
    "n": 9
   },
   "score_fund|score_vol_pulse": {
-   "mean": 0.231,
+   "mean": 0.232,
    "n": 9
   },
   "score_fund|score_overbought": {
@@ -3946,35 +3954,35 @@
    "n": 9
   },
   "score_fund|score_attention": {
-   "mean": 0.137,
+   "mean": 0.139,
    "n": 9
   },
   "score_news|score_oversold60": {
-   "mean": 0.339,
+   "mean": 0.334,
    "n": 9
   },
   "score_news|score_bias60": {
-   "mean": 0.333,
+   "mean": 0.328,
    "n": 9
   },
   "score_news|score_rsi_rev": {
-   "mean": 0.269,
+   "mean": 0.264,
    "n": 9
   },
   "score_news|score_vol_pulse": {
-   "mean": 0.177,
+   "mean": 0.173,
    "n": 9
   },
   "score_news|score_overbought": {
-   "mean": 0.073,
+   "mean": 0.07,
    "n": 9
   },
   "score_news|score_theme_intrinsic": {
-   "mean": 0.239,
+   "mean": 0.235,
    "n": 9
   },
   "score_news|score_attention": {
-   "mean": 0.378,
+   "mean": 0.376,
    "n": 9
   },
   "score_oversold60|score_bias60": {
@@ -4089,9 +4097,10 @@
    "综合总分 T+1 IC=+0.022（NW t=1.48）未见显著正预测力",
    "可交易口径（T+1 开盘买入扣20bp）IC=+0.013（NW t=0.82）不显著 → 前视修正后无可执行 alpha",
    "可交易口径头部组净收益 -0.93%（持有 T+1）为负 → 买前排不赚钱",
+   "选股池本身系统性负超额：池内中位涨跌较全池低 -5.08pct（持有 20 日，96.6% 的入场日跑输）→ 池子选错了，任何因子加权都只是在负 alpha 集合内做相对排序",
    "存在 3 对高共线因子，综合权重虚增风险"
   ],
-  "advice": "⚠️ 建议观望/不机械跟单：实测推荐跑输，综合分无显著正预测力；仅基本面 score_fund 经 Bonferroni 验证有效（T+5 IC=+0.075）。可切『基本面主导』口径或等待 OOS 样本积累后再启用综合排序。"
+  "advice": "⚠️ 建议观望/不机械跟单：实测推荐跑输，综合分无显著正预测力；仅基本面 score_fund 经 Bonferroni 验证有效（T+5 IC=+0.075）。已切『基本面主导』口径（v3.6-fund-led），但须注意选股池本身的负超额问题——该问题无法靠调权重解决，需改造入选规则。"
  },
  "current_weights_composite_ic": {
   "1": {
@@ -4107,22 +4116,22 @@
     "2026-10-22"
    ],
    "ic_series": [
-    -0.2431,
-    -0.1863,
-    0.0776,
-    0.0149,
-    0.2254,
-    0.1277,
-    -0.0503,
-    0.1475
+    -0.1947,
+    -0.1616,
+    0.0499,
+    0.0276,
+    0.1656,
+    0.1213,
+    -0.0549,
+    0.156
    ],
-   "ic_mean": 0.0142,
-   "ic_std": 0.1647,
-   "t_stat": 0.24,
-   "nw_t": 0.26,
+   "ic_mean": 0.0137,
+   "ic_std": 0.139,
+   "t_stat": 0.28,
+   "nw_t": 0.3,
    "bonferroni_sig": false,
    "win_rate": 62.5,
-   "spread_mean": -0.184,
+   "spread_mean": -0.083,
    "subperiod": null
   },
   "5": {
@@ -4134,18 +4143,18 @@
     "2026-10-16"
    ],
    "ic_series": [
-    -0.1298,
-    0.0107,
-    0.128,
-    0.1838
+    -0.0995,
+    -0.021,
+    0.0666,
+    0.1542
    ],
-   "ic_mean": 0.0482,
-   "ic_std": 0.1389,
-   "t_stat": 0.69,
-   "nw_t": 0.98,
+   "ic_mean": 0.0251,
+   "ic_std": 0.1096,
+   "t_stat": 0.46,
+   "nw_t": 0.64,
    "bonferroni_sig": false,
-   "win_rate": 75.0,
-   "spread_mean": 1.184,
+   "win_rate": 50.0,
+   "spread_mean": 0.812,
    "subperiod": null
   },
   "20": {
@@ -4163,21 +4172,23 @@
   }
  },
  "active_weights": {
-  "score_fund": 0.18,
-  "score_news": 0.18,
-  "score_oversold60": 0.12,
-  "score_bias60": 0.1,
-  "score_rsi_rev": 0.06,
-  "score_vol_pulse": 0.1,
-  "score_overbought": 0.06,
-  "score_theme_intrinsic": 0.05,
-  "score_attention": 0.05,
-  "score_sector": 0.1
+  "score_fund": 0.34,
+  "score_news": 0.22,
+  "score_sector": 0.1,
+  "score_oversold60": 0.055,
+  "score_bias60": 0.055,
+  "score_rsi_rev": 0.055,
+  "score_vol_pulse": 0.055,
+  "score_overbought": 0.02,
+  "score_theme_intrinsic": 0.08,
+  "score_attention": 0.02
  },
  "notes": [
   "有效截面 78 个交易日（2026-06-26 ~ 2026-10-23），剔除非交易日陈旧快照 7 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差；价格 store 日常自动增量刷新，--bootstrap-prices 全量重建）",
   "IC 衡量排序能力而非绝对收益；分层多空为未扣成本毛利口径",
   "TOP200 为高换手关注度筛选池：动量/关注型因子的负向 IC 更可能反映'关注度脉冲后的均值回复'，而非因子构造错误；解读时须结合本池的选择机制",
+  "⚠️ total 的 IC 使用历史快照中「当时实际产出的 total 字段」，跨越 4→5→10 维三次口径变更，故 total IC 是分段混合口径的加权结果，不代表当前 v3.6 权重的真实预测力；评估当前权重应看 current_weights_composite_ic（按现权重重算）与 tradable_ic。",
+  "v3.6-fund-led 口径自 2026-10-24 生效，需累计 ≥20 个新截面后 current_weights_composite_ic 才具参考意义。",
   "历史截面来自 git 提交记录（含早期综合行业归类版本，v2.46 已修复）"
  ]
 }

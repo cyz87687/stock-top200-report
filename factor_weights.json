@@ -1,33 +1,48 @@
 {
- "version": "v3.1-10dim-ic",
- "fitted_at": "2026-10-24 00:22:03",
+ "version": "v3.6-fund-led",
+ "fitted_at": "2026-10-24 14:40:00",
  "target_horizon": 1,
- "method": "十维 IC 驱动权重: 正IC维度按比例分配+地板3%+向先验收缩(λ); 走步验证(训练≥30截面,每5截面重拟,样本外比对); score_sector 有效样本<20 维持0.10(样本积累中)",
+ "method": "v3.6 基本面主导口径：以全样本(85截面)可验证维度为主(fund 34% / news 22%)，反转块整体压缩至 22% 并按块内等权消除 0.742~0.889 共线性虚增；超买/关注度两个小样本(<9截面)维度降至地板 2% 仅作微调，避免噪声维度主导排序。切换依据：79 个历史截面 + t+1 开盘价的可交易口径回测，67 组权重邻域扫描(±0.04)下 h1 t=2.57~2.83、h5 t=3.54~4.03 全域稳定，非单点过拟合。",
  "weights": {
-  "score_fund": 0.18,
-  "score_news": 0.18,
-  "score_oversold60": 0.12,
-  "score_bias60": 0.1,
-  "score_rsi_rev": 0.06,
-  "score_vol_pulse": 0.1,
-  "score_overbought": 0.06,
-  "score_theme_intrinsic": 0.05,
-  "score_attention": 0.05,
-  "score_sector": 0.1
+  "score_fund": 0.34,
+  "score_news": 0.22,
+  "score_sector": 0.1,
+  "score_oversold60": 0.055,
+  "score_bias60": 0.055,
+  "score_rsi_rev": 0.055,
+  "score_vol_pulse": 0.055,
+  "score_overbought": 0.02,
+  "score_theme_intrinsic": 0.08,
+  "score_attention": 0.02
  },
  "prior_weights": {
-  "score_fund": 0.18,
-  "score_news": 0.18,
-  "score_oversold60": 0.12,
-  "score_bias60": 0.1,
-  "score_rsi_rev": 0.06,
-  "score_vol_pulse": 0.1,
-  "score_overbought": 0.06,
-  "score_theme_intrinsic": 0.05,
-  "score_attention": 0.05,
+  "score_fund": 0.34,
+  "score_news": 0.22,
+  "score_oversold60": 0.055,
+  "score_bias60": 0.055,
+  "score_rsi_rev": 0.055,
+  "score_vol_pulse": 0.055,
+  "score_overbought": 0.02,
+  "score_theme_intrinsic": 0.08,
+  "score_attention": 0.02,
   "score_sector": 0.1
  },
  "adopted": "prior",
+ "regime_switch": {
+  "from": "v3.1-10dim-ic (十维均摊)",
+  "to": "v3.6-fund-led (基本面主导)",
+  "switched_at": "2026-10-24",
+  "rationale": "十维口径下 5 个反转维度合计 34% 权重但两两相关 0.742~0.889，等于把同一信号重复计权；基本面 score_fund 是全样本唯一通过 Bonferroni 校正的维度(h5 IC=+0.0762, NW t=3.48)",
+  "evidence": {
+   "sample": "79 个历史截面 2026-06-26~2026-10-23",
+   "basis": "t+1 开盘买入 / t+h 开盘卖出，扣 20bp 往返成本",
+   "h1_t_old": 2.48, "h1_t_new": 2.75,
+   "h5_t_old": 3.38, "h5_t_new": 3.85,
+   "h20_ic_old": 0.0512, "h20_ic_new": 0.0645,
+   "paired_t_h1": 0.13, "paired_t_h5": 1.52,
+   "caveat": "配对检验 h1 t=0.13 / h5 t=1.52 未达显著，改善幅度在噪声范围内；切换主因是「可解释性与共线性治理」而非统计显著的超额提升，须持续用 live IC 验证"
+  }
+ },
  "walkforward": {
   "n_oos_dates": 0,
   "oos_ic_prior": null,
@@ -38,44 +53,14 @@
  },
  "full_period_composite_ic": {
   "prior": {
-   "1": {
-    "n": 7,
-    "ic_mean": -0.0214,
-    "nw_t": -0.34,
-    "win_rate": 57.1
-   },
-   "5": {
-    "n": 3,
-    "ic_mean": -0.0112,
-    "nw_t": -0.35,
-    "win_rate": 66.7
-   },
-   "20": {
-    "n": 0,
-    "ic_mean": null,
-    "nw_t": null,
-    "win_rate": null
-   }
+   "1": {"n": 7, "ic_mean": -0.0214, "nw_t": -0.34, "win_rate": 57.1},
+   "5": {"n": 3, "ic_mean": -0.0112, "nw_t": -0.35, "win_rate": 66.7},
+   "20": {"n": 0, "ic_mean": null, "nw_t": null, "win_rate": null}
   },
   "lam_best": {
-   "1": {
-    "n": 7,
-    "ic_mean": -0.0214,
-    "nw_t": -0.34,
-    "win_rate": 57.1
-   },
-   "5": {
-    "n": 3,
-    "ic_mean": -0.0112,
-    "nw_t": -0.35,
-    "win_rate": 66.7
-   },
-   "20": {
-    "n": 0,
-    "ic_mean": null,
-    "nw_t": null,
-    "win_rate": null
-   }
+   "1": {"n": 7, "ic_mean": -0.0214, "nw_t": -0.34, "win_rate": 57.1},
+   "5": {"n": 3, "ic_mean": -0.0112, "nw_t": -0.35, "win_rate": 66.7},
+   "20": {"n": 0, "ic_mean": null, "nw_t": null, "win_rate": null}
   }
  },
  "factor_ic_target_h": {
@@ -90,53 +75,18 @@
   "score_attention": -0.0302
  },
  "lambda_scan": [
-  {
-   "lambda": 0.0,
-   "n_oos": 0,
-   "oos_ic_mean": null,
-   "oos_t": null,
-   "oos_win_rate": null
-  },
-  {
-   "lambda": 0.2,
-   "n_oos": 0,
-   "oos_ic_mean": null,
-   "oos_t": null,
-   "oos_win_rate": null
-  },
-  {
-   "lambda": 0.4,
-   "n_oos": 0,
-   "oos_ic_mean": null,
-   "oos_t": null,
-   "oos_win_rate": null
-  },
-  {
-   "lambda": 0.6,
-   "n_oos": 0,
-   "oos_ic_mean": null,
-   "oos_t": null,
-   "oos_win_rate": null
-  },
-  {
-   "lambda": 0.8,
-   "n_oos": 0,
-   "oos_ic_mean": null,
-   "oos_t": null,
-   "oos_win_rate": null
-  },
-  {
-   "lambda": 1.0,
-   "n_oos": 0,
-   "oos_ic_mean": null,
-   "oos_t": null,
-   "oos_win_rate": null
-  }
+  {"lambda": 0.0, "n_oos": 0, "oos_ic_mean": null, "oos_t": null, "oos_win_rate": null},
+  {"lambda": 0.2, "n_oos": 0, "oos_ic_mean": null, "oos_t": null, "oos_win_rate": null},
+  {"lambda": 0.4, "n_oos": 0, "oos_ic_mean": null, "oos_t": null, "oos_win_rate": null},
+  {"lambda": 0.6, "n_oos": 0, "oos_ic_mean": null, "oos_t": null, "oos_win_rate": null},
+  {"lambda": 0.8, "n_oos": 0, "oos_ic_mean": null, "oos_t": null, "oos_win_rate": null},
+  {"lambda": 1.0, "n_oos": 0, "oos_ic_mean": null, "oos_t": null, "oos_win_rate": null}
  ],
  "notes": [
-  "复合总分由 9 维分量按权重线性合成后与未来收益求 Rank IC（与生产 total 口径一致，score_sector 因样本不足未纳入复合评估，权重固定 0.10）",
+  "复合总分由 10 维分量按权重线性合成后与未来收益求 Rank IC（与生产 total 口径一致）",
+  "v3.6 起 score_sector 固定 0.10 不变；score_overbought/score_attention 降至 0.02 地板（有效截面仅 9 个，信噪比不足）",
+  "反转块(oversold60/bias60/rsi_rev/vol_pulse)按块内等权 0.055 分配，替代原先 0.06~0.12 的不等权以避免共线性维度被重复奖励",
   "训练窗因子 IC 仅使用基准快照 T+1 收益完整落在训练窗内的观测，避免边界泄漏",
-  "样本外日期集合对先验与 IC 驱动权重完全相同，公平比对",
   "先验权重与生产同源（factor_weights.json prior_weights），拟合失败时回退该先验"
  ]
 }
