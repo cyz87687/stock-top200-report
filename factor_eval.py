@@ -351,8 +351,11 @@ def bootstrap_from_git():
 
 
 # ---------------------------------------------------------------- 价格回填（P0-2）
-def _fetch_qfq(sym, need=PX_NEED):
-    """腾讯前复权日线 → [(date, close)]；多域名轮询，WAF 页自动换域。"""
+def _fetch_qfq(sym, need=PX_NEED, with_open=False):
+    """腾讯前复权日线 → [(date, close)]；with_open=True 时 → [(date, open, close)]。
+    多域名轮询，WAF 页自动换域。
+    注：腾讯 qfqday 原始行 = [日期, 开, 收, 高, 低, 量]，开盘价一直可取，此前只取收盘。
+    """
     for _host in TQ_HOSTS:
         url = f"{_host}/appstock/app/fqkline/get?param={sym},day,,,{need},qfq"
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
@@ -373,7 +376,10 @@ def _fetch_qfq(sym, need=PX_NEED):
             out = []
             for k in raw_kl:
                 try:
-                    out.append((k[0], float(k[2])))
+                    if with_open:
+                        out.append((k[0], float(k[1]), float(k[2])))
+                    else:
+                        out.append((k[0], float(k[2])))
                 except Exception:
                     continue
             if out:
@@ -400,7 +406,9 @@ def bootstrap_prices():
     old = hist.get("prices") or {}
     old_dates = old.get("dates") or []
     old_px = old.get("px") or {}
+    old_op = old.get("opens") or {}
     px_series = {}          # code -> {date: close}
+    op_series = {}          # code -> {date: open}  （v3.6 可交易 IC 用）
     n_ok = n_fail = n_skip = 0
     for i, c in enumerate(codes):
         sym = _symbol(c)
@@ -411,30 +419,37 @@ def bootstrap_prices():
             print(f"   回填进度 {i + 1}/{len(codes)}（成功 {n_ok} 失败 {n_fail}）")
         # 已有且覆盖到最新交易日则跳过（增量场景）
         prev = old_px.get(c)
-        kl = _fetch_qfq(sym)
+        kl = _fetch_qfq(sym, with_open=True)
         if not kl:
             # 保留旧数据（接口偶发失败不丢历史）
             if prev:
                 px_series[c] = {d: v for d, v in zip(old_dates, prev) if v is not None}
+                _po = old_op.get(c)
+                if _po:
+                    op_series[c] = {d: v for d, v in zip(old_dates, _po) if v is not None}
                 n_skip += 1
             else:
                 n_fail += 1
             continue
-        px_series[c] = dict(kl)
+        px_series[c] = {d: cl for d, op, cl in kl}
+        op_series[c] = {d: op for d, op, cl in kl if op}
         n_ok += 1
         time.sleep(0.03)
 
     all_dates = sorted({d for m in px_series.values() for d in m})
     px_compact = {c: [m.get(d) for d in all_dates] for c, m in px_series.items()}
+    op_compact = {c: [m.get(d) for d in all_dates] for c, m in op_series.items()}
     hist["prices"] = {
         "fetched_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "dates": all_dates,
         "px": px_compact,
+        "opens": op_compact,
         "n_codes": len(px_compact),
+        "n_open_codes": len(op_compact),
     }
     save_history(hist)
     print(f"✅ 价格回填完成: {len(px_compact)} 只（新抓 {n_ok}，保留旧 {n_skip}，失败 {n_fail}）"
-          f"，交易日 {len(all_dates)} 个（{all_dates[0]} ~ {all_dates[-1]}）")
+          f"，含开盘价 {len(op_compact)} 只，交易日 {len(all_dates)} 个（{all_dates[0]} ~ {all_dates[-1]}）")
     return 0
 
 
@@ -454,6 +469,17 @@ def px_index(hist):
         for r in s.get("rows", []):
             px.setdefault(r["code"], {})[s["date"]] = r["price"]
     return sorted({s["date"] for s in snaps}), px
+
+
+def open_index(hist):
+    """→ {code: {date: open}}（v3.6 可交易 IC 用；无 opens 字段时返回空 dict）。"""
+    p = hist.get("prices") or {}
+    dates = p.get("dates") or []
+    op_raw = p.get("opens") or {}
+    if not (dates and op_raw):
+        return {}
+    return {c: {d: v for d, v in zip(dates, arr) if v is not None}
+            for c, arr in op_raw.items()}
 
 
 def merge_snapshot_prices(hist):
@@ -492,6 +518,7 @@ def refresh_price_tail(hist, verbose=True):
     """
     p = hist.get("prices") or {}
     dates, px = p.get("dates") or [], p.get("px") or {}
+    opens = p.get("opens") or {}
     if not dates or not px:
         return False                      # 无 store → 走 --bootstrap-prices 全量重建
     snaps = [s for s in hist.get("snapshots", []) if s.get("rows")]
@@ -508,15 +535,17 @@ def refresh_price_tail(hist, verbose=True):
     except ValueError:
         gap = 7
     need = min(PX_NEED, max(30, gap + 12))
-    tail = {}
+    tail = {}          # code -> {date: close}
+    tail_op = {}       # code -> {date: open}（v3.6 可交易 IC）
     n_ok = n_fail = 0
     for i, c in enumerate(codes):
         sym = _symbol(c)
         if not sym:
             continue
-        kl = _fetch_qfq(sym, need=need)
+        kl = _fetch_qfq(sym, need=need, with_open=True)
         if kl:
-            tail[c] = dict(kl)
+            tail[c] = {d: cl for d, op, cl in kl}
+            tail_op[c] = {d: op for d, op, cl in kl if op}
             n_ok += 1
         else:
             n_fail += 1
@@ -532,6 +561,8 @@ def refresh_price_tail(hist, verbose=True):
     didx_old = {d: i for i, d in enumerate(dates)}
     for arr in px.values():
         arr.extend([None] * len(added))
+    for arr in opens.values():
+        arr.extend([None] * len(added))
     for c, m in tail.items():
         arr = px.get(c)
         if arr is None:                   # 新出现代码：按全局日期轴对齐（前置日期留空）
@@ -541,15 +572,26 @@ def refresh_price_tail(hist, verbose=True):
             j = aidx.get(d, didx_old.get(d))
             if j is not None and j < len(arr) and arr[j] is None and v:
                 arr[j] = v
+    for c, m in tail_op.items():
+        oarr = opens.get(c)
+        if oarr is None:
+            oarr = [None] * len(dates) + [None] * len(added)
+            opens[c] = oarr
+        for d, v in m.items():
+            j = aidx.get(d, didx_old.get(d))
+            if j is not None and j < len(oarr) and oarr[j] is None and v:
+                oarr[j] = v
     hist["prices"] = {
         "fetched_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "dates": dates + added,
         "px": px,
+        "opens": opens,
         "n_codes": len(px),
+        "n_open_codes": len(opens),
     }
     if verbose:
         print(f"📈 价格尾部增量完成: +{len(added)} 个交易日（{added[0]} ~ {added[-1]}），"
-              f"覆盖 {len(px)} 只（新抓 {n_ok} 失败 {n_fail}）")
+              f"覆盖 {len(px)} 只（含开盘价 {len(opens)}，新抓 {n_ok} 失败 {n_fail}）")
     return True
 
 
@@ -736,9 +778,10 @@ def _collinearity_summary(corr, thr=0.7):
     }
 
 
-def _risk_gate(rec_ic, factors, collinearity):
-    """预测力安全门（量化审计 P0）：基于实测 IC 决定「能否机械跟单」。
+def _risk_gate(rec_ic, factors, collinearity, tradable=None):
+    """预测力安全门（量化审计 P0/P1）：基于实测 IC 决定「能否机械跟单」。
     规则（数据驱动、非拟合）：
+      · 可交易口径 IC 不显著（|NW t|<T_LOOSE）→ 无可靠可执行 alpha
       · 推荐组合 T+1 IC 显著为负（NW t≤-T_LOOSE）→ high_risk（历史推荐跑输）
       · 推荐组合 T+1 胜率 <40% → 记录风险
       · 综合总分无显著正 IC（NW t<T_LOOSE）→ 不可作独立 alpha 源
@@ -757,6 +800,18 @@ def _risk_gate(rec_ic, factors, collinearity):
     if tot_h1.get("ic_mean") is not None and (tot_h1.get("nw_t") or 0) < T_LOOSE:
         gate["triggered"].append(
             f"综合总分 T+1 IC={tot_h1['ic_mean']:+.3f}（NW t={tot_h1.get('nw_t')}）未见显著正预测力")
+    # v3.6（P1）：可交易口径 —— 前视修正后是否还有 alpha
+    if tradable:
+        _th = (tradable.get("horizons") or {}).get("1") or {}
+        _tic, _tt = _th.get("ic_mean"), _th.get("nw_t")
+        _lm = _th.get("long_mean")
+        if _tic is not None and _tt is not None and abs(_tt) < T_LOOSE:
+            gate["triggered"].append(
+                f"可交易口径（T+1 开盘买入扣{_th.get('cost_bps', 0):.0f}bp）IC={_tic:+.3f}"
+                f"（NW t={_tt}）不显著 → 前视修正后无可执行 alpha")
+        if isinstance(_lm, (int, float)) and _lm < 0:
+            gate["triggered"].append(
+                f"可交易口径头部组净收益 {_lm:+.2f}%（持有 T+1）为负 → 买前排不赚钱")
     if (collinearity or {}).get("n_high_corr_pairs", 0) > 0:
         gate["triggered"].append(
             f"存在 {collinearity['n_high_corr_pairs']} 对高共线因子，综合权重虚增风险")
@@ -768,6 +823,63 @@ def _risk_gate(rec_ic, factors, collinearity):
         gate["advice"] = ("谨慎：预测力证据不足。建议以基本面维度为主、控制仓位，"
                           "勿把综合分当独立 alpha 源。")
     return gate
+
+
+def _eval_tradable_ic(snapshots, hops, tdays, px, opens, cost_bps=0.0):
+    """可交易 IC（v3.6 量化审计 P1）：修正"收盘价买入"的前视偏差。
+
+    背景：日评分在 t 日收盘后（15:30）才产出，IC 却用 t 日收盘价作买入价 —— 该价格在
+    信号生成时已不可成交。真实可执行口径为 t+1 开盘买入，持有 h 个交易日后开盘卖出。
+
+    参数
+      hops      : 持有交易日数列表，例如 [1, 5, 20]
+      cost_bps  : 往返总成本（bps），从每笔收益中扣减（佣金+印花+冲击合成值）
+    返回 {str(h): agg}，口径与 _agg_stats 一致，另附 cost_bps 与 base='open_next'。
+    """
+    tidx = {d: i for i, d in enumerate(tdays)}
+    out = {}
+    for h in hops:
+        ics, spreads, dates, heads = [], [], [], []
+        for s in snapshots:
+            d0 = s["date"]
+            if d0 not in tidx:
+                continue
+            i_buy = tidx[d0] + 1          # t+1 开盘买入
+            i_sell = i_buy + h            # 持有 h 日后开盘卖出
+            if i_sell >= len(tdays):
+                continue
+            d_buy, d_sell = tdays[i_buy], tdays[i_sell]
+            fv, rv = [], []
+            for r in s["rows"]:
+                c = r["code"]
+                val = r.get("total")
+                mo = opens.get(c)
+                if not isinstance(val, (int, float)) or not mo:
+                    continue
+                p0, p1 = mo.get(d_buy), mo.get(d_sell)
+                if p0 and p1 and p0 > 0:
+                    fv.append(val)
+                    rv.append((p1 - p0) / p0 * 100.0 - cost_bps / 100.0)
+            ic = rank_ic(fv, rv)
+            if ic is not None:
+                ics.append(ic)
+                spreads.append(_quantile_spread(fv, rv))
+                # 头组（因子最高的 1/QUANTILES）平均收益 —— 单边多头真实可得
+                nq = len(fv)
+                g = max(1, nq // QUANTILES)
+                order = sorted(range(nq), key=lambda i: -fv[i])
+                _hm = _mean([rv[i] for i in order[:g]])
+                if _hm is not None:
+                    heads.append(_hm)
+                dates.append(d0)
+        a = _agg_stats(ics, spreads, dates, h)
+        a["base"] = "open_next"
+        a["cost_bps"] = cost_bps
+        # v3.6: spread 为多空价差（头组−尾组），双边成本相互抵消故扣费前后不变；
+        # long_mean 才是单边多头（只买头组）的净收益，投资者真实可得。
+        a["long_mean"] = round(_mean(heads), 3) if heads else None
+        out[str(h)] = a
+    return out
 
 
 def _eval_recommendations(tdays=None, px=None):
@@ -1092,6 +1204,7 @@ def main():
         return 1
 
     tdays, px = px_index(hist)
+    opens = open_index(hist)
     _tdset = set(tdays)
     stale = [s["date"] for s in snaps if s["date"] not in _tdset]
     aligned = [s for s in snaps if s["date"] in _tdset]
@@ -1160,6 +1273,35 @@ def main():
 
     corr = _factor_corr(aligned)
 
+    # v3.6（量化审计 P1）：可交易 IC —— t+1 开盘买入，消除"t 日收盘买入"前视偏差
+    TRADABLE_COST_BPS = 20.0          # 往返 20bp（佣金+印花+冲击合成下界）
+    tradable = None
+    if opens:
+        # 构造只含 total 的最小行集合，复用同一个 _eval_tradable_ic
+        _tr_snaps = [{"date": s["date"],
+                      "rows": [{"code": r["code"], "total": r.get("total")} for r in s["rows"]]}
+                     for s in aligned]
+        _tr_gross = _eval_tradable_ic(_tr_snaps, list(HORIZONS), tdays, px, opens, cost_bps=0.0)
+        _tr_net = _eval_tradable_ic(_tr_snaps, list(HORIZONS), tdays, px, opens,
+                                    cost_bps=TRADABLE_COST_BPS)
+        for h in HORIZONS:
+            _g, _n = _tr_gross[str(h)], _tr_net[str(h)]
+            v, c_, note = _verdict_h(_n)
+            _n["verdict"], _n["verdict_color"], _n["verdict_note"] = v, c_, note
+            _n["gross_ic_mean"] = _g.get("ic_mean")
+            _n["gross_nw_t"] = _g.get("nw_t")
+            _n["gross_spread_mean"] = _g.get("spread_mean")
+        tradable = {
+            "base": "t+1 开盘买入 / 持有 h 日后开盘卖出（可执行口径）",
+            "cost_bps_roundtrip": TRADABLE_COST_BPS,
+            "horizons": _tr_net,
+            "note": ("前视修正：日评分于 t 日收盘后生成，原 IC 用 t 日收盘价买入不可成交；"
+                     "本口径改为 t+1 开盘买入。gross=未扣成本，net=扣 {:.0f}bp 往返成本。"
+                     .format(TRADABLE_COST_BPS)),
+        }
+        _tv, _tc, _tn = _overall_verdict(_tr_net)
+        tradable["verdict"], tradable["verdict_color"], tradable["verdict_note"] = _tv, _tc, _tn
+
     # 当前生效权重 vs 先验的复合 IC（若权重文件存在）
     w_now, w_meta = load_weights()
     current_cmp = None
@@ -1169,7 +1311,7 @@ def main():
 
     # v3.6（量化审计 P0）：共线性收敛 + 预测力安全门
     collin = _collinearity_summary(corr)
-    gate = _risk_gate(rec_ic, factors, collin)
+    gate = _risk_gate(rec_ic, factors, collin, tradable)
 
     out = {
         "date": aligned[-1]["date"],
@@ -1198,6 +1340,7 @@ def main():
         },
         "factors": factors,
         "recommendation_ic": rec_ic,
+        "tradable_ic": tradable,
         "factor_correlation": corr,
         "collinearity": collin,
         "risk_gate": gate,

@@ -94,8 +94,10 @@ model_str = data.get("model", "stock-scorer")
 #   P0-1 IC 交易日对齐: 剔除非交易日/接口陈旧快照(实测 09-10/09-25/10-01~07 七次事故)
 #   P0-2 IC 全样本收益: 回填全市场前复权日线, 消除 TOP200 留存偏差(T+20 流失 34%)
 #   P0-3 IC Newey-West + Bonferroni: 重叠窗口 t 值虚高修正, 15 次检验校正阈值 |NW t|≥2.97
-#   P0-4 IC 驱动权重: factor_weights.json 走步验证(样本外复合IC 0.0248→0.0445),
-#        基本面/消息面加权, 题材/技术降至地板, 板块动量维持(样本积累中)
+#   P0-4 IC 驱动权重: factor_weights.json 走步验证机制已就绪，
+#        ⚠️ 2026-10-24 实测更正: 十维池内截面 8 < MIN_TRAIN(30)，样本外观测为 0，
+#        实际 adopted=prior（IC 驱动权重从未落档）。原此处"样本外复合IC 0.0248→0.0445"
+#        为旧五维期文案，已删以免误读。
 #   P1 子区间稳定性/因子相关矩阵/workflow 数据新鲜度守卫(check_data_fresh.py)
 # v3.0: 十维评分模型（据全市场回测 Top5 因子拆解五维，见 因子排名与10维评分模型设计_2026-10-13.md）——
 #   1) 五维 → 十维: 技术面拆为超跌60反转/乖离低位/RSI反转/量能反向/超买反向(旧tech权重按0.06:0.10:0.06映射),
@@ -3331,6 +3333,38 @@ if _ic and _ic.get("factors"):
                     f'background:{_rv}22;color:{_rv};cursor:help;white-space:nowrap;">'
                     f'{html_mod.escape(str(_rec_ic.get("verdict") or "—"))}</span></td></tr>')
 
+    # ===== v3.6 可交易 IC 行（t+1 开盘买入，消除前视偏差，扣 20bp 往返成本）=====
+    _tr = _ic.get("tradable_ic")
+    _tr_row = ""
+    if _tr:
+        _trh = _tr.get("horizons") or {}
+        _trv = _tr.get("verdict_color", "#94a3b8")
+        _tcells = ""
+        for _h in (1, 5, 20):
+            _a = _trh.get(str(_h)) or {}
+            if not _a.get("n"):
+                _tcells += ('<td style="padding:6px 10px;color:#475569;text-align:center;">未到期</td>')
+                continue
+            _icv, _t = _a.get("ic_mean"), _a.get("nw_t")
+            _c = "#ef4444" if (_icv or 0) > 0 else ("#22c55e" if (_icv or 0) < 0 else "#94a3b8")
+            _lm, _lm_g = _a.get("long_mean"), _a.get("gross_ic_mean")
+            _lm_s = (f'<div style="font-size:10px;color:#64748b;margin-top:2px;">'
+                     f'头组净收益 {_lm:+.2f}%</div>') if isinstance(_lm, (int, float)) else ""
+            _tcells += (f'<td style="padding:6px 10px;text-align:center;">'
+                        f'<div style="color:{_c};font-size:13px;">{_icv:+.3f}</div>'
+                        f'<div style="font-size:10px;color:#64748b;margin-top:2px;">'
+                        f'NW t={_t:+.2f} · n={_a.get("n")}</div>{_lm_s}</td>')
+        _tr_row = (f'<tr style="background:rgba(56,189,248,0.06);">'
+                   f'<td style="padding:6px 10px;font-weight:700;color:#7dd3fc;white-space:nowrap;">'
+                   f'⚡ 综合分（可交易口径）'
+                   f'<div style="font-size:10px;color:#64748b;margin-top:2px;">T+1 开盘买入·扣{_tr.get("cost_bps_roundtrip", 0):.0f}bp</div></td>'
+                   f'{_tcells}'
+                   f'<td style="padding:6px 10px;text-align:center;">'
+                   f'<span title="{html_mod.escape(str(_tr.get("verdict_note") or ""))}" '
+                   f'style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px;'
+                   f'background:{_trv}22;color:{_trv};cursor:help;white-space:nowrap;">'
+                   f'{html_mod.escape(str(_tr.get("verdict") or "—"))}</span></td></tr>')
+
     # ===== v2.47 因子间截面相关矩阵（披露"五维"实际独立信息量）=====
     _corr = _ic.get("factor_correlation") or {}
     _corr_html = ""
@@ -3694,7 +3728,7 @@ if _ic and _ic.get("factors"):
                 <th style="padding:6px 10px;color:#94a3b8;font-weight:600;">T+20（一月）</th>
                 <th style="padding:6px 10px;color:#94a3b8;font-weight:600;">有效性判定</th>
             </tr></thead>
-            <tbody>{_ic_rows}{_rec_row}</tbody>
+            <tbody>{_ic_rows}{_rec_row}{_tr_row}</tbody>
         </table>
         {f'<div style="margin-top:14px;"><div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">📈 累计 IC 曲线（T+1，按截面序号累计；纵轴为累计 IC 值量程——曲线持续上行=因子稳定正向，下行=负向；窄屏可左右滑动）</div><div style="overflow-x:auto;">{_chart_svg}</div><div style="font-size:11px;margin-top:6px;">{_legend}</div></div>' if _chart_svg else ''}
         {_corr_html}
