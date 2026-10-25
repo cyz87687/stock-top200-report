@@ -448,6 +448,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
             资金口径 = 10 万基准 × 当日仓位纪律 <b style="color:#f59e0b;">6~8成</b>
             （赚钱效应 74 分）÷ 10 只，100 股取整。
         </div>
+        <div style="font-size:10.5px;color:#fbbf24;padding:7px 10px;background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.3);border-radius:6px;margin-bottom:10px;line-height:1.7;">⚠️ <b>权重未完全落地</b>：<code>score_theme_neg</code>、<code>score_size</code> 在当前 scored 数据里没有值（合计 <b>24%</b> 权重） → 本页 total/评级实际只反映 <b>76%</b> 的权重，个股分最大偏移 <b>8.2 分</b>、≥1 分的有 <b>366 只</b>。根因是 scored 由旧版 step2 生成（代码已支持写入），刷新数据后本提示自动消失。<b>不影响当日相对排序的方向，但影响绝对分数与评级分档。</b></div>
         <div style="overflow-x:auto;">
         <table style="width:100%;border-collapse:collapse;font-size:11px;">
             <thead><tr style="background:#1e293b;">
@@ -17643,7 +17644,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
 
     <!-- A2 元信息下沉: 版本号/数据源/口径说明全部收进页脚 -->
     <div class="footer" id="sec-notes">
-        <p style="color:#64748b;">📄 v4.0 报告层 · stock-scorer v3.6-fund-led (10-dim + AI + sector-momentum[evidence], prior-pending (全市场回测先验, 池内 IC 积累中)) 评分层 · 数据日期 2026-10-23 · 更新时间 2026-10-25 13:53:11</p>
+        <p style="color:#64748b;">📄 v4.0 报告层 · stock-scorer v3.6-fund-led (10-dim + AI + sector-momentum[evidence], prior-pending (全市场回测先验, 池内 IC 积累中)) 评分层 · 数据日期 2026-10-23 · 更新时间 2026-10-25 14:31:42</p>
         <p>📚 数据源：东方财富 + 腾讯K线 + 同花顺 + 新浪/乐股 · 全市场成交额排名 · 样本池 TOP500（覆盖 490 只 / 98%）</p>
         <p>📐 盈利取数口径（v3.5.1 起）：growth = 各股最新已披露报告期（2026中报为主）扣非累计同比，东财按报告期接口、官方口径 (本期−上年同期)/|上年同期|；Q3 预测景气加成来自手工汇总表（半导体/消费电子链，池内覆盖约13%，超出机构全年预期部分才计分）</p>
         <p>🗒️ 点评来源：AI 生成（本条点评由大模型基于当日真实行情数据生成。生成者：WorkBuddy LLM (deepseek-v4-flash)，基于当日真实行情数据）</p>

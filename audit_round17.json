@@ -1,0 +1,362 @@
+{
+ "date_run": "2026-10-23",
+ "weights_version": "v4.2-lag-robust",
+ "weights_sum": 1.0,
+ "scored_file": "top200_scored_2026-10-23.json",
+ "n_rows": 490,
+ "dims": [
+  {
+   "dim": "score_fund",
+   "weight": 0.32,
+   "daily_report": {
+    "evaluated": true,
+    "n_by_h": {
+     "1": 77,
+     "5": 73,
+     "20": 58
+    },
+    "note": "独立 IC 已评估"
+   },
+   "step2": {
+    "computes": false,
+    "writes_to_scored": true
+   },
+   "scored_data": {
+    "n_rows_with_value": 490,
+    "n_rows_total": 490,
+    "present": true
+   },
+   "enhance_reads": true,
+   "apply_reads": true,
+   "mf_portfolio_role": "正向加权轴",
+   "effective_weight_when_present": 0.76
+  },
+  {
+   "dim": "score_news",
+   "weight": 0.16,
+   "daily_report": {
+    "evaluated": true,
+    "n_by_h": {
+     "1": 77,
+     "5": 73,
+     "20": 58
+    },
+    "note": "独立 IC 已评估"
+   },
+   "step2": {
+    "computes": false,
+    "writes_to_scored": true
+   },
+   "scored_data": {
+    "n_rows_with_value": 490,
+    "n_rows_total": 490,
+    "present": true
+   },
+   "enhance_reads": true,
+   "apply_reads": true,
+   "mf_portfolio_role": "正向加权轴",
+   "effective_weight_when_present": 0.76
+  },
+  {
+   "dim": "score_theme_neg",
+   "weight": 0.12,
+   "daily_report": {
+    "evaluated": true,
+    "n_by_h": {
+     "1": 77,
+     "5": 73,
+     "20": 58
+    },
+    "note": "独立 IC 已评估"
+   },
+   "step2": {
+    "computes": true,
+    "writes_to_scored": true
+   },
+   "scored_data": {
+    "n_rows_with_value": 0,
+    "n_rows_total": 490,
+    "present": false
+   },
+   "enhance_reads": true,
+   "apply_reads": true,
+   "mf_portfolio_role": "—",
+   "effective_weight_when_present": 0.0
+  },
+  {
+   "dim": "score_size",
+   "weight": 0.12,
+   "daily_report": {
+    "evaluated": true,
+    "n_by_h": {
+     "1": 2,
+     "5": 1,
+     "20": 0
+    },
+    "note": "独立 IC 已评估"
+   },
+   "step2": {
+    "computes": true,
+    "writes_to_scored": true
+   },
+   "scored_data": {
+    "n_rows_with_value": 0,
+    "n_rows_total": 490,
+    "present": false
+   },
+   "enhance_reads": true,
+   "apply_reads": true,
+   "mf_portfolio_role": "—",
+   "effective_weight_when_present": 0.0
+  },
+  {
+   "dim": "score_sector",
+   "weight": 0.1,
+   "daily_report": {
+    "evaluated": true,
+    "n_by_h": {
+     "1": 18,
+     "5": 14,
+     "20": 0
+    },
+    "note": "独立 IC 已评估"
+   },
+   "step2": {
+    "computes": false,
+    "writes_to_scored": true
+   },
+   "scored_data": {
+    "n_rows_with_value": 490,
+    "n_rows_total": 490,
+    "present": true
+   },
+   "enhance_reads": true,
+   "apply_reads": true,
+   "mf_portfolio_role": "—",
+   "effective_weight_when_present": 0.76
+  },
+  {
+   "dim": "score_oversold60",
+   "weight": 0.045,
+   "daily_report": {
+    "evaluated": true,
+    "n_by_h": {
+     "1": 8,
+     "5": 4,
+     "20": 0
+    },
+    "note": "独立 IC 已评估"
+   },
+   "step2": {
+    "computes": false,
+    "writes_to_scored": true
+   },
+   "scored_data": {
+    "n_rows_with_value": 490,
+    "n_rows_total": 490,
+    "present": true
+   },
+   "enhance_reads": true,
+   "apply_reads": true,
+   "mf_portfolio_role": "聚合成块(__rev__)",
+   "effective_weight_when_present": 0.76
+  },
+  {
+   "dim": "score_bias60",
+   "weight": 0.045,
+   "daily_report": {
+    "evaluated": true,
+    "n_by_h": {
+     "1": 8,
+     "5": 4,
+     "20": 0
+    },
+    "note": "独立 IC 已评估"
+   },
+   "step2": {
+    "computes": false,
+    "writes_to_scored": true
+   },
+   "scored_data": {
+    "n_rows_with_value": 490,
+    "n_rows_total": 490,
+    "present": true
+   },
+   "enhance_reads": true,
+   "apply_reads": true,
+   "mf_portfolio_role": "聚合成块(__rev__)",
+   "effective_weight_when_present": 0.76
+  },
+  {
+   "dim": "score_rsi_rev",
+   "weight": 0.045,
+   "daily_report": {
+    "evaluated": true,
+    "n_by_h": {
+     "1": 8,
+     "5": 4,
+     "20": 0
+    },
+    "note": "独立 IC 已评估"
+   },
+   "step2": {
+    "computes": false,
+    "writes_to_scored": true
+   },
+   "scored_data": {
+    "n_rows_with_value": 490,
+    "n_rows_total": 490,
+    "present": true
+   },
+   "enhance_reads": true,
+   "apply_reads": true,
+   "mf_portfolio_role": "聚合成块(__rev__)",
+   "effective_weight_when_present": 0.76
+  },
+  {
+   "dim": "score_vol_pulse",
+   "weight": 0.045,
+   "daily_report": {
+    "evaluated": true,
+    "n_by_h": {
+     "1": 8,
+     "5": 4,
+     "20": 0
+    },
+    "note": "独立 IC 已评估"
+   },
+   "step2": {
+    "computes": false,
+    "writes_to_scored": true
+   },
+   "scored_data": {
+    "n_rows_with_value": 490,
+    "n_rows_total": 490,
+    "present": true
+   },
+   "enhance_reads": true,
+   "apply_reads": true,
+   "mf_portfolio_role": "聚合成块(__rev__)",
+   "effective_weight_when_present": 0.76
+  },
+  {
+   "dim": "score_overbought",
+   "weight": 0.0,
+   "daily_report": {
+    "evaluated": true,
+    "n_by_h": {
+     "1": 8,
+     "5": 4,
+     "20": 0
+    },
+    "note": "独立 IC 已评估"
+   },
+   "step2": {
+    "computes": false,
+    "writes_to_scored": true
+   },
+   "scored_data": {
+    "n_rows_with_value": 490,
+    "n_rows_total": 490,
+    "present": true
+   },
+   "enhance_reads": true,
+   "apply_reads": true,
+   "mf_portfolio_role": "聚合成块(__rev__)",
+   "effective_weight_when_present": 0.76
+  },
+  {
+   "dim": "score_theme_intrinsic",
+   "weight": 0.0,
+   "daily_report": {
+    "evaluated": true,
+    "n_by_h": {
+     "1": 8,
+     "5": 4,
+     "20": 0
+    },
+    "note": "独立 IC 已评估"
+   },
+   "step2": {
+    "computes": false,
+    "writes_to_scored": true
+   },
+   "scored_data": {
+    "n_rows_with_value": 490,
+    "n_rows_total": 490,
+    "present": true
+   },
+   "enhance_reads": true,
+   "apply_reads": true,
+   "mf_portfolio_role": "—",
+   "effective_weight_when_present": 0.76
+  },
+  {
+   "dim": "score_attention",
+   "weight": 0.0,
+   "daily_report": {
+    "evaluated": true,
+    "n_by_h": {
+     "1": 8,
+     "5": 4,
+     "20": 0
+    },
+    "note": "独立 IC 已评估"
+   },
+   "step2": {
+    "computes": false,
+    "writes_to_scored": true
+   },
+   "scored_data": {
+    "n_rows_with_value": 490,
+    "n_rows_total": 490,
+    "present": true
+   },
+   "enhance_reads": true,
+   "apply_reads": true,
+   "mf_portfolio_role": "负向硬排除",
+   "effective_weight_when_present": 0.76
+  }
+ ],
+ "weight_coverage": {
+  "n_compared": 490,
+  "mean_effective_weight": 0.76,
+  "missing_weight_pct": 24.0,
+  "total_diff_mean": -1.03,
+  "total_diff_median": -1.0,
+  "total_diff_abs_max": 8.15,
+  "n_cross_rating_threshold": 366
+ },
+ "pool": {
+  "data": {
+   "file": "top500_all_a.json",
+   "date": "2026-10-25",
+   "rules_version": null,
+   "size_quantile": 0.18,
+   "sample_strata": null,
+   "size_as_factor": null,
+   "sampling": null,
+   "mv_median_yi": 31.1,
+   "mv_max_yi": 39.9,
+   "mv_log_sd": null
+  },
+  "config": {
+   "rules_version": "v4.1-screening-then-scoring",
+   "size_quantile": 0.0,
+   "sample_strata": 5,
+   "size_as_factor": true
+  },
+  "in_sync": false
+ },
+ "summary": {
+  "w_total": 1.0,
+  "w_missing_in_scored_data": 0.24,
+  "w_never_evaluated_in_daily_report": 0,
+  "w_weak_prior_only": 0.42
+ },
+ "boundaries": [
+  "本脚本只做追溯，不重算 IC、不改生产数据",
+  "权重覆盖度按 apply_sector_momentum 既定口径：缺维从分母剔除，不按 0 计入",
+  "effective_weight 取该行实际有值的维度权重之和，缺维即从分母消失（这是正确防呆，但会让 total 静默只反映部分权重）"
+ ]
+}

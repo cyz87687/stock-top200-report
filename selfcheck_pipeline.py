@@ -118,10 +118,48 @@ def check_ten_dim_applied(scored_path):
         return ("skip", "未找到十维权重，跳过一致性检查")
 
     def expected(r):
-        t = 0.0
+        # v4.3（P0 修复，round17）：原实现写 `float(r.get(k) or 0) * float(w)`，
+        #   与 apply_sector_momentum 曾经的 `or 0` 是同一个 Bug 模式。
+        #   后果一：**错判根因**。当 scored 数据缺 score_theme_neg / score_size
+        #   （合计 0.24 权重）时，expected 把这两维当 0 分计入、分母仍是 1.0；
+        #   而 apply 的口径是「缺维从分母剔除」。两者必然对不上 → 自检报
+        #   「十维总分未生效 · apply 可能降级」，但真因是**数据缺维**，
+        #   排查方向被完全带偏（round17 实证：诊断文案与真因无关）。
+        #   后果二：**误报**。即使数据完整，某只股票缺 circ_mv 导致 score_size=None
+        #   时，expected 与 apply 也会不一致 → 无端告警。
+        #   修法：与 apply 完全同口径 —— 只用该行实际有值的维度，缺维从分母剔除。
+        t, den = 0.0, 0.0
         for k, w in W.items():
-            t += float(r.get(k) or 0) * float(w)
-        return round(t * 20, 2)  # v3.3 问题2: 量纲升级 总分满分100 (×20 替代 ×4)
+            v = r.get(k)
+            if isinstance(v, (int, float)):
+                t += float(v) * float(w)
+                den += float(w)
+        if den <= 0:
+            return None
+        return round(t / den * 20, 2)  # v3.3 问题2: 量纲升级 总分满分100 (×20 替代 ×4)
+
+    # v4.3（P0 新增）：**权重覆盖度检查** —— 直接回答「权重有没有真的落到数据上」。
+    #   这是比「total 是否吻合」更前置的一道闸：缺维时 total 照样能算出来（按剩余
+    #   维度归一），页面照常出，但 silently 少算了一部分权重。round17 实测
+    #   scored 数据缺 0.24 权重、最大偏移 8.15 分、366/490 只偏移 ≥1 分，
+    #   而此前唯一的自检项把根因归错了地方。
+    _wpos = {k: v for k, v in W.items() if v > 0}
+    _cov_rows = []
+    for r in rs:
+        _have = [k for k in _wpos if isinstance(r.get(k), (int, float))]
+        _cov_rows.append(sum(_wpos[k] for k in _have))
+    _cov_mean = sum(_cov_rows) / len(_cov_rows) if _cov_rows else 0.0
+    _missing_dims = sorted(k for k in _wpos
+                           if not any(isinstance(r.get(k), (int, float)) for r in rs))
+    if _missing_dims:
+        _mw = sum(_wpos[k] for k in _missing_dims)
+        _msg = (f"⚠️ 权重未落地: {_missing_dims} 在 scored 数据里完全没有值"
+                f"（合计 {_mw:.1%} 权重）→ total 实际只反映 {_cov_mean:.1%} 的权重。"
+                f"根因通常是**数据比代码旧**（step2 已能写这些字段，但 scored 是改动前生成的），"
+                f"不是 apply 降级。请重跑 step2→enhance→apply 刷新 scored。")
+        if _mw >= 0.05:
+            return ("fail", _msg + f"（缺失权重 {_mw:.1%} ≥ 5%，属 P0：评级可能跨档）")
+        return ("warn", _msg)
 
     # 抽前 20 只比对（apply 后 total 应≈十维加权）
     diff = 0
@@ -130,12 +168,15 @@ def check_ten_dim_applied(scored_path):
         if r.get("score_sector") is None:
             continue     # apply 前无板块维度，跳过
         n += 1
-        if abs(float(r.get("total") or 0) - expected(r)) > 0.5:
+        _e = expected(r)
+        if _e is None:
+            continue
+        if abs(float(r.get("total") or 0) - _e) > 0.5:
             diff += 1
     if n and diff / n > 0.5:
         return ("fail", f"十维总分未生效: 抽样 {n} 只中 {diff} 只 total 偏离十维加权值 >0.5"
                         f"（apply_sector_momentum 可能降级）")
-    return ("ok", f"十维总分一致性: 抽样 {n} 只全部吻合")
+    return ("ok", f"十维总分一致性: 抽样 {n} 只全部吻合；权重覆盖度 {_cov_mean:.1%}")
 
 
 def main():
@@ -159,15 +200,15 @@ def main():
     if issues == 0:
         print("   ✅ 关键脚本未见未定义全局引用")
 
-    print("── B) 十维总分一致性 ──")
+    print("── B) 十维总分一致性 + 权重落地 ──")
     res = check_ten_dim_applied(scored)
     if res is None:
         print("   ⏭️ 无 scored json，跳过")
     else:
         st, msg = res
-        icon = {"ok": "✅", "skip": "⏭️", "fail": "⚠️"}[st]
+        icon = {"ok": "✅", "skip": "⏭️", "fail": "⚠️", "warn": "⚠️"}[st]
         print(f"   {icon} {msg}")
-        if st == "fail":
+        if st in ("fail", "warn"):
             issues += 1
 
     print(f"── 结论: {'⚠️ 发现 ' + str(issues) + ' 项可疑（请人工复核）' if issues else '✅ 全部通过'} ──")

@@ -344,30 +344,71 @@ def sec_collinearity(ic):
 
 
 def sec_weights(ic):
-    """现行权重 + 无样本支撑的权重占比"""
+    """现行权重 + 无样本支撑的权重占比
+
+    v4.3（P0 修复，round17 穿透审计）：原实现把证据强度**硬编码**成
+      well = ("score_fund", "score_news", "score_sector") → 一律标「满样本（78 截面）」
+    这与 factor_ic.json 的真实样本量直接矛盾：
+      · score_sector 实测 n(1/5/20) = 18/14/0，从不是 78；
+      · score_theme_neg / score_size 原实现标「弱先验（少数截面）」，实际是
+        **0 个截面**（round17 发现它们此前根本不在 factor_eval.FACTORS 里，
+        日报从未单独评估过，只在复合 IC 里被隐式带入）。
+    「少数截面」与「零截面」是两回事：前者是证据弱，后者是**没有证据**。
+    硬编码标签会让读者以为 42% 的权重都有样本背书，实际并非如此。
+    改为从 factor_ic.json 现取 n，按真实样本量分档。
+    """
     w = ic.get("active_weights") or {}
+    fac = ic.get("factors") or {}
     out = ["## 6. 现行权重与证据覆盖", ""]
     if not w:
         out.append("未查到 active_weights 字段。")
         return "\n".join(out)
 
-    # 有满样本支撑的维度（fund / news / sector）vs 仅少数截面支撑的反转块
-    well = ("score_fund", "score_news", "score_sector")
-    w_well = sum(v for k, v in w.items() if k in well)
-    w_weak = sum(v for k, v in w.items() if k not in well)
+    def _nmax(dim):
+        hz = (fac.get(dim) or {}).get("horizons") or {}
+        return max([(hz.get(h) or {}).get("n") or 0 for h in ("1", "5", "20")] or [0])
 
-    out.append("| 维度 | 权重 | 证据强度 |")
-    out.append("|---|---|---|")
+    # 分档：样本达标(>=MIN_SAMPLE) / 小样本(>0) / 无任何截面(=0)
+    # ⚠️ MIN_SAMPLE 与 factor_eval 保持一致（20）；此处写死并在文案中说明来源
+    MIN_N = 20
+    well, weak, none_dims = [], [], []
+    rows_tbl = []
     for k, v in sorted(w.items(), key=lambda x: -x[1]):
-        strength = "满样本（78 截面）" if k in well else "弱先验（少数截面）"
-        out.append(f"| `{k}` | {v:.1%} | {strength} |")
+        n = _nmax(k)
+        if n >= MIN_N:
+            strength = f"样本达标（n={n}）"
+            well.append(k)
+        elif n > 0:
+            strength = f"⚠️ 小样本（n={n}<{MIN_N}）"
+            weak.append(k)
+        else:
+            strength = "❌ 无任何截面可评估"
+            none_dims.append(k)
+        rows_tbl.append(f"| `{k}` | {v:.1%} | {strength} |")
+
+    out.append("| 维度 | 权重 | 证据强度（按 factor_ic.json 实际截面数） |")
+    out.append("|---|---|---|")
+    out += rows_tbl
+    w_well = sum(v for k, v in w.items() if k in well)
+    w_weak = sum(v for k, v in w.items() if k in weak)
+    w_none = sum(v for k, v in w.items() if k in none_dims)
     out += [
         "",
-        f"- 满样本支撑权重合计：**{w_well:.1%}**",
-        f"- 弱先验权重合计：**{w_weak:.1%}** ← 这部分无统计证据支撑，属先验设定",
+        f"- 样本达标（n≥{MIN_N}）支撑的权重合计：**{w_well:.1%}**",
+        f"- 小样本（0<n<{MIN_N}）支撑的权重合计：**{w_weak:.1%}**",
+        f"- **完全无截面可评估**的权重合计：**{w_none:.1%}** ← 这部分没有任何独立 IC 证据，纯先验设定",
         "",
-        "> ⚠️ 纪律：**页面不得暗示「权重已优化」**。弱先验部分必须明确标注为先验，"
+    ]
+    if none_dims:
+        out.append(f"> ⚠️ `{'`、`'.join(none_dims)}` 共 {w_none:.1%} 的权重在因子 IC 表里"
+                   f"**找不到对应行**——它们只通过 `_derive_dims` 在复合 IC 里被隐式带入，"
+                   f"从未被单独度量。这是「权重与证据脱节」的直接位置，调权重前必须先补样本。")
+        out.append("")
+    out += [
+        "> ⚠️ 纪律：**页面不得暗示「权重已优化」**。非「样本达标」部分必须明确标注为先验，"
         "待满 30 个池内截面后方可运行 `--optimize-weights` 重估。",
+        "> 📌 证据强度一栏由 `gen_factor_daily.py` 从 `factor_ic.json` 现取 n 计算，"
+        "不再硬编码维度名单（v4.3 前曾把 score_sector 错标为「满样本 78 截面」，实测仅 18/14/0）。",
         "",
     ]
     return "\n".join(out)
@@ -682,6 +723,82 @@ def sec_footer():
 # ---------------------------------------------------------------- 主流程
 
 
+def sec_weight_trace():
+    """权重落地核查（v4.3 新增，round17 穿透审计）—— 回答「日报的权重/因子到底有没有应用到生产」
+
+    老大 2026-10-25 提问：「检查每日因子日报的权重和因子有没有应用到 A股成交额 TOP500
+    评分报告，目前看只应用了部分。」
+
+    本节把 `audit_round17.json` 的七环追溯矩阵直接搬进日报，让「哪一维没落地」
+    每天可见，而不是靠人偶然发现。矩阵口径见 audit_round17.py。
+    """
+    a = _load("audit_round17.json")
+    out = ["## 6.5 权重落地核查：日报权重 → 生产报告（v4.3）", ""]
+    if not a:
+        out.append("未查到 audit_round17.json（由 `audit_round17.py` 生成，已接入每日 workflow）。")
+        return "\n".join(out)
+
+    out.append(f"- 权重版本：`{a.get('weights_version')}` · 核查对象：`{a.get('scored_file')}`"
+               f"（{a.get('n_rows')} 行）")
+    s = a.get("summary") or {}
+    wc = a.get("weight_coverage") or {}
+    out.append(f"- **权重合计 {s.get('w_total'):.2f}**（应为 1.00）")
+    out.append("")
+    out.append("| 维度 | 权重 | 日报单独评估 | 样本(1/5/20) | scored 数据落地 | 组合角色 |")
+    out.append("|---|---|---|---|---|---|")
+    for d in a.get("dims") or []:
+        nb = (d.get("daily_report") or {}).get("n_by_h") or {}
+        ns = f"{nb.get('1') or 0}/{nb.get('5') or 0}/{nb.get('20') or 0}"
+        ev = "✅" if (d.get("daily_report") or {}).get("evaluated") else "❌ **未评估**"
+        sd = d.get("scored_data") or {}
+        land = (f"✅ {sd.get('n_rows_with_value')} 行" if sd.get("present")
+                else "❌ **0 行**")
+        out.append(f"| `{d['dim']}` | {d['weight']:.1%} | {ev} | {ns} | {land} | "
+                   f"{d.get('mf_portfolio_role') or '—'} |")
+    out += [
+        "",
+        f"- ⚠️ **scored 数据里缺失的权重合计：{s.get('w_missing_in_scored_data'):.1%}**"
+        f" → 页面上的 `total` 实际只反映 **{wc.get('mean_effective_weight'):.1%}** 的权重",
+        f"- ⚠️ 日报从未单独评估的权重合计：**{s.get('w_never_evaluated_in_daily_report'):.1%}**",
+        f"- 纯先验（无统计证据）权重合计：**{s.get('w_weak_prior_only'):.1%}**",
+        "",
+    ]
+    if wc.get("n_compared"):
+        out.append(f"用现权重复算 vs 文件 `total`：n={wc['n_compared']}，"
+                   f"差均值 {wc['total_diff_mean']:+.2f}、中位 {wc['total_diff_median']:+.2f}、"
+                   f"最大绝对差 **{wc['total_diff_abs_max']:.2f} 分**，"
+                   f"≥1 分的有 {wc['n_cross_rating_threshold']} 只"
+                   f"（评级门槛 S≥85/A≥65/B≥45/C≥25，1 分即可跨档）。")
+        out.append("")
+    pool = a.get("pool") or {}
+    if pool:
+        pi, ci = pool.get("data") or {}, pool.get("config") or {}
+        out.append("**母体口径（选池规则）**：")
+        out.append("")
+        out.append("| 位置 | version | size_quantile | sample_strata | size_as_factor | 市值中位 |")
+        out.append("|---|---|---|---|---|---|")
+        out.append(f"| 数据 `top500_all_a.json` | {pi.get('rules_version') or '—'} | "
+                   f"{pi.get('size_quantile')} | {pi.get('sample_strata') or '—'} | "
+                   f"{pi.get('size_as_factor')} | {pi.get('mv_median_yi')} 亿 |")
+        out.append(f"| 配置 `config.json` | {ci.get('rules_version') or '—'} | "
+                   f"{ci.get('size_quantile')} | {ci.get('sample_strata') or '—'} | "
+                   f"{ci.get('size_as_factor')} | — |")
+        out.append("")
+        if pool.get("in_sync"):
+            out.append("→ ✅ 数据与配置一致。")
+        else:
+            out.append("→ ❌ **数据与配置不一致**：数据是旧配置的产物。代码已改但数据未刷新，"
+                       "属于「静默退化」——页面照常出，但用的是上一版口径。")
+        out.append("")
+    out += [
+        "> **读法**：这一节是「有没有应用」的体检，不是「应用得好不好」的评估。"
+        "任何一行出现 ❌，都意味着该维度在生产链路上是断的——要么数据没刷新，"
+        "要么根本没接入。断点不产生报错，只会让 `total` 静默地少算一部分权重。",
+        "",
+    ]
+    return "\n".join(out)
+
+
 def build(date_str=None, want_html=False):
     ic = _load("factor_ic.json")
     if not ic:
@@ -697,6 +814,7 @@ def build(date_str=None, want_html=False):
         sec_recommendation(ic),
         sec_collinearity(ic),
         sec_weights(ic),
+        sec_weight_trace(),
         sec_mf_backtest(),
         sec_zone_filter(),
         sec_holding_period(),

@@ -2266,7 +2266,47 @@ try:
                 + '这正是<b>不再按板块动量切路线</b>的理由 —— 已由本区块的多因子组合取代。'
             )
 
-        # ---- v4.0: 两块分析内容迁出主页面 ----
+        # ---- v4.3（round17 穿透审计）：权重落地披露 ----
+        # 老大 2026-10-25 提问「日报的权重和因子有没有应用到报告，目前看只应用了部分」。
+        # 穿透结论：scored 数据可能缺 score_theme_neg / score_size（合计 0.24 权重），
+        # 此时页面上的 total / 评级是按剩余维度归一后的结果，却没有任何提示 —— 典型的
+        # 静默退化（缺维从分母剔除，不报错、不出错，只是少算一部分权重）。
+        # 此处按 audit_round17.json 现取，有缺口才显示；数据刷新后自动消失。
+        # ⚠️ 禁止硬编码「缺 24%」—— 数字必须来自当日审计产物。
+        _warn_block = ""
+        try:
+            _a17p = os.path.join(_ai_dir, "audit_round17.json")
+            if os.path.exists(_a17p):
+                _a17 = json.load(open(_a17p, encoding="utf-8"))
+                _s17 = _a17.get("summary") or {}
+                _wc17 = _a17.get("weight_coverage") or {}
+                _miss_w = _s17.get("w_missing_in_scored_data") or 0.0
+                if _miss_w > 0.001:
+                    _miss_dims = [d["dim"] for d in (_a17.get("dims") or [])
+                                  if (d.get("weight") or 0) > 0
+                                  and not (d.get("scored_data") or {}).get("present")]
+                    _cov = _wc17.get("mean_effective_weight")
+                    _dmax = _wc17.get("total_diff_abs_max")
+                    _ncross = _wc17.get("n_cross_rating_threshold")
+                    _cov_s = f"{_cov:.0%}" if isinstance(_cov, (int, float)) else "—"
+                    _dim_s = "、".join(f"<code>{d}</code>" for d in _miss_dims) or "（未指明）"
+                    _off_s = (f"，个股分最大偏移 <b>{_dmax:.1f} 分</b>、≥1 分的有 <b>{_ncross} 只</b>"
+                              if isinstance(_dmax, (int, float)) else "")
+                    _warn_block = (
+                        '<div style="font-size:10.5px;color:#fbbf24;padding:7px 10px;'
+                        'background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.3);'
+                        'border-radius:6px;margin-bottom:10px;line-height:1.7;">'
+                        '⚠️ <b>权重未完全落地</b>：' + _dim_s
+                        + f' 在当前 scored 数据里没有值（合计 <b>{_miss_w:.0%}</b> 权重）'
+                        + f' → 本页 total/评级实际只反映 <b>{_cov_s}</b> 的权重' + _off_s
+                        + '。根因是 scored 由旧版 step2 生成（代码已支持写入），刷新数据后本提示自动消失。'
+                        + '<b>不影响当日相对排序的方向，但影响绝对分数与评级分档。</b></div>'
+                    )
+        except Exception:
+            _warn_block = ""
+
+
+    # ---- v4.0: 两块分析内容迁出主页面 ----
         # 老大指令：「页面上不展示分析与计算过程，仅呈现结论」。
         # 下面两块（构造回测对比 + 动量悖论四层解释）属方法论/计算过程，
         # 默认 SHOW_ANALYSIS=False 不渲染；原文案同步迁至 reports/factor_<date>.md。
@@ -2358,6 +2398,7 @@ try:
             资金口径 = 10 万基准 × 当日仓位纪律 <b style="color:#f59e0b;">{mkt_pos}</b>
             （赚钱效应 {mkt_score if mkt_score is not None else "—"} 分）÷ {len(_mf.get("picks") or [])} 只，100 股取整。
         </div>
+        {_warn_block}
         <div style="overflow-x:auto;">
         <table style="width:100%;border-collapse:collapse;font-size:11px;">
             <thead><tr style="background:#1e293b;">

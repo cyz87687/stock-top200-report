@@ -83,7 +83,19 @@ FACTORS = [
     ("score_sector", "板块动量"),
     ("score_theme", "题材热度（已拆解·对照）"),
     ("score_tech", "技术面（已拆解·对照）"),
+    # v4.3（P0 修复，round17 穿透审计）：这两个维度承载 0.24 的权重，但此前**不在
+    #   FACTORS 里** → 日报的因子 IC 表从未单独量过它们，只在 _composite_ic 里被
+    #   _derive_dims 隐式带入。后果正是老大指出的「只应用了部分」：日报一面给
+    #   theme_neg/size 各配 12% 权重，一面又在自己的证据表里找不到这两行的任何
+    #   IC/t/胜率 —— 权重与证据在两个不同的表里，永远对不上。
+    #   ⚠️ score_size 只有 3/78 个截面带 circ_mv → n 会很小，判定逻辑本就按
+    #      MIN_SAMPLE 报「样本积累中」，这是如实披露而非缺陷；theme_neg 由
+    #      score_theme 派生（58 个截面可用），样本与 score_theme 同源。
+    ("score_theme_neg", "题材反号（10−题材热度）"),
+    ("score_size", "小市值（池内流通市值分位）"),
 ]
+# 派生维度：快照里没有该字段，须在内存派生后再评估（口径与 _composite_ic 一致）
+DERIVED_FIELDS = {"score_theme_neg", "score_size"}
 # 可优化权重的九个维度（fund/news 池内已验证；新拆 5 维先验映射待池内积累；
 #   2 先验维弱证据）；score_sector 样本不足暂固定 0.10
 # ⚠️ v4.1（P0 修复）：OPT_DIMS 专门服务「相关性矩阵 / 权重拟合 / 复合 IC」，
@@ -1654,9 +1666,17 @@ def main():
               f"（历史口径 {pool_sizes}; IC 评估仍用全口径 {len(aligned)} 个）")
 
     # 因子 IC
+    # v4.3（P0 修复，round17）：派生维度须先在内存补齐再评估。
+    #   ⚠️ 必须**逐截面**派生，不能把所有截面的行拼起来一次性派生 —— score_size 的
+    #   定义是「池内流通市值分位」，池是逐日变化的；拼起来算会把历史上所有池混成
+    #   一个宇宙，算出与生产 step2 不同的分位。_composite_ic 里也是逐截面调用的。
+    _aligned_derived = None
+    if any(f in DERIVED_FIELDS for f, _ in FACTORS):
+        _aligned_derived = [dict(s, rows=_derive_dims(s["rows"])) for s in aligned]
     factors = {}
     for field, label in FACTORS:
-        agg = _eval_factor(aligned, field, tdays, px)
+        _src_snaps = _aligned_derived if (field in DERIVED_FIELDS and _aligned_derived) else aligned
+        agg = _eval_factor(_src_snaps, field, tdays, px)
         for h in HORIZONS:
             a = agg[str(h)]
             v, c, note = _verdict_h(a)
