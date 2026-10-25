@@ -219,6 +219,26 @@ jobs:
               echo "[$(date -u '+%H:%M:%S')] ⚠️ Factor IC evaluation failed, report will omit IC section" >> $LOG
             fi
 
+            # Step 3.965: 多因子精选组合（≤10 只）+ 回测 → sector/mf_pick_<date>.json + mf_backtest.json
+            # 【v3.9 新增】解决「候选组合 20 只无法执行」问题；权重由 factor_ic.json 证据反推，非手填。
+            # ⚠️ 必须在 factor_eval.py 之后: 要读最新 factor_ic.json 的池内 IC 来推导权重。
+            # ⚠️ 必须在 track_recommendations.py 之后: 报告层「动量路线低 IC 悖论」区块
+            #    读 recommendation_track.json 的真实跟踪数据。
+            # ⚠️ 必须在 gen_report_top200.py 之前: 报告层渲染「🧮 多因子精选组合」区块。
+            echo "[$(date -u '+%H:%M:%S')] Running pick_multifactor.py + gen_mf_backtest.py ..." >> $LOG
+            if python3 pick_multifactor.py "$SCORED_JSON" --top 10 >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Multifactor portfolio generated" >> $LOG
+              _MFOUT=$(ls -1 sector/mf_pick_*.json 2>/dev/null | sort | tail -1)
+              if [ -n "$_MFOUT" ]; then cp "$_MFOUT" sector/mf_latest.json; fi
+              if timeout 300 python3 gen_mf_backtest.py >> $LOG 2>&1; then
+                echo "[$(date -u '+%H:%M:%S')] ✅ Multifactor backtest regenerated" >> $LOG
+              else
+                echo "[$(date -u '+%H:%M:%S')] ⚠️ Multifactor backtest failed/timeout, report may show stale table" >> $LOG
+              fi
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ Multifactor pick failed, report falls back to mf_latest.json" >> $LOG
+            fi
+
             # Step 3.97: 链路自检 (v3.2) —— 把「静默降级」变成可见告警
             #   背景: 各步用 if 守护, 单步失败不中断 → 如十维总分未重算会被静默吞掉。
             #   本步不中断链路(仅记日志); 发现可疑会打印 ⚠️ 供排查。
@@ -320,10 +340,14 @@ jobs:
           git add -f recommendation_track.json
           git add -f factor_history.json factor_ic.json
           git add -f sector/sw_map.json sector/sector_momentum_latest.json sector/portfolio_*.json sector/portfolio_report_*.html
+          # v3.9 多因子组合产物（*.json 被 gitignore，必须 -f）
+          git add -f sector/mf_pick_*.json sector/mf_latest.json mf_backtest.json 2>/dev/null || true
           # 【v3.5.5】factor_weights.json 每日由 --optimize-weights 重估写入, 必须随链路推送
           git add -f factor_weights.json
           git add enhance_scores.py gen_report_top200.py generate_ai_assessment.py factor_eval.py
           git add sector_momentum_daily.py apply_sector_momentum.py pick_portfolio.py gen_portfolio_report.py fetch_sw_map.py selfcheck_pipeline.py
+          # v3.9 新增脚本
+          git add pick_multifactor.py gen_mf_backtest.py backtest_multifactor.py 2>/dev/null || true
           # 记录 prune 产生的删除(仅限已跟踪的历史报告/评分/组合文件)
           git add -u top200_report_2026-*.html 2>/dev/null || true
           git add -Au -- top200_scored_*.json sector/portfolio_*.json sector/sector_momentum_*.json 2>/dev/null || true

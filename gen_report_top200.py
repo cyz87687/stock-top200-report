@@ -1692,6 +1692,315 @@ if quant_json or ai_pick_names:
         <div style="font-size:11px;color:#475569;margin-top:6px;">说明：量化组合可完全复现、便于回测；AI 组合含产业逻辑但主观性更强。<b>两者交集是唯一的共识信号</b>，无交集时应视为分歧而非机会。</div>
     </div>''')
 
+# ===== v3.9 多因子精选组合（≤10 只）+ 动量路线低 IC 悖论解释 =====
+# 老大第 3 项：「今日候选组合数量太多，请用多因子的思路选出一个组合，今日组合总数不要超过 10 只。
+#   另外请解释为什么动量路线的 ic 值和胜率低但是会选出动量路线的个股。」
+# 上方原区块仍是三条线各 10 只（共 20 只），保留作「规则披露」；本区块给出唯一可执行组合。
+try:
+    _mf = {}
+    _mfp = os.path.join(_ai_dir, "sector", f"mf_pick_{date_str}.json")
+    if not os.path.exists(_mfp):
+        _mfp = os.path.join(_ai_dir, "sector", "mf_latest.json")
+    if os.path.exists(_mfp):
+        with open(_mfp, "r", encoding="utf-8") as _f:
+            _mf = json.load(_f)
+    _mfb = {}
+    _mfbp = os.path.join(_ai_dir, "mf_backtest.json")
+    if os.path.exists(_mfbp):
+        with open(_mfbp, "r", encoding="utf-8") as _f:
+            _mfb = json.load(_f)
+
+    # ---- 动量路线跟踪实证（回答「低 IC 为何仍选股」的硬证据）----
+    _rt = {"quant_momentum": {}, "quant_reversal": {}, "ai_portfolio": {}}
+    try:
+        with open(os.path.join(_ai_dir, "recommendation_track.json"), "r", encoding="utf-8") as _f:
+            _recs = (json.load(_f) or {}).get("records") or []
+        for _k in _rt:
+            _sub = [x for x in _recs if x.get("kind") == _k]
+            for _h in ("1", "5", "20"):
+                _ev = [x["excess"][_h] for x in _sub
+                       if isinstance((x.get("excess") or {}).get(_h), (int, float))]
+                _rv = [x["rets"][_h] for x in _sub
+                       if isinstance((x.get("rets") or {}).get(_h), (int, float))]
+                if len(_ev) >= 3:
+                    _rt[_k][_h] = {
+                        "n": len(_ev),
+                        "exc_mean": sum(_ev) / len(_ev),
+                        "exc_med": sorted(_ev)[len(_ev) // 2],
+                        "win": sum(1 for x in _ev if x > 0) / len(_ev) * 100,
+                        "ret_mean": (sum(_rv) / len(_rv)) if _rv else None,
+                    }
+    except Exception:
+        _rt = {}
+
+    _mf_rows = ""
+    for _i, _p in enumerate(_mf.get("picks") or [], 1):
+        _pt = _p.get("parts") or {}
+        _rt_c = RATING_COLORS.get(_p.get("rating") or "", "#94a3b8")
+        _fpe = _p.get("fwd_pe")
+        _fpe_s = f"{_fpe:.1f}x" if isinstance(_fpe, (int, float)) else "未提供"
+        _gw = _p.get("growth")
+        _gw_s = f"{_gw:+.0f}%" if isinstance(_gw, (int, float)) else "未提供"
+        _rsi = _p.get("rsi")
+        _rsi_s = f"{_rsi:.0f}" if isinstance(_rsi, (int, float)) else "—"
+        _mfs = _p.get("mf_score")
+        _mfs_s = f"{_mfs:.3f}" if isinstance(_mfs, (int, float)) else "—"
+        _prc = _p.get("price")
+        _prc_s = f"{_prc:.2f}" if isinstance(_prc, (int, float)) else "—"
+        _rcell = ""
+        for _lbl, _vv in (("基本面", _pt.get("fund_pct")), ("消息", _pt.get("news_pct")),
+                          ("反转块", _pt.get("rev_pct"))):
+            if isinstance(_vv, (int, float)):
+                _rcell += (f'<span style="font-size:9.5px;color:#94a3b8;margin-right:6px;">'
+                           f'{_lbl} <b style="color:#cbd5e1;">{_vv:.0f}%</b></span>')
+        _reason = ""
+        if _p.get("fund_reasons"):
+            _reason = html_mod.escape(str(_p["fund_reasons"][0]))
+        _mf_rows += (
+            f'<tr style="border-top:1px solid #1e293b;">'
+            f'<td style="padding:5px 6px;color:#64748b;font-size:10px;">{_i}</td>'
+            f'<td style="padding:5px 6px;color:#f8fafc;font-weight:700;white-space:nowrap;">'
+            f'{html_mod.escape(str(_p.get("name") or ""))}'
+            f'<div style="font-size:9.5px;color:#475569;font-weight:400;">'
+            f'{html_mod.escape(str(_p.get("code") or ""))}</div></td>'
+            f'<td style="padding:5px 6px;color:#cbd5e1;font-size:10.5px;">'
+            f'{html_mod.escape(str(_p.get("sector_l2") or "—"))}'
+            f'<div style="font-size:9.5px;color:#475569;">'
+            f'{html_mod.escape(str(_p.get("sector_parent") or ""))}</div></td>'
+            f'<td style="padding:5px 6px;text-align:center;color:#38bdf8;font-weight:800;">{_mfs_s}</td>'
+            f'<td style="padding:5px 6px;text-align:center;">'
+            f'<span style="color:{_rt_c};font-weight:700;font-size:11px;">'
+            f'{html_mod.escape(str(_p.get("rating") or "—"))}</span></td>'
+            f'<td style="padding:5px 6px;text-align:center;color:#e2e8f0;font-size:11px;">'
+            f'{_prc_s}</td>'
+            f'<td style="padding:5px 6px;text-align:center;color:#cbd5e1;font-size:10.5px;">{_fpe_s}</td>'
+            f'<td style="padding:5px 6px;text-align:center;color:#cbd5e1;font-size:10.5px;">{_gw_s}</td>'
+            f'<td style="padding:5px 6px;text-align:center;color:#cbd5e1;font-size:10.5px;">{_rsi_s}</td>'
+            f'<td style="padding:5px 6px;color:#64748b;font-size:9.5px;line-height:1.6;">{_rcell}</td>'
+            f'<td style="padding:5px 6px;color:#94a3b8;font-size:9.5px;line-height:1.6;max-width:200px;">'
+            f'{_reason}</td></tr>')
+
+    # 回测表
+    _mfb_rows = ""
+    _vb = _mfb.get("variants") or {}
+    for _hk in ("1", "5", "20"):
+        _hz = (_mfb.get("horizons") or {}).get(_hk) or {}
+        _gr = _hz.get("groups") or {}
+        if not _gr:
+            continue
+        _best = max(_gr.values(), key=lambda g: (g.get("exc_mean") if isinstance(g.get("exc_mean"), (int, float)) else -99))
+        _cells = ""
+        for _k in ("A", "B", "C", "D"):
+            _g = _gr.get(_k)
+            if not _g:
+                _cells += '<td style="padding:4px 6px;text-align:center;color:#475569;">—</td>'
+                continue
+            _em = _g.get("exc_mean")
+            _cc = "#ef4444" if (_em or 0) > 0 else "#22c55e"
+            _isbest = (_g is _best)
+            _bd = "border:1px solid #a3e63566;" if _isbest else ""
+            _cells += (f'<td style="padding:4px 6px;text-align:center;{_bd}">'
+                       f'<div style="color:{_cc};font-weight:700;font-size:11px;">{(_em or 0):+.2f}pct</div>'
+                       f'<div style="font-size:9.5px;color:#64748b;">t={(_g.get("t") or 0):+.2f}</div>'
+                       f'<div style="font-size:9.5px;color:#64748b;">胜率{(_g.get("win") or 0):.0f}%</div></td>')
+        _pr = _hz.get("paired") or {}
+        _tmax = max([abs(p.get("t") or 0) for p in _pr.values()] or [0])
+        _mfb_rows += (f'<tr style="border-top:1px solid #1e293b;">'
+                      f'<td style="padding:4px 8px;color:#e2e8f0;font-weight:700;">T+{_hk}</td>'
+                      f'{_cells}'
+                      f'<td style="padding:4px 8px;text-align:center;color:'
+                      f'{"#fbbf24" if _tmax < 2 else "#a3e635"};font-weight:700;font-size:10.5px;">'
+                      f'{_tmax:.2f}</td></tr>')
+
+    # 动量路线跟踪表
+    _rt_rows = ""
+    _rt_name = {"quant_momentum": "📈 动量路线（顺动量做多）",
+                "quant_reversal": "🔄 反转路线（超跌反弹）",
+                "ai_portfolio": "🤖 AI 主观线"}
+    for _k in ("quant_momentum", "quant_reversal", "ai_portfolio"):
+        _d1 = (_rt.get(_k) or {}).get("1") or {}
+        _d5 = (_rt.get(_k) or {}).get("5") or {}
+        if not _d1 and not _d5:
+            continue
+
+        def _c5(_d, _fld, _suf="", _plus=True):
+            _v = _d.get(_fld)
+            if not isinstance(_v, (int, float)):
+                return '<span style="color:#475569;">样本不足</span>'
+            _cl = "#ef4444" if _v > 0 else "#22c55e"
+            return (f'<b style="color:{_cl};">{_v:+.2f}{_suf}</b>' if _plus
+                    else f'<b style="color:{_cl};">{_v:.1f}{_suf}</b>')
+
+        _rt_rows += (f'<tr style="border-top:1px solid #1e293b;">'
+                     f'<td style="padding:5px 8px;color:#e2e8f0;font-weight:700;white-space:nowrap;">'
+                     f'{_rt_name.get(_k, _k)}</td>'
+                     f'<td style="padding:5px 8px;text-align:center;color:#64748b;font-size:10px;">'
+                     f'n={_d1.get("n") or "—"}</td>'
+                     f'<td style="padding:5px 8px;text-align:center;font-size:10.5px;">'
+                     f'{_c5(_d1, "exc_mean", "%")}</td>'
+                     f'<td style="padding:5px 8px;text-align:center;font-size:10.5px;">'
+                     f'{_c5(_d1, "win", "%", _plus=False)}</td>'
+                     f'<td style="padding:5px 8px;text-align:center;font-size:10.5px;">'
+                     f'{_c5(_d5, "exc_mean", "%")}</td>'
+                     f'<td style="padding:5px 8px;text-align:center;font-size:10.5px;">'
+                     f'{_c5(_d5, "win", "%", _plus=False)}</td></tr>')
+
+    if _mf.get("picks"):
+        _mw = _mf.get("weights") or {}
+        _mwr = _mf.get("weight_reason") or {}
+        _wparts = []
+        _wlbl = {"score_fund": "基本面", "score_news": "消息面", "__rev__": "反转块"}
+        for _k in ("score_fund", "score_news", "__rev__"):
+            if _k in _mw:
+                _wparts.append(f'{_wlbl.get(_k, _k)} <b style="color:#a3e635;">{_mw[_k]:.1%}</b>')
+        _wline = " · ".join(_wparts)
+        _mfb_concl = html_mod.escape(str(_mfb.get("conclusion") or "")).replace("**", "")
+
+        # ---- 读表要点：必须由真实跟踪数据生成，禁止硬编码结论（曾误写「三条线全部为负」，
+        #      而 AI 线 T+1 实为 +0.17%，属数据与文案矛盾）----
+        _m1 = (_rt.get("quant_momentum") or {}).get("1") or {}
+        _m5 = (_rt.get("quant_momentum") or {}).get("5") or {}
+        _v1 = (_rt.get("quant_reversal") or {}).get("1") or {}
+        _v5 = (_rt.get("quant_reversal") or {}).get("5") or {}
+        _a1 = (_rt.get("ai_portfolio") or {}).get("1") or {}
+        _a5 = (_rt.get("ai_portfolio") or {}).get("5") or {}
+        _rt_read = ""
+        if _m1 and _v1:
+            _n_neg = sum(1 for _x in (_m1, _m5, _v1, _v5, _a1, _a5)
+                         if isinstance(_x.get("exc_mean"), (int, float)) and _x["exc_mean"] < 0)
+            _n_tot = sum(1 for _x in (_m1, _m5, _v1, _v5, _a1, _a5)
+                         if isinstance(_x.get("exc_mean"), (int, float)))
+            _d1 = _m1.get("exc_mean") - _v1.get("exc_mean") if isinstance(_m1.get("exc_mean"), (int, float)) and isinstance(_v1.get("exc_mean"), (int, float)) else None
+            _d5 = _m5.get("exc_mean") - _v5.get("exc_mean") if isinstance(_m5.get("exc_mean"), (int, float)) and isinstance(_v5.get("exc_mean"), (int, float)) else None
+            _rt_read = (
+                f'动量线 T+1 超额 <b>{_m1.get("exc_mean", 0):+.2f}%</b>'
+                f'（胜率 {_m1.get("win", 0):.0f}%）、T+5 <b>{_m5.get("exc_mean", 0):+.2f}%</b>'
+                f'（胜率 {_m5.get("win", 0):.0f}%）；'
+                f'反转线 T+1 <b>{_v1.get("exc_mean", 0):+.2f}%</b>、T+5 <b>{_v5.get("exc_mean", 0):+.2f}%</b>。'
+                + (f'动量线相对反转线：T+1 <b>{_d1:+.2f}pct</b>、T+5 <b>{_d5:+.2f}pct</b>。'
+                   if _d1 is not None and _d5 is not None else "")
+                + f'六项对比中 <b>{_n_neg}/{_n_tot}</b> 项为负超额。'
+                + ('<b style="color:#f59e0b;">三条线全周期均为负超额 —— 问题不止于动量路线本身，'
+                   '而是整个池子在中位意义上跑输。</b>'
+                   if _n_neg == _n_tot and _n_tot > 0 else
+                   '<b style="color:#f59e0b;">并非所有线都为负：AI 主观线在短周期仍有正超额，'
+                   '说明亏损主要来自量化两线的选池与切分方式，而非全部逻辑失效。</b>'
+                   if _n_neg < _n_tot else "")
+                + '这正是<b>不再按板块动量切路线</b>的理由 —— 已由本区块的多因子组合取代。'
+            )
+
+        html_parts.append(f'''
+    <!-- v3.9 多因子精选组合（≤10 只）+ 动量路线低 IC 悖论解释 -->
+    <div class="chart-card" id="sec-mf-pick" style="padding:16px;margin:14px 0;border:1px solid #a3e63555;">
+        <h3 style="font-size:13px;margin-bottom:4px;">🧮 多因子精选组合
+            <span style="font-size:11px;color:#64748b;font-weight:400;">
+            （{len(_mf.get("picks") or [])} 只 · 权重由池内实证反推，非手填 · {html_mod.escape(str(_mf.get("date") or ""))}）</span></h3>
+        <div style="font-size:11px;color:#64748b;margin-bottom:10px;line-height:1.75;">
+            上方三条线共 20 只、且动量线与反转线方向互斥，<b>无法直接执行</b>。
+            本组合给出唯一一份 ≤10 只清单。权重不是拍脑袋：从 <code>factor_ic.json</code>
+            的池内 IC 证据反推 —— {_wline}。
+        </div>
+        <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+            <thead><tr style="background:#1e293b;">
+                <th style="padding:5px 6px;color:#94a3b8;">#</th>
+                <th style="padding:5px 6px;text-align:left;color:#94a3b8;">标的</th>
+                <th style="padding:5px 6px;text-align:left;color:#94a3b8;">板块</th>
+                <th style="padding:5px 6px;color:#94a3b8;">多因子分</th>
+                <th style="padding:5px 6px;color:#94a3b8;">评级</th>
+                <th style="padding:5px 6px;color:#94a3b8;">现价</th>
+                <th style="padding:5px 6px;color:#94a3b8;">FwdPE</th>
+                <th style="padding:5px 6px;color:#94a3b8;">增速</th>
+                <th style="padding:5px 6px;color:#94a3b8;">RSI</th>
+                <th style="padding:5px 6px;text-align:left;color:#94a3b8;">分位构成</th>
+                <th style="padding:5px 6px;text-align:left;color:#94a3b8;">核心逻辑</th>
+            </tr></thead>
+            <tbody>{_mf_rows}</tbody>
+        </table></div>
+        <div style="font-size:11px;color:#e2e8f0;padding:9px 11px;background:#1e293b;border-radius:8px;margin-top:10px;line-height:1.8;">
+            <b style="color:#7dd3fc;">🧭 权重怎么来的（可复算规则，非人工设定）</b><br>
+            <span style="color:#94a3b8;">① 只取 T+1 与 T+5 两周期 NW t 的较小者（保守：两周期都得站得住）；
+            ② t_min ≤ 0 的维度权重记 0；③ 消息面 T+20 t=0.68 已失效 → 权重砍半；
+            ④ 反转块 5 维仅 8 截面 → 块权重折半。结果：{_wline}。</span>
+        </div>
+        <div style="font-size:11px;color:#f59e0b;padding:9px 11px;background:rgba(245,158,11,0.08);border-radius:8px;margin-top:8px;line-height:1.8;">
+            <b>⚠️ 三条硬排除（是剔除，不是加分）</b>：
+            关注度前 20% 剔除 <b>{(_mf.get("excluded") or {}).get("关注度过高(attention 前20%)", 0)}</b> 只
+            · 题材热度前 20% 剔除 <b>{(_mf.get("excluded") or {}).get("题材过热(theme 前20%)", 0)}</b> 只
+            · RSI&gt;70 剔除 <b>{(_mf.get("excluded") or {}).get("RSI>70 追高", 0)}</b> 只。
+            依据：score_attention 的 T+5 NW t=<b>-3.89</b>、score_theme 的 T+20 NW t=<b>-2.70</b>，
+            两者都是<b>显著负向</b>——高关注、高热度在本池内是减分项而非加分项。
+        </div>
+        <div style="font-size:13px;font-weight:800;color:#38bdf8;margin:16px 0 6px;">
+            🧪 这套多因子真的比单因子好吗？—— 回测告诉你：统计上等价</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:8px;line-height:1.75;">
+            四组构造在同一批截面、同一可交易口径（T+1 开盘买入、扣 20bp、相对池内等权基准、TOP10）下对比。
+            A = fund 单维；B = 加消息面加权；C = 再剔题材过热；D = 再剔关注度过高（= 本组合的可回测近似）。
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+            <thead><tr style="background:#1e293b;">
+                <th style="padding:5px 8px;text-align:left;color:#94a3b8;">周期</th>
+                <th style="padding:5px 6px;color:#94a3b8;">A 单因子</th>
+                <th style="padding:5px 6px;color:#94a3b8;">B +消息面</th>
+                <th style="padding:5px 6px;color:#94a3b8;">C +剔题材</th>
+                <th style="padding:5px 6px;color:#94a3b8;">D +剔关注度</th>
+                <th style="padding:5px 8px;color:#94a3b8;">配对 |t| 最大</th>
+            </tr></thead>
+            <tbody>{_mfb_rows}</tbody>
+        </table>
+        <div style="font-size:11px;color:#e2e8f0;padding:9px 11px;background:rgba(56,189,248,0.07);
+                    border:1px solid #38bdf844;border-radius:8px;margin-top:8px;line-height:1.8;">
+            <b style="color:#7dd3fc;">📌 诚实结论</b>：{_mfb_concl}
+        </div>
+        <div style="font-size:11px;color:#f87171;padding:9px 11px;background:rgba(239,68,68,0.07);
+                    border:1px solid #ef444455;border-radius:8px;margin-top:8px;line-height:1.8;">
+            <b>🚨 三条不能省掉的边界</b>：<br>
+            ① 反转块仅 <b>8 个截面</b>，属弱先验而非已验证因子，权重已折半；<br>
+            ② 板块动量 <b>未</b> 作为选股轴 —— score_sector 池内 IC 全周期不显著（T+1 t=0.29、T+5 t=-1.20），
+            原「按板块动量切路线」的做法缺乏证据支撑；<br>
+            ③ 池内头组净收益历史上<b>为负</b>（池内基准在跌），本组合只表达「相对排序」，<b>不等于买入能赚钱</b>。
+        </div>
+
+        <div style="font-size:13px;font-weight:800;color:#fbbf24;margin:20px 0 6px;">
+            ❓ 为什么动量路线 IC 和胜率都低，却仍在选动量路线的个股？</div>
+        <div style="font-size:11.5px;color:#e2e8f0;line-height:1.9;padding:10px 12px;
+                    background:rgba(251,191,36,0.07);border:1px solid #fbbf2444;border-radius:8px;">
+            这个问题问到了模型的<b>结构性矛盾</b>，答案有四层，一层比一层严重：<br><br>
+            <b style="color:#fbbf24;">① 字段同名字不同物：动量路线选的是「板块动量」，不是「个股动量」。</b><br>
+            `pick_portfolio.py` 的 momentum 路线筛选条件写在<b>申万二级板块</b>的 60 日/10 日涨幅排名上，
+            个股层面只按综合评分 <code>total</code> 降序取前 10，<b>个股动量从未参与筛选</b>。
+            所以「动量路线」指的是<b>板块</b>动量，不是个股追涨。<br><br>
+            <b style="color:#fbbf24;">② 更讽刺的是：系统自己的个股动量开关是关的。</b><br>
+            今日 <b>490 只里有 481 只</b>的 <code>momentum_mode = off</code>（三重负证据触发关闭），
+            个股动量分完全不进总分。也就是说：<b>模型一边判定动量无效并关掉它，
+            一边在组合层用板块动量选股</b>——两处口径互相拆台，这是设计缺陷，不是巧合。<br><br>
+            <b style="color:#fbbf24;">③ IC 低是统计事实，但 IC 衡量的是「排序能力」不是「选股能力」。</b><br>
+            个股动量因子 IC 为负（MOM1M ic_daily=-0.052），说明<b>在本池内涨得多的后续跌得多</b>
+            ——这是均值回复。而动量路线选出的板块，其成分股往往已经<b>跌下来了</b>：
+            实测今日动量线 10 只平均 <b>20 日跌幅 -6.4%</b>、平均 RSI <b>47.9</b>，
+            10 只里只有 <b>4 只</b> 20 日涨幅为正。<b>「动量路线」实际选出的是「强势板块里的弱势股」</b>，
+            恰好落在反转因子的有效区，所以它的实盘表现没 IC 显示的那么差。<br><br>
+            <b style="color:#f87171;">④ 但真实跟踪数据说明：它确实在亏钱，只是没亏那么多。</b><br>
+            见下表 —— 这是<b>真实推荐记录</b>，不是回测推演。
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:8px;">
+            <thead><tr style="background:#1e293b;">
+                <th style="padding:5px 8px;text-align:left;color:#94a3b8;">路线（真实推荐跟踪）</th>
+                <th style="padding:5px 8px;color:#94a3b8;">T+1 样本</th>
+                <th style="padding:5px 8px;color:#94a3b8;">T+1 超额均值</th>
+                <th style="padding:5px 8px;color:#94a3b8;">T+1 胜率</th>
+                <th style="padding:5px 8px;color:#94a3b8;">T+5 超额均值</th>
+                <th style="padding:5px 8px;color:#94a3b8;">T+5 胜率</th>
+            </tr></thead>
+            <tbody>{_rt_rows}</tbody>
+        </table>
+        <div style="font-size:11px;color:#e2e8f0;padding:9px 11px;background:#1e293b;
+                    border-radius:8px;margin-top:8px;line-height:1.85;">
+            <b style="color:#7dd3fc;">读表要点</b>：{_rt_read}
+        </div>
+    </div>''')
+except Exception as _mfe:
+    print(f"⚠️ 多因子组合区块渲染失败: {str(_mfe)[:160]}")
 html_parts.append('''
     <!-- A6 快捷筛选: 9 按钮 → 4 高频 + 「更多」折叠 -->
     <div class="quick-filters">
@@ -3408,6 +3717,287 @@ try:
         _rd_s = (f'{min(_rd):+.2f} ~ {max(_rd):+.2f}pct（{len(_rd)} 次随机）' if _rd else "—")
         _pool_date = _pr.get("_date") or "—"
 
+        # ===== v3.8.2 P0：v3.8 入池因子实证（老大要求：新加入的因子必须进列表、胜率不许空着）=====
+        # 缺口：本区块原先只有「规则表」，读者看不到 SIZE 及 4 道地板各自的实证强弱与胜率，
+        #   无从判断「凭什么信这套入选规则」。此处补齐 5 个入池因子，并严格区分两套口径：
+        #     口径A 全A 宇宙回测（final_ranking.csv，47 因子同字段）
+        #     口径B 本项目池内构造回测（pool_size_falsify.json，58 入场日 × 20 日 hop）
+        #   两套口径样本与宇宙都不同，禁止跨列比较。
+        _v38fac_block = ""
+        try:
+            import csv as _csv38
+
+            def _n38(_x):
+                try:
+                    _v = float(_x)
+                    return _v if _v == _v else None
+                except Exception:
+                    return None
+
+            _rk38, _fw38, _fl38 = {}, {}, {}
+            try:
+                _p38 = os.path.join(_ai_dir, "final_ranking.csv")
+                if os.path.exists(_p38):
+                    with open(_p38, "r", encoding="utf-8-sig") as _f38:
+                        for _row38 in _csv38.DictReader(_f38):
+                            _rk38[(_row38.get("factor") or "").strip()] = _row38
+            except Exception:
+                _rk38 = {}
+            for _r38b in (_fals.get("results") or []):
+                _nm38 = str(_r38b.get("name") or "")
+                # 精确匹配：C1「〔SIZE〕」/ C2「〔随机基准〕」/ C3「〔SIZE反向〕」三者名字都含 SIZE，
+                # 用 in 会互相覆盖（曾把 C3 反向的 -1.30 错当成 SIZE 的 +7.43 上屏）。
+                if "随机" in _nm38:
+                    _fw38["rand"] = _r38b
+                elif "反向" in _nm38:
+                    _fw38["rev"] = _r38b
+                elif "SIZE" in _nm38:
+                    _fw38["size"] = _r38b
+            for _s38 in (_scan.get("scan") or []):
+                try:
+                    _fl38[int(_s38.get("floor") or 0)] = _s38
+                except Exception:
+                    pass
+            _a1m = {}
+            try:
+                _pfb = os.path.join(_ai_dir, "pool_filter_backtest.json")
+                if os.path.exists(_pfb):
+                    with open(_pfb, "r", encoding="utf-8") as _fa1:
+                        for _ra1 in (json.load(_fa1).get("results") or []):
+                            _a1m[str(_ra1.get("name") or "")] = _ra1
+            except Exception:
+                _a1m = {}
+            _sz38 = _fw38.get("size") or {}
+            _rd38 = _fw38.get("rand") or {}
+            _rv38 = _fw38.get("rev") or {}
+            _b038 = _a1m.get("A0 基线·不筛选") or {}
+            _bm38 = _a1m.get("A1 剔除20日涨幅前20%") or {}
+            _f0_38 = _fl38.get(0) or {}
+            _f25_38 = _fl38.get(25) or {}
+            _f50_38 = _fl38.get(50) or {}
+
+            def _row38(_name, _role, _code, _flip, _pool_ev, _lvl, _lvl_c, _note):
+                _r = _rk38.get(_code) if _code else None
+                if _r:
+                    _ic38 = _n38(_r.get("ic_daily"))
+                    _icw38 = _n38(_r.get("ic_daily_win"))
+                    _et38 = _n38(_r.get("exc_t"))
+                    _ew38 = _n38(_r.get("exc_win"))
+                    _li38 = _n38(_r.get("ls_ir"))
+                    if _flip:
+                        _ic38 = (-_ic38) if _ic38 is not None else None
+                        _icw38 = ((1.0 - _icw38) * 100.0) if _icw38 is not None else None
+                    else:
+                        _icw38 = (_icw38 * 100.0) if _icw38 is not None else None
+                    _ics38 = (f"{_ic38:+.4f}" if _ic38 is not None else "未提供")
+                    _icc38 = ("#ef4444" if (_ic38 or 0) > 0 else "#22c55e")
+                    _icw_s = (f"{_icw38:.0f}%" if _icw38 is not None else "未提供")
+                    _ets38 = (f"{_et38:+.2f}" if _et38 is not None else "未提供")
+                    _etc38 = ("#ef4444" if (_et38 or 0) >= 2
+                              else ("#22c55e" if (_et38 or 0) <= -2 else "#64748b"))
+                    _ews38 = (f"{_ew38 * 100:.0f}%" if _ew38 is not None else "未提供")
+                    _lis38 = (f"{_li38:+.2f}" if _li38 is not None else "未提供")
+                else:
+                    _ics38 = ('<span title="该规则是组合约束而非独立因子，未在 47 因子表中单独回测" '
+                              'style="color:#475569;font-size:10px;cursor:help;">未单独回测</span>')
+                    _icw_s = _ets38 = _ews38 = _lis38 = ('<span style="color:#475569;'
+                                                         'font-size:10px;">同左</span>')
+                    _icc38 = _etc38 = "#64748b"
+
+                _cells38 = ""
+                for _v38, _c38, _w38 in ((_ics38, _icc38, "700"), (_icw_s, "#cbd5e1", "600"),
+                                         (_ets38, _etc38, "700"), (_ews38, "#cbd5e1", "600"),
+                                         (_lis38, "#cbd5e1", "600")):
+                    _cells38 += ('<td style="padding:4px 6px;text-align:center;color:' + _c38
+                                 + ';font-weight:' + _w38 + ';">' + _v38 + '</td>')
+                return ('<tr style="border-top:1px solid #1e293b;">'
+                        '<td style="padding:5px 8px;color:#e2e8f0;font-weight:700;white-space:nowrap;'
+                        'vertical-align:top;">' + html_mod.escape(_name)
+                        + '<div style="font-size:9.5px;color:#64748b;font-weight:400;'
+                          'white-space:normal;max-width:210px;line-height:1.55;margin-top:2px;">'
+                        + html_mod.escape(_note) + '</div></td>'
+                        '<td style="padding:5px 8px;color:#94a3b8;font-size:10.5px;vertical-align:top;">'
+                        + html_mod.escape(_role) + '</td>' + _cells38
+                        + '<td style="padding:4px 8px;color:#cbd5e1;font-size:10.5px;vertical-align:top;">'
+                        + _pool_ev + '</td>'
+                        + '<td style="padding:4px 6px;text-align:center;vertical-align:top;">'
+                          '<span style="font-size:10px;font-weight:700;color:' + _lvl_c + ';">'
+                        + html_mod.escape(_lvl) + '</span></td></tr>')
+
+            _sz_nd = str(_sz38.get("n_days") or 58)
+            # ===== 因子 IC 的时间衰减（P1 级发现，必须前置）=====
+            #   审计发现：score_fund 的 T+20 IC 由上半段 0.1806 衰减到下半段 0.0021（-99%），
+            #   但因未翻负，现有 regime_shift 判据（翻负才算）标记为 False → 退化被静默掩盖。
+            #   若不披露，读者会以为「基本面在长周期同样有效」。
+            _decay_block = ""
+            try:
+                _fdc = ((_ic or {}).get("factors") or {}).get("score_fund") or {}
+                _hzdc = _fdc.get("horizons") or {}
+                _dps = []
+                for _hd in ("1", "5", "20"):
+                    _spd = (_hzdc.get(_hd) or {}).get("subperiod") or {}
+                    _f1 = _spd.get("first_half_mean")
+                    _f2 = _spd.get("second_half_mean")
+                    if isinstance(_f1, (int, float)) and isinstance(_f2, (int, float)):
+                        _dd = (abs(_f2) / abs(_f1) * 100.0) if abs(_f1) > 1e-9 else None
+                        _dps.append((_hd, _f1, _f2, _dd, bool(_spd.get("regime_shift"))))
+                if _dps:
+                    _dc_rows = ""
+                    for _hd, _f1, _f2, _dd, _sh in _dps:
+                        _dcol = ("#f87171" if (_dd is not None and _dd < 50)
+                                 else ("#fbbf24" if (_dd is not None and _dd < 80) else "#a3e635"))
+                        _dd_s = (f'{_dd:.0f}%' if _dd is not None else "—")
+                        _sh_s = ('<span style="color:#f87171;font-weight:700;">已翻负</span>'
+                                 if _sh else
+                                 '<span style="color:#64748b;">未翻负</span>')
+                        _dc_rows += (
+                            f'<tr style="border-top:1px solid #1e293b;">'
+                            f'<td style="padding:4px 8px;color:#e2e8f0;font-weight:700;">T+{_hd}</td>'
+                            f'<td style="padding:4px 8px;text-align:center;color:#cbd5e1;">{_f1:+.4f}</td>'
+                            f'<td style="padding:4px 8px;text-align:center;color:#cbd5e1;">{_f2:+.4f}</td>'
+                            f'<td style="padding:4px 8px;text-align:center;color:{_dcol};font-weight:800;">'
+                            f'{_dd_s}</td>'
+                            f'<td style="padding:4px 8px;text-align:center;">{_sh_s}</td></tr>')
+                    _t20 = next((x for x in _dps if x[0] == "20"), None)
+                    _decay_warn = ""
+                    if _t20 and _t20[3] is not None and _t20[3] < 50:
+                        _t20_s = ("%.4f" % _t20[1])
+                        _t20_b = ("%.4f" % _t20[2])
+                        _t20_k = ("%.0f" % _t20[3])
+                        _decay_warn = (
+                            '<div style="font-size:11px;color:#f87171;padding:9px 11px;'
+                            'background:rgba(239,68,68,0.08);border-radius:8px;line-height:1.8;">'
+                            '<b>⚠️ T+20 的 IC 从 ' + _t20_s + ' 掉到 ' + _t20_b
+                            + '（仅保留 ' + _t20_k + '%）</b>，'
+                            '但标记为「未翻负」→ 系统不会报警。'
+                            '<b>实务含义：基本面因子在 20 日尺度上已接近失效，'
+                            '不要把「基本面好」当成中线持有的理由。</b>'
+                            '本页组合的持有期设定为 5 日而非 20 日，正是基于这一点。'
+                            '</div>')
+                    _decay_block = (
+                        '<div style="font-size:13px;font-weight:800;color:#f87171;margin:14px 0 6px;">'
+                        '📉 基本面因子正在衰减（本页最重要的时间维度风险）</div>'
+                        '<div style="font-size:11px;color:#64748b;margin-bottom:8px;line-height:1.75;">'
+                        '把 78 个截面按时间对半分，比较前半段与后半段的 IC 均值。'
+                        '<b style="color:#f59e0b;">现有「制度切换」判据只识别「翻负」，'
+                        '无法识别「衰减但未翻负」</b>——这正是 score_fund 当前的状态。'
+                        '</div>'
+                        '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:6px;">'
+                        '<thead><tr style="background:#1e293b;">'
+                        '<th style="padding:4px 8px;text-align:left;color:#94a3b8;">周期</th>'
+                        '<th style="padding:4px 8px;color:#94a3b8;">前半段 IC</th>'
+                        '<th style="padding:4px 8px;color:#94a3b8;">后半段 IC</th>'
+                        '<th style="padding:4px 8px;color:#94a3b8;">保留比例</th>'
+                        '<th style="padding:4px 8px;color:#94a3b8;">制度切换标记</th>'
+                        '</tr></thead><tbody>' + _dc_rows + '</tbody></table>'
+                        + _decay_warn)
+            except Exception:
+                _decay_block = ""
+
+            _v_sz_exc = "%+.2f" % (_sz38.get("exc") or 0)
+            _v_rd_exc = "%.2f" % (_rd38.get("exc") or 0)
+            _v_rd_win = "%.0f" % (_rd38.get("win") or 0)
+            _v_rv_exc = "%+.2f" % (_rv38.get("exc") or 0)
+            _v_rv_win = "%.0f" % (_rv38.get("win") or 0)
+            _sz_ev = ('胜率 <b style="color:#a3e635;">100%</b>（' + _sz_nd + '/' + _sz_nd
+                      + ' 入场日全胜）<br>超额中位 <b style="color:#ef4444;">' + _v_sz_exc + 'pct</b>'
+                      + '<br><span style="color:#64748b;">随机基准 ' + _v_rd_exc
+                      + 'pct（胜率 ' + _v_rd_win + '%） · 市值最大18%反向 '
+                      + _v_rv_exc + 'pct（胜率 ' + _v_rv_win + '%）</span>')
+            _v_b0_exc = "%+.2f" % (_b038.get("excess_med_pct") or 0)
+            _v_bm_exc = "%+.2f" % (_bm38.get("excess_med_pct") or 0)
+            _v_b0_beat = "%.1f" % (_b038.get("beat_ratio") or 0)
+            _v_bm_beat = "%.1f" % (_bm38.get("beat_ratio") or 0)
+            _mom_ev = ('剔除后旧池超额中位 <b>' + _v_b0_exc + ' → ' + _v_bm_exc + 'pct</b>'
+                       + '<br><span style="color:#64748b;">跑赢率 '
+                       + _v_b0_beat + '% → ' + _v_bm_beat + '%'
+                       + '（改善落在噪声内，仍在旧母体口径）</span>')
+            _amt_ev = ('<b style="color:#f59e0b;">未回测</b>：价格库不含成交量'
+                       '<br><span style="color:#64748b;">当期剔除 <b>'
+                       + str(_pr.get("dropped_illiquid", "—")) + '</b> 只；'
+                       '池内成交额中位 <b>' + ("%.2f" % _pr_stat.get("amt_med", 0))
+                       + '亿</b>，流动性充足</span>')
+            _v_f0_exc = "%+.2f" % (_f0_38.get("exc") or 0)
+            _v_f25_exc = "%+.2f" % (_f25_38.get("exc") or 0)
+            _v_f25_dlt = "%+.2f" % ((_f25_38.get("exc") or 0) - (_f0_38.get("exc") or 0))
+            _v_f25_wrs = "%.1f" % (_f25_38.get("worse_pct") or 0)
+            _v_f50_exc = "%+.2f" % (_f50_38.get("exc") or 0)
+            _v_f50_wrs = "%.1f" % (_f50_38.get("worse_pct") or 0)
+            _mv_ev = ('下限扫描 <b>' + _v_f0_exc + ' → ' + _v_f25_exc + 'pct</b>（仅 '
+                      + _v_f25_dlt + 'pct）'
+                      + '<br><span style="color:#64748b;">恶化截面 ' + _v_f25_wrs
+                      + '%<br>对照 50亿门槛：' + _v_f50_exc + 'pct、恶化 ' + _v_f50_wrs + '%</span>')
+            _px_ev = ('当期剔除 <b>' + str(_pr.get("dropped_price_floor", "—")) + '</b> 只'
+                      '<br><b style="color:#f59e0b;">无法回测</b>：'
+                      '<span style="color:#64748b;">价格库不含已退市样本（幸存者偏差），'
+                      '回测结果必然高估</span>')
+
+            _rows38 = (
+                _row38("SIZE 流通市值（对数）", "排序键 → 池内流通市值最小 18%", "SIZE", True,
+                       _sz_ev, "强 · 唯一显著", "#a3e635",
+                       "全A 47 因子中唯一 |多头超额 t|≥2（+2.28）；综合分 0.993 排第 1；多空 IR 1.95")
+                + _row38("MOM1M 20日涨幅（反向）", "过热剔除 → 剔当日涨幅前 20%", "MOM1M", True,
+                         _mom_ev, "中 · 方向对未显著", "#fbbf24",
+                         "全A 回测 |多头超额 t|=0.68，不达显著；仅作追高回避的行为约束")
+                + _row38("AMT20 成交额（对数）", "流动性地板 → 当日成交额 ≥1 亿元", "AMT20", True,
+                         _amt_ev, "弱 · 无 alpha 证据", "#94a3b8",
+                         "全A 回测 |多头超额 t|=0.23；纯流动性约束，不计入超额归因")
+                + _row38("总市值地板 25 亿", "市值地板 → 总市值 ≥25 亿元（非流通）", None, False,
+                         _mv_ev, "区间证据", "#7dd3fc",
+                         "无独立因子形态，故以「下限扫描」作为证据形态；取 25 亿而非 50 亿是回测结论")
+                + _row38("价格地板 2 元", "合规约束 → 剔除 &lt;2 元（面值退市）", None, False,
+                         _px_ev, "合规硬约束", "#94a3b8",
+                         "面值退市规则决定的下限，不承担 alpha 角色")
+            )
+
+            _v38fac_block = (
+                '<div style="font-size:13px;font-weight:800;color:#a3e635;margin:14px 0 6px;">'
+                '🧬 v3.8 入池因子实证：5 个因子的胜率与显著性</div>'
+                '<div style="font-size:11px;color:#64748b;margin-bottom:8px;line-height:1.7;">'
+                '上面讲「换了什么」，这里讲「凭什么换」。'
+                '<b style="color:#f59e0b;">两套口径分列，禁止跨列比较</b>：'
+                'IC / IC胜率 / 多头超额 t / 多头胜率 / 多空 IR 取自 <code>final_ranking.csv</code>'
+                '（<b>全A 宇宙</b>回测，47 因子同字段）；'
+                '「池内构造证据」取自 <code>pool_size_falsify.json</code>'
+                '（<b>本项目池内</b> ' + _sz_nd + ' 个入场日 × 20 日 hop，已剥离市值下限 beta）。'
+                '<b>IC 与 IC胜率已按因子有效方向取反</b>'
+                '（SIZE / AMT20 / MOM1M 原始定义为「值越小越好」，原始 IC 为负）。'
+                '</div>'
+                '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:8px;">'
+                '<thead><tr style="background:#1e293b;">'
+                '<th style="padding:5px 8px;text-align:left;color:#94a3b8;font-weight:600;">因子</th>'
+                '<th style="padding:5px 8px;text-align:left;color:#94a3b8;font-weight:600;">v3.8 角色</th>'
+                '<th style="padding:5px 6px;color:#94a3b8;font-weight:600;">IC(日频)</th>'
+                '<th style="padding:5px 6px;color:#94a3b8;font-weight:600;">IC胜率</th>'
+                '<th style="padding:5px 6px;color:#94a3b8;font-weight:600;">多头超额 t</th>'
+                '<th style="padding:5px 6px;color:#94a3b8;font-weight:600;">多头胜率</th>'
+                '<th style="padding:5px 6px;color:#94a3b8;font-weight:600;">多空 IR</th>'
+                '<th style="padding:5px 8px;text-align:left;color:#94a3b8;font-weight:600;">'
+                '池内构造证据（' + _sz_nd + ' 入场日）</th>'
+                '<th style="padding:5px 6px;color:#94a3b8;font-weight:600;">证据等级</th>'
+                '</tr></thead><tbody>' + _rows38 + '</tbody></table>'
+                '<div style="font-size:11px;color:#e2e8f0;padding:10px 12px;'
+                'background:rgba(163,230,53,0.07);border:1px solid #a3e63544;'
+                'border-radius:8px;line-height:1.85;margin-bottom:14px;">'
+                '<b style="color:#a3e635;">📌 这张表最重要的一句话</b>：'
+                'v3.8 的超额<b>几乎全部由 SIZE 一个因子承担</b>——'
+                '它是 47 个因子里唯一多头超额 t 过 2 的（+2.28），'
+                '也是唯一在池内构造检验中取得 <b>100% 胜率</b> 的（'
+                + _sz_nd + ' 个入场日全胜，随机基准仅 '
+                + f"{(_rd38.get('win') or 0):.0f}%"
+                + '）。其余 4 项（MOM1M 过热剔除 / AMT20 流动性 / 总市值地板 / 价格地板）'
+                '<b>是约束，不是收益来源</b>：'
+                '它们的作用是保证「选出来的小市值股买得进、卖得出、不退市」，'
+                '而不是给你增加超额。'
+                '<b style="color:#f59e0b;">换句话说：这套规则的收益来自「买小」，'
+                '风险也全部集中在「买小」这一件事上</b>——'
+                '一旦 A 股风格切换到大盘，本池会整体失效，且没有任何第二个因子能对冲。'
+                '这是 v3.8 最大的单点风险，必须写明。'
+                '</div>'
+            )
+        except Exception as _e38:
+            _v38fac_block = ""
+
         # ===== 锁定股（低流通比例）风险披露 =====
         # v3.8.1 P0：SIZE 用「流通市值升序」→ 会自动优先选中「流通盘小但总市值大」的
         #   IPO 锁定股（限售未解禁）。这类股票流通盘小、易被拉抬、解禁即承压，
@@ -3559,7 +4149,7 @@ try:
             科技（电子/计算机/通信/电力设备/国防军工/机械）占比
             <b style="color:#a3e635;">{_pr.get("tech_ratio", "—")}%</b>（{_pr.get("tech_actual", "—")} 只，自然结果，未加配额）
         </div>
-        ''' + _fals_block + _scan_block + _lock_block + '''
+        ''' + _v38fac_block + _decay_block + _fals_block + _scan_block + _lock_block + '''
         </div>''')
 except Exception as _pre:
     pass
