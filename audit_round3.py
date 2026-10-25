@@ -45,39 +45,69 @@ def main():
             "换母体后因子行为可能完全不同，当前无任何证据。",
             "已披露（conclusion 字段 + 上区块分区表）。属「等数据」，需 ≥20 个新母体截面。")
 
-    # 2. 反转块共线性 + 弱样本
+    # 2. 反转块共线性 + 弱样本 —— 已做权重扫描，无法定权，转 FIXED（已披露）
     coll = (ic.get("collinearity") or {}).get("high_corr_pairs") or []
     rbk = ["score_oversold60", "score_bias60", "score_rsi_rev",
            "score_vol_pulse", "score_overbought"]
     rbw = sum(float(w.get(k) or 0) for k in rbk)
     if len(coll) >= 3 and rbw > 0.15:
-        add("P1", "反转块 5 维合计权重 %.2f，但 3 对因子 |corr|≥0.74 且仅 8 个截面" % rbw,
+        r5 = load("audit_round5.json") or {}
+        scan = (r5.get("q1_weight_scan") or {}).get("vs_base_0.24") or {}
+        sig_n = sum(1 for _v in scan.values()
+                    for _c in _v.values() if _c.get("sig"))
+        max_t = 0.0
+        for _v in scan.values():
+            for _c in _v.values():
+                _t = _c.get("t")
+                if isinstance(_t, (int, float)) and abs(_t) > abs(max_t):
+                    max_t = _t
+        add("FIXED", "反转块 %.2f 权重仅 3~7 个截面支撑——已披露，不做伪优化" % rbw,
             "共线：bias60|rsi_rev=0.889, oversold|bias60=0.834, oversold|rsi_rev=0.742；"
-            "反转块各维 n=8 截面（总 78）",
-            "高度相关的 5 个维度各自计权 = 同一信号被重复放大。"
-            "有效独立权重远低于名义 %.2f，且样本仅 8 截面（占 10%%）。" % rbw,
-            "建议合并为单一「反转块因子」（块内先正交化或取均值再加权），"
-            "名义权重不变但消除重复计权。属结构性改造，需回测验证，不宜直接改。")
+            "audit_round4 实测反转块各维有效截面 T+1 n=7 / T+5 n=3（不是 78）；"
+            "T+1 IC=-0.0254（负）、T+5 IC=+0.0791；"
+            "audit_round5 权重扫描 0/8%%/12%%/18%%/24%% × 两种构造共 10 组，"
+            "显著项 %d 个，最大 |t|=%.2f（Bonferroni 门槛 3.08）" % (sig_n, abs(max_t)),
+            "高度相关的 5 个维度各自计权 = 同一信号被重复放大；"
+            "但更根本的问题是样本量只有 3~7 个截面——在此样本上调整权重即过拟合。",
+            "不改权重（在 3~7 截面上调权=拟合噪声）。改为页面强制披露："
+            "「24%% 权重是纯先验、非拟合结果」「T+1 方向为负」"
+            "「10 种权重配置全部不显著」。等截面数≥30 再谈优化。")
 
-    # 3. 多因子组合的板块约束不可回测
+    # 3. 板块集中度约束 —— 已由 audit_round4 回测：无效但不伤害，转 FIXED
     if mf.get("picks"):
         n = len(mf["picks"])
-        add("P1", "多因子组合的板块集中度约束（L2≤2/L1≤2）未经回测验证",
-            f"组合 {n} 只，picks 内 sector_l2 去重数={len(set(p.get('sector_l2') for p in mf['picks']))}；"
-            "backtest_multifactor.py 的快照无 sector 字段，故 C/D 组回测未含该约束",
-            "报告展示的组合含「同板块≤2只」约束，但回测验证的 D 组不含此约束 → "
-            "页面回测数字与页面实际组合不完全对应，存在口径差。",
-            "已在区块内以「可回测近似」措辞标注；彻底解决需给 factor_history 快照补 sector 字段"
-            "（会增加存储，暂缓）。")
+        r4 = load("audit_round4.json") or {}
+        cap = (r4.get("p1_3_sector_cap") or {})
+        ev = []
+        for h in ("h1", "h5", "h20"):
+            c = (cap.get(h) or {}).get("cap2_2") or {}
+            if c:
+                ev.append("%s delta=%+.2f t=%s %s"
+                          % (h, c.get("delta") or 0, c.get("t"),
+                             "SIG" if c.get("sig") else "ns"))
+        add("FIXED", "板块集中度约束（L2≤2/L1≤2）已回测：无效但不伤害",
+            f"组合 {n} 只，sector_l2 去重={len(set(p.get('sector_l2') for p in mf['picks']))}；"
+            "audit_round4 用 490 只 sector 映射回填历史快照（覆盖 85.9%）后重跑，"
+            "有/无约束配对对比：" + ("; ".join(ev) if ev else "无数据"),
+            "原判定为「未经回测验证」。现已有回测：三周期全部不显著"
+            "（Bonferroni 门槛 |t|≥3.08），方向一致为正（T+20 delta +0.61~+1.42），"
+            "说明约束既不损失收益、也不显著增厚。",
+            "保留约束（不显著为正 + 提升可执行性/降低单一板块风险），"
+            "但页面已明确「不声称该约束带来超额」。")
 
-    # 4. 动量路线与评分口径互相拆台（已在页面披露，但是真结构缺陷）
-    add("P1", "组合层用板块动量选股，评分层却已关闭个股动量（两处口径互斥）",
-        "今日 490 只中 481 只 tech.momentum_mode=off；而 pick_portfolio.py momentum 路线"
-        "仍按板块 60/10 日动量排名筛板块",
+    # 4. 动量路线与评分口径互斥 —— 已量化：叠加板块动量几乎零增益，转 FIXED
+    r4b = load("audit_round4.json") or {}
+    mom = r4b.get("p1_4_sector_mom") or {}
+    dm = mom.get("delta_mom_minus_plain") or {}
+    add("FIXED", "组合层板块动量与评分层关个股动量互斥——已量化增益≈0，已弃用",
+        "今日 490 只中 481 只 tech.momentum_mode=off；audit_round4 实测叠加板块动量后："
+        + ("T+1 %+.2f / T+5 %+.2f / T+20 %+.2f pct"
+           % (dm.get("h1") or 0, dm.get("h5") or 0, dm.get("h20") or 0)),
         "同一系统内一处判定动量无效并关闭，另一处继续用动量选股。"
-        "这是设计层面的口径冲突，非参数问题。",
-        "已由 pick_multifactor.py 取代（不再按板块动量切路线），并在页面明确解释四层原因。"
-        "旧 pick_portfolio.py 主线保留作规则披露。")
+        "这是设计层面的口径冲突，非参数问题。现用量化证明：叠加板块动量的增益"
+        "只有 0.08~0.37pct，远低于噪声，即「口径冲突换来的收益几乎是零」。",
+        "pick_multifactor.py 已彻底不用板块动量（源码无 sector_mom 引用），"
+        "只在页面解释四层原因。旧 pick_portfolio.py 主线保留作规则披露。")
 
     # 5. 回测窗口太短（关键）
     rng = ic.get("snapshot_range") or []
@@ -90,12 +120,32 @@ def main():
         except Exception:
             days = None
         if days is not None and days < 200:
-            add("P1", "全部实证仅覆盖 %.0f 天（%s ~ %s），单一市场状态" % (days, rng[0], rng[1]),
-                f"snapshot_range={rng}，n_snapshots={ic.get('n_snapshots')}",
+            r6 = load("audit_round6.json") or {}
+            r7 = load("audit_round7.json") or {}
+            dsum = r6.get("decay_summary") or {}
+            n20 = ((r7.get("m2_daily_h1") or {}).get("近20日") or {})
+            add("P1", "全部实证仅覆盖 %.0f 天（%s ~ %s），且已实证出现状态切换" % (days, rng[0], rng[1]),
+                f"snapshot_range={rng}，n_snapshots={ic.get('n_snapshots')}；"
+                "30日滚动窗口早5窗→晚5窗：T+1 %+.2f→%+.2f、T+5 %+.2f→%+.2f、T+20 %+.2f→%+.2f pct；"
+                "近20日 T+1 超额 %+.2f%%（NW t=%s、OLS t=%s、胜率 %.0f%%、n=%d）"
+                % ((dsum.get("h1") or {}).get("early5") or 0,
+                   (dsum.get("h1") or {}).get("late5") or 0,
+                   (dsum.get("h5") or {}).get("early5") or 0,
+                   (dsum.get("h5") or {}).get("late5") or 0,
+                   (dsum.get("h20") or {}).get("early5") or 0,
+                   (dsum.get("h20") or {}).get("late5") or 0,
+                   n20.get("exc") or 0, n20.get("t_nw"), n20.get("t_ols"),
+                   n20.get("win") or 0, n20.get("n") or 0),
                 "约 120 天、且期间 A 股整体下跌（池内 20 日中位超额 -5.08pct）。"
-                "在这样的窗口里，任何「小市值有效」的结论都可能只是「下跌市里小市值跌得少」的 beta，"
-                "而非真正的 alpha。跨市场状态（牛/熊/震荡）无一样本。",
-                "建议至少覆盖一轮完整涨跌周期再谈「因子有效」。当前只能宣称「在本窗口内有效」。")
+                "在这样的窗口里，任何「小市值有效」的结论都可能只是「下跌市里小市值跌得少」的 beta。"
+                "本轮进一步证实：这个短窗口内部本身就发生了状态切换——"
+                "T+20 早5窗 +3.05% → 晚5窗 -0.04%，T+5 +1.16% → -0.94%。"
+                "即「窗口太短」已不是未来风险，而是正在发生的事实。",
+                "这条无法靠改代码解决：只能等时间积累。已做三件事："
+                "① 页面新增「fund 近20日转负超额」区块强制披露；"
+                "② 明确组合持有期压到 5 日以内；"
+                "③ 写入「连续两个 30 日窗口超额为负应降仓」的纪律（尚未自动化）。"
+                "状态：等数据，跨牛熊样本需数月。")
 
     # ---------- 已修项 ----------
     add("FIXED", "v3.8 入池因子未进列表、胜率留空",
