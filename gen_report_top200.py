@@ -127,7 +127,11 @@ model_str = data.get("model", "stock-scorer")
 # v3.5.5: ⑤ ⚖️ 权重区块展示「每日重估登记」状态（fitted_at/池内十维截面数/距门槛差距），
 #          --optimize-weights 接入每日链路（workflow+本地）；样本不足自动维持先验并刷新记录
 # v3.6: ⑥ 主口径由「十维均摊」切换为「基本面主导(v3.6-fund-led)」，版本标识同步
-REPORT_VER = "v3.6"
+# v4.0: ⑦ 页面信息架构收敛 —— 定位改为「每日决策页」（环境→买什么→池里还有什么），
+#          11 类分析/方法论区块迁至 reports/factor_<date>.md，主页面只留结论；
+#          多因子 10 只组合补齐买入区间/止损/目标/盈亏比/股数/金额，
+#          并修复 build_trade_plan 的「买区高于现价」与「盈亏比按现价算」两个 P0 缺陷。
+REPORT_VER = "v4.0"
 _has_sector = any(x.get('score_sector') is not None for x in results)
 _has_10d = any(x.get('score_oversold60') is not None for x in results)
 _ver_tag = (f"{REPORT_VER} · 基本面主导" if _has_10d
@@ -510,18 +514,33 @@ def build_trade_plan(r):
     nearest_sup = max(sups) if sups else None      # 现价下方最近支撑
     nearest_res = min(ress) if ress else None      # 现价上方最近阻力
 
-    # 买点区间: 强势(多头)以 ma5~ma10 为回踩区; 弱势以 ma10~ma20 为等企稳区
+    # 买点区间: 强势(多头)以 ma5~ma10 为回踩区; 弱势以 ma10~ma20 为企稳区
+    #   ⚠️ 2026-10-25 修 P0 一致性缺陷：当股价已跌破全部均线（日线空头）时，
+    #      ma10/ma20 位于现价【上方】，它们是反弹压力位而非回踩支撑。
+    #      原实现照抄为买区 → 买区高于现价，等于让使用者在现价上方挂买单（追高），
+    #      且止损位、目标位会落在买区下方，盈亏比自相矛盾。
+    #      实测 10-23 巨人网络：现价 20.40，买区 21.30~22.20，止损 19.49，目标 20.67，R:R=0.3。
     bullish = ("多头" in trend)
     ref_hi = ma5 if bullish else ma10
     ref_lo = ma10 if bullish else ma20
+    buy_lo = buy_hi = None
     if ref_hi and ref_lo:
         if ref_hi < ref_lo:
             ref_lo, ref_hi = ref_hi, ref_lo
-        buy_lo, buy_hi = ref_lo, ref_hi
-    elif nearest_sup:
-        buy_lo, buy_hi = nearest_sup * 0.98, nearest_sup * 1.02
-    else:
-        buy_lo, buy_hi = price * 0.95, price * 0.98
+        if ref_lo <= price:
+            # 均线在现价下方 = 回踩支撑，可用作买区；上限不越过现价
+            buy_lo, buy_hi = ref_lo, min(ref_hi, price)
+    if buy_lo is None or buy_hi is None or (buy_hi - buy_lo) / max(price, 1e-9) < 0.005:
+        # 均线整体在现价上方（空头压制）或区间过窄 → 退到「支撑位附近挂单」
+        if nearest_sup and nearest_sup < price:
+            buy_lo = nearest_sup * 0.995
+            buy_hi = min(nearest_sup * 1.02, price)
+        else:
+            buy_lo, buy_hi = price * 0.95, price * 0.98
+    if buy_hi > price:
+        buy_hi = price     # 买区上限永不超过现价，杜绝「追高式挂单」
+    if buy_lo > buy_hi:
+        buy_lo, buy_hi = buy_hi * 0.99, buy_hi
 
     # 止损: 优先最近支撑下方 1.5%; 否则 ma20; 再否则现价 -8%
     if nearest_sup:
@@ -531,11 +550,26 @@ def build_trade_plan(r):
     else:
         stop = price * 0.92
     stop = min(stop, price * 0.97) if stop >= price else stop   # 确保止损在现价下方
+    # 止损必须低于买区下限，否则「买入即触发止损」
+    if stop >= buy_lo:
+        stop = buy_lo * 0.975
 
-    # 目标位: 最近阻力; 无则按 2:1 盈亏比推
-    risk = max(price - stop, price * 0.02)
-    target = nearest_res if nearest_res else price + risk * 2
-    reward = max(target - price, 0)
+    # 目标位 / 盈亏比: 一律以【计划入场价】为基准，不再用现价
+    #   ⚠️ 2026-10-25 修 P0：原实现以现价算 risk/reward，当现价高于买区时
+    #      「等回踩再买」与盈亏比互相矛盾（回踩后风险变小、空间变大，却仍报 0.3）。
+    entry_ref = min(max(price, buy_lo), buy_hi)      # 现价在买区内→取现价; 高于买区→取买区上限
+    risk = max(entry_ref - stop, entry_ref * 0.02)
+    # 目标位: 取【最近】有效阻力位（实战第一目标位），不为了凑盈亏比去跳到远处阻力。
+    #   ⚠️ 2026-10-25：曾按「第一个 RR≥1.5 的阻力」取，结果宏景科技目标 +38%、RR 14.6，
+    #      属无实战意义的统计凑数，已回退为最近阻力。
+    _res_up = sorted(v for v in ress if v > entry_ref * 1.015)
+    if _res_up:
+        target = _res_up[0]
+        tgt_basis = "阻力位"
+    else:
+        target = entry_ref + risk * 2
+        tgt_basis = "2:1推演"
+    reward = max(target - entry_ref, 0)
     rr = reward / risk if risk > 0 else 0
 
     # P1-3 一致性约束: 超买/高分位 → 不建议追高
@@ -549,6 +583,7 @@ def build_trade_plan(r):
     return {
         "buy_lo": buy_lo, "buy_hi": buy_hi, "stop": stop, "target": target,
         "rr": rr, "overbought": overbought, "flags": flags,
+        "entry_ref": entry_ref, "tgt_basis": tgt_basis,
         "pos_chg": (price - ma20) / ma20 * 100 if ma20 else None,
     }
 
@@ -708,6 +743,30 @@ def route_of(r):
 
 # 开始生成HTML
 html_parts = []
+
+# ===================================================================
+# v4.0 页面信息架构收敛（2026-10-25 老大指令）
+# -------------------------------------------------------------------
+# 定位：本页是「每日决策页」，不是「方法论白皮书」。只回答三个问题：
+#   ① 今天什么环境（市场状态 → 仓位纪律）
+#   ② 买什么（唯一一份 ≤10 只清单 + 买入区间/止损/股数）
+#   ③ 池子里还有什么值得看（完整排名 + 焦点池）
+# 所有「分析与计算过程」（因子 IC、时间衰减、证伪检验、共线矩阵、
+# 覆盖率、口径说明、47 因子对照…）一律不在此页展示，
+# 改为 gen_factor_daily.py 每日生成 Markdown 报告落盘 reports/（不上线）。
+#
+# 开关集中在此，便于回滚与审计；不要在各区块内部散落条件判断。
+# ===================================================================
+SHOW_LEGACY_3LINES = False   # 动量线/反转线/AI线 三合一「今日候选组合」
+                             #   关闭理由：三线实测超额均未跑赢（动量 T+1 -1.53%/胜率37%、
+                             #   反转 -0.61%、AI 胜率 -6.07%），且动量与反转方向互斥，
+                             #   20 只并列 = 不可执行。只保留多因子 10 只。
+SHOW_ANALYSIS = False        # 因子分析/方法论区块（IC 表、衰减、证伪、覆盖率、口径说明等）
+                             #   关闭理由：属「自证清白」型内容，占页面 40%+ 篇幅却无决策价值；
+                             #   迁至 reports/factor_YYYY-MM-DD.md 供调权重使用。
+SHOW_FULL_RANK = True        # 完整排名 490 只（含展开详情卡）——保留，是个股尽调入口
+SHOW_FOCUS_POOL = True       # 每日 AI 焦点池 ——保留，是「池外线索」的唯一来源
+
 
 html_parts.append('''<!DOCTYPE html>
 <html lang="zh-CN">
@@ -1058,11 +1117,12 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
 </head>
 <body>
 <div class="container">
-    <!-- A4 锚点导航: 12 区块 → 4 组跳转 -->
+    <!-- v4.0 锚点导航: 决策页三问（环境 → 买什么 → 池子里还有什么） -->
     <nav class="nav-bar">
-        <a href="#sec-decision">① 今日决策</a>
-        <a href="#sec-list">② 选股清单</a>
-        <a href="#sec-research">③ 深度研究</a>
+        <a href="#sec-decision">① 今日环境</a>
+        <a href="#sec-mf-pick">② 买什么</a>
+        <a href="#sec-list">③ 完整排名</a>
+        <a href="#sec-focus-pool">④ 焦点池</a>
         <a href="#sec-notes">ⓘ 说明</a>
         <span class="nav-date">数据日期 ''' + date_str + '''</span>
     </nav>
@@ -1179,7 +1239,11 @@ try:
     with open(_cfg_path, "r", encoding="utf-8") as _cf:
         _cfg = json.load(_cf)
     _rt = (_cfg.get("regime_tag") or "").strip()
-    _rn = (_cfg.get("regime_note") or "").strip()
+    # v4.0: 悬浮说明从「方法论长篇」改为「对使用者意味着什么」。
+    #   原 regime_note 属方法论文本（权重切换依据、配对 t 值等），已迁至 reports/factor_<date>.md。
+    _rn = ("本页所有评级与排名，都是在「下跌市」样本区间内校准的："
+           "结论反映的是池内相对强弱，不代表绝对收益方向。"
+           "池内基准本身在跌，前排标的也可能亏钱，请以仓位纪律与个股止损为准。")
     _sr = (_ic or {}).get("snapshot_range") or []
     if len(_sr) == 2 and all(_sr):
         _rt = (re.sub(r'（[^（）]*）', f'（截面区间 {_sr[0]}~{_sr[1]}）', _rt, count=1)
@@ -1686,8 +1750,9 @@ if quant_json or ai_pick_names:
     else:
         _cap_html = ""
 
-    html_parts.append(f'''
+    _legacy_3lines_html = f'''
     <!-- v2.43 三合一「今日候选组合」: 消除 v2.41/v2.42 的组合区块重复与资金分配矛盾 -->
+    <!-- v4.0: 默认关闭（SHOW_LEGACY_3LINES=False）。三线实测均无正超额且方向互斥，20 只不可执行。 -->
     <div class="chart-card" id="sec-today-pick" style="padding:16px;margin:14px 0;">
         <h3 style="font-size:13px;margin-bottom:10px;">🎯 今日候选组合 <span style="font-size:11px;color:#64748b;font-weight:400;">（三条独立逻辑线 · 量化=可复现规则 / AI=产业逻辑解读）</span></h3>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
@@ -1699,7 +1764,9 @@ if quant_json or ai_pick_names:
         </div>
         {_cap_html}
         <div style="font-size:11px;color:#475569;margin-top:6px;">说明：量化组合可完全复现、便于回测；AI 组合含产业逻辑但主观性更强。<b>两者交集是唯一的共识信号</b>，无交集时应视为分歧而非机会。</div>
-    </div>''')
+    </div>'''
+    if SHOW_LEGACY_3LINES:
+        html_parts.append(_legacy_3lines_html)
 
 # ===== v3.9 多因子精选组合（≤10 只）+ 动量路线低 IC 悖论解释 =====
 # 老大第 3 项：「今日候选组合数量太多，请用多因子的思路选出一个组合，今日组合总数不要超过 10 只。
@@ -1801,9 +1868,22 @@ try:
     except Exception:
         _rt = {}
 
+    # ---- v4.0 执行参数（买入区间/止损/目标/股数/金额）----
+    # 复用 build_trade_plan（与 S/A 详情卡同源）：多头取 ma5~ma10 回踩区、
+    # 弱势取 ma10~ma20 企稳区，止损=最近支撑下方 1.5%。
+    # 资金口径：10 万基准 × 当日仓位纪律（POSITION_LADDER 同源）÷ 只数，100 股取整。
+    _by_code = {str(_r0.get("code")): _r0 for _r0 in results}
+    _POS_RATIO = {"≤2成": 0.15, "2~4成": 0.30, "4~6成": 0.50,
+                  "6~8成": 0.70, "8成+警惕": 0.85}
+    _mf_ratio = _POS_RATIO.get(mkt_pos, 0.50)
+    _MF_CAPITAL = 100000
+    _mf_cap = int(_MF_CAPITAL * _mf_ratio)
+    _mf_picks = _mf.get("picks") or []
+    _mf_per = (_mf_cap / len(_mf_picks)) if _mf_picks else 0
+    _mf_no_plan = 0
+    _mf_n_in = 0
     _mf_rows = ""
-    for _i, _p in enumerate(_mf.get("picks") or [], 1):
-        _pt = _p.get("parts") or {}
+    for _i, _p in enumerate(_mf_picks, 1):
         _rt_c = RATING_COLORS.get(_p.get("rating") or "", "#94a3b8")
         _fpe = _p.get("fwd_pe")
         _fpe_s = f"{_fpe:.1f}x" if isinstance(_fpe, (int, float)) else "未提供"
@@ -1814,13 +1894,42 @@ try:
         _mfs = _p.get("mf_score")
         _mfs_s = f"{_mfs:.3f}" if isinstance(_mfs, (int, float)) else "—"
         _prc = _p.get("price")
+        _src = _by_code.get(str(_p.get("code")) or "") or {}
+        if not isinstance(_prc, (int, float)):
+            _prc = _src.get("price")
         _prc_s = f"{_prc:.2f}" if isinstance(_prc, (int, float)) else "—"
-        _rcell = ""
-        for _lbl, _vv in (("基本面", _pt.get("fund_pct")), ("消息", _pt.get("news_pct")),
-                          ("反转块", _pt.get("rev_pct"))):
-            if isinstance(_vv, (int, float)):
-                _rcell += (f'<span style="font-size:9.5px;color:#94a3b8;margin-right:6px;">'
-                           f'{_lbl} <b style="color:#cbd5e1;">{_vv:.0f}%</b></span>')
+        _plan = build_trade_plan(_src) if _src else None
+        if not _plan or not isinstance(_prc, (int, float)) or _prc <= 0:
+            _mf_no_plan += 1
+            _buy_s = _stop_s = _tgt_s = _amt_s = _sh_s = "—"
+            _rr_s = "—"; _rr_c = "#94a3b8"; _prc_warn = ""
+        else:
+            _buy_s = f"{_plan['buy_lo']:.2f}~{_plan['buy_hi']:.2f}"
+            _eref = _plan.get("entry_ref") or _prc
+            # A股口径：跌用绿、涨用红
+            _stop_s = (f'<b style="color:#e2e8f0;">{_plan["stop"]:.2f}</b>'
+                       f'<div style="font-size:9px;color:#22c55e;">'
+                       f'{(_plan["stop"] - _eref) / _eref * 100:+.1f}%</div>')
+            _tgt_s = (f'<b style="color:#e2e8f0;">{_plan["target"]:.2f}</b>'
+                      f'<div style="font-size:9px;color:#ef4444;">'
+                      f'{(_plan["target"] - _eref) / _eref * 100:+.1f}%</div>')
+            _rr_s = f"{_plan['rr']:.1f}"
+            _rr_c = ("#a3e635" if _plan["rr"] >= 1.5
+                     else ("#f59e0b" if _plan["rr"] >= 1.0 else "#94a3b8"))
+            _shares = int(_mf_per / _prc / 100) * 100
+            if _shares > 0:
+                _sh_s = f"{_shares}"
+                _amt_s = f"¥{_shares * _prc:,.0f}"
+            else:
+                _sh_s = '<span style="color:#f59e0b;">不足1手</span>'
+                _amt_s = "—"
+            if _prc > _plan["buy_hi"] * 1.02:
+                _prc_warn = ('<div style="font-size:9px;color:#f59e0b;">'
+                             '现价高于买区 · 等回踩</div>')
+            else:
+                _prc_warn = ""
+                if _prc >= _plan["buy_lo"] * 0.98:
+                    _mf_n_in += 1
         _reason = ""
         if _p.get("fund_reasons"):
             _reason = html_mod.escape(str(_p["fund_reasons"][0]))
@@ -1830,23 +1939,28 @@ try:
             f'<td style="padding:5px 6px;color:#f8fafc;font-weight:700;white-space:nowrap;">'
             f'{html_mod.escape(str(_p.get("name") or ""))}'
             f'<div style="font-size:9.5px;color:#475569;font-weight:400;">'
-            f'{html_mod.escape(str(_p.get("code") or ""))}</div></td>'
-            f'<td style="padding:5px 6px;color:#cbd5e1;font-size:10.5px;">'
-            f'{html_mod.escape(str(_p.get("sector_l2") or "—"))}'
-            f'<div style="font-size:9.5px;color:#475569;">'
-            f'{html_mod.escape(str(_p.get("sector_parent") or ""))}</div></td>'
-            f'<td style="padding:5px 6px;text-align:center;color:#38bdf8;font-weight:800;">{_mfs_s}</td>'
-            f'<td style="padding:5px 6px;text-align:center;">'
-            f'<span style="color:{_rt_c};font-weight:700;font-size:11px;">'
-            f'{html_mod.escape(str(_p.get("rating") or "—"))}</span></td>'
+            f'{html_mod.escape(str(_p.get("code") or ""))} · '
+            f'{html_mod.escape(str(_p.get("sector_l2") or "—"))}</div>'
+            f'<div style="font-size:9px;color:#64748b;font-weight:400;white-space:normal;'
+            f'max-width:190px;line-height:1.5;">{_reason}</div></td>'
             f'<td style="padding:5px 6px;text-align:center;color:#e2e8f0;font-size:11px;">'
-            f'{_prc_s}</td>'
-            f'<td style="padding:5px 6px;text-align:center;color:#cbd5e1;font-size:10.5px;">{_fpe_s}</td>'
-            f'<td style="padding:5px 6px;text-align:center;color:#cbd5e1;font-size:10.5px;">{_gw_s}</td>'
+            f'{_prc_s}{_prc_warn}</td>'
+            f'<td style="padding:5px 6px;text-align:center;color:#22c55e;font-weight:700;'
+            f'font-size:10.5px;white-space:nowrap;">{_buy_s}</td>'
+            f'<td style="padding:5px 6px;text-align:center;font-size:10.5px;">{_stop_s}</td>'
+            f'<td style="padding:5px 6px;text-align:center;font-size:10.5px;">{_tgt_s}</td>'
+            f'<td style="padding:5px 6px;text-align:center;color:{_rr_c};font-weight:700;'
+            f'font-size:10.5px;">{_rr_s}</td>'
+            f'<td style="padding:5px 6px;text-align:center;color:#e2e8f0;font-size:10.5px;">{_sh_s}</td>'
+            f'<td style="padding:5px 6px;text-align:center;color:#38bdf8;font-size:10.5px;">{_amt_s}</td>'
+            f'<td style="padding:5px 6px;text-align:center;">'
+            f'<span style="color:#38bdf8;font-weight:800;">{_mfs_s}</span>'
+            f'<div style="font-size:10px;color:{_rt_c};font-weight:700;">'
+            f'{html_mod.escape(str(_p.get("rating") or "—"))}</div></td>'
+            f'<td style="padding:5px 6px;text-align:center;color:#cbd5e1;font-size:10px;">'
+            f'{_fpe_s}<div style="font-size:9.5px;color:#64748b;">{_gw_s}</div></td>'
             f'<td style="padding:5px 6px;text-align:center;color:#cbd5e1;font-size:10.5px;">{_rsi_s}</td>'
-            f'<td style="padding:5px 6px;color:#64748b;font-size:9.5px;line-height:1.6;">{_rcell}</td>'
-            f'<td style="padding:5px 6px;color:#94a3b8;font-size:9.5px;line-height:1.6;max-width:200px;">'
-            f'{_reason}</td></tr>')
+            f'</tr>')
 
     # 回测表
     _mfb_rows = ""
@@ -1957,49 +2071,11 @@ try:
                 + '这正是<b>不再按板块动量切路线</b>的理由 —— 已由本区块的多因子组合取代。'
             )
 
-        html_parts.append(f'''
-    <!-- v3.9 多因子精选组合（≤10 只）+ 动量路线低 IC 悖论解释 -->
-    <div class="chart-card" id="sec-mf-pick" style="padding:16px;margin:14px 0;border:1px solid #a3e63555;">
-        <h3 style="font-size:13px;margin-bottom:4px;">🧮 多因子精选组合
-            <span style="font-size:11px;color:#64748b;font-weight:400;">
-            （{len(_mf.get("picks") or [])} 只 · 权重由池内实证反推，非手填 · {html_mod.escape(str(_mf.get("date") or ""))}）</span></h3>
-        <div style="font-size:11px;color:#64748b;margin-bottom:10px;line-height:1.75;">
-            上方三条线共 20 只、且动量线与反转线方向互斥，<b>无法直接执行</b>。
-            本组合给出唯一一份 ≤10 只清单。权重不是拍脑袋：从 <code>factor_ic.json</code>
-            的池内 IC 证据反推 —— {_wline}。
-        </div>
-        <div style="overflow-x:auto;">
-        <table style="width:100%;border-collapse:collapse;font-size:11px;">
-            <thead><tr style="background:#1e293b;">
-                <th style="padding:5px 6px;color:#94a3b8;">#</th>
-                <th style="padding:5px 6px;text-align:left;color:#94a3b8;">标的</th>
-                <th style="padding:5px 6px;text-align:left;color:#94a3b8;">板块</th>
-                <th style="padding:5px 6px;color:#94a3b8;">多因子分</th>
-                <th style="padding:5px 6px;color:#94a3b8;">评级</th>
-                <th style="padding:5px 6px;color:#94a3b8;">现价</th>
-                <th style="padding:5px 6px;color:#94a3b8;">FwdPE</th>
-                <th style="padding:5px 6px;color:#94a3b8;">增速</th>
-                <th style="padding:5px 6px;color:#94a3b8;">RSI</th>
-                <th style="padding:5px 6px;text-align:left;color:#94a3b8;">分位构成</th>
-                <th style="padding:5px 6px;text-align:left;color:#94a3b8;">核心逻辑</th>
-            </tr></thead>
-            <tbody>{_mf_rows}</tbody>
-        </table></div>
-        <div style="font-size:11px;color:#e2e8f0;padding:9px 11px;background:#1e293b;border-radius:8px;margin-top:10px;line-height:1.8;">
-            <b style="color:#7dd3fc;">🧭 权重怎么来的（可复算规则，非人工设定）</b><br>
-            <span style="color:#94a3b8;">① 只取 T+1 与 T+5 两周期 NW t 的较小者（保守：两周期都得站得住）；
-            ② t_min ≤ 0 的维度权重记 0；③ 消息面 T+20 t=0.68 已失效 → 权重砍半；
-            ④ 反转块 5 维仅 8 截面 → 块权重折半。结果：{_wline}。</span>
-        </div>
-        <div style="font-size:11px;color:#f59e0b;padding:9px 11px;background:rgba(245,158,11,0.08);border-radius:8px;margin-top:8px;line-height:1.8;">
-            <b>⚠️ 三条硬排除（是剔除，不是加分）</b>：
-            关注度前 20% 剔除 <b>{(_mf.get("excluded") or {}).get("关注度过高(attention 前20%)", 0)}</b> 只
-            · 题材热度前 20% 剔除 <b>{(_mf.get("excluded") or {}).get("题材过热(theme 前20%)", 0)}</b> 只
-            · RSI&gt;70 剔除 <b>{(_mf.get("excluded") or {}).get("RSI>70 追高", 0)}</b> 只。
-            依据：score_attention 的 T+5 NW t=<b>-3.89</b>、score_theme 的 T+20 NW t=<b>-2.70</b>，
-            两者都是<b>显著负向</b>——高关注、高热度在本池内是减分项而非加分项。
-        </div>
-        {_mf_risk_block}
+        # ---- v4.0: 两块分析内容迁出主页面 ----
+        # 老大指令：「页面上不展示分析与计算过程，仅呈现结论」。
+        # 下面两块（构造回测对比 + 动量悖论四层解释）属方法论/计算过程，
+        # 默认 SHOW_ANALYSIS=False 不渲染；原文案同步迁至 reports/factor_<date>.md。
+        _mf_backtest_block = f'''
         <div style="font-size:13px;font-weight:800;color:#38bdf8;margin:16px 0 6px;">
             🧪 这套多因子真的比单因子好吗？—— 回测告诉你：统计上等价</div>
         <div style="font-size:11px;color:#64748b;margin-bottom:8px;line-height:1.75;">
@@ -2029,14 +2105,15 @@ try:
             原「按板块动量切路线」的做法缺乏证据支撑；<br>
             ③ 池内头组净收益历史上<b>为负</b>（池内基准在跌），本组合只表达「相对排序」，<b>不等于买入能赚钱</b>。
         </div>
-
+        '''
+        _mom_paradox_block = f'''
         <div style="font-size:13px;font-weight:800;color:#fbbf24;margin:20px 0 6px;">
             ❓ 为什么动量路线 IC 和胜率都低，却仍在选动量路线的个股？</div>
         <div style="font-size:11.5px;color:#e2e8f0;line-height:1.9;padding:10px 12px;
                     background:rgba(251,191,36,0.07);border:1px solid #fbbf2444;border-radius:8px;">
             这个问题问到了模型的<b>结构性矛盾</b>，答案有四层，一层比一层严重：<br><br>
             <b style="color:#fbbf24;">① 字段同名字不同物：动量路线选的是「板块动量」，不是「个股动量」。</b><br>
-            `pick_portfolio.py` 的 momentum 路线筛选条件写在<b>申万二级板块</b>的 60 日/10 日涨幅排名上，
+            <code>pick_portfolio.py</code> 的 momentum 路线筛选条件写在<b>申万二级板块</b>的 60 日/10 日涨幅排名上，
             个股层面只按综合评分 <code>total</code> 降序取前 10，<b>个股动量从未参与筛选</b>。
             所以「动量路线」指的是<b>板块</b>动量，不是个股追涨。<br><br>
             <b style="color:#fbbf24;">② 更讽刺的是：系统自己的个股动量开关是关的。</b><br>
@@ -2067,6 +2144,61 @@ try:
                     border-radius:8px;margin-top:8px;line-height:1.85;">
             <b style="color:#7dd3fc;">读表要点</b>：{_rt_read}
         </div>
+        '''
+        if not SHOW_ANALYSIS:
+            _mf_backtest_block = ""
+            _mom_paradox_block = ""
+
+        html_parts.append(f'''
+    <!-- v3.9 多因子精选组合（≤10 只）+ 动量路线低 IC 悖论解释 -->
+    <div class="chart-card" id="sec-mf-pick" style="padding:16px;margin:14px 0;border:1px solid #a3e63555;">
+        <h3 style="font-size:13px;margin-bottom:4px;">🧮 多因子精选组合
+            <span style="font-size:11px;color:#64748b;font-weight:400;">
+            （{len(_mf.get("picks") or [])} 只 · 权重由池内实证反推，非手填 · {html_mod.escape(str(_mf.get("date") or ""))}）</span></h3>
+        <div style="font-size:11px;color:#64748b;margin-bottom:10px;line-height:1.75;">
+            唯一一份可执行清单（≤10 只）。买入区间 / 止损 / 目标位与个股详情页<b>同源同一函数</b>推导：
+            多头取 ma5~ma10 回踩区、弱势取 ma10~ma20 企稳区，止损=最近支撑下方 1.5%。
+            资金口径 = 10 万基准 × 当日仓位纪律 <b style="color:#f59e0b;">{mkt_pos}</b>
+            （赚钱效应 {mkt_score if mkt_score is not None else "—"} 分）÷ {len(_mf.get("picks") or [])} 只，100 股取整。
+        </div>
+        <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+            <thead><tr style="background:#1e293b;">
+                <th style="padding:5px 6px;color:#94a3b8;">#</th>
+                <th style="padding:5px 6px;text-align:left;color:#94a3b8;">标的 / 板块 / 核心逻辑</th>
+                <th style="padding:5px 6px;color:#94a3b8;">现价</th>
+                <th style="padding:5px 6px;color:#94a3b8;">买入区间</th>
+                <th style="padding:5px 6px;color:#94a3b8;">止损位</th>
+                <th style="padding:5px 6px;color:#94a3b8;">目标位</th>
+                <th style="padding:5px 6px;color:#94a3b8;">盈亏比</th>
+                <th style="padding:5px 6px;color:#94a3b8;">股数</th>
+                <th style="padding:5px 6px;color:#94a3b8;">金额</th>
+                <th style="padding:5px 6px;color:#94a3b8;">多因子<br>分/评级</th>
+                <th style="padding:5px 6px;color:#94a3b8;">FwdPE<br>增速</th>
+                <th style="padding:5px 6px;color:#94a3b8;">RSI</th>
+            </tr></thead>
+            <tbody>{_mf_rows}</tbody>
+        </table></div>
+        <div style="font-size:11px;color:#e2e8f0;padding:9px 11px;background:#1e293b;border-radius:8px;margin-top:10px;line-height:1.85;">
+            <b style="color:#7dd3fc;">📌 今日执行要点</b>：
+            10 只中 <b style="color:#22c55e;">{_mf_n_in} 只现价已进入买入区间</b>，
+            其余 <b style="color:#f59e0b;">{len(_mf.get("picks") or []) - _mf_n_in} 只需等回踩</b>
+            —— 现价高于买区时不要市价追，卖出纪律一律以止损位为准。<br>
+            <span style="color:#94a3b8;">本组合为「相对排序」表达：池内头组历史净收益为负（池子本身在跌），
+            <b style="color:#f59e0b;">排名靠前 ≠ 买入必赚</b>，请叠加下方仓位纪律与个股止损。<br>
+            盈亏比 = （最近阻力位 − 买区上限）/（买区上限 − 止损位）。<b style="color:#f59e0b;">数值过高（如 &gt;5）
+            并非优质信号</b>，而是说明上方最近阻力很远 —— 空间大但兑现需要时间，且止损一旦被打掉就归零；
+            盈亏比 &lt;1 的标的应先观察、不急于建仓。</span>
+        </div>
+        <div style="font-size:11px;color:#f59e0b;padding:9px 11px;background:rgba(245,158,11,0.08);border-radius:8px;margin-top:8px;line-height:1.8;">
+            <b>⚠️ 三条硬排除（是剔除，不是加分）</b>：
+            关注度前 20% 剔除 <b>{(_mf.get("excluded") or {}).get("关注度过高(attention 前20%)", 0)}</b> 只
+            · 题材热度前 20% 剔除 <b>{(_mf.get("excluded") or {}).get("题材过热(theme 前20%)", 0)}</b> 只
+            · RSI&gt;70 剔除 <b>{(_mf.get("excluded") or {}).get("RSI>70 追高", 0)}</b> 只。
+            依据：高关注、高热度在本池内是<b>显著负向</b>因子（T+5 NW t=-3.89 / T+20 NW t=-2.70）。
+        </div>
+        {_mf_risk_block}
+        {_mf_backtest_block}{_mom_paradox_block}
     </div>''')
 except Exception as _mfe:
     print(f"⚠️ 多因子组合区块渲染失败: {str(_mfe)[:160]}")
@@ -3672,6 +3804,22 @@ if _focus_pool.get("focus"):
 # ② 版本号标签硬编码 v2.40 五维（现为十维 v3.5.x），replace hack 已无意义。
 # 数据字段 ai_model_summary 仍由 enhance_scores.py 注入 scored 顶层（不影响其他消费方），仅不再渲染。
 # 头部 Hero 区的 mkt_phase/mkt_disc/赚钱效应/仓位建议为当日算法层总结，承担原区块的信息职能。
+
+# ===================================================================
+# v4.0 分析区切片起点（2026-10-25）
+# -------------------------------------------------------------------
+# 以下 3703~5614 全部属于「分析与计算过程」：因子 IC 表、时间衰减、
+# 反转块样本量、SIZE 证伪、市值下限扫描、锁定股偏差、47 因子对照、
+# 相关矩阵、十维权重、安全门、稀释检验、覆盖率、盈利取数口径……
+#
+# 这些内容对「今天买什么」零贡献，但对「权重该怎么调」至关重要。
+# 因此不在本页展示，改由 gen_factor_daily.py 每日生成 Markdown 报告
+# 落盘 reports/factor_YYYY-MM-DD.md（不上线）。
+#
+# 实现方式：记录当前已渲染区块的数量，本段代码照常执行（变量后续仍被
+# 推荐跟踪区块复用），执行完再把 html_parts 截断回记录点，
+# 从而「计算保留、渲染丢弃」，且不必改动近 1900 行的缩进结构。
+_ANALYSIS_SLICE_START = len(html_parts)
 
 # ===== v2.46 因子有效性评估（Rank IC）=====
 # 数据来源: factor_eval.py → factor_ic.json（每日随流水线更新；历史截面来自 git 提交记录）
@@ -5619,6 +5767,18 @@ try:
     </div>''')
 except Exception as _qe:
     pass
+
+# ===================================================================
+# v4.0 分析区切片终点：回滚 html_parts 到起点，按开关决定是否保留
+# -------------------------------------------------------------------
+# 上面的代码已完整执行（_ic / _wmeta / _g_em 等变量仍可被下文复用），
+# 这里只把「渲染结果」丢弃，实现「算但不显示」。
+# SHOW_ANALYSIS=True 时原样保留（用于调试或需要出方法论页时）。
+if not SHOW_ANALYSIS:
+    _n_analysis_blocks = len(html_parts) - _ANALYSIS_SLICE_START
+    del html_parts[_ANALYSIS_SLICE_START:]
+    print(f"🧹 v4.0 已隐藏 {_n_analysis_blocks} 个分析/方法论区块"
+          f"（迁至 reports/factor_<date>.md）")
 
 
 # ===== v2.41 P0-4 推荐跟踪与胜率 (真实K线回填) =====
