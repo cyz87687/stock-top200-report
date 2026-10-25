@@ -502,6 +502,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
             依据：score_attention 的 T+5 NW t=<b>-3.89</b>、score_theme 的 T+20 NW t=<b>-2.70</b>，
             两者都是<b>显著负向</b>——高关注、高热度在本池内是减分项而非加分项。
         </div>
+        <div style="font-size:11px;color:#cbd5e1;padding:9px 11px;background:#1c0a0a;border-left:3px solid #ef4444;border-radius:4px;margin-top:8px;line-height:1.85;"><b style="color:#f87171;">🚨 这 10 只不是 10 份独立风险 —— 等效只有 2.4 只</b><br>把组合内两两日收益相关系数算出来（45 对），<b style="color:#ef4444;">均值 0.358</b>、最大 0.678。按 <code>n / (1 + (n-1)·ρ)</code> 折算，<b style="color:#f87171;">等效独立标的数 = 2.4 只</b>（名义 10 只）。<br><b style="color:#f59e0b;">实务含义：</b>① 「强制分散到 10 只」只把单一标的的特质风险削掉，<b>削不掉系统性/风格风险</b> —— 若这 10 只一起跌，实际承受的是 2.4 只标的的波动，不是 1/10；② 因此仓位不该按「10 只 = 很安全」来定，按等效 2.4 只来定更接近真实风险；③ 若后续 ρ 升破 0.5，继续加只数没有意义，要用行业/风格分散（比如掺入非科技板块）而不是继续堆数量。</div>
         <div style="font-size:13px;font-weight:800;color:#38bdf8;margin:16px 0 6px;">
             🧪 这套多因子真的比单因子好吗？—— 回测告诉你：统计上等价</div>
         <div style="font-size:11px;color:#64748b;margin-bottom:8px;line-height:1.75;">
@@ -17913,7 +17914,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
 
     <!-- A2 元信息下沉: 版本号/数据源/口径说明全部收进页脚 -->
     <div class="footer" id="sec-notes">
-        <p style="color:#64748b;">📄 v3.6 报告层 · stock-scorer v3.6-fund-led (10-dim + AI + sector-momentum[evidence], prior-pending (全市场回测先验, 池内 IC 积累中)) 评分层 · 数据日期 2026-10-23 · 更新时间 2026-10-25 11:43:04</p>
+        <p style="color:#64748b;">📄 v3.6 报告层 · stock-scorer v3.6-fund-led (10-dim + AI + sector-momentum[evidence], prior-pending (全市场回测先验, 池内 IC 积累中)) 评分层 · 数据日期 2026-10-23 · 更新时间 2026-10-25 11:45:54</p>
         <p>📚 数据源：东方财富 + 腾讯K线 + 同花顺 + 新浪/乐股 · 全市场成交额排名 · 样本池 TOP500（覆盖 490 只 / 98%）</p>
         <p>📐 盈利取数口径（v3.5.1 起）：growth = 各股最新已披露报告期（2026中报为主）扣非累计同比，东财按报告期接口、官方口径 (本期−上年同期)/|上年同期|；Q3 预测景气加成来自手工汇总表（半导体/消费电子链，池内覆盖约13%，超出机构全年预期部分才计分）</p>
         <p>🗒️ 点评来源：AI 生成（本条点评由大模型基于当日真实行情数据生成。生成者：WorkBuddy LLM (deepseek-v4-flash)，基于当日真实行情数据）</p>

@@ -1710,6 +1710,65 @@ try:
         with open(_mfbp, "r", encoding="utf-8") as _f:
             _mfb = json.load(_f)
 
+    # ---- 组合风险体检（P1，2026-10-25 新增）----
+    #   audit_round8 实测：10 只两两日收益平均相关 0.358、最大 0.678，
+    #   按 n/(1+(n-1)ρ) 折算等效独立标的仅 2.4 只。
+    #   → 「10 只 = 分散」是错觉，必须上屏，否则读者会按 10 只满仓等权。
+    _mf_risk_block = ""
+    try:
+        _r8 = json.load(open(os.path.join(_ai_dir, "audit_round8.json")))
+        _p8 = _r8.get("picks") or []
+        _tos = [x.get("turnover_yi") for x in _p8
+                if isinstance(x.get("turnover_yi"), (int, float))]
+        _avg_c = None
+        _mx_c = None
+        _eff = None
+        for _it in (_r8.get("items") or []):
+            if "等效独立标的" in (_it.get("title") or ""):
+                _ev = _it.get("evidence") or ""
+                _mm = re.search(r"均值\s*(-?\d+\.\d+)", _ev)
+                if _mm:
+                    _avg_c = float(_mm.group(1))
+                _mm2 = re.search(r"最大\s*(-?\d+\.\d+)", _ev)
+                if _mm2:
+                    _mx_c = float(_mm2.group(1))
+                _mm3 = re.search(r"等效独立标的数\s*=\s*(\d+\.\d+)", _ev)
+                if _mm3:
+                    _eff = float(_mm3.group(1))
+        _n_pk = len(_p8)
+        if _avg_c is not None and _eff is not None:
+            _cap_yi = min(_tos) * 0.05 if _tos else None
+            _corr_cl = "#ef4444" if _avg_c >= 0.3 else "#f59e0b"
+            _mf_risk_block = (
+                '<div style="font-size:11px;color:#cbd5e1;padding:9px 11px;'
+                'background:#1c0a0a;border-left:3px solid #ef4444;border-radius:4px;'
+                'margin-top:8px;line-height:1.85;">'
+                '<b style="color:#f87171;">🚨 这 ' + str(_n_pk) + ' 只不是 ' + str(_n_pk)
+                + ' 份独立风险 —— 等效只有 ' + ("%.1f" % _eff) + ' 只</b><br>'
+                '把组合内两两日收益相关系数算出来（' + str(_n_pk * (_n_pk - 1) // 2)
+                + ' 对），<b style="color:' + _corr_cl + ';">均值 '
+                + ("%.3f" % _avg_c) + '</b>、最大 ' + ("%.3f" % (_mx_c or 0)) + '。'
+                '按 <code>n / (1 + (n-1)·ρ)</code> 折算，'
+                '<b style="color:#f87171;">等效独立标的数 = ' + ("%.1f" % _eff) + ' 只</b>'
+                '（名义 ' + str(_n_pk) + ' 只）。<br>'
+                '<b style="color:#f59e0b;">实务含义：</b>'
+                '① 「强制分散到 10 只」只把单一标的的特质风险削掉，'
+                '<b>削不掉系统性/风格风险</b> —— 若这 10 只一起跌，'
+                '实际承受的是 ' + ("%.1f" % _eff) + ' 只标的的波动，不是 1/10；'
+                '② 因此仓位不该按「10 只 = 很安全」来定，'
+                '按等效 ' + ("%.1f" % _eff) + ' 只来定更接近真实风险；'
+                '③ 若后续 ρ 升破 0.5，继续加只数没有意义，'
+                '要用行业/风格分散（比如掺入非科技板块）而不是继续堆数量。'
+                '</div>')
+        elif _tos:
+            _mf_risk_block = (
+                '<div style="font-size:11px;color:#94a3b8;padding:9px 11px;'
+                'background:#1e293b;border-radius:8px;margin-top:8px;line-height:1.8;">'
+                '组合成交额中位 <b>' + ("%.2f" % (sorted(_tos)[len(_tos) // 2]))
+                + '</b> 亿元，流动性充足。</div>')
+    except Exception:
+        _mf_risk_block = ""
+
     # ---- 动量路线跟踪实证（回答「低 IC 为何仍选股」的硬证据）----
     _rt = {"quant_momentum": {}, "quant_reversal": {}, "ai_portfolio": {}}
     try:
@@ -1931,6 +1990,7 @@ try:
             依据：score_attention 的 T+5 NW t=<b>-3.89</b>、score_theme 的 T+20 NW t=<b>-2.70</b>，
             两者都是<b>显著负向</b>——高关注、高热度在本池内是减分项而非加分项。
         </div>
+        {_mf_risk_block}
         <div style="font-size:13px;font-weight:800;color:#38bdf8;margin:16px 0 6px;">
             🧪 这套多因子真的比单因子好吗？—— 回测告诉你：统计上等价</div>
         <div style="font-size:11px;color:#64748b;margin-bottom:8px;line-height:1.75;">
