@@ -3889,6 +3889,15 @@ def main():
             _elig_map[_c] = {
                 "turnover_ratio": _s.get("turnover_ratio"),
                 "circ_mv": _s.get("circ_mv"),
+                # v3.8.1: 补透传 total_mv / amount / pe / pb ——
+                #   v3.8 新增三条选池规则（总市值≥25亿、成交额≥1亿、SIZE 用流通市值），
+                #   但这些字段此前未落盘到 scored，导致规则**事后无法复盘验证**，
+                #   也无法在未来检验「估值口径(BP/EP)」是否有效。此处一并透传。
+                "total_mv": _s.get("total_mv"),
+                "amount": _s.get("amount"),
+                "pe": _s.get("pe"),
+                "pb": _s.get("pb"),
+                "price": _s.get("price"),
                 "liquid_ok": _s.get("liquid_ok", True),
                 "suspended": _s.get("suspended", False),
                 "is_new": _s.get("is_new", False),
@@ -4461,6 +4470,10 @@ def main():
             # v3.2 P0-1/P0-3: 资格/流动性标记透传（来自 fetch 池，供报告层与组合层消费）
             "turnover_ratio": _elig_map.get(code, {}).get("turnover_ratio"),
             "circ_mv": _elig_map.get(code, {}).get("circ_mv"),
+            # v3.8.1: 选池规则的输入字段必须落盘，否则规则永远无法复盘验证
+            "total_mv": _elig_map.get(code, {}).get("total_mv"),
+            "amount": _elig_map.get(code, {}).get("amount"),
+            "pb": _elig_map.get(code, {}).get("pb"),
             "liquid_ok": _elig_map.get(code, {}).get("liquid_ok", True),
             "suspended": _elig_map.get(code, {}).get("suspended", False),
             "is_new": _elig_map.get(code, {}).get("is_new", False),
