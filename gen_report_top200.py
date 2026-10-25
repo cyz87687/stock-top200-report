@@ -143,6 +143,17 @@ _ver_tag = (f"{REPORT_VER} · 基本面主导" if _has_10d
 #    后端 step2/apply_sector_momentum 的总分缩放 ×4 改为 ×10、评级门槛同步放大即可。
 _DIM_MAX = 10  # v3.3 问题2: 量纲升级为「每维满分10 / 总分满分100」(后端 ×20, 前端 ×2 展示)
 
+# v4.0 页面信息架构收敛的开关注（在函数定义之前声明，供 _dim_matrix_html 运行时读取）
+#   定位：本页是「每日决策页」，不是「方法论白皮书」。只回答三个问题：
+#     ① 今天什么环境（市场状态 → 仓位纪律）
+#     ② 买什么（唯一一份 ≤10 只清单 + 买入区间/止损/目标/股数）
+#     ③ 池子里还有什么值得看（完整排名 + 焦点池）
+SHOW_LEGACY_3LINES = False   # 动量线/反转线/AI线 三合一「今日候选组合」（20 只，方向互斥不可执行）
+SHOW_ANALYSIS = False        # 因子分析/方法论区块（IC 表、衰减、证伪、覆盖率、口径说明等）
+SHOW_DIM_MATRIX = False      # 个股「十维评分明细·权重×分数」矩阵 → 改为「评分结构摘要」
+SHOW_FULL_RANK = True        # 完整排名 490 只（含展开详情卡）—— 保留，是个股尽调入口
+SHOW_FOCUS_POOL = True       # 每日 AI 焦点池 —— 保留，是「池外线索」的唯一来源
+
 
 def _load_dim_weights():
     """从 factor_weights.json 读十维权重，供维度矩阵与文案使用。
@@ -182,8 +193,40 @@ _DIM_DEFS = [
 
 
 def _dim_matrix_html(r):
-    """个股十维评分明细矩阵：10个维度独立成行（维度名+权重+分数条+加权贡献）。
-    板块动量可选（optional），缺失时显示「—」而非 0，避免误导。"""
+    """个股十维摘要。
+
+    v4.0（2026-10-25 老大指令「页面上不展示分析与计算过程，仅呈现结论」）：
+      原实现是「维度名 × 权重 + 分数条 + 加权贡献(分数×权重)」的十行矩阵 ——
+      这是**计算过程**，且 73 只详情卡各重复一遍（实测占该区块约 150KB）。
+      各维度原始分数在上方四张 dim-card 里已经呈现过，此处不应再重复算式。
+      现改为**结论式摘要**：只答「哪几维最强、哪几维是短板」，权重与贡献列移出。
+      如需回看完整加权算式，见 reports/factor_<date>.md 与 factor_weights.json。
+    """
+    if not SHOW_DIM_MATRIX:
+        items = []
+        for label, key, w, optional in _DIM_DEFS:
+            v = r.get(key)
+            if v is None:
+                continue
+            try:
+                v = float(v)
+            except (TypeError, ValueError):
+                continue
+            items.append((label, v))
+        if not items:
+            return ""
+        items.sort(key=lambda x: -x[1])
+        strong = [(l, v) for l, v in items if v >= 8.0][:3]
+        weak = [(l, v) for l, v in reversed(items) if v < 5.0][:2]
+        _s = "、".join(f"{l} {v:.1f}" for l, v in strong) if strong else "无（无维度达 8 分以上）"
+        _w = "、".join(f"{l} {v:.1f}" for l, v in weak) if weak else "无（无维度低于 5 分）"
+        return ('<div class="dim-matrix" style="padding:9px 11px;">'
+                '<div class="dm-head" style="margin-bottom:6px;">📊 评分结构摘要</div>'
+                f'<div style="font-size:11px;color:#cbd5e1;line-height:1.85;">'
+                f'<b style="color:#22c55e;">优势维度</b>：{_s}<br>'
+                f'<b style="color:#f97316;">短板维度</b>：{_w}'
+                f'</div></div>')
+
     has_sec = r.get("score_sector") is not None
     rows = []
     for label, key, w, optional in _DIM_DEFS:
@@ -553,21 +596,38 @@ def build_trade_plan(r):
     # 止损必须低于买区下限，否则「买入即触发止损」
     if stop >= buy_lo:
         stop = buy_lo * 0.975
+    # ⚠️ 2026-10-25：止损与买区上限的最小间距，防「风险敞口过窄 → 盈亏比被数学放大」。
+    #   实例（北方稀土）：买区 35.50~35.90、止损 35.37，敞口仅 1.5%，
+    #   而页面显示的是 2 位小数四舍五入值，实算与展示出现 2.8 vs 3.8 的口径打架。
+    #   统一要求敞口 ≥ 买区上限的 2.5%（与下方 risk 下限一致），不足则下移止损。
+    _min_gap = buy_hi * 0.025
+    if (buy_hi - stop) < _min_gap:
+        stop = buy_hi - _min_gap
+    # 展示值统一按 2 位小数落地后再参与计算，确保「页面上的数」= 「算 RR 的数」
+    buy_lo = round(buy_lo, 2)
+    buy_hi = round(buy_hi, 2)
+    stop = round(stop, 2)
+    if buy_lo > buy_hi:
+        buy_lo = round(buy_hi * 0.99, 2)
 
     # 目标位 / 盈亏比: 一律以【计划入场价】为基准，不再用现价
     #   ⚠️ 2026-10-25 修 P0：原实现以现价算 risk/reward，当现价高于买区时
     #      「等回踩再买」与盈亏比互相矛盾（回踩后风险变小、空间变大，却仍报 0.3）。
     entry_ref = min(max(price, buy_lo), buy_hi)      # 现价在买区内→取现价; 高于买区→取买区上限
+    # ⚠️ 分母下限：买区上限与止损过近时（如 35.90 / 35.37，仅差 1.5%），
+    #   报价保留 2 位小数的舍入误差会被除法放大 —— 报告层显示 35.90/35.37，
+    #   而内存里是 35.8999…/35.3699…，RR 会从 2.8 跳到 3.8。
+    #   故风险敞口不得小于入场价的 2%，与下方 risk 下限同一口径。
     risk = max(entry_ref - stop, entry_ref * 0.02)
     # 目标位: 取【最近】有效阻力位（实战第一目标位），不为了凑盈亏比去跳到远处阻力。
     #   ⚠️ 2026-10-25：曾按「第一个 RR≥1.5 的阻力」取，结果宏景科技目标 +38%、RR 14.6，
     #      属无实战意义的统计凑数，已回退为最近阻力。
     _res_up = sorted(v for v in ress if v > entry_ref * 1.015)
     if _res_up:
-        target = _res_up[0]
+        target = round(_res_up[0], 2)
         tgt_basis = "阻力位"
     else:
-        target = entry_ref + risk * 2
+        target = round(entry_ref + risk * 2, 2)
         tgt_basis = "2:1推演"
     reward = max(target - entry_ref, 0)
     rr = reward / risk if risk > 0 else 0
@@ -755,17 +815,18 @@ html_parts = []
 # 覆盖率、口径说明、47 因子对照…）一律不在此页展示，
 # 改为 gen_factor_daily.py 每日生成 Markdown 报告落盘 reports/（不上线）。
 #
-# 开关集中在此，便于回滚与审计；不要在各区块内部散落条件判断。
+# ⚠️ 开关已统一上移至 _DIM_MAX 之后（函数定义之前），此处不再重复定义，
+#    否则会覆盖上方早期读取到的值导致行为不一致。
 # ===================================================================
-SHOW_LEGACY_3LINES = False   # 动量线/反转线/AI线 三合一「今日候选组合」
-                             #   关闭理由：三线实测超额均未跑赢（动量 T+1 -1.53%/胜率37%、
-                             #   反转 -0.61%、AI 胜率 -6.07%），且动量与反转方向互斥，
-                             #   20 只并列 = 不可执行。只保留多因子 10 只。
-SHOW_ANALYSIS = False        # 因子分析/方法论区块（IC 表、衰减、证伪、覆盖率、口径说明等）
-                             #   关闭理由：属「自证清白」型内容，占页面 40%+ 篇幅却无决策价值；
-                             #   迁至 reports/factor_YYYY-MM-DD.md 供调权重使用。
-SHOW_FULL_RANK = True        # 完整排名 490 只（含展开详情卡）——保留，是个股尽调入口
-SHOW_FOCUS_POOL = True       # 每日 AI 焦点池 ——保留，是「池外线索」的唯一来源
+# 关闭理由备忘：
+#   SHOW_LEGACY_3LINES=False —— 三线实测超额均未跑赢（动量 T+1 -1.53%/胜率37%、
+#       反转 -0.61%、AI 胜率 -6.07%），且动量与反转方向互斥，
+#       20 只并列 = 不可执行。只保留多因子 10 只。
+#   SHOW_ANALYSIS=False —— 属「自证清白」型内容，占页面 40%+ 篇幅却无决策价值；
+#       迁至 reports/factor_YYYY-MM-DD.md 供调权重使用。
+#   SHOW_DIM_MATRIX=False —— 个股卡里的「权重×分数=加权贡献」十行矩阵是计算过程，
+#       73 只各重复一遍；各维原始分已在上方四张 dim-card 呈现，此处只留摘要。
+# ===================================================================
 
 
 html_parts.append('''<!DOCTYPE html>
@@ -2554,8 +2615,13 @@ for idx, r in enumerate(top20):
     plan = build_trade_plan(r)
     plan_tag, plan_note = trade_plan_advice(r, plan)
     if plan:
-        _risk_pct = (plan["buy_hi"] - plan["stop"]) / plan["buy_hi"] * 100 if plan["buy_hi"] else 0
-        _up_pct = (plan["target"] - r.get("price", 0)) / r.get("price", 1) * 100
+        # ⚠️ 2026-10-25 修 P0 口径混用：这里原用「现价」算止损/目标百分比，
+        #   而盈亏比已改为按【计划入场价】计算 → 同一行出现
+        #   「止损 -3.4%、目标 +0.2%、盈亏比 3.2:1」的自相矛盾（长川科技实例）。
+        #   现统一为：百分比一律相对计划入场价（买区上限），仅当现价已在买区内时等于现价。
+        _eref = plan.get("entry_ref") or r.get("price") or 0
+        _risk_pct = (_eref - plan["stop"]) / _eref * 100 if _eref else 0
+        _up_pct = (plan["target"] - _eref) / _eref * 100 if _eref else 0
         _plan_color = "#ef4444" if plan["overbought"] else ("#f59e0b" if _bearish else "#22c55e")
         # R1 盈亏比可信度
         _conf_lv, _conf_sc, _conf_note = trade_confidence(r, plan)
