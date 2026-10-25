@@ -3894,7 +3894,201 @@ try:
             except Exception:
                 _decay_block = ""
 
+            # ===== 因子近期失效（P0 级风险，2026-10-25 新增）=====
+            #   audit_round6/7 交叉验证：fund 头组近 20 日 T+1 超额 -0.53%（t_NW -3.46、
+            #   t_OLS -2.70、胜率 25%），且 30 日滚动窗口早5窗 +0.36% → 晚5窗 -0.33%。
+            #   滚动窗口 t 因高度重叠被高估，故同时给非重叠跳采的 OLS t，供读者自行判断。
+            _live_block = ""
+            try:
+                _r6 = json.load(open("audit_round6.json"))
+                _r7 = json.load(open("audit_round7.json"))
+                _dec = _r6.get("decay_summary") or {}
+                _m2 = _r7.get("m2_daily_h1") or {}
+                _n20 = _m2.get("近20日") or {}
+                _n10 = _m2.get("近10日") or {}
+                _m1 = (_r7.get("m1_nonoverlap_h5") or {}).get("近60日") or {}
+                _m3 = (_r7.get("m3_top10_h5") or {}).get("近60日") or {}
+
+                def _g(dd, k, fmt="%+.2f", suf=""):
+                    v = dd.get(k)
+                    if not isinstance(v, (int, float)):
+                        return "—"
+                    return (fmt % v) + suf
+
+                _rows_live = ""
+                for _h, _lab in (("h1", "T+1"), ("h5", "T+5"), ("h20", "T+20")):
+                    _c = _dec.get(_h) or {}
+                    _e5 = _c.get("early5")
+                    _l5 = _c.get("late5")
+                    _dc = _c.get("decay")
+                    _cl_d = "#ef4444" if (isinstance(_dc, (int, float)) and _dc < 0) else "#a3e635"
+                    _rows_live += (
+                        '<tr style="border-bottom:1px solid #1e293b;">'
+                        '<td style="padding:4px 8px;color:#e2e8f0;font-weight:700;">' + _lab + '</td>'
+                        '<td style="padding:4px 8px;text-align:center;color:#a3e635;">'
+                        + _g(_c, "early5") + '%</td>'
+                        '<td style="padding:4px 8px;text-align:center;color:#ef4444;">'
+                        + _g(_c, "late5") + '%</td>'
+                        '<td style="padding:4px 8px;text-align:center;color:' + _cl_d + ';font-weight:700;">'
+                        + _g(_c, "decay") + 'pct</td>'
+                        '</tr>')
+
+                _live_block = (
+                    '<div style="font-size:13px;font-weight:800;color:#f87171;margin:16px 0 6px;">'
+                    '🚨 基本面因子近 20 日已转为负超额（P0 级风险）</div>'
+                    '<div style="font-size:11px;color:#64748b;margin-bottom:8px;line-height:1.75;">'
+                    '上面的「衰减」是 IC 口径，这里换成<b style="color:#e2e8f0;">真金白银的收益率口径</b>：'
+                    '把每个入场日的「fund 头 20% 等权收益 − 全池等权收益」作为一条超额序列，'
+                    '按 30 个交易日滚动求均值。<b style="color:#f59e0b;">注意滚动窗口高度重叠、t 值会被高估</b>，'
+                    '所以下面同时给出非重叠跳采的 OLS t，两者一起看。'
+                    '</div>'
+                    '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:6px;">'
+                    '<thead><tr style="background:#1e293b;">'
+                    '<th style="padding:4px 8px;text-align:left;color:#94a3b8;">持有期</th>'
+                    '<th style="padding:4px 8px;color:#94a3b8;">早 5 个窗口均值</th>'
+                    '<th style="padding:4px 8px;color:#94a3b8;">晚 5 个窗口均值</th>'
+                    '<th style="padding:4px 8px;color:#94a3b8;">变化</th>'
+                    '</tr></thead><tbody>' + _rows_live + '</tbody></table>'
+                    '<div style="background:#1c0a0a;border-left:3px solid #ef4444;padding:8px 10px;'
+                    'border-radius:4px;font-size:11px;color:#cbd5e1;line-height:1.8;margin-bottom:8px;">'
+                    '<b style="color:#f87171;">近 20 个交易日的实测（' + str(_n20.get("n") or 0)
+                    + ' 个入场日）：</b>头组相对全池超额 <b style="color:#ef4444;">'
+                    + _g(_n20, "exc") + '%</b>，'
+                    'NW t = <b>' + _g(_n20, "t_nw", "%+.2f") + '</b>，'
+                    'OLS t = <b>' + _g(_n20, "t_ols", "%+.2f") + '</b>，'
+                    '胜率 <b style="color:#ef4444;">' + _g(_n20, "win", "%.0f") + '%</b>。'
+                    '<br>近 10 日（' + str(_n10.get("n") or 0) + ' 个入场日）超额 '
+                    + _g(_n10, "exc") + '%，NW t = ' + _g(_n10, "t_nw", "%+.2f")
+                    + '，胜率 ' + _g(_n10, "win", "%.0f") + '%。'
+                    '<br><b style="color:#f59e0b;">两种口径都说负，且样本量足够（n='
+                    + str(_n20.get("n") or 0) + '），这不是噪声。</b>'
+                    '</div>'
+                    '<div style="font-size:11px;color:#64748b;line-height:1.75;">'
+                    '<b style="color:#e2e8f0;">但拉长看没这么糟，所以不能直接判死：</b>'
+                    'T+5 非重叠跳采（每 5 日取 1 个入场日）近 60 日为 '
+                    + _g(_m1, "exc") + '%（n=' + str(_m1.get("n") or 0) + '，OLS t = '
+                    + _g(_m1, "t_ols", "%+.2f") + '），全样本 '
+                    + _g((_r7.get("m1_nonoverlap_h5") or {}).get("全样本") or {}, "exc")
+                    + '%（OLS t = '
+                    + _g((_r7.get("m1_nonoverlap_h5") or {}).get("全样本") or {}, "t_ols", "%+.2f")
+                    + '）→ <b style="color:#e2e8f0;">全样本口径下 fund 仍是正的，只是近 1 个月被抹平</b>。'
+                    '头 10 只口径近 60 日 ' + _g(_m3, "exc") + '%（n='
+                    + str(_m3.get("n") or 0) + '），方向一致。'
+                    '<br><b style="color:#f87171;">必须说清楚的一点：</b>'
+                    '「短周期还能用」这个说法<b>只对 T+5 非重叠样本成立</b>（近 60 日 OLS t = '
+                    + _g(_m1, "t_ols", "%+.2f") + '，不显著）；'
+                    '<b>近 20 日的 T+1 恰恰也是负的（-0.53%）</b>，'
+                    '所以本页不能声称「短周期安全」——只能说「长周期已无可辩驳地失效，'
+                    '短周期处于临界、且近期方向向下」。'
+                    '</div>'
+                    '<div style="background:#0f2027;border-left:3px solid #f59e0b;padding:8px 10px;'
+                    'border-radius:4px;font-size:11px;color:#cbd5e1;line-height:1.8;">'
+                    '<b style="color:#f59e0b;">本页的操作含义（不粉饰）：</b>'
+                    '① 组合持有期压在 <b>5 日以内</b>——20 日持有的超额支撑已经消失，'
+                    '滚动窗口 T+20 从 +3.05% 翻到 -0.04%；'
+                    '② fund 权重虽仍是模型里唯一有历史的维度，但它<b>近期在亏超额</b>，'
+                    '所以本页组合只给 10 只、且强制分散，不做重仓押注；'
+                    '③ 「连续两个 30 日滚动窗口超额为负即降仓」这条纪律'
+                    '<b>目前没有自动化</b>，需人工判断，已列入待修；'
+                    '④ <b style="color:#f87171;">本页任何「基本面好」的表述，都不构成中线持有理由</b>。'
+                    '</div>')
+            except Exception:
+                _live_block = ""
+
+            # ===== 反转块样本量披露（P1 级，2026-10-25 新增）=====
+            #   audit_round4 实测：反转块 5 维只在 3~7 个截面上有值（不是 78 个），
+            #   且 T+1 IC 为负（-0.0254）、T+5 才转正（+0.0791）。
+            #   audit_round5 权重扫描：0.24→0.12 三周期全部不显著（|t|<1.8）→
+            #   说明「该给多少权重」这个问题在本样本下根本无法回答，必须明说出来。
+            _rev_block = ""
+            try:
+                _r4 = json.load(open("audit_round4.json"))
+                _r5 = json.load(open("audit_round5.json"))
+                _rvw = _r4.get("p1_2_reversal_block") or {}
+                _w24 = _rvw.get("weighted") or {}
+                _wm = _rvw.get("mean") or {}
+                _scan = (_r5.get("q1_weight_scan") or {}).get("vs_base_0.24") or {}
+
+                _n1 = (_w24.get("h1") or {}).get("n")
+                _n5 = (_w24.get("h5") or {}).get("n")
+                _n20 = (_w24.get("h20") or {}).get("n")
+                _ic1 = (_w24.get("h1") or {}).get("ic")
+                _ic5 = (_w24.get("h5") or {}).get("ic")
+                _t1 = (_w24.get("h1") or {}).get("t")
+                _t5 = (_w24.get("h5") or {}).get("t")
+
+                def _f2(v, fmt="%+.4f"):
+                    return (fmt % v) if isinstance(v, (int, float)) else "—"
+
+                # 权重扫描：找 T+5 上 |t| 最大的变更
+                _best = None
+                for _k, _v in _scan.items():
+                    _c5 = _v.get("h5") or {}
+                    _tt = _c5.get("t")
+                    if isinstance(_tt, (int, float)):
+                        if _best is None or abs(_tt) > abs(_best[1]):
+                            _best = (_k, _tt, _c5.get("delta"))
+
+                _rev_rows = (
+                    '<tr style="border-bottom:1px solid #1e293b;">'
+                    '<td style="padding:4px 8px;color:#e2e8f0;font-weight:700;">T+1</td>'
+                    '<td style="padding:4px 8px;text-align:center;color:#ef4444;">'
+                    + _f2(_ic1) + '</td>'
+                    '<td style="padding:4px 8px;text-align:center;color:#94a3b8;">'
+                    + _f2(_t1, "%+.2f") + '</td>'
+                    '<td style="padding:4px 8px;text-align:center;color:#ef4444;font-weight:700;">'
+                    + str(_n1 if _n1 is not None else "—") + '</td></tr>'
+                    '<tr style="border-bottom:1px solid #1e293b;">'
+                    '<td style="padding:4px 8px;color:#e2e8f0;font-weight:700;">T+5</td>'
+                    '<td style="padding:4px 8px;text-align:center;color:#a3e635;">'
+                    + _f2(_ic5) + '</td>'
+                    '<td style="padding:4px 8px;text-align:center;color:#94a3b8;">'
+                    + _f2(_t5, "%+.2f") + '</td>'
+                    '<td style="padding:4px 8px;text-align:center;color:#ef4444;font-weight:700;">'
+                    + str(_n5 if _n5 is not None else "—") + '</td></tr>')
+
+                _best_s = ("—" if _best is None else
+                           ("%s（T+5 delta %+.2f，t=%+.2f）"
+                            % (_best[0], _best[2] or 0, _best[1])))
+
+                _rev_block = (
+                    '<div style="font-size:13px;font-weight:800;color:#f59e0b;margin:16px 0 6px;">'
+                    '⚠️ 反转块 24% 权重的真实样本量：只有 3~7 个截面</div>'
+                    '<div style="font-size:11px;color:#64748b;margin-bottom:8px;line-height:1.75;">'
+                    '模型给反转块 5 个维度合计 <b style="color:#e2e8f0;">24% 权重</b>'
+                    '（oversold60 / bias60 / rsi_rev / vol_pulse / overbought）。'
+                    '但实测这 5 维<b style="color:#f87171;">只在极少数截面上有值</b>'
+                    '——不是 78 个截面，而是 3~7 个。原因：这几维依赖 60 日回看窗口，'
+                    '而历史快照从 2026-06-26 才开始积累。'
+                    '</div>'
+                    '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:6px;">'
+                    '<thead><tr style="background:#1e293b;">'
+                    '<th style="padding:4px 8px;text-align:left;color:#94a3b8;">持有期</th>'
+                    '<th style="padding:4px 8px;color:#94a3b8;">IC 均值</th>'
+                    '<th style="padding:4px 8px;color:#94a3b8;">NW t</th>'
+                    '<th style="padding:4px 8px;color:#94a3b8;">有效截面数</th>'
+                    '</tr></thead><tbody>' + _rev_rows + '</tbody></table>'
+                    '<div style="background:#1c0a0a;border-left:3px solid #ef4444;padding:8px 10px;'
+                    'border-radius:4px;font-size:11px;color:#cbd5e1;line-height:1.8;">'
+                    '<b style="color:#f87171;">两个必须承认的问题：</b>'
+                    '<br>① <b>方向在 T+1 是反的。</b>反转块 T+1 的 IC 是 '
+                    + _f2(_ic1) + '（负值），T+5 才转正为 ' + _f2(_ic5)
+                    + '。也就是说「超跌反弹」在次日并不成立，要等一周。'
+                    '<br>② <b>该给多少权重，这个样本回答不了。</b>'
+                    '把反转块权重从 24% 扫到 0%（0/8%/12%/18%/24% 五档）、'
+                    '并同时试「按现权重」与「等权均值合成 1 维」两种构造，'
+                    '共 10 种配置，<b style="color:#f59e0b;">T+1/T+5/T+20 全部不显著</b>'
+                    '（|t| 最大 ' + (("%.2f" % abs(_best[1])) if _best else "—") + '）。'
+                    '最极端的一档：' + _best_s + '。'
+                    '<br><b style="color:#f87171;">结论：这 24% 是纯先验，不是拟合出来的。</b>'
+                    '本页不声称「权重已优化」；也不会因为扫描出某个档位「看起来更好」就改权重'
+                    '——在 3~7 个截面上挑最优点就是过拟合。'
+                    '</div>')
+            except Exception:
+                _rev_block = ""
+
             _v_sz_exc = "%+.2f" % (_sz38.get("exc") or 0)
+            _v_rd_exc = "%.2f" % (_rd38.get("exc") or 0)
             _v_rd_exc = "%.2f" % (_rd38.get("exc") or 0)
             _v_rd_win = "%.0f" % (_rd38.get("win") or 0)
             _v_rv_exc = "%+.2f" % (_rv38.get("exc") or 0)
@@ -4149,7 +4343,7 @@ try:
             科技（电子/计算机/通信/电力设备/国防军工/机械）占比
             <b style="color:#a3e635;">{_pr.get("tech_ratio", "—")}%</b>（{_pr.get("tech_actual", "—")} 只，自然结果，未加配额）
         </div>
-        ''' + _v38fac_block + _decay_block + _fals_block + _scan_block + _lock_block + '''
+        ''' + _v38fac_block + _decay_block + _live_block + _rev_block + _fals_block + _scan_block + _lock_block + '''
         </div>''')
 except Exception as _pre:
     pass
