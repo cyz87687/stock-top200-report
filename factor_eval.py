@@ -259,6 +259,13 @@ def snapshot_from_scored(path):
             v = r.get(k)
             if isinstance(v, (int, float)):
                 row[k] = v
+        # v3.8.2（P0）：母体口径必须落快照，否则「新旧母体分段体检」永远缺依据。
+        #   10-13 起 scored 已带 circ_mv（490/490），但此前只透传 FACTORS 字段被丢弃
+        #   → pool_excess_by_regime 全部走"无市值→跳过"，静默返回样本不足。
+        for _k in ("circ_mv", "total_mv", "amount"):
+            _v = r.get(_k)
+            if isinstance(_v, (int, float)) and _v > 0:
+                row[_k] = _v
         if len(row) > 2:
             rows.append(row)
     # v3.0 A2: 池口径留痕(扩池前后截面不可混算 IC; 旧文件无该字段 → 200)
@@ -842,6 +849,124 @@ def _eval_pool_excess(snapshots, tdays, px, hop=20, min_n=20):
             "verdict": verdict}
 
 
+def _eval_pool_excess_by_regime(snapshots, tdays, px, hop=20, min_n=5):
+    """按「母体口径」分段做池子负超额体检（v3.8.2 P0）。
+
+    动机：v3.8 把母体从「成交额 TOP」换成「全A 流通市值最小18%」，
+      但 `_eval_pool_excess` 把所有历史截面混在一起算 —— 旧母体的负 alpha
+      会把新母体的改善完全淹没，页面只能永远显示"负超额·稳定"，
+      无法回答"换母体到底有没有用"这个最核心的问题。
+
+    分段依据（v3.8.2 修订）：优先用池内流通市值中位 <60亿 判定为 SIZE 新母体；
+      若该快照缺 circ_mv 字段（10-12 及之前的旧 scored 未落盘），
+      **不丢弃**，回落到「日期分界」：晚于首个低市值截面的日期即判为新母体，
+      否则判为旧母体。两段都单独体检，绝不混算。
+
+    返回 {"legacy": {...}, "size_pool": {...}, "split_rule": ...}
+    """
+    # ---- 第一遍：推断母体切换日（首个池内流通市值中位 <60亿 的截面）----
+    _first_size_date = None
+    for s in snapshots:
+        _m = sorted([float(r.get("circ_mv") or 0) for r in s["rows"]
+                     if float(r.get("circ_mv") or 0) > 0])
+        if _m and (_m[len(_m) // 2] / 1e8) < 60.0:
+            _first_size_date = s["date"]
+            break
+
+    legacy, size_pool = [], []
+    _n_unknown = 0
+    for s in snapshots:
+        d0 = s["date"]
+        i0 = tdays.index(d0) if d0 in tdays else None
+        if i0 is None or i0 + hop >= len(tdays):
+            continue
+        d1 = tdays[i0 + hop]
+        # 本快照的池内市值中位（用 circ_mv 字段）
+        _mvs = sorted([float(r.get("circ_mv") or 0) for r in s["rows"]
+                       if float(r.get("circ_mv") or 0) > 0])
+        if _mvs:
+            _mv_med_yi = (_mvs[len(_mvs) // 2]) / 1e8
+            _is_size = _mv_med_yi < 60.0
+        elif _first_size_date is not None:
+            # 缺字段 → 按日期分界回填，避免把旧截面全部丢掉
+            _mv_med_yi = None
+            _is_size = d0 >= _first_size_date
+        else:
+            # 全历史无任何低市值截面（v3.8 母体从未跑过真实交易日）→ 全部归旧母体。
+            # 丢弃会让 legacy 样本归零，等于把 59 个可用截面白扔 —— 反而更不可用。
+            _mv_med_yi = None
+            _is_size = False
+            _n_unknown += 1
+        pv, av = [], []
+        for r in s["rows"]:
+            m = px.get(r["code"])
+            if not m:
+                continue
+            p0, p1 = m.get(d0), m.get(d1)
+            if p0 and p1 and p0 > 0:
+                pv.append(p1 / p0 - 1.0)
+        for m in px.values():
+            if not m:
+                continue
+            p0, p1 = m.get(d0), m.get(d1)
+            if p0 and p1 and p0 > 0:
+                av.append(p1 / p0 - 1.0)
+        if len(pv) < min_n or len(av) < min_n:
+            continue
+        pv.sort(); av.sort()
+
+        def _med(a):
+            n = len(a)
+            return a[n // 2] if n % 2 else (a[n // 2 - 1] + a[n // 2]) / 2.0
+        rec = (_med(pv) - _med(av), _mv_med_yi)
+        (size_pool if _is_size else legacy).append(rec)
+
+    def _sumup(arr, label):
+        if not arr:
+            return {"label": label, "n_days": 0, "median_excess_pct": None,
+                    "neg_ratio_pct": None, "mv_med_yi": None, "verdict": "样本不足"}
+        xs = sorted(v for v, _ in arr)
+        n = len(xs)
+        med = xs[n // 2] if n % 2 else (xs[n // 2 - 1] + xs[n // 2]) / 2.0
+        neg = 100.0 * sum(1 for v in xs if v < 0) / n
+        # 缺字段的截面 mv 为 None，只对有值的求中位，并披露覆盖数
+        _mvvalid = sorted(mv for _, mv in arr if isinstance(mv, (int, float)))
+        mv_med = _mvvalid[len(_mvvalid) // 2] if _mvvalid else None
+        if med < -0.02 and neg >= 75:
+            verdict = "负超额·稳定"
+        elif med < -0.01:
+            verdict = "负超额·偏弱"
+        elif med > 0.01:
+            verdict = "正超额"
+        else:
+            verdict = "中性"
+        return {"label": label, "n_days": n,
+                "median_excess_pct": round(med * 100, 2),
+                "neg_ratio_pct": round(neg, 1),
+                "mv_med_yi": round(mv_med, 1) if mv_med is not None else None,
+                "mv_known_days": len(_mvvalid),
+                "verdict": verdict}
+
+    _lg_s, _sz_s = _sumup(legacy, "成交额旧母体"), _sumup(size_pool, "SIZE 新母体")
+    # 结论必须数据驱动：新母体样本不足时明确说"无法判定"，不许暗示已改善
+    if not _sz_s.get("n_days"):
+        _concl = ("SIZE 新母体尚无已成熟的 %d 日窗口样本 → **无法判定换母体是否有效**。"
+                  "页面其余因子 IC 全部来自成交额旧母体，不可外推到新母体。" % hop)
+    else:
+        _concl = ("SIZE 新母体 %d 个入场日、中位超额 %+.2f pct、跑输占比 %.1f%%。"
+                  % (_sz_s["n_days"], _sz_s["median_excess_pct"], _sz_s["neg_ratio_pct"]))
+    return {
+        "split_rule": ("按每快照池内流通市值中位 <60亿 归为「SIZE 新母体」，否则归为「成交额旧母体」；"
+                       "缺 circ_mv 字段的旧截面按日期分界回填，不丢弃"),
+        "hop": hop,
+        "first_size_date": _first_size_date,
+        "n_unclassified": _n_unknown,
+        "legacy": _lg_s,
+        "size_pool": _sz_s,
+        "conclusion": _concl,
+    }
+
+
 def _risk_gate(rec_ic, factors, collinearity, tradable=None, pool_excess=None):
     """预测力安全门（量化审计 P0/P1）：基于实测 IC 决定「能否机械跟单」。
     规则（数据驱动、非拟合）：
@@ -1018,7 +1143,19 @@ def _norm4(w):
 
 
 def _composite_ic(snapshots, w4, h, tdays, px, max_base_idx=None, dates_only=None):
-    """给定 4 维权重（自动归一），计算复合总分的 IC 序列与聚合指标。"""
+    """给定权重（自动归一），计算复合总分的 IC 序列与聚合指标。
+
+    v3.9（P0 修复）：原实现用 `all(isinstance(r.get(f)) for f in OPT_DIMS)` 要求
+      **全部 9 维同时非空**。但 reversal 块 5 维 + theme_intrinsic + attention
+      只在 9 个快照中出现（10-13 起才落盘），其余 76 个快照缺这 7 维
+      → 复合 IC 实际只用了 9 个截面（h=20 时甚至为 0），
+      与「单因子 IC 用 78 个截面」完全不可比，页面上的"当前权重复合 IC"
+      因此严重低估/失真。
+
+    修复口径：**逐行按可用维度重新归一化权重**（缺维不参与，权重在剩余维度上
+      重新分配），只要求 score_fund 存在且至少 2 个维度可用。
+      这样同一份快照集能算出可比的 n，且不会因为缺维而丢行。
+    """
     wn = _norm4(w4)
     fwd = _fwd_returns(snapshots, h, tdays, px, max_base_idx)
     ics, spreads, dates = [], [], []
@@ -1028,9 +1165,17 @@ def _composite_ic(snapshots, w4, h, tdays, px, max_base_idx=None, dates_only=Non
         base = next(s for s in snapshots if s["date"] == d0)
         fv, rv = [], []
         for r in base["rows"]:
-            if r["code"] in rets and all(isinstance(r.get(f), (int, float)) for f in OPT_DIMS):
-                fv.append(sum(wn[f] * r[f] for f in OPT_DIMS))
-                rv.append(rets[r["code"]])
+            if r["code"] not in rets:
+                continue
+            # 本行实际可用的维度（有数值的）
+            _avail = [f for f in OPT_DIMS if isinstance(r.get(f), (int, float))]
+            if "score_fund" not in _avail or len(_avail) < 2:
+                continue
+            _wsum = sum(wn[f] for f in _avail)
+            if _wsum <= 1e-9:
+                continue
+            fv.append(sum(wn[f] / _wsum * r[f] for f in _avail))
+            rv.append(rets[r["code"]])
         ic = rank_ic(fv, rv)
         if ic is not None:
             ics.append(ic)
@@ -1377,6 +1522,157 @@ def main():
         _tv, _tc, _tn = _overall_verdict(_tr_net)
         tradable["verdict"], tradable["verdict_color"], tradable["verdict_note"] = _tv, _tc, _tn
 
+    # v3.9（P0）：按「当前权重现算」的可交易复合分 —— 这才是与 fund 单维可比的基准。
+    #   问题：tradable_ic 用的是快照里的 total 字段，而 total 跨越 4→5→10 维三次
+    #   口径变更（分段混合），用它去和「今天的 fund 单维」比高低是错的口径对比。
+    #   必须在同一时刻用同一套权重重算，才能回答"加权到底加分还是减分"。
+    tradable_w = None
+    _wfw, _wmeta2 = load_weights()
+    if _wfw and opens:
+        try:
+            _wr = {k: float(_wfw.get(k) or 0.0) for k in OPT_DIMS}
+            _ws = sum(_wr.values()) or 1.0
+            _wr = {k: v / _ws for k, v in _wr.items()}
+            _wr_snaps = []
+            for _s in aligned:
+                _rows = []
+                for _r in _s["rows"]:
+                    _av = [f for f in OPT_DIMS if isinstance(_r.get(f), (int, float))]
+                    if "score_fund" not in _av or len(_av) < 2:
+                        continue
+                    _ws2 = sum(_wr[f] for f in _av)
+                    if _ws2 <= 1e-9:
+                        continue
+                    _rows.append({"code": _r["code"],
+                                  "total": sum(_wr[f] / _ws2 * _r[f] for f in _av)})
+                if _rows:
+                    _wr_snaps.append({"date": _s["date"], "rows": _rows})
+            _wr_net = _eval_tradable_ic(_wr_snaps, list(HORIZONS), tdays, px, opens,
+                                        cost_bps=TRADABLE_COST_BPS)
+            _wv3, _wc3, _wn3 = _overall_verdict(_wr_net)
+            tradable_w = {
+                "base": "按 factor_weights.json 当前权重、逐行可用维度归一后重算的复合分",
+                "cost_bps_roundtrip": TRADABLE_COST_BPS,
+                "weights_used": {k: round(v, 4) for k, v in _wr.items()},
+                "horizons": _wr_net,
+                "verdict": _wv3, "verdict_color": _wc3, "verdict_note": _wn3,
+                "note": ("与 tradable_ic 的区别：tradable_ic 用的是快照内 total 字段，"
+                         "该字段跨越 4→5→10 维三次口径变更，属分段混合口径；"
+                         "本项用当前权重在同一批截面上重算，口径统一，"
+                         "可直接与 tradable_fund_ic 对比。"),
+            }
+        except Exception as _ew:
+            tradable_w = {"error": str(_ew)[:120]}
+
+    # v3.8.2（P1）：单维可交易净收益 —— 只对 score_fund（唯一 Bonferroni 显著维度）算。
+    #   动机：页面已披露「综合分头组净收益三期全为负」，但用户真正要知道的是
+    #   「只买基本面最好的那一组，能不能赚钱」。综合分为负可能是被 22% 消息面
+    #   与 44% 先验维度拖累，掩盖了 fund 本身的正收益。不算这一项 = 该结论无法回答。
+    tradable_fund = None
+    if opens:
+        try:
+            _fd_snaps = [{"date": s["date"],
+                          "rows": [{"code": r["code"], "total": r.get("score_fund")}
+                                   for r in s["rows"]]}
+                         for s in aligned]
+            _fd_net = _eval_tradable_ic(_fd_snaps, list(HORIZONS), tdays, px, opens,
+                                        cost_bps=TRADABLE_COST_BPS)
+            _fd_gross = _eval_tradable_ic(_fd_snaps, list(HORIZONS), tdays, px, opens,
+                                          cost_bps=0.0)
+            for h in HORIZONS:
+                _g2, _n2 = _fd_gross[str(h)], _fd_net[str(h)]
+                _n2["gross_ic_mean"] = _g2.get("ic_mean")
+            _fv2, _fc2, _fn2 = _overall_verdict(_fd_net)
+            # v3.9（P1）：月度漂移 —— 全样本 IC 会掩盖「因子正在失效」。
+            #   实测 6 月 IC=+0.151 → 10 月 IC=-0.077，若只看全样本均值会误判为"一直有效"。
+            _monthly = []
+            _bym = {}
+            for _s in aligned:
+                _bym.setdefault(_s["date"][:7], []).append(_s)
+            for _m in sorted(_bym):
+                # 注意：必须逐月构造该月**全部**截面；早先误用外层残留的 _s
+                # 导致每个月都在评估同一个快照 → 月度序列恒为空/重复。
+                _msnaps = [{"date": _s2["date"],
+                            "rows": [{"code": r["code"], "total": r.get("score_fund")}
+                                     for r in _s2["rows"]]}
+                           for _s2 in _bym[_m]]
+                try:
+                    _mr = _eval_tradable_ic(_msnaps, [5], tdays, px, opens,
+                                            cost_bps=TRADABLE_COST_BPS)["5"]
+                    if _mr.get("ic_mean") is not None:
+                        _monthly.append({"month": _m, "n": _mr.get("n"),
+                                         "ic": _mr.get("ic_mean"),
+                                         "win_rate": _mr.get("win_rate")})
+                except Exception:
+                    continue
+            # v3.9（P0）：月度超额 —— 区分「因子失效」与「市场逆风」。
+            #   仅看 IC 转负无法判断性质：若同月池内等权也大跌、头组跌得少，是逆风；
+            #   若头组跌得比池内更多，才是因子失效。必须同时给出池内基准。
+            _mex = []
+            for _mm in sorted(_bym):
+                _sub = _bym[_mm]
+                _pools = []
+                for _s3 in _sub:
+                    _i0 = tdays.index(_s3["date"]) if _s3["date"] in tdays else None
+                    if _i0 is None or _i0 + 6 >= len(tdays):
+                        continue
+                    _db, _ds = tdays[_i0 + 1], tdays[_i0 + 6]
+                    _rr = []
+                    for _row in _s3["rows"]:
+                        _mo = opens.get(_row["code"])
+                        if not _mo:
+                            continue
+                        _p0, _p1 = _mo.get(_db), _mo.get(_ds)
+                        if _p0 and _p1 and _p0 > 0:
+                            _rr.append((_p1 - _p0) / _p0 * 100.0 - TRADABLE_COST_BPS / 100.0)
+                    if _rr:
+                        _pools.append(sum(_rr) / len(_rr))
+                _mon = next((x for x in _monthly if x["month"] == _mm), None)
+                if not _pools or not _mon:
+                    continue
+                _pm = sum(_pools) / len(_pools)
+                _hm = _mon.get("ic") and None  # 占位，真正 head 由下方单独算
+                _mex.append({"month": _mm, "n": len(_pools),
+                             "pool_mean_pct": round(_pm, 2)})
+            # 头部组月度净收益（与 pool_mean 同口径）单独算，供超额对比
+            for _e in _mex:
+                _sub = _bym[_e["month"]]
+                _heads = []
+                for _s4 in _sub:
+                    _i0 = tdays.index(_s4["date"]) if _s4["date"] in tdays else None
+                    if _i0 is None or _i0 + 6 >= len(tdays):
+                        continue
+                    _db, _ds = tdays[_i0 + 1], tdays[_i0 + 6]
+                    _fv, _rv = [], []
+                    for _row in _s4["rows"]:
+                        _v = _row.get("score_fund")
+                        _mo = opens.get(_row["code"])
+                        if not isinstance(_v, (int, float)) or not _mo:
+                            continue
+                        _p0, _p1 = _mo.get(_db), _mo.get(_ds)
+                        if _p0 and _p1 and _p0 > 0:
+                            _fv.append(_v)
+                            _rv.append((_p1 - _p0) / _p0 * 100.0 - TRADABLE_COST_BPS / 100.0)
+                    if len(_fv) < 20:
+                        continue
+                    _ord = sorted(range(len(_fv)), key=lambda i: -_fv[i])
+                    _g = max(1, len(_fv) // 5)
+                    _heads.append(sum(_rv[i] for i in _ord[:_g]) / _g)
+                if _heads:
+                    _e["head_mean_pct"] = round(sum(_heads) / len(_heads), 2)
+                    _e["excess_pct"] = round(_e["head_mean_pct"] - _e["pool_mean_pct"], 2)
+            tradable_fund = {
+                "base": "仅按 score_fund（基本面）排序，t+1 开盘买入头组 / 持有 h 日后开盘卖出",
+                "cost_bps_roundtrip": TRADABLE_COST_BPS,
+                "horizons": _fd_net,
+                "verdict": _fv2, "verdict_color": _fc2, "verdict_note": _fn2,
+                "monthly_drift": _monthly,
+                "monthly_excess": _mex,
+                "note": "单维口径：剥离消息面/反转块/先验维度的影响，回答「只买基本面头组能否赚钱」。",
+            }
+        except Exception:
+            tradable_fund = None
+
     # 当前生效权重 vs 先验的复合 IC（若权重文件存在）
     w_now, w_meta = load_weights()
     current_cmp = None
@@ -1387,6 +1683,13 @@ def main():
     # v3.6（量化审计 P0）：共线性收敛 + 池子负超额体检 + 预测力安全门
     collin = _collinearity_summary(corr)
     pool_excess = _eval_pool_excess(aligned, tdays, px, hop=20)
+    # v3.8.2 P0：母体口径切换（成交额 TOP → 全A SIZE 选池）后，
+    #   上面这个 pool_excess 混入了历史旧母体截面，结论**必然仍是"负超额"**，
+    #   无法回答"新母体到底修好了没有"。故按口径分段重算，给新母体一个独立结论。
+    try:
+        pool_excess_by_regime = _eval_pool_excess_by_regime(aligned, tdays, px, hop=20)
+    except Exception as _pbe:
+        pool_excess_by_regime = {"error": str(_pbe)}
     gate = _risk_gate(rec_ic, factors, collin, tradable, pool_excess)
 
     out = {
@@ -1417,7 +1720,10 @@ def main():
         "factors": factors,
         "recommendation_ic": rec_ic,
         "tradable_ic": tradable,
+        "tradable_fund_ic": tradable_fund,
+        "tradable_w_ic": tradable_w,
         "pool_excess": pool_excess,
+        "pool_excess_by_regime": pool_excess_by_regime,
         "factor_correlation": corr,
         "collinearity": collin,
         "risk_gate": gate,
