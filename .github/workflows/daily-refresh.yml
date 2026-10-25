@@ -289,6 +289,18 @@ jobs:
               echo "[$(date -u '+%H:%M:%S')] ⚠️ audit_round20 failed, architecture evaluation holds stale data" >> $LOG
             fi
 
+            # Step 3.961: fund 拆分「质量因子25%+成长因子20%」可行性实证（老大 2026-10-25）
+            #   16 子因子（ROE/ROIC/ROA/OCF-NI/收现比/应计/OCFG/盈利波动/毛利波动/负债率/商誉
+            #   + 扣非增速/CAGR3/营收增速/单季环比/增速差分）从 EM 财务摘要缓存 point-in-time 回填，
+            #   子因子 IC + 族得分 IC + 行业内中性化 + 相关性 + 7 个权重变体合并损益。
+            # ⚠️ 必须在 factor_eval.py 之后：读 factor_history.json 全部截面与价格库。
+            echo "[$(date -u '+%H:%M:%S')] Running audit_round21 (quality/growth split feasibility) ..." >> $LOG
+            if timeout 900 python3 audit_round21.py >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Quality/growth split feasibility updated" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ audit_round21 failed, quality/growth split holds stale data" >> $LOG
+            fi
+
             # Step 3.965: 多因子精选组合（≤10 只）+ 回测 → sector/mf_pick_<date>.json + mf_backtest.json
             # 【v3.9 新增】解决「候选组合 20 只无法执行」问题；权重由 factor_ic.json 证据反推，非手填。
             # 【v4.3 新增】只选当日现价落在买入区间内的个股（老大第 2 项要求）。
@@ -460,10 +472,10 @@ jobs:
           # v4.3 新增脚本：多因子买区过滤 / 持仓周期回测（老大 2026-10-25 三项要求）
           # round18：消息面/题材因子诊断（区分度、行业失衡、替代因子实证）
           git add audit_round14.py audit_round14b.py audit_round15.py audit_round16.py \
-                audit_round17.py audit_round18.py audit_round19.py audit_round20.py selfcheck_pipeline.py 2>/dev/null || true
+                audit_round17.py audit_round18.py audit_round19.py audit_round20.py audit_round21.py selfcheck_pipeline.py 2>/dev/null || true
           # v4.3 审计产物（*.json 被 gitignore，必须 -f）：报告层与因子日报的数据源
           git add -f audit_round14.json audit_round14b.json audit_round15.json audit_round16.json \
-                audit_round17.json audit_round18.json audit_round19.json audit_round20.json 2>/dev/null || true
+                audit_round17.json audit_round18.json audit_round19.json audit_round20.json audit_round21.json 2>/dev/null || true
           # 记录 prune 产生的删除(仅限已跟踪的历史报告/评分/组合文件)
           git add -u top200_report_2026-*.html 2>/dev/null || true
           git add -Au -- top200_scored_*.json sector/portfolio_*.json sector/sector_momentum_*.json 2>/dev/null || true
