@@ -267,6 +267,15 @@ jobs:
                 cp "$LATEST_HTML" index.html
                 echo "[$(date -u '+%H:%M:%S')] ✅ Copied $LATEST_HTML → index.html" >> $LOG
               fi
+              # Step 4.5: v4.0 因子日报（Markdown 存档，不上线）
+              #   主页面已按老大指令「只呈现结论」，全部计算过程/证伪检验迁至本报告。
+              #   失败不阻断主链（日报是底稿而非决策产物）。
+              echo "[$(date -u '+%H:%M:%S')] Running gen_factor_daily.py ..." >> $LOG
+              if python3 gen_factor_daily.py >> $LOG 2>&1; then
+                echo "[$(date -u '+%H:%M:%S')] ✅ Factor daily report generated" >> $LOG
+              else
+                echo "[$(date -u '+%H:%M:%S')] ⚠️ Factor daily report failed (non-blocking)" >> $LOG
+              fi
               SUCCESS=1
               break
             else
@@ -322,6 +331,11 @@ jobs:
           prune_keep "sector/sector_momentum_[0-9]*.json" $KEEP_OTHER
           # 3.5) 每日 AI 焦点池 (保留最新1)
           prune_keep "focus_pool_[0-9]*.json" $KEEP_OTHER
+          # 3.6) v4.0 因子日报存档 (保留最近 30 份，供权重优化回溯)
+          mkdir -p reports
+          prune_keep "reports/factor_[0-9]*.md" 30
+          #   日报的本地 HTML 预览不入库（老大要求「Markdown 存档，不上线」）
+          rm -f reports/factor_[0-9]*.html 2>/dev/null || true
           # 4) 清理备份/临时文件
           rm -f *.bak *.bak_* *.prebak 2>/dev/null || true
           echo "--- 保留后清单 ---"
@@ -345,6 +359,9 @@ jobs:
           # 【v3.5.5】factor_weights.json 每日由 --optimize-weights 重估写入, 必须随链路推送
           git add -f factor_weights.json
           git add enhance_scores.py gen_report_top200.py generate_ai_assessment.py factor_eval.py
+          # v4.0 因子日报生成器 + 每日存档（Markdown，不上线）
+          git add gen_factor_daily.py 2>/dev/null || true
+          git add -f reports/factor_*.md 2>/dev/null || true
           git add sector_momentum_daily.py apply_sector_momentum.py pick_portfolio.py gen_portfolio_report.py fetch_sw_map.py selfcheck_pipeline.py
           # v3.9 新增脚本
           git add pick_multifactor.py gen_mf_backtest.py backtest_multifactor.py 2>/dev/null || true
