@@ -233,9 +233,16 @@ def src_strong_pool(date_str, n=20):
 # 主力池对照：读当日 scored json，得到 code → 池内字段（用于 in_main_pool 标记）
 # ---------------------------------------------------------------
 def load_scored_map(here, date_str, scored_path=None):
-    """→ (set(code6), dict(code6 → {name, sector, rating, total, price, pct_chg}))
+    """→ (set(code6), dict(code6 → {name, sector, rating, total, price, pct_chg}), meta)
 
-    优先显式路径，其次同日 top200_scored_<date>.json，最后取最新一份。
+    ⚠️ 2026-10-25 修 P0：原实现「同名文件不存在就回退到最新一份」且**不校验文件内 date**，
+    导致 10-23 焦点池拿到了 10-22 的 scored（当日 scored 16:32 还没生成，mtime 是次日 14:36），
+    29 只标的的 price/pct_chg 全部错成前一日 —— 宇树科技显示 520.00 / +0.97%，
+    真实是 624.00 / +20.00%（20CM 涨停）。涨跌方向都可能反（天娱数科 -7.71% → 实际 +10%）。
+
+    现在规则收紧：**只接受内部 date == date_str 的 scored**。
+    找不到就返回空 map，由调用方显式标注「行情不可用」，绝不静默用旧数据顶上。
+    meta 返回 {"source": 文件名 or None, "date": 文件内 date or None, "ok": bool}
     """
     cands = []
     if scored_path:
@@ -243,30 +250,43 @@ def load_scored_map(here, date_str, scored_path=None):
     cands.append(os.path.join(here, f"top200_scored_{date_str}.json"))
     try:
         import glob
+        # 兜底候选也保留，但下面必须通过 date 校验才会被采用
         latest = sorted((f for f in glob.glob(os.path.join(here, "top200_scored_*.json"))
                          if ".bak" not in f and "_watch_" not in f), reverse=True)
-        cands += latest[:1]
+        cands += latest[:3]
     except Exception:
         pass
+
+    skipped = []
     for p in cands:
         try:
-            if p and os.path.exists(p):
-                data = json.load(open(p, encoding='utf-8'))
-                m = {}
-                for r in (data.get("results") or []):
-                    c6 = norm_code6(r.get("code"))
-                    if not c6:
-                        continue
-                    m[c6] = {"name": r.get("name"),
-                             "sector": r.get("sector"),
-                             "rating": r.get("rating"),
-                             "total": r.get("total"),
-                             "price": r.get("price"),
-                             "pct_chg": r.get("pct_chg")}
-                return set(m.keys()), m
+            if not p or not os.path.exists(p):
+                continue
+            data = json.load(open(p, encoding='utf-8'))
+            fdate = str(data.get("date") or "").strip()
+            if fdate != date_str:
+                # 关键防护：日期不符一律跳过，并记录以便上层告警
+                skipped.append((os.path.basename(p), fdate or "无date"))
+                continue
+            m = {}
+            for r in (data.get("results") or []):
+                c6 = norm_code6(r.get("code"))
+                if not c6:
+                    continue
+                m[c6] = {"name": r.get("name"),
+                         "sector": r.get("sector"),
+                         "rating": r.get("rating"),
+                         "total": r.get("total"),
+                         "price": r.get("price"),
+                         "pct_chg": r.get("pct_chg")}
+            meta = {"source": os.path.basename(p), "date": fdate, "ok": True,
+                    "skipped": skipped}
+            return set(m.keys()), m, meta
         except Exception:
             continue
-    return set(), {}
+
+    meta = {"source": None, "date": None, "ok": False, "skipped": skipped}
+    return set(), {}, meta
 
 
 # ---------------------------------------------------------------
@@ -391,7 +411,16 @@ def main():
         print(f'  ⚠️ 未找到 {os.path.basename(search_path)}（可先 --emit-template 生成模板）')
 
     # ---- 主力池对照（in_main_pool 标记 + 评级/板块富集）----
-    pool_codes, pool_map = load_scored_map(HERE, date_str, args.scored)
+    pool_codes, pool_map, pool_meta = load_scored_map(HERE, date_str, args.scored)
+
+    if pool_meta.get("ok"):
+        print(f"  ✅ 行情来源校验通过: {pool_meta['source']} (内部 date={pool_meta['date']})")
+    else:
+        print(f"  🚨 未找到内部 date={date_str} 的 scored 文件 —— "
+              f"本焦点池的 price/pct_chg 将全部置空，绝不回退到旧日期行情！")
+        if pool_meta.get("skipped"):
+            print(f"     已拒绝的候选: " +
+                  ", ".join(f"{n}(date={d})" for n, d in pool_meta["skipped"]))
 
     ranked = sorted(agg.values(), key=lambda x: -x['score'])[:args.top]
     for i, it in enumerate(ranked, 1):
@@ -422,6 +451,10 @@ def main():
         'ai_summary': ai_summary,
         'n_in_pool': n_in,
         'n_out_pool': len(ranked) - n_in,
+        # 行情口径留痕：报告层据此判断是否显示涨跌幅
+        'quote_source': pool_meta.get('source'),
+        'quote_date': pool_meta.get('date'),
+        'quote_ok': bool(pool_meta.get('ok')),
         'focus': ranked,
     }
 
