@@ -24,12 +24,7 @@ W_NEWS, W_TECH, W_FUND, W_THEME = 0.20, 0.20, 0.30, 0.30
 # 计算 total 必须走十维公式，禁止再用旧的四维 0-20 量纲公式——
 # 否则单独重跑本脚本会把 total 打回 20 分制，与 apply_sector_momentum 的
 # 百分制十维口径冲突（历史事故：页面出现 11~18 与 28~93 两套量纲并存）。
-_W_PRIOR_10D = {
-    "score_fund": 0.34, "score_news": 0.22, "score_sector": 0.10,
-    "score_oversold60": 0.055, "score_bias60": 0.055, "score_rsi_rev": 0.055,
-    "score_vol_pulse": 0.055, "score_overbought": 0.02,
-    "score_theme_intrinsic": 0.08, "score_attention": 0.02,
-}
+_W_PRIOR_10D = {"score_fund": 0.32, "score_news": 0.16, "score_theme_neg": 0.12, "score_size": 0.12, "score_sector": 0.10, "score_oversold60": 0.045, "score_bias60": 0.045, "score_rsi_rev": 0.045, "score_vol_pulse": 0.045, "score_overbought": 0.0, "score_theme_intrinsic": 0.0, "score_attention": 0.0}
 
 
 def _load_w10():
@@ -48,14 +43,26 @@ def _load_w10():
 
 
 def _calc_total_10d(r):
-    """按十维权重重算百分制 total（与 apply_sector_momentum 的 <has_10d> 分支一致）。"""
+    """按十维权重重算百分制 total（与 apply_sector_momentum 的 <has_10d> 分支一致）。
+
+    v4.1: 新增 score_theme_neg / score_size 两维。score_size 可能为 None（该股缺市值），
+    此时**不能**按 0 计入 —— 0 分会被误读成「市值最大」，等于凭空扣分。
+    改为从分母里剔除该权重，按可用维度归一（与 step2 完全同口径）。
+    """
     w = _load_w10()
     s = 0.0
+    denom = 0.0
     for k, v in w.items():
         if v <= 0:
             continue
-        s += float(r.get(k) or 0) * v
-    return round(s * 20, 2)
+        val = r.get(k)
+        if val is None:
+            continue          # 缺该维度 → 不计入分母，避免凭空扣分
+        s += float(val) * v
+        denom += v
+    if denom <= 0:
+        return 0.0
+    return round(s / denom * 20, 2)
 
 
 def _rate_100(total):

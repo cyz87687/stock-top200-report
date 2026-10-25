@@ -261,6 +261,18 @@ def load_sw_l1():
         return {}
 
 
+def _log_sd(vals):
+    """流通市值的对数标准差 —— 度量「池内 SIZE 还有多少区分度」。
+    v4.1 用它对冲一个隐蔽陷阱：若进池时已按市值截断，池内 SIZE 就退化成
+    常数，评分层再加 SIZE 权重毫无意义（旧实现池内 log-SD 仅 0.276）。"""
+    import math
+    xs = [math.log(float(v)) for v in vals if float(v or 0) > 0]
+    if len(xs) < 2:
+        return 0.0
+    m = sum(xs) / len(xs)
+    return (sum((x - m) ** 2 for x in xs) / (len(xs) - 1)) ** 0.5
+
+
 def apply_pool_rules(pool_norm, cfg=None):
     """v3.8 全A 母体规则选池：**SIZE 小市值**为主，剔除低价口径。
 
@@ -327,9 +339,17 @@ def apply_pool_rules(pool_norm, cfg=None):
     cfg = cfg or (_POOL_CFG.get("pool_rules") or {})
     stats = {"enabled": bool(cfg.get("enabled", True)),
              "universe": cfg.get("universe", "all_a"),
+             # v4.1（P1-2）：母体版本必须落盘。下游「新旧母体分段体检」原先靠
+             #   池内流通市值中位 <60亿 去**猜**母体归属，而 v4.1 分层抽样后
+             #   池内市值中位实测 85.9 亿（跨度 4.1~9694 亿）——一旦新母体上线，
+             #   猜法必然把它误判成旧母体，「分段体检」将再次静默失效。
+             #   改为显式版本号传递，归因不再依赖阈值猜测。
+             "version": cfg.get("version", "unknown"),
+             "size_as_factor": bool(cfg.get("size_as_factor", False)),
              "in": len(pool_norm), "out": len(pool_norm),
              "sort_key": cfg.get("sort_key", "mv"),
              "size_quantile": cfg.get("size_quantile", 0.18),
+             "sample_strata": cfg.get("sample_strata", 5),
              "min_amount": cfg.get("min_amount", 1.0e8),
              "min_mktcap": cfg.get("min_mktcap", 25e8),
              "price_floor": cfg.get("price_floor", 2.0),
@@ -390,24 +410,66 @@ def apply_pool_rules(pool_norm, cfg=None):
         stats["dropped_high_mom"] = before - len(kept)
     stats["after_mom_filter"] = len(kept)
 
-    # —— 排序键：SIZE（流通市值升序，越小越好）或旧口径 price ——
+    # —— 进池方式：v4.1「分层抽样」 ——
+    # ⚠️ 2026-10-25 P0 改造（老大裁决）：SIZE 从此**不再是筛选条件**，而是评分加分项。
+    #   旧实现 `n_take = min(len, max(POOL, int(len*q)))` 有两个致命问题：
+    #     ① size_quantile 静默失效——max(POOL,·) 在候选<2778 只时恒取 POOL，
+    #        今日候选 2520→int(2520*0.18)=453 → max(500,453)=500，实际取 19.84%；
+    #        某日候选 1000 只则取 500=50%，参数随候选数漂移，不可复现。
+    #     ② 把市值大的全剔掉后，池内市值 log-SD 仅 0.276（4.1~39.9 亿），
+    #        SIZE 若改评分项在池内**毫无区分度**（全集 log-SD 1.112）——自相矛盾。
+    #   分层抽样：按流通市值分 n_strata 档等量抽样，保留完整市值跨度（log-SD→1.10），
+    #   使「小市值优先」能在评分层真实发挥作用，同时池子规模可控（step2 时限约束）。
     key_name = "circ_mv" if stats["sort_key"] == "mv" else "price"
     by_key = sorted(kept, key=lambda s: float(s.get(key_name) or 0))
-    q = float(stats["size_quantile"] if stats["sort_key"] == "mv"
-              else cfg.get("price_quantile", 0.18) or 0.18)
-    n_take = min(len(by_key), max(POOL, int(len(by_key) * q)))
-    chosen = by_key[:n_take]
-    # 若不足 pool_size（极端情况），用成交额补齐
-    if len(chosen) < POOL:
-        cs = {s["code"] for s in chosen}
-        rest = [s for s in kept if s["code"] not in cs]
-        rest.sort(key=lambda s: -float(s.get("amount") or 0))
-        chosen = chosen + rest[:POOL - len(chosen)]
+    n_strata = int(cfg.get("sample_strata", 5) or 0)
+    if n_strata > 1 and len(by_key) > POOL:
+        chosen, _seen = [], set()
+        per = max(1, POOL // n_strata)
+        N = len(by_key)
+        for k in range(n_strata):
+            lo, hi = N * k // n_strata, N * (k + 1) // n_strata
+            blk = by_key[lo:hi]
+            if not blk:
+                continue
+            take = blk if len(blk) <= per else [blk[int(i * len(blk) / per)]
+                                                for i in range(per)]
+            for s in take:
+                c = s.get("code")
+                if c and c not in _seen:
+                    _seen.add(c)
+                    chosen.append(s)
+        # 若分层后不足 POOL，按成交额补齐（只在极端候选稀少时触发）
+        if len(chosen) < POOL:
+            rest = [s for s in kept if s.get("code") not in _seen]
+            rest.sort(key=lambda s: -float(s.get("amount") or 0))
+            chosen += rest[:POOL - len(chosen)]
+        stats["sampling"] = "stratified"
+        stats["sample_strata"] = n_strata
+    else:
+        # 候选不足 POOL：全取（不截断，保留全部符合条件的标的）
+        chosen = by_key[:POOL]
+        stats["sampling"] = "all" if len(by_key) <= POOL else "size_cut"
+        stats["sample_strata"] = 0
     chosen = chosen[:POOL]
     chosen.sort(key=lambda s: -float(s.get("amount") or 0))
     for i, s in enumerate(chosen, 1):
         s["rank"] = i
     stats["out"] = len(chosen)
+    # 落盘「实际覆盖的全A市值分位」，杜绝"配 18% 实取 40%"这类口径漂移不可审计
+    try:
+        _all_mv = sorted(float(x.get("circ_mv") or 0) for x in pool_norm
+                         if float(x.get("circ_mv") or 0) > 0)
+        _sel_mv = sorted(float(s.get("circ_mv") or 0) for s in chosen
+                         if float(s.get("circ_mv") or 0) > 0)
+        if _all_mv and _sel_mv:
+            _thr = _sel_mv[-1]
+            _pct = 100.0 * sum(1 for v in _all_mv if v <= _thr) / len(_all_mv)
+            stats["mv_coverage_pct"] = round(_pct, 1)
+            stats["mv_upper_yi"] = round(_thr / 1e8, 1)
+            stats["mv_log_sd"] = round(_log_sd(_sel_mv), 3)
+    except Exception:
+        pass
     if stats["sort_key"] == "mv":
         mvs = sorted([float(s.get("circ_mv") or 0) for s in chosen])
         prices = sorted([float(s.get("price") or 0) for s in chosen])

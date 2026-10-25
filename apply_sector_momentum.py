@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
-"""将「板块60日动量 / 板块10日动量」并入评分模型 (stock-scorer v3.0-10dim)
+"""将「板块60日动量 / 板块10日动量」并入评分模型 (stock-scorer)
 
-v3.0-10dim（2026-10-13，依据《因子排名与10维评分模型设计_2026-10-13》）：
-十维总分（权重来自 factor_weights.json，缺失/非法回退十维先验）：
-  基本面0.18 | 消息0.18 | 板块动量0.10 | 超跌60 0.12 | 乖离低位0.10 |
-  RSI反转0.06 | 量能反向0.10 | 超买反向0.06 | 题材内禀0.05 | 关注度0.05  (合计1.0)
-  total = Σ(score_i × w_i) × 4
+⚠️ 权重不再写在本文件 —— 唯一来源是 factor_weights.json（当前 v4.2-lag-robust）：
+    fund 0.32 | news 0.16 | theme_neg 0.12 | size 0.12 | sector 0.10 |
+    反转块 4×0.045 | overbought/theme_intrinsic/attention 0
+   合计 1.0。文件缺失或非法时回退下列 _W_PRIOR_10D 硬编码先验。
+   本段此前写成 v3.0 的「基本面0.18 | 消息0.18 | …」静态清单，早已与代码脱钩，
+   会误导维护者以为是权威口径 —— 改为指向单一来源，避免再次失同步。
+
+total = Σ(score_i × w_i) / Σ(w_i | 该股可用) × 20   ← 百分制
+  注意：分母按「该股实际可用维度」归一，缺维（如无 circ_mv 时的 score_size）
+  从分母剔除，不按 0 计入 —— 按 0 会被误读为「市值最大」，等于凭空扣分。
+
 技术面/题材旧维度已拆解：均线/MACD/动量退出评分（三重负证据，仅 tech detail 展示）；
 题材拆为内禀/关注度两维，板块动量子项归并 score_sector。
 
@@ -34,12 +40,7 @@ SECTOR_DIR = os.path.join(HERE, 'sector')
 MAP_PATH = os.path.join(SECTOR_DIR, 'sw_map.json')
 
 # v3.6-fund-led: 基本面主导先验（与 factor_weights.json weights 同源，回退时必须一致）
-_W_PRIOR_10D = {
-    "score_fund": 0.34, "score_news": 0.22, "score_sector": 0.10,
-    "score_oversold60": 0.055, "score_bias60": 0.055, "score_rsi_rev": 0.055,
-    "score_vol_pulse": 0.055, "score_overbought": 0.02,
-    "score_theme_intrinsic": 0.08, "score_attention": 0.02,
-}
+_W_PRIOR_10D = {"score_fund": 0.32, "score_news": 0.16, "score_theme_neg": 0.12, "score_size": 0.12, "score_sector": 0.10, "score_oversold60": 0.045, "score_bias60": 0.045, "score_rsi_rev": 0.045, "score_vol_pulse": 0.045, "score_overbought": 0.0, "score_theme_intrinsic": 0.0, "score_attention": 0.0}
 # 旧五维 → 十维映射（兼容历史 scored json 重跑）
 _W_MAP_FROM_5D = {
     "score_fund": [("score_fund", 1.0)],
@@ -178,16 +179,35 @@ def main():
             # v3.0-10dim: 十维总分（新字段缺失的历史 scored json 按旧五维公式回退）
             _has_10d = any('score_oversold60' in r for r in results)
             if _has_10d:
-                total = round((float(r.get('score_fund') or 0) * _FW["score_fund"]
-                               + float(r.get('score_news') or 0) * _FW["score_news"]
-                               + float(r.get('score_oversold60') or 0) * _FW["score_oversold60"]
-                               + float(r.get('score_bias60') or 0) * _FW["score_bias60"]
-                               + float(r.get('score_rsi_rev') or 0) * _FW["score_rsi_rev"]
-                               + float(r.get('score_vol_pulse') or 0) * _FW["score_vol_pulse"]
-                               + float(r.get('score_overbought') or 0) * _FW["score_overbought"]
-                               + float(r.get('score_theme_intrinsic') or 0) * _FW["score_theme_intrinsic"]
-                               + float(r.get('score_attention') or 0) * _FW["score_attention"]
-                               + score_sector * _FW["score_sector"]) * 20, 2)  # v3.3 问题2: ×20 (每维满分10/总分满分100)
+                # v4.2（P0 修复）：**缺失维必须从分母剔除，绝不能 `or 0` 按 0 计入**。
+                #   原实现写成 `float(r.get('score_theme_neg') or 0)`，
+                #   于是任何缺该字段的行（所有 10-24 之前的历史 scored、以及个别
+                #   上游没算出来的行）都会被当成「theme_neg = 0 分」参与加权，
+                #   相当于凭空扣掉 0.12 权重：实测同一条记录 enhance 算 90.08、
+                #   apply 算 77.80，差 12.28 分 —— apply 在最后一步覆盖 total，
+                #   等于把正确分数改错，且 diff 静默不报错。
+                #   与 step2 / enhance 的「逐行按可用维度归一」口径必须完全一致。
+                _parts = []
+                for _k, _wt in (
+                    ('score_fund', _FW["score_fund"]),
+                    ('score_news', _FW["score_news"]),
+                    ('score_theme_neg', _FW.get("score_theme_neg", 0.0)),
+                    ('score_oversold60', _FW["score_oversold60"]),
+                    ('score_bias60', _FW["score_bias60"]),
+                    ('score_rsi_rev', _FW["score_rsi_rev"]),
+                    ('score_vol_pulse', _FW["score_vol_pulse"]),
+                    ('score_overbought', _FW["score_overbought"]),
+                    ('score_theme_intrinsic', _FW["score_theme_intrinsic"]),
+                    ('score_attention', _FW["score_attention"]),
+                    ('score_size', _FW.get("score_size", 0.0)),
+                ):
+                    _v = r.get(_k)
+                    if isinstance(_v, (int, float)):
+                        _parts.append((float(_v), _wt))
+                # 板块动量本步才有，恒可用
+                _parts.append((float(score_sector), _FW["score_sector"]))
+                _denom = sum(w for _, w in _parts)
+                total = round(sum(v * w for v, w in _parts) / max(0.5, _denom) * 20, 2)  # ×20 保持百分制
             else:
                 total = round((float(r.get('score_news') or 0) * _FW["score_news"]
                                + float(r.get('score_tech') or 0) * (_FW["score_rsi_rev"] + _FW["score_vol_pulse"] + _FW["score_overbought"])

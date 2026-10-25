@@ -37,12 +37,7 @@ WEIGHTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "factor_
 # v3.6-fund-led (2026-10-24 口径切换)：基本面主导，反转块等权压缩以消除共线性虚增。
 # 切换依据见 factor_weights.json → regime_switch；回退先验必须与之同步，
 # 否则 load_factor_weights 失败时会静默退回旧十维均摊口径。
-_W_PRIOR_10D = {
-    "score_fund": 0.34, "score_news": 0.22, "score_sector": 0.10,
-    "score_oversold60": 0.055, "score_bias60": 0.055, "score_rsi_rev": 0.055,
-    "score_vol_pulse": 0.055, "score_overbought": 0.02,
-    "score_theme_intrinsic": 0.08, "score_attention": 0.02,
-}
+_W_PRIOR_10D = {"score_fund": 0.32, "score_news": 0.16, "score_theme_neg": 0.12, "score_size": 0.12, "score_sector": 0.10, "score_oversold60": 0.045, "score_bias60": 0.045, "score_rsi_rev": 0.045, "score_vol_pulse": 0.045, "score_overbought": 0.0, "score_theme_intrinsic": 0.0, "score_attention": 0.0}
 # 旧五维(v2.41-ic) → 十维映射：tech 拆 3 维、theme 拆 2 维，按十维先验比例缩放
 _W_MAP_FROM_5D = {
     "score_fund": [("score_fund", 1.0)],
@@ -85,6 +80,13 @@ W_FUND, W_NEWS, W_SECTOR_W = FW["score_fund"], FW["score_news"], FW["score_secto
 W_OVERSOLD60, W_BIAS60, W_RSI_REV = FW["score_oversold60"], FW["score_bias60"], FW["score_rsi_rev"]
 W_VOL_PULSE, W_OVERBOUGHT = FW["score_vol_pulse"], FW["score_overbought"]
 W_THEME_INT, W_ATTENTION = FW["score_theme_intrinsic"], FW["score_attention"]
+# v4.1 新增两维（老大 2026-10-25 裁决）：
+#   score_theme_neg = 10 − score_theme，把 IC 表全场唯一过 Bonferroni 的负 alpha 反号利用；
+#   score_size      = 池内流通市值分位（越小越高分），SIZE 从「筛选条件」降级为「评分加分」。
+# 用 .get 兜底：旧 weights 文件（v3.6 及以前）无这两键，缺失时按 0 处理不报错，
+#   但 load_factor_weights 已随 _W_PRIOR_10D 一起升级，正常路径必然取到新值。
+W_THEME_NEG = FW.get("score_theme_neg", 0.0)
+W_SIZE = FW.get("score_size", 0.0)
 SCORER_VER = FW_META.get("version", "v3.0-10dim") if FW_META else "v3.0-10dim"
 
 SECTOR = {
@@ -3906,6 +3908,27 @@ def main():
     if _em:
         print(f"   🏷️ 资格标记: 次新 {_em.get('new_stock', 0)} / 停牌 {_em.get('suspended', 0)}"
               f" / 流动性不达标 {_em.get('illiquid', 0)} / 低换手 {_em.get('low_turnover', 0)}")
+
+    # v4.1: 池内流通市值分位表（供 score_size 打分）。
+    #   SIZE 已从「筛选条件」改为「评分加分」，必须按**当日池内**分位归一——
+    #   分层抽样后池内市值分布逐日变化，任何固定阈值都会失真。
+    _mv_rank = {}
+    _mv_vals = sorted(v["circ_mv"] for v in _elig_map.values()
+                      if isinstance(v.get("circ_mv"), (int, float)) and v["circ_mv"] > 0)
+    if _mv_vals:
+        _n_mv = len(_mv_vals)
+        for _code, _v in _elig_map.items():
+            _mv = _v.get("circ_mv")
+            if not isinstance(_mv, (int, float)) or _mv <= 0:
+                continue
+            # 二分定位：分位越小（市值越小）→ 得分越高（10 分制满分 10）
+            import bisect as _bs
+            _pos = _bs.bisect_left(_mv_vals, _mv)
+            _pct = _pos / max(1, _n_mv - 1)
+            _mv_rank[_code] = round((1.0 - _pct) * 10.0, 2)
+        print(f"   📐 SIZE 评分表: {len(_mv_rank)} 只（池内流通市值中位 "
+              f"{_mv_vals[_n_mv // 2] / 1e8:.1f} 亿，最小 {_mv_vals[0] / 1e8:.1f} / "
+              f"最大 {_mv_vals[-1] / 1e8:.1f} 亿）")
     
     print(f"📊 Stock-Scorer v2.7 | {len(stocks)}只标的")
     print(f"   权重: 题材热度30% 基本面30%(含行业前景) 消息20% 技术面20%")
@@ -4398,15 +4421,29 @@ def main():
             if isinstance(td, dict):
                 td = dict(td)
                 td["industry_prospect"] = f"行业前景{'加分' if industry_bonus > 0 else '减分'}{industry_bonus:+.1f}({label})"
-        # v3.0-10dim: 十维中间总分（step2 无板块动量维度，按 (1−w_sector) 归一化
-        #   保持 0-20 量纲；最终分由 apply_sector_momentum.py 按十权重重算）。
-        #   权重来自 factor_weights.json（十维优先；旧五维自动映射；缺失回退十维先验）。
-        _w9 = (fs * W_FUND + ns * W_NEWS
-               + s_oversold60 * W_OVERSOLD60 + s_bias60 * W_BIAS60 + s_rsi_rev * W_RSI_REV
-               + s_vol_pulse * W_VOL_PULSE + s_overbought * W_OVERBOUGHT
-               + s_theme_int * W_THEME_INT + s_attn * W_ATTENTION)
-        _scale = 1.0 / max(0.5, 1.0 - W_SECTOR_W)
-        total = round(_w9 * _scale * 20, 2)  # v3.3 问题2: 量纲升级 每维满分10/总分满分100 (×20 替代 ×4)
+        # v4.1（2026-10-25）新增两维：
+        #   s_theme_neg = 10 − score_theme —— 把全场唯一过 Bonferroni 的负 alpha 反号利用。
+        #     实证：score_theme h20 IC=-0.1207 / NW t=-3.59（n=58，过 3.08 门槛），
+        #     原始方向五分位严格递减 Q1 −5.82% → Q5 −9.84%（Q5−Q1 = −4.02pct）。
+        #     ⚠️ 反号后 Q5−Q1 仅 +2.98pct 且非严格单调（Q3/Q4 交叉）→ 反号≠强度镜像。
+        #   s_size = 池内流通市值分位（越小越高分）—— SIZE 退出筛选、改为评分加分。
+        #     必须用当日池内分位而非固定阈值：分层抽样后池内市值分布逐日变化。
+        s_theme_neg = max(0.0, min(10.0, 10.0 - float(ths)))
+        s_size = _mv_rank.get(code)
+        # 缺失市值时不参与（权重按可用维度归一），不臆造中位分
+        _parts = [(fs, W_FUND), (ns, W_NEWS), (s_theme_neg, W_THEME_NEG),
+                  (s_oversold60, W_OVERSOLD60), (s_bias60, W_BIAS60),
+                  (s_rsi_rev, W_RSI_REV), (s_vol_pulse, W_VOL_PULSE),
+                  (s_overbought, W_OVERBOUGHT), (s_theme_int, W_THEME_INT),
+                  (s_attn, W_ATTENTION)]
+        if s_size is not None:
+            _parts.append((s_size, W_SIZE))
+        _denom = sum(w for _, w in _parts)
+        _w9 = sum(v * w for v, w in _parts)
+        # step2 阶段无板块动量维度：按「已用权重之和」归一化保持量纲，
+        #   最终分由 apply_sector_momentum.py 按全权重重算（含 score_sector）。
+        _scale = 1.0 / max(0.5, _denom)
+        total = round(_w9 * _scale * 20, 2)  # 每维满分10 / 总分满分100（×20）
 
         if total >= 85: rating, advice = "S", "优先买入，可重仓"
         elif total >= 65: rating, advice = "A", "逢低加仓，重点关注"
@@ -4439,6 +4476,9 @@ def main():
             "score_overbought": round(s_overbought, 2),
             "score_theme_intrinsic": round(s_theme_int, 2),
             "score_attention": round(s_attn, 2),
+            # v4.1 新增两维（供 factor_eval 逐日评估与页面结构摘要消费）
+            "score_theme_neg": round(s_theme_neg, 2),
+            "score_size": (round(s_size, 2) if s_size is not None else None),
             "score_sustain": round(sustain_info["score"], 2),
             "sustain_note": sustain_info["note"],
             "is_cyclic": sustain_info["is_cyclic"],
@@ -4548,6 +4588,13 @@ def main():
         "date": raw.get("date", ""),
         "model": f"stock-scorer {SCORER_VER} (10-dim + AI + sector-momentum[evidence])",
         "pool_size": raw.get("pool_size") or len(stocks),
+        # v4.1（P1-2）：把选池口径**原样透传**到 scored。
+        #   原先 fetch 写进 top500_all_a.json 的 pool_rules 在 step2 被丢弃，
+        #   导致下游只能靠「池内市值中位 <60亿」去猜母体归属（v4.1 分层抽样后
+        #   该中位实测 85.9 亿，猜法必然误判）。显式透传后，母体归因可审计。
+        "pool_rules": raw.get("pool_rules") or {},
+        "all_count": raw.get("all_count"),
+        "dropped_eligibility": raw.get("dropped_eligibility"),
         "weights": "题材30%(内禀0.30+板块动量0.35+成交额排名0.15+情绪确认0.20) 消息20% 技术面20%(结构60%[均线趋势35%/MACD动能25%/量能资金25%/RSI入场时机15%]+动量40%,RSI为Wilder平滑口径) 基本面30%(含行业前景)",
         "results": results,
         "stats": {
