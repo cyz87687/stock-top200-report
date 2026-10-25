@@ -1,0 +1,764 @@
+{
+ "n_snapshots": 78,
+ "price_days": 143,
+ "price_range": [
+  "2026-03-24",
+  "2026-10-23"
+ ],
+ "csv_loaded": true,
+ "csv_source": "/Users/yzreal/WorkBuddy/2026-07-24-18-07-15/stock-top200-report/reference_final_ranking_halfyear.csv",
+ "csv_ecosystem": {
+  "VOLR20": {
+   "category": "流动性",
+   "ic_daily": "-0.017627962",
+   "icir_daily": "-0.139530403",
+   "exc_t": "-2.522100178",
+   "ls_ir": "-0.781340594",
+   "direction": "因子值越小越好",
+   "selected": "FALSE",
+   "score": "0.5308356460067838"
+  },
+  "TURN20": {
+   "category": "流动性",
+   "ic_daily": "-0.00923096",
+   "icir_daily": "-0.029838262",
+   "exc_t": "-0.293855477",
+   "ls_ir": "-0.653654316",
+   "direction": "因子值越小越好",
+   "selected": "FALSE",
+   "score": "0.32161578785075545"
+  },
+  "AMT20": {
+   "category": "流动性",
+   "ic_daily": "-0.036244991",
+   "icir_daily": "-0.147168049",
+   "exc_t": "-0.23047812",
+   "ls_ir": "-0.047742563",
+   "direction": "因子值越小越好",
+   "selected": "FALSE",
+   "score": "0.4629972247918594"
+  },
+  "MAX20": {
+   "category": "波动",
+   "ic_daily": "0.0096993860585799",
+   "icir_daily": "0.0472028203630708",
+   "exc_t": "0.6739711290621163",
+   "ls_ir": "0.934232063473826",
+   "direction": "因子值越大越好",
+   "selected": "FALSE",
+   "score": "0.4071847055195806"
+  },
+  "MOM1W": {
+   "category": "动量",
+   "ic_daily": "-0.032672212",
+   "icir_daily": "-0.160408722",
+   "exc_t": "1.5104729224497653",
+   "ls_ir": "0.7686582446241603",
+   "direction": "因子值越小越好",
+   "selected": "TRUE",
+   "score": "0.6398396546407648"
+  },
+  "LVOL20": {
+   "category": "波动",
+   "ic_daily": "0.0076469079146279",
+   "icir_daily": "0.029976279007937",
+   "exc_t": "1.055726205387954",
+   "ls_ir": "0.9381819440440404",
+   "direction": "因子值越大越好",
+   "selected": "FALSE",
+   "score": "0.38529139685476405"
+  },
+  "DIST52H": {
+   "category": "波动",
+   "ic_daily": "-0.000115542",
+   "icir_daily": "-0.000400871",
+   "exc_t": "0.0379689664716683",
+   "ls_ir": "-0.032303252",
+   "direction": "因子值越小越好",
+   "selected": "FALSE",
+   "score": "0.05735430157261795"
+  },
+  "ILLIQ": {
+   "category": "流动性",
+   "ic_daily": "",
+   "icir_daily": "",
+   "exc_t": "-1.092496493",
+   "ls_ir": "-0.799083905",
+   "direction": "因子值越小越好",
+   "selected": "FALSE",
+   "score": ""
+  },
+  "TRIX12": {
+   "category": "技术",
+   "ic_daily": "-0.059181938",
+   "icir_daily": "-0.276343945",
+   "exc_t": "0.0441191209738636",
+   "ls_ir": "-0.280841248",
+   "direction": "因子值越小越好",
+   "selected": "FALSE",
+   "score": "0.6867098365710763"
+  },
+  "MACDDIF": {
+   "category": "技术",
+   "ic_daily": "-0.057934806",
+   "icir_daily": "-0.260005125",
+   "exc_t": "0.3568680956230578",
+   "ls_ir": "-0.09315512",
+   "direction": "因子值越小越好",
+   "selected": "FALSE",
+   "score": "0.6366019118100524"
+  }
+ },
+ "csv_selected": {
+  "SIZE": {
+   "category": "规模",
+   "ic_daily": "-0.065544187",
+   "icir_daily": "-0.603956875",
+   "ic_month_t": "-1.718510547",
+   "exc_t": "2.2843838906113967",
+   "ls_ir": "1.949191145714458",
+   "score": "0.9927536231884058",
+   "direction": "因子值越小越好"
+  },
+  "ROE": {
+   "category": "质量",
+   "ic_daily": "0.033699678838365",
+   "icir_daily": "0.3388499629354675",
+   "ic_month_t": "1.9090438187928984",
+   "exc_t": "0.4700690660167883",
+   "ls_ir": "0.6722994925699319",
+   "score": "0.7489978415047794",
+   "direction": "因子值越大越好"
+  },
+  "NAG": {
+   "category": "成长",
+   "ic_daily": "0.0379763996330288",
+   "icir_daily": "0.3108333716406369",
+   "ic_month_t": "1.3580093570256828",
+   "exc_t": "0.7218782711453047",
+   "ls_ir": "1.216344973777392",
+   "score": "0.8774283071230342",
+   "direction": "因子值越大越好"
+  },
+  "DEBT": {
+   "category": "偿债",
+   "ic_daily": "-0.020167769",
+   "icir_daily": "-0.194763355",
+   "ic_month_t": "-0.257174264",
+   "exc_t": "0.7005952612215249",
+   "ls_ir": "0.6059722186255592",
+   "score": "0.5755473327166204",
+   "direction": "因子值越小越好"
+  },
+  "MFI14": {
+   "category": "技术",
+   "ic_daily": "-0.036410465",
+   "icir_daily": "-0.182555506",
+   "ic_month_t": "-1.19602583",
+   "exc_t": "0.5414066392726621",
+   "ls_ir": "0.4297289224351618",
+   "score": "0.591736046870182",
+   "direction": "因子值越小越好"
+  },
+  "EP": {
+   "category": "估值",
+   "ic_daily": "0.0457462476176846",
+   "icir_daily": "0.1717798660257427",
+   "ic_month_t": "0.5555194110596536",
+   "exc_t": "0.0972580450262787",
+   "ls_ir": "0.4427085771206467",
+   "score": "0.6133209990749305",
+   "direction": "因子值越大越好"
+  },
+  "MOM1W": {
+   "category": "动量",
+   "ic_daily": "-0.032672212",
+   "icir_daily": "-0.160408722",
+   "ic_month_t": "-1.282686676",
+   "exc_t": "1.5104729224497653",
+   "ls_ir": "0.7686582446241603",
+   "score": "0.6398396546407648",
+   "direction": "因子值越小越好"
+  },
+  "PSY12": {
+   "category": "技术",
+   "ic_daily": "-0.021186091",
+   "icir_daily": "-0.111205617",
+   "ic_month_t": "-1.285422583",
+   "exc_t": "0.6190100921948921",
+   "ls_ir": "0.5785600958614596",
+   "score": "0.4528214616096207",
+   "direction": "因子值越小越好"
+  },
+  "OCFG": {
+   "category": "成长",
+   "ic_daily": "0.0409302163264521",
+   "icir_daily": "0.7323799639442812",
+   "ic_month_t": "2.2566420320736142",
+   "exc_t": "1.5844858749074917",
+   "ls_ir": "0.4688186036173377",
+   "score": "0.7577860006167129",
+   "direction": "因子值越大越好"
+  }
+ },
+ "pool_retest": {
+  "lowvol20": {
+   "csv_name": "LVOL20",
+   "desc": "20日价格波动/现价（低波）",
+   "dispersion": {
+    "n": 17482,
+    "uniq": 17482,
+    "hhi": 0.0001,
+    "top5_share": 0.0,
+    "zero_rate": 0.0,
+    "cap_rate": 0.0
+   },
+   "ic": {
+    "1": {
+     "n": 77,
+     "ic": -0.0384,
+     "t_by_lag": {
+      "0": -1.22,
+      "3": -1.17,
+      "6": -1.07
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": -0.0031
+    },
+    "5": {
+     "n": 73,
+     "ic": -0.0745,
+     "t_by_lag": {
+      "0": -2.15,
+      "3": -1.23,
+      "6": -1.04
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": -0.014
+    },
+    "20": {
+     "n": 58,
+     "ic": -0.0035,
+     "t_by_lag": {
+      "0": -0.08,
+      "3": -0.04,
+      "6": -0.03
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": 0.0
+    }
+   },
+   "ic_industry_neutral": {
+    "1": {
+     "n": 77,
+     "ic": -0.0333,
+     "t_by_lag": {
+      "0": -1.65,
+      "3": -1.48,
+      "6": -1.29
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": -0.0023
+    },
+    "20": {
+     "n": 58,
+     "ic": 0.0069,
+     "t_by_lag": {
+      "0": 0.21,
+      "3": 0.11,
+      "6": 0.09
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": 0.007
+    }
+   }
+  },
+  "mom1w": {
+   "csv_name": "MOM1W",
+   "desc": "5日动量（CSV 方向: 越小越好=反转）",
+   "dispersion": {
+    "n": 17665,
+    "uniq": 17523,
+    "hhi": 0.0001,
+    "top5_share": 0.002,
+    "zero_rate": 0.002,
+    "cap_rate": 0.0
+   },
+   "ic": {
+    "1": {
+     "n": 77,
+     "ic": -0.0277,
+     "t_by_lag": {
+      "0": -1.01,
+      "3": -1.28,
+      "6": -1.33
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": -0.0015
+    },
+    "5": {
+     "n": 73,
+     "ic": -0.0454,
+     "t_by_lag": {
+      "0": -1.85,
+      "3": -1.26,
+      "6": -1.23
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": -0.0143
+    },
+    "20": {
+     "n": 58,
+     "ic": -0.1364,
+     "t_by_lag": {
+      "0": -5.17,
+      "3": -3.28,
+      "6": -3.03
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": -0.0443
+    }
+   },
+   "ic_industry_neutral": {
+    "1": {
+     "n": 77,
+     "ic": -0.0049,
+     "t_by_lag": {
+      "0": -0.27,
+      "3": -0.31,
+      "6": -0.35
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": 0.0021
+    },
+    "20": {
+     "n": 58,
+     "ic": -0.0719,
+     "t_by_lag": {
+      "0": -3.74,
+      "3": -2.34,
+      "6": -2.09
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": -0.0241
+    }
+   }
+  },
+  "mom1m": {
+   "csv_name": "MOM1M",
+   "desc": "1个月动量（CSV 方向: 越小越好=反转）",
+   "dispersion": {
+    "n": 17546,
+    "uniq": 17465,
+    "hhi": 0.0001,
+    "top5_share": 0.001,
+    "zero_rate": 0.001,
+    "cap_rate": 0.0
+   },
+   "ic": {
+    "1": {
+     "n": 77,
+     "ic": -0.0897,
+     "t_by_lag": {
+      "0": -3.42,
+      "3": -3.33,
+      "6": -3.42
+     },
+     "robust_bonf": true,
+     "q_spread_top_minus_bot": -0.0076
+    },
+    "5": {
+     "n": 73,
+     "ic": -0.1678,
+     "t_by_lag": {
+      "0": -6.46,
+      "3": -3.83,
+      "6": -3.39
+     },
+     "robust_bonf": true,
+     "q_spread_top_minus_bot": -0.0376
+    },
+    "20": {
+     "n": 58,
+     "ic": -0.2499,
+     "t_by_lag": {
+      "0": -9.35,
+      "3": -5.24,
+      "6": -4.29
+     },
+     "robust_bonf": true,
+     "q_spread_top_minus_bot": -0.0932
+    }
+   },
+   "ic_industry_neutral": {
+    "1": {
+     "n": 77,
+     "ic": -0.046,
+     "t_by_lag": {
+      "0": -2.53,
+      "3": -2.62,
+      "6": -2.65
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": -0.0031
+    },
+    "20": {
+     "n": 58,
+     "ic": -0.1597,
+     "t_by_lag": {
+      "0": -6.94,
+      "3": -3.8,
+      "6": -3.07
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": -0.0595
+    }
+   }
+  },
+  "bias20": {
+   "csv_name": "BIAS20",
+   "desc": "20日乖离率（CSV 方向: 越小越好=反转）",
+   "dispersion": {
+    "n": 17482,
+    "uniq": 17481,
+    "hhi": 0.0001,
+    "top5_share": 0.0,
+    "zero_rate": 0.0,
+    "cap_rate": 0.0
+   },
+   "ic": {
+    "1": {
+     "n": 77,
+     "ic": -0.0492,
+     "t_by_lag": {
+      "0": -1.73,
+      "3": -1.85,
+      "6": -1.84
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": -0.0027
+    },
+    "5": {
+     "n": 73,
+     "ic": -0.1085,
+     "t_by_lag": {
+      "0": -4.03,
+      "3": -2.44,
+      "6": -2.17
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": -0.0251
+    },
+    "20": {
+     "n": 58,
+     "ic": -0.1954,
+     "t_by_lag": {
+      "0": -7.68,
+      "3": -4.48,
+      "6": -3.85
+     },
+     "robust_bonf": true,
+     "q_spread_top_minus_bot": -0.0695
+    }
+   },
+   "ic_industry_neutral": {
+    "1": {
+     "n": 77,
+     "ic": -0.0235,
+     "t_by_lag": {
+      "0": -1.32,
+      "3": -1.35,
+      "6": -1.32
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": -0.0001
+    },
+    "20": {
+     "n": 58,
+     "ic": -0.1199,
+     "t_by_lag": {
+      "0": -5.92,
+      "3": -3.34,
+      "6": -2.76
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": -0.0424
+    }
+   }
+  },
+  "max20": {
+   "csv_name": "MAX20",
+   "desc": "距20日高点回撤/彩票因子（CSV 方向: 越大越好）",
+   "dispersion": {
+    "n": 17482,
+    "uniq": 14880,
+    "hhi": 0.019,
+    "top5_share": 0.139,
+    "zero_rate": 0.138,
+    "cap_rate": 0.0
+   },
+   "ic": {
+    "1": {
+     "n": 77,
+     "ic": 0.028,
+     "t_by_lag": {
+      "0": 0.89,
+      "3": 0.9,
+      "6": 0.83
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": 0.001
+    },
+    "5": {
+     "n": 73,
+     "ic": 0.0741,
+     "t_by_lag": {
+      "0": 2.32,
+      "3": 1.34,
+      "6": 1.14
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": 0.0169
+    },
+    "20": {
+     "n": 58,
+     "ic": 0.1404,
+     "t_by_lag": {
+      "0": 4.9,
+      "3": 2.86,
+      "6": 2.43
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": 0.0486
+    }
+   },
+   "ic_industry_neutral": {
+    "1": {
+     "n": 77,
+     "ic": 0.0181,
+     "t_by_lag": {
+      "0": 0.91,
+      "3": 0.88,
+      "6": 0.81
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": 0.0013
+    },
+    "20": {
+     "n": 58,
+     "ic": 0.0906,
+     "t_by_lag": {
+      "0": 4.13,
+      "3": 2.35,
+      "6": 1.93
+     },
+     "robust_bonf": false,
+     "q_spread_top_minus_bot": 0.0317
+    }
+   }
+  },
+  "dist52h": {
+   "csv_name": "DIST52H",
+   "desc": "距52周高点（CSV 方向: 越小越好）",
+   "dispersion": null,
+   "ic": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "ic_industry_neutral": {
+    "1": null,
+    "20": null
+   }
+  }
+ },
+ "corr_with_existing": {
+  "lowvol20": {
+   "score_fund": -0.128,
+   "score_news": -0.018,
+   "score_theme": -0.078,
+   "score_sector": 0.097,
+   "score_oversold60": 0.38,
+   "score_bias60": 0.445,
+   "score_rsi_rev": 0.463,
+   "score_vol_pulse": 0.435,
+   "score_overbought": 0.186,
+   "score_tech": 0.024,
+   "score_theme_intrinsic": 0.318,
+   "score_attention": 0.144
+  },
+  "mom1w": {
+   "score_fund": -0.114,
+   "score_news": -0.148,
+   "score_theme": 0.275,
+   "score_sector": -0.292,
+   "score_oversold60": -0.448,
+   "score_bias60": -0.577,
+   "score_rsi_rev": -0.705,
+   "score_vol_pulse": -0.525,
+   "score_overbought": -0.523,
+   "score_tech": 0.134,
+   "score_theme_intrinsic": -0.227,
+   "score_attention": -0.073
+  },
+  "mom1m": {
+   "score_fund": -0.197,
+   "score_news": -0.274,
+   "score_theme": 0.365,
+   "score_sector": -0.301,
+   "score_oversold60": -0.666,
+   "score_bias60": -0.85,
+   "score_rsi_rev": -0.868,
+   "score_vol_pulse": -0.6,
+   "score_overbought": -0.545,
+   "score_tech": 0.341,
+   "score_theme_intrinsic": -0.269,
+   "score_attention": -0.138
+  },
+  "bias20": {
+   "score_fund": -0.187,
+   "score_news": -0.256,
+   "score_theme": 0.378,
+   "score_sector": -0.37,
+   "score_oversold60": -0.651,
+   "score_bias60": -0.81,
+   "score_rsi_rev": -0.894,
+   "score_vol_pulse": -0.716,
+   "score_overbought": -0.601,
+   "score_tech": 0.324,
+   "score_theme_intrinsic": -0.347,
+   "score_attention": -0.139
+  },
+  "max20": {
+   "score_fund": 0.091,
+   "score_news": 0.183,
+   "score_theme": -0.366,
+   "score_sector": 0.332,
+   "score_oversold60": 0.579,
+   "score_bias60": 0.722,
+   "score_rsi_rev": 0.809,
+   "score_vol_pulse": 0.681,
+   "score_overbought": 0.578,
+   "score_tech": -0.241,
+   "score_theme_intrinsic": 0.357,
+   "score_attention": 0.128
+  },
+  "dist52h": {}
+ },
+ "snapshot_missing_fields": [
+  "roe",
+  "debt_ratio",
+  "pe",
+  "ocfg",
+  "growth",
+  "cagr3",
+  "turnover",
+  "turnover_ratio"
+ ],
+ "weak_fin_validation": {
+  "roe": {
+   "direction": "越大越好",
+   "ics": [
+    [
+     "2026-10-13",
+     0.0489
+    ]
+   ],
+   "mean_ic": 0.0489,
+   "note": "n=3~4 截面，仅方向性证据，禁显著性断言"
+  },
+  "debt_ratio": {
+   "direction": "越小越好",
+   "ics": [
+    [
+     "2026-10-13",
+     0.0472
+    ]
+   ],
+   "mean_ic": 0.0472,
+   "note": "n=3~4 截面，仅方向性证据，禁显著性断言"
+  },
+  "ocfg": {
+   "direction": "越大越好",
+   "ics": [
+    [
+     "2026-10-13",
+     0.0232
+    ]
+   ],
+   "mean_ic": 0.0232,
+   "note": "n=3~4 截面，仅方向性证据，禁显著性断言"
+  },
+  "pe": {
+   "direction": "越小越好(EP=1/PE)",
+   "ics": [
+    [
+     "2026-10-12",
+     -0.1958
+    ],
+    [
+     "2026-10-13",
+     -0.262
+    ]
+   ],
+   "mean_ic": -0.2289,
+   "note": "n=3~4 截面，仅方向性证据，禁显著性断言"
+  }
+ },
+ "size_retest": {
+  "circ_mv": {
+   "ics": [
+    [
+     "2026-10-13",
+     0.2108
+    ]
+   ],
+   "note": "n 极小仅方向性；CSV SIZE 为全市场口径 222 截面 exc_t=2.28/exc_win=91%，本池为池内口径，口径差异是 round17 负 IC 的候选解释"
+  },
+  "ln_circ_mv": {
+   "ics": [
+    [
+     "2026-10-13",
+     0.2108
+    ]
+   ],
+   "note": "n 极小仅方向性；CSV SIZE 为全市场口径 222 截面 exc_t=2.28/exc_win=91%，本池为池内口径，口径差异是 round17 负 IC 的候选解释"
+  }
+ },
+ "conclusion": {
+  "ecosystem": "CSV 47 因子无消息/情绪/舆情类；量价关注度代理（VOLR20/TURN20/AMT20/MAX20/ILLIQ）全部 |IC|<0.04 且多不显著",
+  "robust_in_csv": "SIZE(exc_t2.28,win91%) / OCFG(icir0.732 全场第一) / NAG(ls_ir1.22) / ROE / DEBT / EP / MOM1W(exc_t1.51)",
+  "pool_retest": {
+   "lowvol20": {
+    "1": -0.0384,
+    "5": -0.0745,
+    "20": -0.0035
+   },
+   "mom1w": {
+    "1": -0.0277,
+    "5": -0.0454,
+    "20": -0.1364
+   },
+   "mom1m": {
+    "1": -0.0897,
+    "5": -0.1678,
+    "20": -0.2499
+   },
+   "bias20": {
+    "1": -0.0492,
+    "5": -0.1085,
+    "20": -0.1954
+   },
+   "max20": {
+    "1": 0.028,
+    "5": 0.0741,
+    "20": 0.1404
+   },
+   "dist52h": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  }
+ }
+}
