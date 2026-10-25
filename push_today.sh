@@ -5,7 +5,7 @@
 set -uo pipefail
 cd /Users/yzreal/WorkBuddy/2026-07-24-18-07-15/stock-top200-report
 PY=/Users/yzreal/.workbuddy/binaries/python/envs/default/bin/python
-TODAY=$(date '+%Y-%m-%d')
+TODAY=2026-10-20   # 数据日期(step2跨零点运行, 文件名已按内部date字段改回10-20; 勿用系统日期)
 
 files=()
 add() { [ -f "$1" ] && files+=("$1"); }
@@ -28,8 +28,9 @@ add sector/sector_momentum_latest.json
 add sector/sector_momentum_$TODAY.json
 add sector/portfolio_$TODAY.json
 add sector/portfolio_report_$TODAY.html
-# C) factor-eval skill（.workbuddy/ 被 gitignore，需显式推送使其落地远程 git）
+# C) factor-eval skill（.workbuddy/ 被 gitignore，需显式推送使其落地远程 git）+ 10-20 剩余步骤runner
 add .workbuddy/skills/factor-eval/SKILL.md
+add run_daily_rest_1020.sh
 
 # 去重
 uniq=()
@@ -38,6 +39,6 @@ while IFS= read -r f; do uniq+=("$f"); done < <(printf '%s\n' "${files[@]}" | so
 echo "待推送文件数: ${#uniq[@]}"
 printf '%s\n' "${uniq[@]}"
 
-export COMMIT_MSG="factor-eval skill 入git + 2026-10-15 每日评分数据(东财按报告期growth/Q3景气加分/v3.5.1)"
+export COMMIT_MSG="2026-10-20 每日评分数据(东财按报告期growth 490/490/Q3景气加分32只/v3.5.2徽章修复保持; step2跨零点运行已按内部date改回10-20)"
 $PY push_via_api.py "${uniq[@]}"
 echo "push_exit=$?"
