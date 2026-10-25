@@ -1943,6 +1943,7 @@ try:
     _mf_per = (_mf_cap / len(_mf_picks)) if _mf_picks else 0
     _mf_no_plan = 0
     _mf_n_in = 0
+    _mf_n_fallback = 0          # json 缺 plan、由本层自行推导的只数（旧文件兼容）
     _mf_rows = ""
     for _i, _p in enumerate(_mf_picks, 1):
         _rt_c = RATING_COLORS.get(_p.get("rating") or "", "#94a3b8")
@@ -1959,7 +1960,22 @@ try:
         if not isinstance(_prc, (int, float)):
             _prc = _src.get("price")
         _prc_s = f"{_prc:.2f}" if isinstance(_prc, (int, float)) else "—"
-        _plan = build_trade_plan(_src) if _src else None
+        # v4.3（老大第 2 项要求）：买入区间优先取 mf_pick json 里的 plan 字段 ——
+        #   那是 pick_multifactor 用同一个 build_trade_plan 同源算出来并落盘的。
+        #   以前页面自己重算一遍，于是「json 的 10 只」与「页面展示的买区」可能不一致；
+        #   更关键的是：选股层以前不知道买区在哪，选完才在页面发现「现价高于买区」，
+        #   只能打提示不能剔除（实测 10-23：10 只里 6 只高于买区）。
+        #   现在这道闸已前移到选股层（pick_multifactor 用 AST 抽取同一函数复用），
+        #   本层只负责展示，不再有口径分裂的空间。旧 json 缺 plan 时才回退推导。
+        _plan = _p.get("plan") if isinstance(_p.get("plan"), dict) else None
+        if _plan:
+            _plan = {k: _plan.get(k) for k in
+                     ("buy_lo", "buy_hi", "stop", "target", "rr",
+                      "entry_ref", "tgt_basis", "overbought", "flags")}
+        elif _src:
+            _plan = build_trade_plan(_src)
+            if _plan:
+                _mf_n_fallback += 1
         if not _plan or not isinstance(_prc, (int, float)) or _prc <= 0:
             _mf_no_plan += 1
             _buy_s = _stop_s = _tgt_s = _amt_s = _sh_s = "—"
@@ -1984,13 +2000,16 @@ try:
             else:
                 _sh_s = '<span style="color:#f59e0b;">不足1手</span>'
                 _amt_s = "—"
+            # v4.3：选股层已保证现价在买区内，这里只做「万一」兜底提示
             if _prc > _plan["buy_hi"] * 1.02:
                 _prc_warn = ('<div style="font-size:9px;color:#f59e0b;">'
                              '现价高于买区 · 等回踩</div>')
+            elif _prc < _plan["buy_lo"] * 0.98:
+                _prc_warn = ('<div style="font-size:9px;color:#f59e0b;">'
+                             '已跌破买区下限</div>')
             else:
                 _prc_warn = ""
-                if _prc >= _plan["buy_lo"] * 0.98:
-                    _mf_n_in += 1
+                _mf_n_in += 1
         _reason = ""
         if _p.get("fund_reasons"):
             _reason = html_mod.escape(str(_p["fund_reasons"][0]))
@@ -2087,6 +2106,121 @@ try:
                      f'{_c5(_d5, "exc_mean", "%")}</td>'
                      f'<td style="padding:5px 8px;text-align:center;font-size:10.5px;">'
                      f'{_c5(_d5, "win", "%", _plus=False)}</td></tr>')
+
+    # ---- v4.3（老大第 3 项要求）：持仓周期推荐，必须由数据说话 ----
+    # 数据源：audit_round15.json（同源同权重的历史回测，79 个入场日，
+    #   2026-06-26 ~ 2026-10-23，入场=次日开盘、出场=d0+h 收盘、基准=池内等权）。
+    # ⚠️ 结论由回测数字驱动，**禁止手写「建议持有 X 日」**；
+    #   数据缺失时整块隐藏，不留硬编码兜底。
+    _mf_hold_block = ""
+    try:
+        _a15p = os.path.join(_ai_dir, "audit_round15.json")
+        if os.path.exists(_a15p):
+            _a15 = json.load(open(_a15p, encoding="utf-8"))
+            _hz = _a15.get("horizons") or {}
+            _curve = _a15.get("curve_by_h") or {}
+            _peak_h = _a15.get("peak_h")
+            _best_h = _a15.get("best_std_horizon")
+            if _hz and len(_hz) >= 3:
+                def _pctv(v):
+                    return f"{v:+.2f}%" if isinstance(v, (int, float)) else "—"
+                def _tv(v):
+                    return f"{v:+.2f}" if isinstance(v, (int, float)) else "—"
+                _hrows = ""
+                for _hk in ("1", "3", "5", "10", "15", "20"):
+                    _x = _hz.get(_hk) or {}
+                    if not _x:
+                        continue
+                    _exc = _x.get("exc_mean_pct")
+                    _nwt = _x.get("nw_t_laghm1")
+                    # 颜色：超额为正红（A股涨=红）、为负绿；显著性高的行高亮
+                    _ec = "#ef4444" if isinstance(_exc, (int, float)) and _exc > 0 else "#22c55e"
+                    _tc = "#fbbf24" if isinstance(_nwt, (int, float)) and abs(_nwt) >= 2.0 else "#94a3b8"
+                    _hl = "border:1px solid #a3e63566;" if str(_best_h) == _hk else ""
+                    _tag = " ← 推荐" if str(_best_h) == _hk else ""
+                    _hrows += (
+                        f'<tr style="border-top:1px solid #1e293b;">'
+                        f'<td style="padding:5px 8px;color:#e2e8f0;font-weight:700;">T+{_hk}{_tag}</td>'
+                        f'<td style="padding:5px 6px;text-align:center;color:#64748b;font-size:10px;">'
+                        f'n={_x.get("n", "—")}</td>'
+                        f'<td style="padding:5px 6px;text-align:center;color:#e2e8f0;">'
+                        f'{_pctv(_x.get("port_mean_pct"))}</td>'
+                        f'<td style="padding:5px 6px;text-align:center;color:#94a3b8;">'
+                        f'{_pctv(_x.get("bench_mean_pct"))}</td>'
+                        f'<td style="padding:5px 6px;text-align:center;{_hl}">'
+                        f'<b style="color:{_ec};">{_pctv(_exc)}</b>'
+                        f'<div style="font-size:9px;color:#64748b;">中位 {_pctv(_x.get("exc_med_pct"))}</div></td>'
+                        f'<td style="padding:5px 6px;text-align:center;color:#cbd5e1;">'
+                        f'{_x.get("win_pct", "—")}%</td>'
+                        f'<td style="padding:5px 6px;text-align:center;color:{_tc};font-weight:700;">'
+                        f'{_tv(_nwt)}</td>'
+                        f'<td style="padding:5px 6px;text-align:center;color:#64748b;font-size:10px;">'
+                        f'n={_x.get("n_nonoverlap", "—")} / {_pctv(_x.get("nonoverlap_exc_mean_pct"))}</td>'
+                        f'</tr>')
+                _rec_txt = f"T+{_best_h}" if _best_h else "—"
+                _pk_txt = (f"h={_peak_h}（{_a15.get('peak_exc_pct'):+.2f}%）"
+                           if isinstance(_a15.get("peak_exc_pct"), (int, float)) else "—")
+                _nentry = _a15.get("n_entry_days") or {}
+                _nen = _nentry.get("no_cap") if isinstance(_nentry, dict) else None
+                # ⚠️ 文案里的数字必须从 json 现取，禁止硬编码。
+                #   曾硬编码「T+1 超额仅 +0.26%、NW t=1.32」—— 权重或样本一变即成假话。
+                _h1 = _hz.get("1") or {}
+                _h1e = _h1.get("exc_mean_pct"); _h1t = _h1.get("nw_t_laghm1")
+                _h1w = _h1.get("win_pct")
+                _h20 = _hz.get("20") or {}
+                _h20p = _h20.get("port_mean_pct"); _h20b = _h20.get("bench_mean_pct")
+                _bp = max(_hz.items(),
+                          key=lambda kv: (kv[1] or {}).get("exc_mean_pct")
+                          if isinstance((kv[1] or {}).get("exc_mean_pct"), (int, float)) else -99)
+                _bph, _bpv = _bp[0], _bp[1]
+                _mf_hold_block = (
+                    '<div style="font-size:11px;color:#e2e8f0;padding:9px 11px;'
+                    'background:rgba(163,230,53,0.06);border:1px solid #a3e63544;'
+                    'border-radius:8px;margin-top:8px;line-height:1.9;">'
+                    '<b style="color:#a3e635;">⏱ 持仓周期：' + str(_rec_txt) + '（约 '
+                    + str(_best_h) + ' 个交易日）</b>'
+                    '<span style="color:#94a3b8;font-size:10px;"> · 由回测决定，非拍脑袋</span><br>'
+                    '<table style="width:100%;border-collapse:collapse;font-size:10.5px;margin:6px 0;">'
+                    '<thead><tr style="background:#1e293b;">'
+                    '<th style="padding:4px 6px;color:#94a3b8;">持有期</th>'
+                    '<th style="padding:4px 6px;color:#94a3b8;">样本</th>'
+                    '<th style="padding:4px 6px;color:#94a3b8;">组合收益</th>'
+                    '<th style="padding:4px 6px;color:#94a3b8;">池内基准</th>'
+                    '<th style="padding:4px 6px;color:#94a3b8;">超额</th>'
+                    '<th style="padding:4px 6px;color:#94a3b8;">胜率</th>'
+                    '<th style="padding:4px 6px;color:#94a3b8;">NW t</th>'
+                    '<th style="padding:4px 6px;color:#94a3b8;">非重叠</th>'
+                    '</tr></thead><tbody>' + _hrows + '</tbody></table>'
+                    '<b style="color:#7dd3fc;">依据</b>（同源同权重回测，' + str(_nen or "?")
+                    + ' 个入场日 · 2026-06-26~2026-10-23 · 入场=次日开盘）：'
+                    '① 超额随持有期单调上升，20 日内峰值 ' + _pk_txt + '，'
+                    'T+10 起进入 +2.5% 以上的高区平台；'
+                    '② <b style="color:#f59e0b;">T+1 超额仅 '
+                    + (f"{_h1e:+.2f}%" if isinstance(_h1e, (int, float)) else "—")
+                    + '、NW t='
+                    + (f"{_h1t:+.2f}" if isinstance(_h1t, (int, float)) else "—")
+                    + '、胜率 '
+                    + (f"{_h1w:.1f}%" if isinstance(_h1w, (int, float)) else "—")
+                    + '</b> —— 短周期基本无效，不要做 T+0 回转；'
+                    '③ 推荐 ' + str(_rec_txt) + ' 而非点估计最高的 T+'
+                    + str(_bph) + '（' + (f"{_bpv.get('exc_mean_pct'):+.2f}%" if isinstance(_bpv.get("exc_mean_pct"), (int, float)) else "—")
+                    + '），因为 T+' + str(_bph) + ' 的 NW t 只有 '
+                    + (f"{_bpv.get('nw_t_laghm1'):+.2f}" if isinstance(_bpv.get("nw_t_laghm1"), (int, float)) else "—")
+                    + '、非重叠样本只剩 ' + str(_bpv.get("n_nonoverlap", "?")) + ' 个 —— '
+                    '名义超额最高恰恰是统计上最不可信的；'
+                    '④ <b style="color:#f59e0b;">绝对收益全周期为负</b>'
+                    '（T+20 组合 ' + (f"{_h20p:+.2f}%" if isinstance(_h20p, (int, float)) else "—")
+                    + ' vs 基准 ' + (f"{_h20b:+.2f}%" if isinstance(_h20b, (int, float)) else "—")
+                    + '）—— 持有多久都不赚钱，只是相对池子少亏，'
+                    '这是池子负 alpha 决定的，不是持有期能解决的。<br>'
+                    '<span style="color:#94a3b8;font-size:10px;">纪律：'
+                    '「' + str(_rec_txt) + '」是<b>时间上限</b>，不是目标价；'
+                    '触发止损立即离场，不因「还没到 ' + str(_best_h) + ' 日」而扛单。'
+                    '回测口径与边界：见 audit_round15.json（历史截面无 tech 字段，'
+                    '无法复现 RSI 剔除与板块约束；基准为池内等权而非全市场指数）。</span>'
+                    '</div>')
+    except Exception as _e:
+        _mf_hold_block = ""
 
     if _mf.get("picks"):
         _mw = _mf.get("weights") or {}
@@ -2215,9 +2349,11 @@ try:
     <div class="chart-card" id="sec-mf-pick" style="padding:16px;margin:14px 0;border:1px solid #a3e63555;">
         <h3 style="font-size:13px;margin-bottom:4px;">🧮 多因子精选组合
             <span style="font-size:11px;color:#64748b;font-weight:400;">
-            （{len(_mf.get("picks") or [])} 只 · 权重由池内实证反推，非手填 · {html_mod.escape(str(_mf.get("date") or ""))}）</span></h3>
+            （{len(_mf.get("picks") or [])} 只 · 权重由池内实证反推，非手填 · 现价均在买入区间内 · {html_mod.escape(str(_mf.get("date") or ""))}）</span></h3>
         <div style="font-size:11px;color:#64748b;margin-bottom:10px;line-height:1.75;">
-            唯一一份可执行清单（≤10 只）。买入区间 / 止损 / 目标位与个股详情页<b>同源同一函数</b>推导：
+            唯一一份可执行清单（≤10 只）。<b style="color:#a3e635;">v4.3 起只保留当日现价落在买入区间内的个股</b>
+            （现价高于买区 = 当日挂单成交不了，已在选股层剔除）。
+            买入区间 / 止损 / 目标位与个股详情页<b>同源同一函数</b>推导：
             多头取 ma5~ma10 回踩区、弱势取 ma10~ma20 企稳区，止损=最近支撑下方 1.5%。
             资金口径 = 10 万基准 × 当日仓位纪律 <b style="color:#f59e0b;">{mkt_pos}</b>
             （赚钱效应 {mkt_score if mkt_score is not None else "—"} 分）÷ {len(_mf.get("picks") or [])} 只，100 股取整。
@@ -2242,15 +2378,19 @@ try:
         </table></div>
         <div style="font-size:11px;color:#e2e8f0;padding:9px 11px;background:#1e293b;border-radius:8px;margin-top:10px;line-height:1.85;">
             <b style="color:#7dd3fc;">📌 今日执行要点</b>：
-            10 只中 <b style="color:#22c55e;">{_mf_n_in} 只现价已进入买入区间</b>，
-            其余 <b style="color:#f59e0b;">{len(_mf.get("picks") or []) - _mf_n_in} 只需等回踩</b>
-            —— 现价高于买区时不要市价追，卖出纪律一律以止损位为准。<br>
+            <b style="color:#22c55e;">{len(_mf.get("picks") or [])} 只现价均已落在买入区间内</b>
+            （v4.3 起选股层已剔除现价高于买区的标的：当日合格候选
+            {(_mf.get("zone_stats") or {}).get("in_zone", "—")} 只在区间 /
+            {(_mf.get("zone_stats") or {}).get("above_zone", "—")} 只需等回踩，
+            共剔除 {(_mf.get("excluded") or {}).get("现价不在买入区间", 0)} 只）
+            —— 当日挂单即可成交，无需等回踩。<br>
             <span style="color:#94a3b8;">本组合为「相对排序」表达：池内头组历史净收益为负（池子本身在跌），
             <b style="color:#f59e0b;">排名靠前 ≠ 买入必赚</b>，请叠加下方仓位纪律与个股止损。<br>
             盈亏比 = （最近阻力位 − 买区上限）/（买区上限 − 止损位）。<b style="color:#f59e0b;">数值过高（如 &gt;5）
             并非优质信号</b>，而是说明上方最近阻力很远 —— 空间大但兑现需要时间，且止损一旦被打掉就归零；
             盈亏比 &lt;1 的标的应先观察、不急于建仓。</span>
         </div>
+        {_mf_hold_block}
         <div style="font-size:11px;color:#f59e0b;padding:9px 11px;background:rgba(245,158,11,0.08);border-radius:8px;margin-top:8px;line-height:1.8;">
             <b>⚠️ 三条硬排除（是剔除，不是加分）</b>：
             关注度前 20% 剔除 <b>{(_mf.get("excluded") or {}).get("关注度过高(attention 前20%)", 0)}</b> 只
@@ -5588,7 +5728,11 @@ if _ic and _ic.get("factors"):
 
     # v3.8.2（P0）：母体已从「成交额榜」换成「全A SIZE 选池」，混口径统计会把
     #   旧母体的负 alpha 一路带下来、永远显示"选错了"，无法回答"换母体有没有用"。
-    #   故按「池内市值中位 < 60亿 = SIZE 新母体」分段呈现，让新旧口径各自说话。
+    # ⚠️ v4.1（2026-10-25）：此段位于 _ANALYSIS_SLICE_START(3888) 之后，
+    #   SHOW_ANALYSIS=False 时**不渲染、不进页面**（v4.0 页面定位=每日决策页，
+    #   不承载方法论）。母体分段结论的正式载体已迁至 reports/factor_<date>.md
+    #   的「3.1 按母体口径分组」章节。此处仅保留供 SHOW_ANALYSIS=True 调试用，
+    #   其中的阈值口径文案（<60亿）已过时，勿据此下结论。
     _pe = _ic.get("pool_excess") or {}
     _peb = _ic.get("pool_excess_by_regime") or {}
     _pe_div = ''

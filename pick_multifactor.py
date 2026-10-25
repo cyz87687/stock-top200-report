@@ -23,6 +23,22 @@
 
 用法：
   python3 pick_multifactor.py [scored_json] [--top 10] [--out sector/mf_pick_<date>.json]
+  python3 pick_multifactor.py --allow-off-zone     # 放宽：不要求现价在买区内（调试用）
+
+⚠️ v4.3（2026-10-25 老大第 2 项要求）：**只选当日现价落在买入区间内的个股**。
+  原实现选完 10 只后在报告层才发现「现价高于买区」，只能打个提示——
+  实测 10-23：10 只里 **6 只现价高于买区上限**（巨人网络 +1.04%、鼎泰高科 +12.08%），
+  页面写"10 只"但当日可成交的只有 4 只，读者按 10 只备资金必然落空。
+  现在把这道闸前移到选股层：
+    ① 用 AST 从 gen_report_top200.py **抽取 build_trade_plan 源码**复用
+       （不重写：重写必然与页面口径漂移；不 import：会触发整份报告渲染）；
+    ② 对全部合格候选算买区，剔除 `price > buy_hi` 或 `price < buy_lo` 的；
+    ③ 把 buy_lo/buy_hi/stop/target/rr 一并落进 picks，报告层直接取用，
+       不再各自推导，杜绝「json 与页面两套买区」。
+  实证边界（audit_round16，A/B 同源同权重只差这一道闸，79 个入场日）：
+     配对检验 B−A 超额：T+1 −0.05% / T+5 −0.15% / T+10 −0.67% / T+15 −1.14%，
+     |NW t| 最大 1.54（<2）→ **代价在噪声内，不可断言有害**；
+     而可执行性从「10 只中位数 4 只可当日成交」提升到「全部可当日成交」。
 """
 import os
 import sys
@@ -54,6 +70,43 @@ DROP_HIGH = {
 # 组合约束
 MAX_PER_L2 = 2
 MAX_PER_L1 = 2
+
+# v4.3：现价必须落在买入区间内（老大 2026-10-25 第 2 项要求）。
+# ⚠️ 容差口径（v4.3 修订，曾在这里犯错）：第一版抄了页面 `_mf_n_in` 的 ±2% 容差，
+#   结果巨人网络现价 20.40 vs 买区上限 20.19（越界 1.04%）被放进组合 ——
+#   老大要的是「只选当日**在**买入区间的个股」，1% 的越界也不算在区间内。
+#   ±2% 那个口径只适用于页面打提示，不适用于**剔除**。
+#   现改为**严格口径**：price 不得高于 buy_hi、不得低于 buy_lo。
+#   保留的极小容差只为吸收 2 位小数舍入（页面展示值与内存值曾因此打架），
+#   不构成「允许小幅越界」。
+ZONE_TOL_PCT = 0.001      # 0.1% 相对容差（仅舍入吸收）
+ZONE_TOL_ABS = 0.01       # 1 分钱绝对容差
+
+
+def _load_trade_plan_fn():
+    """从 gen_report_top200.py 抽取 build_trade_plan 源码并 exec 出来复用。
+
+    为什么不用 import：gen_report_top200.py 是顶层脚本，import 即触发整份报告
+      渲染（读 json、拼 2.7MB HTML），既慢又有副作用。
+    为什么不用复制源码：两处副本必然漂移，而「买入区间」是本道闸的唯一依据，
+      口径漂移会让过滤结果与页面展示不一致。
+    抽取失败时返回 None → 调用方按「无买区数据」保守处理（不过滤，但如实计数）。
+    """
+    try:
+        import ast
+        p = os.path.join(HERE, "gen_report_top200.py")
+        src = open(p, encoding="utf-8").read()
+        tree = ast.parse(src)
+        for node in tree.body:
+            if isinstance(node, ast.FunctionDef) and node.name == "build_trade_plan":
+                ns = {}
+                exec(compile(ast.get_source_segment(src, node),
+                             "<build_trade_plan>", "exec"), ns)
+                return ns["build_trade_plan"]
+        print("⚠️ 未在 gen_report_top200.py 找到 build_trade_plan → 买区过滤不生效")
+    except Exception as _e:
+        print(f"⚠️ 抽取 build_trade_plan 失败({_e}) → 买区过滤不生效")
+    return None
 
 
 def _f(x, d=None):
@@ -157,7 +210,7 @@ def pct_rank(vals):
     return out
 
 
-def build(scored_path, top, per_l2, per_l1):
+def build(scored_path, top, per_l2, per_l1, require_zone=True):
     with open(scored_path, encoding='utf-8') as f:
         data = json.load(f)
     results = [r for r in data.get("results") or [] if r]
@@ -181,6 +234,41 @@ def build(scored_path, top, per_l2, per_l1):
             continue
         elig.append(r)
 
+    # v4.3（老大第 2 项要求）：现价必须落在买入区间内。
+    # 买区由报告层同源函数 build_trade_plan 推导（AST 抽取复用，不重写、不 import），
+    # 因此页面展示的买区与这里的判据**必然一致**，不会出现「json 说能买、页面说要等回踩」。
+    btp = _load_trade_plan_fn()
+    zone_map = {}          # index → plan dict
+    zone_log = {"no_plan": 0, "above_zone": 0, "below_zone": 0, "in_zone": 0}
+    if btp:
+        for i, r in enumerate(elig):
+            try:
+                plan = btp(r)
+            except Exception:
+                plan = None
+            price = r.get("price")
+            if not plan or not isinstance(price, (int, float)) or price <= 0:
+                zone_log["no_plan"] += 1
+                continue
+            lo, hi = plan.get("buy_lo"), plan.get("buy_hi")
+            if not isinstance(lo, (int, float)) or not isinstance(hi, (int, float)):
+                zone_log["no_plan"] += 1
+                continue
+            # 严格口径：现价不得越出买区上下限；容差仅吸收 2 位小数舍入
+            _tol_hi = max(hi * ZONE_TOL_PCT, ZONE_TOL_ABS)
+            _tol_lo = max(lo * ZONE_TOL_PCT, ZONE_TOL_ABS)
+            if price > hi + _tol_hi:
+                zone_log["above_zone"] += 1
+            elif price < lo - _tol_lo:
+                zone_log["below_zone"] += 1
+            else:
+                zone_log["in_zone"] += 1
+                zone_map[i] = plan
+    else:
+        # 抽不到 build_trade_plan → 不过滤，但把「未校验」如实计数，
+        # 绝不静默当成「全部通过」
+        zone_log["no_plan"] = len(elig)
+
     # 分位化（全部在合格样本内排名，避免绝对量纲问题）
     def col(key):
         return [(_f(r.get(key)) if isinstance(r.get(key), (int, float)) else None)
@@ -199,7 +287,8 @@ def build(scored_path, top, per_l2, per_l1):
     pr_att = pct_rank(col("score_attention"))
     pr_thm = pct_rank(col("score_theme"))
 
-    # 硬排除：attention / theme 高分（这两个方向实证为负）
+    # 硬排除：attention / theme 高分（这两个方向实证为负）+ RSI 追高
+    #   + v4.3「现价不在买入区间」剔除（老大第 2 项要求）
     keep_idx, exc_log = [], {}
     for i, r in enumerate(elig):
         bad = None
@@ -209,6 +298,9 @@ def build(scored_path, top, per_l2, per_l1):
             bad = "题材过热(theme 前20%)"
         elif (_f((r.get("tech") or {}).get("rsi"), 0) or 0) > 70:
             bad = "RSI>70 追高"
+        elif require_zone and btp and i not in zone_map:
+            # 已算出买区但不满足 → 现价高于上限（需回踩）或已破位（低于下限）
+            bad = "现价不在买入区间"
         if bad:
             exc_log[bad] = exc_log.get(bad, 0) + 1
         else:
@@ -247,6 +339,13 @@ def build(scored_path, top, per_l2, per_l1):
             "att_pct": round(pr_att.get(i, 0) * 100, 1),
             "thm_pct": round(pr_thm.get(i, 0) * 100, 1),
         }
+        # v4.3：把同源推导出的交易计划一并落盘，报告层直接取用，
+        #   不再各自推导 —— 否则会出现「json 与页面两套买区」的口径分裂。
+        _pl = zone_map.get(i)
+        if _pl:
+            r2["_plan"] = {k: _pl.get(k) for k in
+                           ("buy_lo", "buy_hi", "stop", "target", "rr",
+                            "entry_ref", "tgt_basis", "overbought", "flags")}
         picked.append(r2)
         if len(picked) >= top:
             break
@@ -254,10 +353,26 @@ def build(scored_path, top, per_l2, per_l1):
     out = {
         "date": date_str,
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "method": "multifactor-v1（权重由池内实证反推，非手填）",
+        "method": "multifactor-v2（权重由池内实证反推，非手填；v4.3 起只选当日现价在买入区间内的个股）",
         "top": top,
         "n_eligible": len(elig),
         "n_scored": len(scored),
+        "zone_filter": {
+            "enabled": bool(require_zone and btp),
+            "rule": ("现价须落在买入区间内（严格口径，容差仅吸收 2 位小数舍入："
+                     "相对 0.1% 或绝对 1 分钱取大）；买区由 "
+                     "gen_report_top200.build_trade_plan 同源推导，"
+                     "多头取 ma5~ma10 回踩区、弱势取 ma10~ma20 企稳区"),
+            "tolerance_pct": ZONE_TOL_PCT,
+            "tolerance_abs": ZONE_TOL_ABS,
+            "counts": zone_log,
+            "note": ("build_trade_plan 中 buy_hi = min(ref_hi, price)，即买区上限永不高于现价"
+                     " → 「现价在买区内」的实质含义是**股价已回踩到均线带内**，"
+                     "而不是现价夹在区间上下限之间。price > buy_hi 即需等回踩，"
+                     "当日挂单成交不了。⚠️ v4.3 曾误用页面 `_mf_n_in` 的 ±2% 容差做剔除，"
+                     "导致现价越界 1.04% 的巨人网络被放进组合，已改为严格口径"),
+        },
+        "zone_stats": zone_log,
         "weights": {k: round(v, 4) for k, v in W.items()},
         "weight_reason": why,
         "rev_parts": rev_parts,
@@ -274,6 +389,7 @@ def build(scored_path, top, per_l2, per_l1):
             "price": r.get("price"), "pct_chg": r.get("pct_chg"),
             "total": r.get("total"), "rating": r.get("rating"),
             "mf_score": r.get("_mf_score"), "parts": r.get("_mf_parts"),
+            "plan": r.get("_plan"),
             "score_fund": _f(r.get("score_fund")), "score_news": _f(r.get("score_news")),
             "score_theme": _f(r.get("score_theme")),
             "score_attention": _f(r.get("score_attention")),
@@ -292,6 +408,8 @@ def build(scored_path, top, per_l2, per_l1):
             "score_sector 池内 IC 全周期不显著（T+1 t=0.29 / T+5 t=-1.20）→ 未作为选股轴",
             "池内头组净收益历史上为负 → 组合≠赚钱，须配合仓位纪律与止损",
             "组合仅表达「相对排序」，不构成个股推荐",
+            "v4.3 买区过滤的收益代价在噪声内（audit_round16 配对检验 |NW t| 最大 1.54 < 2），"
+            "但把可执行性从「10 只中约 4 只可当日成交」提升到「全部可当日成交」",
         ],
     }
     return out
@@ -304,6 +422,8 @@ def main():
     ap.add_argument("--per-l2", type=int, default=MAX_PER_L2)
     ap.add_argument("--per-l1", type=int, default=MAX_PER_L1)
     ap.add_argument("--out", default=None)
+    ap.add_argument("--allow-off-zone", action="store_true",
+                    help="放宽：不要求现价落在买入区间内（仅调试对照用）")
     args = ap.parse_args()
 
     scored = args.scored
@@ -315,7 +435,8 @@ def main():
         print("❌ 未找到 scored json")
         return 1
 
-    out = build(scored, args.top, args.per_l2, args.per_l1)
+    out = build(scored, args.top, args.per_l2, args.per_l1,
+                require_zone=not args.allow_off_zone)
     op = args.out or os.path.join(SECTOR_DIR, f"mf_pick_{out['date']}.json")
     os.makedirs(os.path.dirname(op), exist_ok=True)
     with open(op, "w", encoding="utf-8") as f:
@@ -326,11 +447,17 @@ def main():
     for k, v in out["weight_reason"].items():
         print(f"   {k}: {v}")
     print("硬排除:", out["excluded"], "| 资格过滤:", out["eligibility_dropped"])
-    print(f"\n=== 多因子组合（{len(out['picks'])} 只）===")
+    print("买区统计:", out["zone_stats"],
+          "| 过滤开关:", out["zone_filter"]["enabled"])
+    print(f"\n=== 多因子组合（{len(out['picks'])} 只 · 现价均在买入区间内）===")
     for i, p in enumerate(out["picks"], 1):
+        _pl = p.get("plan") or {}
+        _zs = (f"买区 {_pl['buy_lo']:.2f}~{_pl['buy_hi']:.2f} · 止损 {_pl['stop']:.2f} · "
+               f"目标 {_pl['target']:.2f} · RR {_pl['rr']:.1f}") if _pl else "无交易计划"
         print(f"{i:>2}. {p['name']:<6}{p['code']} {str(p['sector_l2']):<8} "
               f"mf={p['mf_score']:.3f} total={p['total']:.1f}({p['rating']}) "
               f"fund={p['score_fund']} news={p['score_news']} RSI={p['rsi']}")
+        print(f"      现价 {p['price']:.2f} | {_zs}")
     print(f"\n✅ 写入 {op}")
     return 0
 

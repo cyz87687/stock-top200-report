@@ -1,17 +1,36 @@
 {
  "date": "2026-10-23",
- "generated_at": "2026-10-25 11:30:28",
- "method": "multifactor-v1（权重由池内实证反推，非手填）",
+ "generated_at": "2026-10-25 13:46:56",
+ "method": "multifactor-v2（权重由池内实证反推，非手填；v4.3 起只选当日现价在买入区间内的个股）",
  "top": 10,
  "n_eligible": 490,
- "n_scored": 304,
+ "n_scored": 93,
+ "zone_filter": {
+  "enabled": true,
+  "rule": "现价须落在买入区间内（严格口径，容差仅吸收 2 位小数舍入：相对 0.1% 或绝对 1 分钱取大）；买区由 gen_report_top200.build_trade_plan 同源推导，多头取 ma5~ma10 回踩区、弱势取 ma10~ma20 企稳区",
+  "tolerance_pct": 0.001,
+  "tolerance_abs": 0.01,
+  "counts": {
+   "no_plan": 0,
+   "above_zone": 357,
+   "below_zone": 0,
+   "in_zone": 133
+  },
+  "note": "build_trade_plan 中 buy_hi = min(ref_hi, price)，即买区上限永不高于现价 → 「现价在买区内」的实质含义是**股价已回踩到均线带内**，而不是现价夹在区间上下限之间。price > buy_hi 即需等回踩，当日挂单成交不了。⚠️ v4.3 曾误用页面 `_mf_n_in` 的 ±2% 容差做剔除，导致现价越界 1.04% 的巨人网络被放进组合，已改为严格口径"
+ },
+ "zone_stats": {
+  "no_plan": 0,
+  "above_zone": 357,
+  "below_zone": 0,
+  "in_zone": 133
+ },
  "weights": {
   "score_fund": 0.7617,
   "score_news": 0.2007,
   "__rev__": 0.0376
  },
  "weight_reason": {
-  "score_fund": "t_min=2.96（唯一全周期稳健）",
+  "score_fund": "t_min=2.96（T+1/T+5 均显著；但 T+20 t=1.72，长周期已明显衰减）",
   "score_news": "t_min=1.56，但 T+20 t=0.68，长周期失效 → 砍半",
   "__rev__": "块内 4 维均 t_min=0.29，仅 8 截面 → 折半"
  },
@@ -137,127 +156,38 @@
  },
  "excluded": {
   "关注度过高(attention 前20%)": 98,
+  "现价不在买入区间": 211,
   "题材过热(theme 前20%)": 78,
   "RSI>70 追高": 10
  },
  "eligibility_dropped": {},
  "capped": [
   {
-   "name": "富临精工",
-   "reason": "二级板块 电池 已满 2"
+   "name": "江西铜业",
+   "reason": "一级行业 有色金属 已满 2"
   },
   {
-   "name": "全志科技",
+   "name": "中钨高新",
+   "reason": "一级行业 有色金属 已满 2"
+  },
+  {
+   "name": "商络电子",
    "reason": "一级行业 电子 已满 2"
   },
   {
-   "name": "新宙邦",
-   "reason": "二级板块 电池 已满 2"
-  },
-  {
-   "name": "德福科技",
-   "reason": "二级板块 电池 已满 2"
-  },
-  {
-   "name": "鼎龙股份",
+   "name": "天津普林",
    "reason": "一级行业 电子 已满 2"
   },
   {
-   "name": "金海通",
-   "reason": "一级行业 电子 已满 2"
+   "name": "星宸科技",
+   "reason": "二级板块 半导体 已满 2"
   },
   {
-   "name": "广合科技",
-   "reason": "一级行业 电子 已满 2"
-  },
-  {
-   "name": "圣邦股份",
-   "reason": "一级行业 电子 已满 2"
-  },
-  {
-   "name": "天华新能",
-   "reason": "二级板块 电池 已满 2"
+   "name": "东方锆业",
+   "reason": "一级行业 有色金属 已满 2"
   }
  ],
  "picks": [
-  {
-   "name": "巨人网络",
-   "code": "sz002558",
-   "sector_l2": "游戏Ⅱ",
-   "sector_parent": "传媒",
-   "price": 20.4,
-   "pct_chg": 3.08,
-   "total": 77.12,
-   "rating": "A",
-   "mf_score": 0.8919,
-   "parts": {
-    "fund_pct": 92.6,
-    "news_pct": 78.7,
-    "rev_pct": 75.3,
-    "att_pct": 26.8,
-    "thm_pct": 78.1
-   },
-   "score_fund": 5.0,
-   "score_news": 3.55,
-   "score_theme": 4.4,
-   "score_attention": 1.35,
-   "score_sector": 2.08,
-   "rsi": 31.6,
-   "trend": "日线空头",
-   "fwd_pe": 9.0,
-   "growth": 177.2,
-   "circ_mv_yi": 387.71,
-   "mom5": -2.6,
-   "mom20": -15.0,
-   "fund_reasons": [
-    "低估值(FwdPE=9.0)+高增长(+177%)",
-    "估值阶梯合理收缩(9.0→7.9→7.2),3年收缩20%",
-    "PEG=0.05(严重低估,增速远超估值)"
-   ],
-   "news_reasons": [
-    "无真实新闻/催化剂",
-    "消息时效:近7日无消息"
-   ]
-  },
-  {
-   "name": "天赐材料",
-   "code": "sz002709",
-   "sector_l2": "电池",
-   "sector_parent": "电力设备",
-   "price": 27.29,
-   "pct_chg": 5.37,
-   "total": 85.8,
-   "rating": "S",
-   "mf_score": 0.8776,
-   "parts": {
-    "fund_pct": 89.8,
-    "news_pct": 80.0,
-    "rev_pct": 88.5,
-    "att_pct": 62.2,
-    "thm_pct": 75.1
-   },
-   "score_fund": 5.0,
-   "score_news": 3.59,
-   "score_theme": 4.19,
-   "score_attention": 3.11,
-   "score_sector": 3.28,
-   "rsi": 34.5,
-   "trend": "日线空头",
-   "fwd_pe": 8.5,
-   "growth": 370.0,
-   "circ_mv_yi": 411.81,
-   "mom5": -5.0,
-   "mom20": -17.0,
-   "fund_reasons": [
-    "低基数失真修正: 单点增速1097%→370%(超出三年CAGR=-37.4%可支持上限,已饱和)",
-    "低估值(FwdPE=8.5)+高增长(+370%)",
-    "估值阶梯合理收缩(8.5→7.5→6.6),3年收缩22%"
-   ],
-   "news_reasons": [
-    "电解液龙头地位稳固+新型锂盐放量+海外客户拓展",
-    "⚠️锂电材料价格战+产能过剩风险"
-   ]
-  },
   {
    "name": "复旦微电",
    "code": "sh688385",
@@ -274,6 +204,17 @@
     "rev_pct": 18.6,
     "att_pct": 22.9,
     "thm_pct": 69.9
+   },
+   "plan": {
+    "buy_lo": 51.7,
+    "buy_hi": 54.04,
+    "stop": 50.41,
+    "target": 62.3,
+    "rr": 2.2754820936639097,
+    "entry_ref": 54.04,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
    },
    "score_fund": 5.0,
    "score_news": 3.5,
@@ -298,84 +239,6 @@
    ]
   },
   {
-   "name": "亿纬锂能",
-   "code": "sz300014",
-   "sector_l2": "电池",
-   "sector_parent": "电力设备",
-   "price": 44.33,
-   "pct_chg": 6.08,
-   "total": 83.26,
-   "rating": "A",
-   "mf_score": 0.8717,
-   "parts": {
-    "fund_pct": 90.2,
-    "news_pct": 80.2,
-    "rev_pct": 63.6,
-    "att_pct": 75.3,
-    "thm_pct": 77.5
-   },
-   "score_fund": 5.0,
-   "score_news": 3.59,
-   "score_theme": 4.32,
-   "score_attention": 3.76,
-   "score_sector": 3.28,
-   "rsi": 37.7,
-   "trend": "日线空头",
-   "fwd_pe": 13.3,
-   "growth": 111.9,
-   "circ_mv_yi": 936.68,
-   "mom5": -5.8,
-   "mom20": -8.1,
-   "fund_reasons": [
-    "低估值(FwdPE=13.3)+高增长(+112%)",
-    "估值阶梯明显收缩(13.3→9.7→7.9),3年收缩41%",
-    "PEG=0.12(严重低估,增速远超估值)"
-   ],
-   "news_reasons": [
-    "锂电龙头+动力电池+储能+大圆柱量产",
-    "⚠️锂电行业竞争+原材料波动"
-   ]
-  },
-  {
-   "name": "生益电子",
-   "code": "sh688183",
-   "sector_l2": "元件",
-   "sector_parent": "电子",
-   "price": 87.28,
-   "pct_chg": 0.96,
-   "total": 81.35,
-   "rating": "A",
-   "mf_score": 0.8676,
-   "parts": {
-    "fund_pct": 90.6,
-    "news_pct": 73.4,
-    "rev_pct": 80.4,
-    "att_pct": 34.2,
-    "thm_pct": 25.8
-   },
-   "score_fund": 5.0,
-   "score_news": 3.5,
-   "score_theme": 2.49,
-   "score_attention": 1.72,
-   "score_sector": 2.08,
-   "rsi": 29.3,
-   "trend": "日线空头",
-   "fwd_pe": 27.0,
-   "growth": 110.3,
-   "circ_mv_yi": 731.05,
-   "mom5": -8.4,
-   "mom20": -27.5,
-   "fund_reasons": [
-    "估值合理(FwdPE=27.0)+增速(+110%)",
-    "估值阶梯强收缩(27.0→17.7→13.1),3年收缩51%,中PE起始,阶梯加分适度",
-    "PEG=0.24(严重低估,增速远超估值)"
-   ],
-   "news_reasons": [
-    "PCB+高频高速板+汽车电子板",
-    "⚠️PCB行业竞争+原材料波动"
-   ]
-  },
-  {
    "name": "智微智能",
    "code": "sz001339",
    "sector_l2": "计算机设备",
@@ -391,6 +254,17 @@
     "rev_pct": 58.5,
     "att_pct": 2.9,
     "thm_pct": 76.7
+   },
+   "plan": {
+    "buy_lo": 61.8,
+    "buy_hi": 64.21,
+    "stop": 58.0,
+    "target": 74.03,
+    "rr": 1.581320450885671,
+    "entry_ref": 64.21,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
    },
    "score_fund": 5.0,
    "score_news": 1.5,
@@ -431,6 +305,17 @@
     "att_pct": 14.7,
     "thm_pct": 4.7
    },
+   "plan": {
+    "buy_lo": 5.01,
+    "buy_hi": 5.1,
+    "stop": 4.96,
+    "target": 6.18,
+    "rr": 7.714285714285732,
+    "entry_ref": 5.1,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
    "score_fund": 5.0,
    "score_news": 1.2,
    "score_theme": 1.69,
@@ -470,6 +355,17 @@
     "att_pct": 41.5,
     "thm_pct": 31.1
    },
+   "plan": {
+    "buy_lo": 120.94,
+    "buy_hi": 122.92,
+    "stop": 119.73,
+    "target": 125.34,
+    "rr": 0.7586206896551735,
+    "entry_ref": 122.92,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
    "score_fund": 5.0,
    "score_news": 0.8,
    "score_theme": 2.59,
@@ -493,81 +389,303 @@
    ]
   },
   {
-   "name": "北方稀土",
-   "code": "sh600111",
-   "sector_l2": "小金属",
-   "sector_parent": "有色金属",
-   "price": 36.53,
-   "pct_chg": 2.12,
-   "total": 78.85,
+   "name": "圣邦股份",
+   "code": "sz300661",
+   "sector_l2": "半导体",
+   "sector_parent": "电子",
+   "price": 88.08,
+   "pct_chg": 1.54,
+   "total": 83.36,
    "rating": "A",
-   "mf_score": 0.8321,
+   "mf_score": 0.8323,
    "parts": {
-    "fund_pct": 83.8,
-    "news_pct": 87.7,
-    "rev_pct": 46.2,
-    "att_pct": 70.8,
-    "thm_pct": 60.9
+    "fund_pct": 82.6,
+    "news_pct": 87.3,
+    "rev_pct": 73.8,
+    "att_pct": 20.9,
+    "thm_pct": 27.4
+   },
+   "plan": {
+    "buy_lo": 86.31,
+    "buy_hi": 88.08,
+    "stop": 85.44,
+    "target": 106.99,
+    "rr": 7.162878787878785,
+    "entry_ref": 88.08,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
    },
    "score_fund": 4.82,
    "score_news": 4.0,
-   "score_theme": 3.39,
-   "score_attention": 3.54,
+   "score_theme": 2.52,
+   "score_attention": 1.05,
    "score_sector": 3.28,
-   "rsi": 49.8,
-   "trend": "偏空",
-   "fwd_pe": 28.8,
-   "growth": 128.8,
-   "circ_mv_yi": 1320.58,
-   "mom5": 3.4,
-   "mom20": -0.5,
+   "rsi": 32.3,
+   "trend": "日线空头",
+   "fwd_pe": 64.1,
+   "growth": 164.6,
+   "circ_mv_yi": 531.48,
+   "mom5": -2.5,
+   "mom20": -24.4,
    "fund_reasons": [
-    "估值合理(FwdPE=28.8)+增速(+129%)",
-    "估值阶梯明显收缩(28.8→23.4→19.7),3年收缩32%,中PE起始,阶梯加分适度",
-    "PEG=0.22(严重低估,增速远超估值)"
+    "高估值(FwdPE=64.1)但有增长(+165%)",
+    "估值阶梯强收缩(64.1→43.5→31.3),3年收缩51%,高PE起始,阶梯加分受限",
+    "PEG=0.39(严重低估,增速远超估值)"
    ],
    "news_reasons": [
-    "稀土龙头+北方稀土集团+新能源车磁材需求",
-    "⚠️稀土价格波动+政策调控"
+    "模拟芯片国产替代龙头+信号链+电源管理双平台",
+    "⚠️模拟芯片竞争加剧+研发投入大"
    ]
   },
   {
-   "name": "鼎泰高科",
-   "code": "sz301377",
-   "sector_l2": "通用设备",
-   "sector_parent": "机械设备",
-   "price": 246.0,
-   "pct_chg": 0.82,
-   "total": 89.0,
-   "rating": "S",
-   "mf_score": 0.8314,
+   "name": "厦门钨业",
+   "code": "sh600549",
+   "sector_l2": "小金属",
+   "sector_parent": "有色金属",
+   "price": 36.3,
+   "pct_chg": 1.97,
+   "total": 79.98,
+   "rating": "A",
+   "mf_score": 0.7958,
    "parts": {
-    "fund_pct": 79.8,
-    "news_pct": 93.7,
-    "rev_pct": 95.5,
-    "att_pct": 37.6,
-    "thm_pct": 37.6
+    "fund_pct": 83.6,
+    "news_pct": 62.2,
+    "rev_pct": 90.4,
+    "att_pct": 42.1,
+    "thm_pct": 24.5
    },
-   "score_fund": 4.71,
-   "score_news": 4.5,
-   "score_theme": 2.75,
-   "score_attention": 1.89,
-   "score_sector": 2.76,
-   "rsi": 20.2,
+   "plan": {
+    "buy_lo": 35.42,
+    "buy_hi": 36.3,
+    "stop": 35.07,
+    "target": 48.45,
+    "rr": 9.878048780487834,
+    "entry_ref": 36.3,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.82,
+   "score_news": 3.0,
+   "score_theme": 2.45,
+   "score_attention": 2.12,
+   "score_sector": 3.28,
+   "rsi": 24.7,
    "trend": "日线空头",
-   "fwd_pe": 75.2,
-   "growth": 173.2,
-   "circ_mv_yi": 244.09,
-   "mom5": -8.8,
-   "mom20": -38.2,
+   "fwd_pe": 12.2,
+   "growth": 122.8,
+   "circ_mv_yi": 564.08,
+   "mom5": -1.4,
+   "mom20": -26.4,
    "fund_reasons": [
-    "低基数失真修正: 单点增速353%→173%(超出三年CAGR=25.3%可支持上限,已饱和)",
-    "高估值(FwdPE=75.2)但有增长(+173%)",
-    "估值阶梯强收缩(75.2→40.9→27.6),3年收缩63%,高PE起始,阶梯加分受限"
+    "低估值(FwdPE=12.2)+高增长(+123%)",
+    "估值阶梯明显收缩(12.2→10.0→8.3),3年收缩32%",
+    "PEG=0.10(严重低估,增速远超估值)"
    ],
    "news_reasons": [
-    "PCB钻针全球龙头+AI服务器高密度PCB拉动+微钻放量+涂层钻针毛利率超50%",
-    "⚠️PCB行业周期+股东询价转让"
+    "钨钼稀土龙头+高端材料布局+新能源电池材料拓展",
+    "⚠️大宗商品价格波动"
+   ]
+  },
+  {
+   "name": "多氟多",
+   "code": "sz002407",
+   "sector_l2": "化学制品",
+   "sector_parent": "基础化工",
+   "price": 23.92,
+   "pct_chg": 1.7,
+   "total": 81.31,
+   "rating": "A",
+   "mf_score": 0.7888,
+   "parts": {
+    "fund_pct": 83.0,
+    "news_pct": 61.1,
+    "rev_pct": 89.6,
+    "att_pct": 64.8,
+    "thm_pct": 37.8
+   },
+   "plan": {
+    "buy_lo": 23.4,
+    "buy_hi": 23.92,
+    "stop": 23.17,
+    "target": 24.63,
+    "rr": 0.9466666666666631,
+    "entry_ref": 23.92,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.82,
+   "score_news": 3.0,
+   "score_theme": 2.76,
+   "score_attention": 3.24,
+   "score_sector": 2.92,
+   "rsi": 27.1,
+   "trend": "日线空头",
+   "fwd_pe": 14.3,
+   "growth": 370.0,
+   "circ_mv_yi": 258.56,
+   "mom5": -5.4,
+   "mom20": -26.6,
+   "fund_reasons": [
+    "低基数失真修正: 单点增速2499%→370%(超出三年CAGR=-62.2%可支持上限,已饱和)",
+    "低估值(FwdPE=14.3)+高增长(+370%)",
+    "估值阶梯明显收缩(14.3→11.2→8.3),3年收缩42%"
+   ],
+   "news_reasons": [
+    "氟化工龙头+六氟磷酸锂+新型锂盐布局",
+    "⚠️锂盐价格波动+产能扩张压力"
+   ]
+  },
+  {
+   "name": "金风科技",
+   "code": "sz002202",
+   "sector_l2": "风电设备",
+   "sector_parent": "电力设备",
+   "price": 14.9,
+   "pct_chg": 1.15,
+   "total": 79.44,
+   "rating": "A",
+   "mf_score": 0.7764,
+   "parts": {
+    "fund_pct": 79.3,
+    "news_pct": 70.6,
+    "rev_pct": 81.0,
+    "att_pct": 38.2,
+    "thm_pct": 65.6
+   },
+   "plan": {
+    "buy_lo": 14.66,
+    "buy_hi": 14.9,
+    "stop": 14.51,
+    "target": 18.16,
+    "rr": 8.358974358974347,
+    "entry_ref": 14.9,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.68,
+   "score_news": 3.36,
+   "score_theme": 3.61,
+   "score_attention": 1.92,
+   "score_sector": 3.28,
+   "rsi": 28.6,
+   "trend": "日线空头",
+   "fwd_pe": 14.2,
+   "growth": 47.8,
+   "circ_mv_yi": 501.18,
+   "mom5": -1.5,
+   "mom20": -18.2,
+   "fund_reasons": [
+    "合理估值(FwdPE=14.2)+高增长(+48%)",
+    "估值阶梯明显收缩(14.2→11.3→9.4),3年收缩34%",
+    "PEG=0.30(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "风电整机龙头+海上风电",
+    "⚠️风电行业周期+招标波动"
+   ]
+  },
+  {
+   "name": "宝丰能源",
+   "code": "sh600989",
+   "sector_l2": "化学原料",
+   "sector_parent": "基础化工",
+   "price": 21.33,
+   "pct_chg": 5.02,
+   "total": 66.35,
+   "rating": "A",
+   "mf_score": 0.7689,
+   "parts": {
+    "fund_pct": 85.1,
+    "news_pct": 50.3,
+    "rev_pct": 53.2,
+    "att_pct": 64.6,
+    "thm_pct": 53.2
+   },
+   "plan": {
+    "buy_lo": 20.92,
+    "buy_hi": 21.33,
+    "stop": 20.71,
+    "target": 21.76,
+    "rr": 0.6935483870967823,
+    "entry_ref": 21.33,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.82,
+   "score_news": 1.3,
+   "score_theme": 3.14,
+   "score_attention": 3.23,
+   "score_sector": 3.28,
+   "rsi": 40.2,
+   "trend": "日线空头",
+   "fwd_pe": 9.3,
+   "growth": 57.5,
+   "circ_mv_yi": 1564.21,
+   "mom5": -4.8,
+   "mom20": -8.2,
+   "fund_reasons": [
+    "低估值(FwdPE=9.3)+高增长(+57%)",
+    "估值阶梯收缩不足(9.3→8.8→8.3),3年仅收缩11%",
+    "PEG=0.16(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "iFinD确认:多重利好",
+    "财报披露(定期报告,中性)"
+   ]
+  },
+  {
+   "name": "中材科技",
+   "code": "sz002080",
+   "sector_l2": "玻璃玻纤",
+   "sector_parent": "建筑材料",
+   "price": 40.29,
+   "pct_chg": 0.3,
+   "total": 79.55,
+   "rating": "A",
+   "mf_score": 0.7537,
+   "parts": {
+    "fund_pct": 75.5,
+    "news_pct": 74.0,
+    "rev_pct": 80.8,
+    "att_pct": 74.6,
+    "thm_pct": 19.4
+   },
+   "plan": {
+    "buy_lo": 39.97,
+    "buy_hi": 40.29,
+    "stop": 39.28,
+    "target": 41.25,
+    "rr": 0.9504950495049532,
+    "entry_ref": 40.29,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.5,
+   "score_news": 3.5,
+   "score_theme": 2.32,
+   "score_attention": 3.73,
+   "score_sector": 3.28,
+   "rsi": 30.3,
+   "trend": "日线空头",
+   "fwd_pe": 23.7,
+   "growth": 35.5,
+   "circ_mv_yi": 676.12,
+   "mom5": -5.6,
+   "mom20": -31.4,
+   "fund_reasons": [
+    "估值合理(FwdPE=23.7)+增速(+36%)",
+    "估值阶梯明显收缩(23.7→15.5→12.3),3年收缩48%",
+    "PEG=0.67(低估,增速覆盖估值)"
+   ],
+   "news_reasons": [
+    "风电叶片+玻璃纤维+新材料",
+    "⚠️风电行业周期+原材料波动"
    ]
   }
  ],
@@ -575,6 +693,7 @@
   "反转块仅 8 个截面 → 弱先验，不是已验证因子",
   "score_sector 池内 IC 全周期不显著（T+1 t=0.29 / T+5 t=-1.20）→ 未作为选股轴",
   "池内头组净收益历史上为负 → 组合≠赚钱，须配合仓位纪律与止损",
-  "组合仅表达「相对排序」，不构成个股推荐"
+  "组合仅表达「相对排序」，不构成个股推荐",
+  "v4.3 买区过滤的收益代价在噪声内（audit_round16 配对检验 |NW t| 最大 1.54 < 2），但把可执行性从「10 只中约 4 只可当日成交」提升到「全部可当日成交」"
  ]
 }

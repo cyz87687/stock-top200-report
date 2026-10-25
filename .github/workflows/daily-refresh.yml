@@ -219,21 +219,56 @@ jobs:
               echo "[$(date -u '+%H:%M:%S')] ⚠️ Factor IC evaluation failed, report will omit IC section" >> $LOG
             fi
 
+            # Step 3.955: 多因子组合专项审计（v4.3，老大 2026-10-25 三项要求）
+            #   必须在 factor_eval.py 之后：round15/round16 要读 factor_history.json（本步刚刷新）。
+            #   必须在 gen_report_top200.py 之前：报告层「⏱ 持仓周期」区块读 audit_round15.json。
+            #   必须在 pick_multifactor.py 之前：round15/16 不依赖 mf_pick，只依赖历史截面。
+            #   失败不阻断主链（审计是研究层，不是决策产物），但会记 ⚠️。
+            echo "[$(date -u '+%H:%M:%S')] Running audit_round15/16 (holding period + zone filter A/B) ..." >> $LOG
+            if timeout 600 python3 audit_round15.py >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Holding-period backtest updated" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ audit_round15 failed/timeout, report holds stale holding-period block" >> $LOG
+            fi
+            if timeout 600 python3 audit_round16.py >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Zone-filter A/B comparison updated" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ audit_round16 failed/timeout, daily report may show stale table" >> $LOG
+            fi
+
             # Step 3.965: 多因子精选组合（≤10 只）+ 回测 → sector/mf_pick_<date>.json + mf_backtest.json
             # 【v3.9 新增】解决「候选组合 20 只无法执行」问题；权重由 factor_ic.json 证据反推，非手填。
+            # 【v4.3 新增】只选当日现价落在买入区间内的个股（老大第 2 项要求）。
+            #   买区由 gen_report_top200.build_trade_plan 同源推导（AST 抽取复用，不重写），
+            #   因此页面展示的买区与选股判据必然一致。
             # ⚠️ 必须在 factor_eval.py 之后: 要读最新 factor_ic.json 的池内 IC 来推导权重。
             # ⚠️ 必须在 track_recommendations.py 之后: 报告层「动量路线低 IC 悖论」区块
             #    读 recommendation_track.json 的真实跟踪数据。
             # ⚠️ 必须在 gen_report_top200.py 之前: 报告层渲染「🧮 多因子精选组合」区块。
             echo "[$(date -u '+%H:%M:%S')] Running pick_multifactor.py + gen_mf_backtest.py ..." >> $LOG
             if python3 pick_multifactor.py "$SCORED_JSON" --top 10 >> $LOG 2>&1; then
-              echo "[$(date -u '+%H:%M:%S')] ✅ Multifactor portfolio generated" >> $LOG
+              echo "[$(date -u '+%H:%M:%S')] ✅ Multifactor portfolio generated (in-zone only)" >> $LOG
               _MFOUT=$(ls -1 sector/mf_pick_*.json 2>/dev/null | sort | tail -1)
               if [ -n "$_MFOUT" ]; then cp "$_MFOUT" sector/mf_latest.json; fi
               if timeout 300 python3 gen_mf_backtest.py >> $LOG 2>&1; then
                 echo "[$(date -u '+%H:%M:%S')] ✅ Multifactor backtest regenerated" >> $LOG
               else
                 echo "[$(date -u '+%H:%M:%S')] ⚠️ Multifactor backtest failed/timeout, report may show stale table" >> $LOG
+              fi
+              # Step 3.965b: 组合产出后立刻核查「现价 vs 买入区间」（v4.3）
+              #   选股层已做这道闸，这里做**独立复核**：万一 build_trade_plan 抽失败或
+              #   数据异常导致过滤没生效，能在此发现而不是等老大在页面上发现。
+              #   round14 默认自动探测最新 mf_pick_<date>.json，不写死日期。
+              echo "[$(date -u '+%H:%M:%S')] Running audit_round14/14b (in-zone verification) ..." >> $LOG
+              if timeout 300 python3 audit_round14.py >> $LOG 2>&1; then
+                echo "[$(date -u '+%H:%M:%S')] ✅ In-zone verification done" >> $LOG
+              else
+                echo "[$(date -u '+%H:%M:%S')] ⚠️ audit_round14 failed, check mf_pick in-zone manually" >> $LOG
+              fi
+              if timeout 300 python3 audit_round14b.py >> $LOG 2>&1; then
+                echo "[$(date -u '+%H:%M:%S')] ✅ Candidate pool zone distribution done" >> $LOG
+              else
+                echo "[$(date -u '+%H:%M:%S')] ⚠️ audit_round14b failed (non-blocking)" >> $LOG
               fi
             else
               echo "[$(date -u '+%H:%M:%S')] ⚠️ Multifactor pick failed, report falls back to mf_latest.json" >> $LOG
@@ -336,6 +371,10 @@ jobs:
           prune_keep "reports/factor_[0-9]*.md" 30
           #   日报的本地 HTML 预览不入库（老大要求「Markdown 存档，不上线」）
           rm -f reports/factor_[0-9]*.html 2>/dev/null || true
+          # 3.7) v4.3 多因子审计产物（保留最近 2 份，供跨日对比）
+          #   audit_round15/16 是持仓周期与买区过滤的每日实证底稿，
+          #   报告层与因子日报都读它们 → 必须入库，否则线上页面拿不到数据。
+          prune_keep "audit_round1[456]*.json" 2
           # 4) 清理备份/临时文件
           rm -f *.bak *.bak_* *.prebak 2>/dev/null || true
           echo "--- 保留后清单 ---"
@@ -365,6 +404,10 @@ jobs:
           git add sector_momentum_daily.py apply_sector_momentum.py pick_portfolio.py gen_portfolio_report.py fetch_sw_map.py selfcheck_pipeline.py
           # v3.9 新增脚本
           git add pick_multifactor.py gen_mf_backtest.py backtest_multifactor.py 2>/dev/null || true
+          # v4.3 新增脚本：多因子买区过滤 / 持仓周期回测（老大 2026-10-25 三项要求）
+          git add audit_round14.py audit_round14b.py audit_round15.py audit_round16.py 2>/dev/null || true
+          # v4.3 审计产物（*.json 被 gitignore，必须 -f）：报告层与因子日报的数据源
+          git add -f audit_round14.json audit_round14b.json audit_round15.json audit_round16.json 2>/dev/null || true
           # 记录 prune 产生的删除(仅限已跟踪的历史报告/评分/组合文件)
           git add -u top200_report_2026-*.html 2>/dev/null || true
           git add -Au -- top200_scored_*.json sector/portfolio_*.json sector/sector_momentum_*.json 2>/dev/null || true

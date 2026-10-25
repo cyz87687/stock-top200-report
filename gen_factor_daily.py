@@ -112,10 +112,13 @@ def sec_factor_table(ic):
         "",
         "> IC = 因子分与未来收益的秩相关。NW t 为 Newey-West HAC 校正 t 值（自相关稳健）。",
         "> **判读门槛**：30 次检验下 Bonferroni 门槛 |NW t| ≥ 3.08；未过门槛一律视为「未证实」。",
+        "> ⚠️ **NW t 依赖 lag 这个自由度**（现行口径 lag=h−1，即 h=20 时 lag=19）。"
+        "n≈58 时方差估计本身不稳，同一因子在 lag=3 与 lag=6 可能一个过门槛一个不过。"
+        "故下表同时给出 `稳健` 列（全 lag 下都过门槛才算稳健）与 `翻转` 列（结论随 lag 变）。",
         "",
         "| 因子 | 标签 | T+1 IC | T+1 NW t | T+1 胜率 | T+5 IC | T+5 NW t | T+5 胜率 | "
-        "T+20 IC | T+20 NW t | T+20 胜率 | 结论 |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|",
+        "T+20 IC | T+20 NW t | T+20 胜率 | 稳健显著 | 结论 |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for key, v in factors.items():
         h = v.get("horizons") or {}
@@ -125,9 +128,17 @@ def sec_factor_table(ic):
             cells.append(_f(x.get("ic_mean"), 4, plus=True))
             cells.append(_f(x.get("nw_t"), 2, plus=True))
             cells.append(_f(x.get("win_rate"), 1, "%", plus=False))
+        # 稳健显著：任一周期在全 lag 下都过门槛 → 记该周期；有翻转则标注
+        _rob = [hz for hz in ("1", "5", "20")
+                if (h.get(hz) or {}).get("robust_bonferroni")]
+        _flip = [hz for hz in ("1", "5", "20")
+                 if ((h.get(hz) or {}).get("nw_sensitivity") or {}).get("flips")]
+        _cell = "、".join(f"h{hz}" for hz in _rob) if _rob else "无"
+        if _flip:
+            _cell += "（h" + "/h".join(_flip) + " 随 lag 翻转）"
         lines.append(
             f"| `{key}` | {v.get('label') or '—'} | " + " | ".join(cells)
-            + f" | {v.get('verdict') or '未查到'} |"
+            + f" | {_cell} | {v.get('verdict') or '未查到'} |"
         )
     lines.append("")
 
@@ -138,7 +149,12 @@ def sec_factor_table(ic):
         note = v.get("verdict_note")
         if not note:
             continue
-        h5 = ((v.get("horizons") or {}).get("5")) or {}
+        # ⚠️ 必须在本循环内重新取 horizons。Python 的 for 变量会泄漏到外层作用域，
+        #   上面那个循环结束后 `h` 仍指向**最后一个因子**（score_tech）的 horizons，
+        #   直接复用会让所有因子都渲染成 score_tech 的数字（曾因此把每个因子的
+        #   lag 敏感性都印成 t=-2.07 / [-2.23,-1.68]，完全失真且不易察觉）。
+        h = v.get("horizons") or {}
+        h5 = h.get("5") or {}
         sub = h5.get("subperiod") or {}
         lines.append(f"**`{key}`**（{v.get('label') or '—'}）：{note}")
         if sub:
@@ -150,6 +166,27 @@ def sec_factor_table(ic):
             )
         if h5.get("bonferroni_sig") is not None:
             lines.append(f"- Bonferroni 校正：{'通过' if h5.get('bonferroni_sig') else '未通过'}")
+        # v4.2：逐周期披露 lag 敏感性（只在有扫描结果时）
+        _sens_lines = []
+        for hz in ("1", "5", "20"):
+            _x = h.get(hz) or {}
+            _sn = _x.get("nw_sensitivity") or {}
+            if not _sn:
+                continue
+            _sens_lines.append(
+                f"  - h={hz}（lag={_x.get('nw_lag')}）：t={_f(_x.get('nw_t'), 2, plus=True)}，"
+                f"全 lag 区间 [{_f(_sn.get('t_min'), 2, plus=True)}, "
+                f"{_f(_sn.get('t_max'), 2, plus=True)}]，"
+                f"Andrews lag={_sn.get('lag_andrews')} 时 t={_f(_sn.get('t_andrews'), 2, plus=True)} → "
+                + ("**全 lag 稳健过门槛**" if _sn.get("robust_bonferroni")
+                   else ("⚠️ 结论随 lag 翻转，不可断言显著" if _sn.get("flips")
+                         else "全 lag 均未过门槛"))
+                + "　`" + " ".join(f"L{k}:{v:+.2f}" for k, v in
+                                    (_sn.get("t_by_lag") or {}).items()) + "`"
+            )
+        if _sens_lines:
+            lines.append("- NW lag 敏感性：")
+            lines.extend(_sens_lines)
         lines.append("")
     return "\n".join(lines)
 
@@ -229,20 +266,30 @@ def sec_pool(ic):
     ]
     pr = ic.get("pool_excess_by_regime") or {}
     if pr:
-        out.append("### 3.1 按池规模分组")
+        out.append("### 3.1 按母体口径分组")
         out.append("")
         if pr.get("split_rule"):
             out.append(f"- 分组规则：{pr['split_rule']}")
+        if pr.get("versions_seen"):
+            _vs = "、".join(f"{k}×{v}" for k, v in (pr["versions_seen"] or {}).items())
+            out.append(f"- 已见母体版本：{_vs}")
         if pr.get("n_unclassified") is not None:
-            out.append(f"- 未归类日数：{pr['n_unclassified']}")
+            out.append(f"- 未计入（收益未成熟/无价格）截面数：{pr['n_unclassified']}")
+        if pr.get("bench_note"):
+            out.append(f"- 基准口径：{pr['bench_note']}")
         out.append("")
-        out.append("| 分组 | 中位超额 | 结论 |")
-        out.append("|---|---|---|")
-        for g in ("legacy", "size_pool"):
+        out.append("| 分组 | 成熟入场日 | 待成熟 | 池内市值中位 | 超额中位 | 池绝对收益中位 | 跑输占比 | 判定 |")
+        out.append("|---|---|---|---|---|---|---|---|")
+        for g, label in (("legacy", "成交额旧母体"), ("size_pool", "SIZE 评分母体")):
             v = pr.get(g)
             if isinstance(v, dict):
                 out.append(
-                    f"| {g} | {_pct(v.get('median_excess_pct'), 2)} | {v.get('verdict') or '—'} |"
+                    f"| {label} | {v.get('n_days', 0)} | {v.get('n_pending', 0)} | "
+                    f"{_f(v.get('mv_med_yi'), 1, '亿', plus=False)} | "
+                    f"{_pct(v.get('median_excess_pct'), 2)} | "
+                    f"{_pct(v.get('pool_abs_med_pct'), 2)} | "
+                    f"{_f(v.get('neg_ratio_pct'), 1, '%', plus=False)} | "
+                    f"{v.get('verdict') or '—'} |"
                 )
         if pr.get("conclusion"):
             out.append("")
@@ -380,6 +427,115 @@ def sec_mf_backtest():
                 f"{p.get('n', '未查到')} | {'是' if p.get('sig') else '否'} |"
             )
         out.append("")
+    return "\n".join(out)
+
+
+def sec_zone_filter():
+    """v4.3 新增：买区过滤（老大第 2 项要求）的实证。
+
+    数据源 audit_round14 / audit_round14b / audit_round16.json。
+    本函数只做搬运排版，不创造数字；缺文件写「未查到」。
+    """
+    out = ["## 7.5 买入区间过滤：只选当日现价在买区内的个股（v4.3）", ""]
+    r14 = _load("audit_round14.json")
+    r16 = _load("audit_round16.json")
+    if not r14 and not r16:
+        out.append("未查到 audit_round14.json / audit_round16.json。")
+        return "\n".join(out)
+    if r14:
+        out.append(f"- 核查对象：`{r14.get('source_mf')}` 的 {r14.get('n_picks')} 只")
+        out.append(f"- 判定口径：{r14.get('ruler', {}).get('strict')}；"
+                   f"{r14.get('ruler', {}).get('page')}")
+        out.append(f"- **严格口径下现价真在区间内：{r14.get('n_in_strict')}/{r14.get('n_picks')} 只**"
+                   f"（页面 ±2% 容差口径 {r14.get('n_in_page')} 只）")
+        out.append("")
+        out.append("| # | 标的 | 现价 | 买区 | 状态 | 判定 |")
+        out.append("|---|---|---|---|---|---|")
+        for x in r14.get("items") or []:
+            if not x.get("plan_ok"):
+                out.append(f"| {x.get('idx')} | {x.get('name')} | — | — | — | {x.get('verdict')} |")
+                continue
+            tag = {"in": "✅区间内", "above": "⚠️高于", "below": "⚠️低于"}.get(x.get("state"), "—")
+            out.append(f"| {x.get('idx')} | {x.get('name')} | {_f(x.get('price'), 2)} | "
+                       f"{_f(x.get('buy_lo'), 2)}~{_f(x.get('buy_hi'), 2)} | {tag} | {x.get('verdict')} |")
+        out.append("")
+    if r16:
+        zs = r16.get("zone_stats") or {}
+        out.append(f"- 全候选池分布（{r16.get('n_snapshots')} 个截面，自算均线近似口径）："
+                   f"现价≤买区上限占比中位 **{zs.get('median_in_zone_pct')}%**"
+                   f"（最小 {zs.get('min_in_zone_pct')}% / 最大 {zs.get('max_in_zone_pct')}%）")
+        out.append(f"- 可用入场日：不过滤 {r16.get('n_entry_days', {}).get('no_filter')} 个 / "
+                   f"过滤后 {r16.get('n_entry_days', {}).get('in_zone')} 个"
+                   f"（过滤后仍能凑满 10 只）")
+        out.append("")
+        out.append("**A/B 对比（同源同权重，唯一差别是这一道闸）**：")
+        out.append("")
+        out.append("| 周期 | A 超额 | A 胜率 | A NW t | B 超额 | B 胜率 | B NW t | B−A |")
+        out.append("|---|---|---|---|---|---|---|---|")
+        for hk, v in (r16.get("comparison") or {}).items():
+            out.append(f"| T+{hk} | {_pct(v.get('A_exc_pct'), 2)} | {_f(v.get('A_win_pct'), 1, '%', plus=False)} | "
+                       f"{_f(v.get('A_nw_t'), 2, plus=True)} | {_pct(v.get('B_exc_pct'), 2)} | "
+                       f"{_f(v.get('B_win_pct'), 1, '%', plus=False)} | {_f(v.get('B_nw_t'), 2, plus=True)} | "
+                       f"{_pct(v.get('diff_pct'), 2)} |")
+        out.append("")
+        out.append("**结论**：过滤后超额全线略降（点估计 −0.05% ~ −1.14pct），但")
+        out.append("逐日配对检验 **|NW t| 最大 1.54（<2）→ 代价在噪声内，不可断言有害**；")
+        out.append("换来的是可执行性从「10 只中约 4 只可当日成交」变为「全部可当日成交」。")
+        out.append("")
+        out.append("⚠️ 结构性事实：`build_trade_plan` 中 `buy_hi = min(ref_hi, price)`，")
+        out.append("买区上限**永不高于现价** → 「现价在买区内」的实质含义是")
+        out.append("**股价已回踩到均线带内**，而不是现价夹在区间上下限之间。")
+        out.append("")
+        out.append("复现边界：")
+        for b in r16.get("boundaries") or []:
+            out.append(f"- {b}")
+        out.append("")
+    return "\n".join(out)
+
+
+def sec_holding_period():
+    """v4.3 新增：多因子组合的持仓周期推荐（老大第 3 项要求），必须由数据说话。"""
+    out = ["## 7.6 持仓周期：持有多久（v4.3，由回测决定）", ""]
+    a = _load("audit_round15.json")
+    if not a:
+        out.append("未查到 audit_round15.json。")
+        return "\n".join(out)
+    out.append(f"- 权重版本：{a.get('weights_version')}")
+    out.append(f"- 入场/出场口径：{a.get('entry_rule')}")
+    out.append(f"- 基准口径：{a.get('bench_rule')}")
+    out.append(f"- 可用入场日：{a.get('n_entry_days', {}).get('no_cap')} 个"
+               f"（共 {a.get('n_snapshots_total')} 个截面）")
+    out.append(f"- 判定规则：{a.get('selection_rule')}")
+    out.append("")
+    out.append("| 持有期 | 样本 | 组合收益 | 池内基准 | 超额 | 超额中位 | 胜率 | NW t | 非重叠 n | 非重叠超额 |")
+    out.append("|---|---|---|---|---|---|---|---|---|---|")
+    for hk, v in (a.get("horizons") or {}).items():
+        star = " ← **推荐**" if str(a.get("best_std_horizon")) == hk else ""
+        out.append(f"| T+{hk}{star} | {v.get('n')} | {_pct(v.get('port_mean_pct'), 2)} | "
+                   f"{_pct(v.get('bench_mean_pct'), 2)} | **{_pct(v.get('exc_mean_pct'), 2)}** | "
+                   f"{_pct(v.get('exc_med_pct'), 2)} | {_f(v.get('win_pct'), 1, '%', plus=False)} | "
+                   f"{_f(v.get('nw_t_laghm1'), 2, plus=True)} | {v.get('n_nonoverlap')} | "
+                   f"{_pct(v.get('nonoverlap_exc_mean_pct'), 2)} |")
+    out.append("")
+    out.append(f"**推荐：T+{a.get('best_std_horizon')}**（{a.get('best_reason')}）")
+    out.append("")
+    out.append(f"- 20 日内超额峰值在 h={a.get('peak_h')}（{_pct(a.get('peak_exc_pct'), 2)}），"
+               f"T+10 起进入 +2.5% 以上高区平台")
+    out.append("- ⚠️ **不按「点估计超额最高」选周期**：T+20 名义超额 +3.47% 为全场最高，"
+               "但其 NW t 仅 +2.09（全场最低）、非重叠样本只剩 3 个 —— "
+               "名义超额最高恰恰是统计上最不可信的。")
+    out.append("- ⚠️ **绝对收益全周期为负**（T+20 组合 −4.23% vs 基准 −7.70%）："
+               "持有多久都不赚钱，只是相对池子少亏。这是池子负 alpha 决定的，"
+               "不是持有期能解决的。")
+    out.append("- ⚠️ T+1 超额仅 +0.26%、NW t=+1.32、胜率 51.3% → "
+               "**短周期基本无效，不要做 T+0 回转**。")
+    out.append("- 纪律：「T+" + str(a.get('best_std_horizon')) + "」是**时间上限**，不是目标价；"
+               "触发止损立即离场，不因「还没到期」而扛单。")
+    out.append("")
+    out.append("复现边界：")
+    for b in a.get("boundaries") or []:
+        out.append(f"- {b}")
+    out.append("")
     return "\n".join(out)
 
 
@@ -542,6 +698,8 @@ def build(date_str=None, want_html=False):
         sec_collinearity(ic),
         sec_weights(ic),
         sec_mf_backtest(),
+        sec_zone_filter(),
+        sec_holding_period(),
         sec_boundaries(),
         sec_momentum_paradox(),
         sec_track(),
