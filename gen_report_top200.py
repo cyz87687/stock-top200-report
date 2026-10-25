@@ -1349,6 +1349,12 @@ def _focus_pool_html(fp):
         else:
             badge = '<span style="color:#64748b;font-weight:700;">池外</span>'
         pct = it.get("pct_chg")
+        # ⚠️ 2026-10-25 修 P0：焦点池曾把 10-22 行情当 10-23 用（宇树 520.00/+0.97% 实际 624.00/+20%）。
+        # 根因是 fetch_focus_list.py 的 load_scored_map 不校验 scored 内部 date。
+        # 现在该脚本已收紧校验，且报告层再加一道闸：quote_ok=False 时一律不显示涨跌幅，
+        # 避免「日期错配的数字」被当成当日真实行情。
+        if not fp.get("quote_ok", True):
+            pct = None
         if isinstance(pct, (int, float)):
             _pc = "#ef4444" if pct > 0 else ("#22c55e" if pct < 0 else "#94a3b8")
             name += f'<span style="font-size:10px;color:{_pc};margin-left:4px;">{pct:+.1f}%</span>'
@@ -1378,6 +1384,9 @@ def _focus_pool_html(fp):
         <div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">
             数据源：{html_mod.escape(src_txt)}　｜　{ai_badge}　｜　
             方法：{html_mod.escape(str(fp.get("method","")))[:120]}
+        </div>
+        <div style="font-size:10.5px;color:#64748b;margin-bottom:8px;line-height:1.7;">
+            行情口径：{'<b style="color:#a3e635;">' + html_mod.escape(str(fp.get("quote_source") or "")) + '</b>（内部 date=' + html_mod.escape(str(fp.get("quote_date") or "")) + '）—— 涨跌幅取自与焦点池<b>同日</b>的评分文件，逐只可回溯。' if fp.get("quote_ok", True) else '<b style="color:#ef4444;">⚠️ 未找到同日评分文件，本区块已隐藏全部涨跌幅</b>（避免把隔日行情当成当日表现）。'}
         </div>
         {ai_sum_html}
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
