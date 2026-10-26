@@ -1,0 +1,354 @@
+{
+ "date": "2026-10-26",
+ "momentum_date": "2026-10-26",
+ "top": 10,
+ "per_sector": 3,
+ "per_parent": 2,
+ "route_pool_map": {
+  "momentum": 200,
+  "reversal": 498
+ },
+ "momentum_route_weight": 0.5,
+ "portfolios": {
+  "momentum": {
+   "level_used": "L3 兜底: 60日动量前10",
+   "target_rule": "L0 严格: 60日动量第1 ∩ 10日动量前3",
+   "level_trace": [
+    {
+     "level": "L0 严格: 60日动量第1 ∩ 10日动量前3",
+     "n_sectors": 1,
+     "n_cands": 0,
+     "sectors": [
+      "数字媒体"
+     ]
+    },
+    {
+     "level": "L1 放宽: 60日动量前3 ∩ 10日前5",
+     "n_sectors": 1,
+     "n_cands": 0,
+     "sectors": [
+      "数字媒体"
+     ]
+    },
+    {
+     "level": "L2 再放宽: 60日前5 ∩ 10日前10",
+     "n_sectors": 2,
+     "n_cands": 0,
+     "sectors": [
+      "数字媒体",
+      "照明设备Ⅱ"
+     ]
+    },
+    {
+     "level": "L3 兜底: 60日动量前10",
+     "n_sectors": 10,
+     "n_cands": 10,
+     "sectors": [
+      "农产品加工",
+      "出版",
+      "厨卫电器",
+      "广告营销",
+      "影视院线",
+      "房地产服务",
+      "教育",
+      "数字媒体",
+      "照明设备Ⅱ",
+      "软件开发"
+     ]
+    }
+   ],
+   "sectors": [
+    "农产品加工",
+    "出版",
+    "厨卫电器",
+    "广告营销",
+    "影视院线",
+    "房地产服务",
+    "教育",
+    "数字媒体",
+    "照明设备Ⅱ",
+    "软件开发"
+   ],
+   "n_candidates": 10,
+   "pool_used": 200,
+   "eligibility": {
+    "before": 200,
+    "after": 200,
+    "dropped": 0
+   },
+   "exposure": [
+    {
+     "parent": "传媒",
+     "n": 2,
+     "share": 0.4,
+     "base_share": 0.5,
+     "dev_pp": -10.0
+    },
+    {
+     "parent": "计算机",
+     "n": 2,
+     "share": 0.4,
+     "base_share": 0.4,
+     "dev_pp": 0.0
+    },
+    {
+     "parent": "房地产",
+     "n": 1,
+     "share": 0.2,
+     "base_share": 0.1,
+     "dev_pp": 10.0
+    }
+   ],
+   "l1_capped": [],
+   "route_weight": 0.5,
+   "picks": [
+    {
+     "name": "浙文互联",
+     "code": "sh600986",
+     "sector_l2": "广告营销",
+     "parent": "传媒",
+     "total": 65.88,
+     "rating": "A",
+     "adj_total": 32.94,
+     "amt_rank": 194,
+     "price": 6.96,
+     "pct_chg": 1.46,
+     "turnover_ratio": 3.12,
+     "circ_mv": 10352123472.0,
+     "rsi": 47.9,
+     "trend": "双线空头",
+     "sector_r60": 7,
+     "sector_r10": 47,
+     "sector_mom60": 17.11,
+     "sector_mom10": -3.54,
+     "score_sector": 1.8,
+     "score_news": 0.5,
+     "score_tech": 1.48,
+     "score_fund": 3.32,
+     "score_theme": 2.34
+    },
+    {
+     "name": "引力传媒",
+     "code": "sh603598",
+     "sector_l2": "广告营销",
+     "parent": "传媒",
+     "total": 65.58,
+     "rating": "A",
+     "adj_total": 32.79,
+     "amt_rank": 164,
+     "price": 17.95,
+     "pct_chg": -3.7,
+     "turnover_ratio": 7.83,
+     "circ_mv": 4849325330.0,
+     "rsi": 45.4,
+     "trend": "周线多头",
+     "sector_r60": 7,
+     "sector_r10": 47,
+     "sector_mom60": 17.11,
+     "sector_mom10": -3.54,
+     "score_sector": 1.8,
+     "score_news": 0.0,
+     "score_tech": 3.38,
+     "score_fund": 2.42,
+     "score_theme": 1.81
+    },
+    {
+     "name": "特发服务",
+     "code": "sz300917",
+     "sector_l2": "房地产服务",
+     "parent": "房地产",
+     "total": 56.94,
+     "rating": "B",
+     "adj_total": 28.47,
+     "amt_rank": 182,
+     "price": 29.35,
+     "pct_chg": -0.68,
+     "turnover_ratio": 6.833,
+     "circ_mv": 4960150000.0,
+     "rsi": 47.7,
+     "trend": "周线多头",
+     "sector_r60": 6,
+     "sector_r10": 99,
+     "sector_mom60": 17.28,
+     "sector_mom10": -7.21,
+     "score_sector": 1.72,
+     "score_news": 0.0,
+     "score_tech": 2.72,
+     "score_fund": 1.22,
+     "score_theme": 2.38
+    },
+    {
+     "name": "深信服",
+     "code": "sz300454",
+     "sector_l2": "软件开发",
+     "parent": "计算机",
+     "total": 54.0,
+     "rating": "B",
+     "adj_total": 27.0,
+     "amt_rank": 24,
+     "price": 145.2,
+     "pct_chg": -1.05,
+     "turnover_ratio": 4.709,
+     "circ_mv": 41817808798.0,
+     "rsi": 58.8,
+     "trend": "周线多头",
+     "sector_r60": 9,
+     "sector_r10": 13,
+     "sector_mom60": 15.36,
+     "sector_mom10": 0.17,
+     "score_sector": 1.24,
+     "score_news": 0.0,
+     "score_tech": 4.02,
+     "score_fund": 4.22,
+     "score_theme": 3.52
+    },
+    {
+     "name": "鼎捷数智",
+     "code": "sz300378",
+     "sector_l2": "软件开发",
+     "parent": "计算机",
+     "total": 38.93,
+     "rating": "C",
+     "adj_total": 19.46,
+     "amt_rank": 23,
+     "price": 43.54,
+     "pct_chg": -0.86,
+     "turnover_ratio": 16.817,
+     "circ_mv": 11734654233.0,
+     "rsi": 64.9,
+     "trend": "双线多头",
+     "sector_r60": 9,
+     "sector_r10": 13,
+     "sector_mom60": 15.36,
+     "sector_mom10": 0.17,
+     "score_sector": 1.24,
+     "score_news": 0.0,
+     "score_tech": 4.1,
+     "score_fund": 0.98,
+     "score_theme": 3.6
+    }
+   ]
+  },
+  "reversal": {
+   "level_used": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+   "target_rule": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+   "level_trace": [
+    {
+     "level": "L0 严格: 60日动量末3 ∩ 10日动量末10",
+     "n_sectors": 2,
+     "n_cands": 10,
+     "sectors": [
+      "电子化学品Ⅱ",
+      "能源金属"
+     ]
+    }
+   ],
+   "sectors": [
+    "电子化学品Ⅱ",
+    "能源金属"
+   ],
+   "n_candidates": 10,
+   "pool_used": 498,
+   "eligibility": {
+    "before": 498,
+    "after": 498,
+    "dropped": 0
+   },
+   "exposure": [
+    {
+     "parent": "电子",
+     "n": 2,
+     "share": 0.667,
+     "base_share": 0.9,
+     "dev_pp": -23.3
+    },
+    {
+     "parent": "有色金属",
+     "n": 1,
+     "share": 0.333,
+     "base_share": 0.1,
+     "dev_pp": 23.3
+    }
+   ],
+   "l1_capped": [],
+   "route_weight": 1.0,
+   "picks": [
+    {
+     "name": "光华科技",
+     "code": "sz002741",
+     "sector_l2": "电子化学品Ⅱ",
+     "parent": "电子",
+     "total": 85.16,
+     "rating": "S",
+     "adj_total": 85.16,
+     "amt_rank": 242,
+     "price": 17.84,
+     "pct_chg": -3.83,
+     "turnover_ratio": 3.409,
+     "circ_mv": 7671674455.0,
+     "rsi": 29.7,
+     "trend": "双线空头",
+     "sector_r60": 123,
+     "sector_r10": 120,
+     "sector_mom60": -15.0,
+     "sector_mom10": -11.03,
+     "score_sector": 3.28,
+     "score_news": 0.0,
+     "score_tech": 1.48,
+     "score_fund": 4.62,
+     "score_theme": 1.99
+    },
+    {
+     "name": "天承科技",
+     "code": "sh688603",
+     "sector_l2": "电子化学品Ⅱ",
+     "parent": "电子",
+     "total": 80.13,
+     "rating": "A",
+     "adj_total": 80.13,
+     "amt_rank": 299,
+     "price": 81.82,
+     "pct_chg": -5.4,
+     "turnover_ratio": 1.966,
+     "circ_mv": 10204960554.0,
+     "rsi": 29.1,
+     "trend": "双线空头",
+     "sector_r60": 123,
+     "sector_r10": 120,
+     "sector_mom60": -15.0,
+     "sector_mom10": -11.03,
+     "score_sector": 3.28,
+     "score_news": 0.0,
+     "score_tech": 1.48,
+     "score_fund": 4.22,
+     "score_theme": 1.74
+    },
+    {
+     "name": "腾远钴业",
+     "code": "sz301219",
+     "sector_l2": "能源金属",
+     "parent": "有色金属",
+     "total": 82.84,
+     "rating": "A",
+     "adj_total": 82.84,
+     "amt_rank": 424,
+     "price": 36.13,
+     "pct_chg": -1.5,
+     "turnover_ratio": 1.261,
+     "circ_mv": 9872166439.0,
+     "rsi": 32.2,
+     "trend": "双线空头",
+     "sector_r60": 124,
+     "sector_r10": 121,
+     "sector_mom60": -21.0,
+     "sector_mom10": -11.36,
+     "score_sector": 3.28,
+     "score_news": 0.0,
+     "score_tech": 1.63,
+     "score_fund": 4.7,
+     "score_theme": 1.69
+    }
+   ]
+  }
+ }
+}

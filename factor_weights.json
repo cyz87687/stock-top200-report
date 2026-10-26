@@ -1,148 +1,142 @@
 {
-  "version": "v4.2-lag-robust",
-  "fitted_at": "2026-10-25 13:30:00",
-  "target_horizon": 20,
-  "method": "v4.2 口径（round13 lag 敏感性审计后重排）。⚠️ 核心新事实：round13 对全部 12 因子 × 3 周期做 NW lag 扫描（lag∈{0,1,2,3,4,6,8,12,19}）后发现——**全 lag 都稳健过 Bonferroni 3.08 的组合只有 1 个：score_fund h=5（t 范围 3.48~5.21）**；11 个组合的「显著与否」会随 lag 翻转。据此重排：① fund 0.28→0.32（唯一稳健显著维度）；② theme_neg 0.18→0.12（方向可靠但显著性不稳，见 regime_switch.evidence.lag_sensitivity）；③ 反转块 4×0.04→4×0.045（9 截面，T+20 待成熟，微调）；④ news 0.16、size 0.12、sector 0.10 不变。权重设计原则：**没有一维能靠统计显著性单独立住，所有权重本质上都是先验**，页面与日报禁暗示「权重已被数据优化」。",
-  "weights": {
-    "score_fund": 0.32,
-    "score_news": 0.16,
-    "score_theme_neg": 0.12,
-    "score_size": 0.12,
-    "score_sector": 0.1,
-    "score_oversold60": 0.045,
-    "score_bias60": 0.045,
-    "score_rsi_rev": 0.045,
-    "score_vol_pulse": 0.045,
-    "score_overbought": 0.0,
-    "score_theme_intrinsic": 0.0,
-    "score_attention": 0.0
+ "version": "v3.6-fund-led",
+ "fitted_at": "2026-10-26 16:03:34",
+ "target_horizon": 1,
+ "method": "v3.6 基本面主导: 以全样本可验证维度为主(fund/news)，反转块等权压缩消除共线性虚增，小样本维度降至地板; 走步验证(训练≥30截面,每5截面重拟,样本外比对); score_sector 有效样本<20 维持0.10(样本积累中)",
+ "weights": {
+  "score_fund": 0.438,
+  "score_news": 0.218,
+  "score_oversold60": 0.061,
+  "score_bias60": 0.061,
+  "score_rsi_rev": 0.061,
+  "score_vol_pulse": 0.061,
+  "score_overbought": 0.0,
+  "score_theme_intrinsic": 0.0,
+  "score_attention": 0.0,
+  "score_sector": 0.1
+ },
+ "prior_weights": {
+  "score_fund": 0.436,
+  "score_news": 0.218,
+  "score_oversold60": 0.061,
+  "score_bias60": 0.061,
+  "score_rsi_rev": 0.061,
+  "score_vol_pulse": 0.061,
+  "score_overbought": 0.0,
+  "score_theme_intrinsic": 0.0,
+  "score_attention": 0.0,
+  "score_sector": 0.1
+ },
+ "adopted": "prior",
+ "walkforward": {
+  "n_oos_dates": 0,
+  "oos_ic_prior": null,
+  "oos_ic_new": null,
+  "oos_t_new": null,
+  "lambda": null,
+  "note": "十维池内截面 10 < MIN_TRAIN(30)，样本外观测不足 → 维持先验权重（每日重估登记，满 30 后自动启用走步验证）"
+ },
+ "full_period_composite_ic": {
+  "prior": {
+   "1": {
+    "n": 9,
+    "ic_mean": -0.0087,
+    "nw_t": -0.2,
+    "win_rate": 55.6
+   },
+   "5": {
+    "n": 5,
+    "ic_mean": 0.0284,
+    "nw_t": 1.0,
+    "win_rate": 60.0
+   },
+   "20": {
+    "n": 0,
+    "ic_mean": null,
+    "nw_t": null,
+    "win_rate": null
+   }
   },
-  "prior_weights": {
-    "score_fund": 0.32,
-    "score_news": 0.16,
-    "score_theme_neg": 0.12,
-    "score_size": 0.12,
-    "score_sector": 0.1,
-    "score_oversold60": 0.045,
-    "score_bias60": 0.045,
-    "score_rsi_rev": 0.045,
-    "score_vol_pulse": 0.045,
-    "score_overbought": 0.0,
-    "score_theme_intrinsic": 0.0,
-    "score_attention": 0.0
+  "lam_best": {
+   "1": {
+    "n": 9,
+    "ic_mean": -0.0087,
+    "nw_t": -0.2,
+    "win_rate": 55.6
+   },
+   "5": {
+    "n": 5,
+    "ic_mean": 0.0284,
+    "nw_t": 1.0,
+    "win_rate": 60.0
+   },
+   "20": {
+    "n": 0,
+    "ic_mean": null,
+    "nw_t": null,
+    "win_rate": null
+   }
+  }
+ },
+ "factor_ic_target_h": {
+  "score_fund": -0.0118,
+  "score_news": 0.0002,
+  "score_oversold60": 0.0025,
+  "score_bias60": 0.0049,
+  "score_rsi_rev": -0.0238,
+  "score_vol_pulse": -0.0209,
+  "score_overbought": -0.0227,
+  "score_theme_intrinsic": -0.0445,
+  "score_attention": -0.036
+ },
+ "lambda_scan": [
+  {
+   "lambda": 0.0,
+   "n_oos": 0,
+   "oos_ic_mean": null,
+   "oos_t": null,
+   "oos_win_rate": null
   },
-  "adopted": "prior",
-  "regime_switch": {
-    "from": "v3.6-fund-led (基本面主导)",
-    "to": "v4.2-lag-robust",
-    "switched_at": "2026-10-25",
-    "rationale": "v3.6 把 fund 提到 0.34 的依据是「全样本唯一过 Bonferroni」，但该结论建立在 h5 单点 lag 口径上。round13 做全 lag 扫描后确认：score_fund h=5 是**唯一**在 lag∈{0..19} 全部取值下都过 3.08 的组合（t 范围 3.48~5.21），这是它权重第一的唯一硬证据；而 score_theme 反号（h20）虽然点估计 IC=-0.1076 方向清晰，t 值却在 lag=3 时 -3.35（过）与 lag=6 时 -2.86（不过）之间摆动，**不能作为 0.18 权重的依据**。故 v4.2 把 theme_neg 从 0.18 降到 0.12，fund 从 0.28 提到 0.32。",
-    "evidence": {
-      "sample": "58 个 T+20 成熟截面 2026-06-26~2026-09-17（另有 77 个 T+1 / 73 个 T+5）",
-      "lag_sensitivity": {
-        "source": "audit_round13.json（2026-10-25 全因子 × 3 周期 × 9 档 lag 扫描）",
-        "n_robust_bonferroni_combos": 1,
-        "n_flipping_combos": 11,
-        "only_robust": "score_fund h=5（t 范围 3.48~5.21，全 lag 过 3.08）",
-        "score_theme_h20": {"ic": -0.1076, "n": 58,
-                            "t_at_lag3": -3.35, "t_at_lag6": -2.86,
-                            "t_at_lag19": -2.70, "t_range": [-5.25, -2.58],
-                            "robust_bonferroni": false,
-                            "verdict": "方向可靠但显著性不稳，不宜按「已证显著」配权"},
-        "discipline": "任何『某因子显著/不显著』的表述必须同时标注 NW lag —— lag 是能翻转结论的自由度，隐去即等于选择性报告"
-      },
-      "theme_neg": {
-        "h1_ic": 0.0433, "h1_t": 1.68,
-        "h5_ic": 0.0795, "h5_t": 1.71,
-        "h20_ic": 0.1076, "h20_t": 2.70,
-        "bonferroni_pass_at_lag19": false,
-        "note": "⚠️ v4.1 曾记录 h20_ic=0.1207 / t=3.59，那是价格库刷新前的旧值且 lag 口径不同；v4.2 以刷新后 repo 内的 factor_ic.json 为准（0.1076 / 2.70 / lag=19）"
-      },
-      "theme_raw": {
-        "h1_ic": -0.0383, "h5_ic": -0.0711, "h20_ic": -0.1076, "h20_t": -2.70
-      },
-      "theme_quintile_t20": {
-        "Q1": -5.82, "Q2": -6.55, "Q3": -7.5, "Q4": -8.82, "Q5": -9.84,
-        "shape": "原始方向严格递减，Q5-Q1=-4.02pct"
-      },
-      "caveat": "⚠️ 四条必须同时披露的边界：(1) 五分位严格递减说明方向可靠，但**反号后的 Q5-Q1 只有 +2.98pct 且非严格单调**（Q3 -7.06 / Q4 -7.14 有交叉）——反号≠原信号强度的镜像。(2) corr(theme, rsi_rev)=-0.549 提示可能与反转块共线，但反转块仅 9 截面（10-13 起，T+20 未成熟）、theme_neg 的 IC 在另 58 个截面（6-26~9-17）算得，**两样本不重叠**，无法做 FWL 残差检验 → 「theme_neg 是否只是反转块代理」既未证实也未证伪。(3) 分段稳定性不均：段1(6/26~7/15) t=0.52 不显著，段2(7/16~8/5) t=6.33，段3 t=3.20，段4 t=3.14 —— 四段中三段显著但首段失效。(4) **NW lag 敏感性**（round13 新增）：h20 的 t 在 lag=3 时 -3.35、lag=6 时 -2.86，结论随 lag 翻转，故「过 Bonferroni」不成立。"
-    }
+  {
+   "lambda": 0.2,
+   "n_oos": 0,
+   "oos_ic_mean": null,
+   "oos_t": null,
+   "oos_win_rate": null
   },
-  "walkforward": {
-    "n_oos_dates": 0,
-    "note": "score_theme_neg 与 score_size 为 v4.1 新增维度，无历史 OOS 截面；反转块满 30 池内截面后（预计 2026-11 下旬）才可启用走步验证。"
+  {
+   "lambda": 0.4,
+   "n_oos": 0,
+   "oos_ic_mean": null,
+   "oos_t": null,
+   "oos_win_rate": null
   },
-  "full_period_composite_ic": {
-    "prior": {
-      "1": {
-        "n": null,
-        "ic_mean": null,
-        "nw_t": null
-      },
-      "5": {
-        "n": null,
-        "ic_mean": null,
-        "nw_t": null
-      },
-      "20": {
-        "n": null,
-        "ic_mean": null,
-        "nw_t": null
-      }
-    },
-    "note": "v4.1 权重重构后需重算复合 IC；score_theme_neg / score_size 为新增维度，暂无历史序列"
+  {
+   "lambda": 0.6,
+   "n_oos": 0,
+   "oos_ic_mean": null,
+   "oos_t": null,
+   "oos_win_rate": null
   },
-  "factor_ic_target_h": {},
-  "lambda_scan": [
-    {
-      "lambda": 0.0,
-      "n_oos": 0,
-      "oos_ic_mean": null,
-      "oos_t": null,
-      "oos_win_rate": null
-    },
-    {
-      "lambda": 0.2,
-      "n_oos": 0,
-      "oos_ic_mean": null,
-      "oos_t": null,
-      "oos_win_rate": null
-    },
-    {
-      "lambda": 0.4,
-      "n_oos": 0,
-      "oos_ic_mean": null,
-      "oos_t": null,
-      "oos_win_rate": null
-    },
-    {
-      "lambda": 0.6,
-      "n_oos": 0,
-      "oos_ic_mean": null,
-      "oos_t": null,
-      "oos_win_rate": null
-    },
-    {
-      "lambda": 0.8,
-      "n_oos": 0,
-      "oos_ic_mean": null,
-      "oos_t": null,
-      "oos_win_rate": null
-    },
-    {
-      "lambda": 1.0,
-      "n_oos": 0,
-      "oos_ic_mean": null,
-      "oos_t": null,
-      "oos_win_rate": null
-    }
-  ],
-  "notes": [
-    "复合总分由各维按权重线性合成后与未来收益求 Rank IC（与生产 total 口径一致）",
-    "⚠️ score_theme_neg = 10 - score_theme（0-10 制反号），在 step2 内直接算并落盘，不改变原始 score_theme 字段",
-    "⚠️ score_size 按池内流通市值分位打分（越小越高分），分层抽样后池内市值分布逐日变化，分位须每日重算",
-    "⚠️ 反转块五维合计 0.16（v4.1 前 0.24），因只有 9 个截面有数据且 T+1 方向为负；待 T+20 成熟（约 11 月中旬）重估",
-    "score_overbought/theme_intrinsic/attention 归零：仅 9 截面 + 与保留维度共线，非「验证无效」而是「证据不足且重复」",
-    "先验权重与生产同源（prior_weights），拟合失败时回退该先验；四份代码内硬编码 _W_PRIOR_10D/PRIOR_W10 必须同步，漏一处即静默回退旧口径"
-  ]
+  {
+   "lambda": 0.8,
+   "n_oos": 0,
+   "oos_ic_mean": null,
+   "oos_t": null,
+   "oos_win_rate": null
+  },
+  {
+   "lambda": 1.0,
+   "n_oos": 0,
+   "oos_ic_mean": null,
+   "oos_t": null,
+   "oos_win_rate": null
+  }
+ ],
+ "notes": [
+  "复合总分由 9 维分量按权重线性合成后与未来收益求 Rank IC（与生产 total 口径一致，score_sector 因样本不足未纳入复合评估，权重固定 0.10）",
+  "训练窗因子 IC 仅使用基准快照 T+1 收益完整落在训练窗内的观测，避免边界泄漏",
+  "样本外日期集合对先验与 IC 驱动权重完全相同，公平比对",
+  "先验权重与生产同源（factor_weights.json prior_weights），拟合失败时回退该先验"
+ ]
 }

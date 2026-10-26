@@ -1,0 +1,676 @@
+{
+ "date": "2026-10-26",
+ "generated_at": "2026-10-26 16:03:47",
+ "method": "multifactor-v2（权重由池内实证反推，非手填；v4.3 起只选当日现价在买入区间内的个股）",
+ "top": 10,
+ "n_eligible": 498,
+ "n_scored": 118,
+ "zone_filter": {
+  "enabled": true,
+  "rule": "现价须落在买入区间内（严格口径，容差仅吸收 2 位小数舍入：相对 0.1% 或绝对 1 分钱取大）；买区由 gen_report_top200.build_trade_plan 同源推导，多头取 ma5~ma10 回踩区、弱势取 ma10~ma20 企稳区",
+  "tolerance_pct": 0.001,
+  "tolerance_abs": 0.01,
+  "counts": {
+   "no_plan": 0,
+   "above_zone": 321,
+   "below_zone": 0,
+   "in_zone": 177
+  },
+  "note": "build_trade_plan 中 buy_hi = min(ref_hi, price)，即买区上限永不高于现价 → 「现价在买区内」的实质含义是**股价已回踩到均线带内**，而不是现价夹在区间上下限之间。price > buy_hi 即需等回踩，当日挂单成交不了。⚠️ v4.3 曾误用页面 `_mf_n_in` 的 ±2% 容差做剔除，导致现价越界 1.04% 的巨人网络被放进组合，已改为严格口径"
+ },
+ "zone_stats": {
+  "no_plan": 0,
+  "above_zone": 321,
+  "below_zone": 0,
+  "in_zone": 177
+ },
+ "weights": {
+  "score_fund": 0.7722,
+  "score_news": 0.2194,
+  "__rev__": 0.0083
+ },
+ "weight_reason": {
+  "score_fund": "t_min=2.78（T+1/T+5 均显著；但 T+20 t=1.75，长周期已明显衰减）",
+  "score_news": "t_min=1.58，但 T+20 t=0.52，长周期失效 → 砍半",
+  "__rev__": "块内 2 维均 t_min=0.06，仅 8 截面 → 折半"
+ },
+ "rev_parts": [
+  "score_oversold60",
+  "score_bias60"
+ ],
+ "ic_evidence": {
+  "score_fund": {
+   "1": {
+    "ic": 0.0406,
+    "t": 2.78,
+    "n": 78,
+    "wr": 59.0
+   },
+   "5": {
+    "ic": 0.0748,
+    "t": 3.45,
+    "n": 74,
+    "wr": 70.3
+   },
+   "20": {
+    "ic": 0.0915,
+    "t": 1.75,
+    "n": 59,
+    "wr": 72.9
+   }
+  },
+  "score_news": {
+   "1": {
+    "ic": 0.043,
+    "t": 2.69,
+    "n": 78,
+    "wr": 59.0
+   },
+   "5": {
+    "ic": 0.0387,
+    "t": 1.58,
+    "n": 74,
+    "wr": 63.5
+   },
+   "20": {
+    "ic": 0.0148,
+    "t": 0.52,
+    "n": 59,
+    "wr": 59.3
+   }
+  },
+  "score_attention": {
+   "1": {
+    "ic": -0.036,
+    "t": -1.73,
+    "n": 9,
+    "wr": 33.3
+   },
+   "5": {
+    "ic": -0.0847,
+    "t": -5.45,
+    "n": 5,
+    "wr": 0.0
+   }
+  },
+  "score_theme": {
+   "1": {
+    "ic": -0.0356,
+    "t": -1.77,
+    "n": 78,
+    "wr": 39.7
+   },
+   "5": {
+    "ic": -0.0686,
+    "t": -1.71,
+    "n": 74,
+    "wr": 36.5
+   },
+   "20": {
+    "ic": -0.1122,
+    "t": -2.81,
+    "n": 59,
+    "wr": 23.7
+   }
+  },
+  "score_sector": {
+   "1": {
+    "ic": 0.0044,
+    "t": 0.14,
+    "n": 19,
+    "wr": 52.6
+   },
+   "5": {
+    "ic": -0.0269,
+    "t": -0.85,
+    "n": 15,
+    "wr": 33.3
+   }
+  },
+  "score_tech": {
+   "1": {
+    "ic": -0.0326,
+    "t": -1.85,
+    "n": 78,
+    "wr": 37.2
+   },
+   "5": {
+    "ic": -0.057,
+    "t": -1.79,
+    "n": 74,
+    "wr": 32.4
+   },
+   "20": {
+    "ic": -0.0379,
+    "t": -1.43,
+    "n": 59,
+    "wr": 33.9
+   }
+  }
+ },
+ "drop_rules": {
+  "score_attention": "分位 >= 80% 剔除",
+  "score_theme": "分位 >= 80% 剔除"
+ },
+ "excluded": {
+  "现价不在买入区间": 215,
+  "题材过热(theme 前20%)": 65,
+  "关注度过高(attention 前20%)": 100
+ },
+ "eligibility_dropped": {},
+ "capped": [
+  {
+   "name": "宏桥控股",
+   "reason": "二级板块 工业金属 已满 2"
+  }
+ ],
+ "picks": [
+  {
+   "name": "华新建材",
+   "code": "sh600801",
+   "sector_l2": "水泥",
+   "sector_parent": "建筑材料",
+   "price": 22.27,
+   "pct_chg": -2.54,
+   "total": 67.5,
+   "rating": "A",
+   "mf_score": 0.88,
+   "parts": {
+    "fund_pct": 89.9,
+    "news_pct": 83.5,
+    "rev_pct": 26.2,
+    "att_pct": 52.5,
+    "thm_pct": 44.5
+   },
+   "plan": {
+    "buy_lo": 21.8,
+    "buy_hi": 22.27,
+    "stop": 20.33,
+    "target": 23.2,
+    "rr": 0.4793814432989686,
+    "entry_ref": 22.27,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.7,
+   "score_news": 0.5,
+   "score_theme": 2.02,
+   "score_attention": 2.63,
+   "score_sector": 2.4,
+   "rsi": 45.5,
+   "trend": "偏空",
+   "fwd_pe": 12.3,
+   "growth": 59.3,
+   "circ_mv_yi": 298.8,
+   "mom5": -0.4,
+   "mom20": -8.4,
+   "fund_reasons": [
+    "低估值(FwdPE=12.3)+高增长(+59%)",
+    "估值阶梯明显收缩(12.3→10.1→8.6),3年收缩30%",
+    "PEG=0.21(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "公告确认:利好事件",
+    "消息时效:近7日有公告"
+   ]
+  },
+  {
+   "name": "云南铜业",
+   "code": "sz000878",
+   "sector_l2": "工业金属",
+   "sector_parent": "有色金属",
+   "price": 14.07,
+   "pct_chg": -1.88,
+   "total": 74.1,
+   "rating": "A",
+   "mf_score": 0.8701,
+   "parts": {
+    "fund_pct": 88.7,
+    "news_pct": 81.9,
+    "rev_pct": 61.8,
+    "att_pct": 62.8,
+    "thm_pct": 48.7
+   },
+   "plan": {
+    "buy_lo": 13.99,
+    "buy_hi": 14.07,
+    "stop": 13.72,
+    "target": 14.33,
+    "rr": 0.742857142857143,
+    "entry_ref": 14.07,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.7,
+   "score_news": 0.5,
+   "score_theme": 2.08,
+   "score_attention": 3.14,
+   "score_sector": 3.28,
+   "rsi": 31.6,
+   "trend": "双线空头",
+   "fwd_pe": 11.1,
+   "growth": 89.6,
+   "circ_mv_yi": 281.91,
+   "mom5": -4.7,
+   "mom20": -16.0,
+   "fund_reasons": [
+    "低估值(FwdPE=11.1)+高增长(+90%)",
+    "估值阶梯合理收缩(11.1→9.7→9.2),3年收缩17%",
+    "PEG=0.12(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "公告确认:利好事件",
+    "消息时效:近7日有公告"
+   ]
+  },
+  {
+   "name": "金龙汽车",
+   "code": "sh600686",
+   "sector_l2": "商用车",
+   "sector_parent": "汽车",
+   "price": 9.54,
+   "pct_chg": 0,
+   "total": 85.5,
+   "rating": "S",
+   "mf_score": 0.8304,
+   "parts": {
+    "fund_pct": 83.9,
+    "news_pct": 80.9,
+    "rev_pct": 59.4,
+    "att_pct": 14.3,
+    "thm_pct": 18.7
+   },
+   "plan": {
+    "buy_lo": 9.34,
+    "buy_hi": 9.54,
+    "stop": 9.25,
+    "target": 11.07,
+    "rr": 5.2758620689655364,
+    "entry_ref": 9.54,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.6,
+   "score_news": 0.5,
+   "score_theme": 1.74,
+   "score_attention": 0.72,
+   "score_sector": 3.28,
+   "rsi": 36.2,
+   "trend": "双线空头",
+   "fwd_pe": 9.4,
+   "growth": 370.0,
+   "circ_mv_yi": 68.41,
+   "mom5": -7.7,
+   "mom20": -11.7,
+   "fund_reasons": [
+    "低基数失真修正: 单点增速1473%→370%(超出无存续期CAGR可支持上限,已饱和)",
+    "低估值(FwdPE=9.4)+高增长(+370%)",
+    "估值阶梯明显收缩(9.4→6.7→5.5),3年收缩41%"
+   ],
+   "news_reasons": [
+    "公告确认:利好事件",
+    "消息时效:近7日有公告"
+   ]
+  },
+  {
+   "name": "福斯特",
+   "code": "sh603806",
+   "sector_l2": "光伏设备",
+   "sector_parent": "电力设备",
+   "price": 13.02,
+   "pct_chg": -1.14,
+   "total": 72.48,
+   "rating": "A",
+   "mf_score": 0.8233,
+   "parts": {
+    "fund_pct": 99.4,
+    "news_pct": 23.5,
+    "rev_pct": 49.1,
+    "att_pct": 43.9,
+    "thm_pct": 62.8
+   },
+   "plan": {
+    "buy_lo": 12.85,
+    "buy_hi": 13.02,
+    "stop": 12.69,
+    "target": 14.38,
+    "rr": 4.121212121212124,
+    "entry_ref": 13.02,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 5.0,
+   "score_news": 0.0,
+   "score_theme": 2.25,
+   "score_attention": 2.2,
+   "score_sector": 3.28,
+   "rsi": 37.2,
+   "trend": "双线空头",
+   "fwd_pe": 20.9,
+   "growth": 55.8,
+   "circ_mv_yi": 339.66,
+   "mom5": -1.9,
+   "mom20": -8.6,
+   "fund_reasons": [
+    "估值合理(FwdPE=20.9)+增速(+56%)",
+    "估值阶梯明显收缩(20.9→16.2→12.9),3年收缩38%",
+    "PEG=0.37(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "无真实新闻/催化剂",
+    "消息时效:近7日有公告"
+   ]
+  },
+  {
+   "name": "松霖科技",
+   "code": "sh603992",
+   "sector_l2": "家居用品",
+   "sector_parent": "轻工制造",
+   "price": 21.55,
+   "pct_chg": -0.74,
+   "total": 74.21,
+   "rating": "A",
+   "mf_score": 0.8031,
+   "parts": {
+    "fund_pct": 98.6,
+    "news_pct": 18.9,
+    "rev_pct": 2.6,
+    "att_pct": 33.2,
+    "thm_pct": 67.0
+   },
+   "plan": {
+    "buy_lo": 21.3,
+    "buy_hi": 21.55,
+    "stop": 21.01,
+    "target": 24.88,
+    "rr": 6.166666666666673,
+    "entry_ref": 21.55,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 5.0,
+   "score_news": 0.0,
+   "score_theme": 2.31,
+   "score_attention": 1.67,
+   "score_sector": 2.56,
+   "rsi": 50.1,
+   "trend": "偏多",
+   "fwd_pe": 25.9,
+   "growth": 96.6,
+   "circ_mv_yi": 95.48,
+   "mom5": -5.6,
+   "mom20": 7.6,
+   "fund_reasons": [
+    "估值合理(FwdPE=25.9)+增速(+97%)",
+    "估值阶梯明显收缩(25.9→18.8→14.6),3年收缩44%,中PE起始,阶梯加分适度",
+    "PEG=0.27(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "无真实新闻/催化剂",
+    "消息时效:近7日无消息"
+   ]
+  },
+  {
+   "name": "上海家化",
+   "code": "sh600315",
+   "sector_l2": "化妆品",
+   "sector_parent": "美容护理",
+   "price": 18.29,
+   "pct_chg": 0,
+   "total": 74.6,
+   "rating": "A",
+   "mf_score": 0.7988,
+   "parts": {
+    "fund_pct": 98.4,
+    "news_pct": 17.7,
+    "rev_pct": 2.2,
+    "att_pct": 13.7,
+    "thm_pct": 63.6
+   },
+   "plan": {
+    "buy_lo": 18.0,
+    "buy_hi": 18.29,
+    "stop": 17.82,
+    "target": 19.13,
+    "rr": 1.7872340425531954,
+    "entry_ref": 18.29,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 5.0,
+   "score_news": 0.0,
+   "score_theme": 2.26,
+   "score_attention": 0.69,
+   "score_sector": 3.36,
+   "rsi": 50.7,
+   "trend": "周线多头",
+   "fwd_pe": 25.7,
+   "growth": 58.9,
+   "circ_mv_yi": 122.95,
+   "mom5": -0.1,
+   "mom20": 2.6,
+   "fund_reasons": [
+    "估值合理(FwdPE=25.7)+增速(+59%)",
+    "估值阶梯合理收缩(25.7→21.4→18.9),3年收缩26%",
+    "PEG=0.44(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "无真实新闻/催化剂",
+    "消息时效:近7日无消息"
+   ]
+  },
+  {
+   "name": "新疆众和",
+   "code": "sh600888",
+   "sector_l2": "工业金属",
+   "sector_parent": "有色金属",
+   "price": 9.03,
+   "pct_chg": -0.22,
+   "total": 73.42,
+   "rating": "A",
+   "mf_score": 0.7922,
+   "parts": {
+    "fund_pct": 78.9,
+    "news_pct": 82.1,
+    "rev_pct": 35.6,
+    "att_pct": 48.5,
+    "thm_pct": 55.7
+   },
+   "plan": {
+    "buy_lo": 8.9,
+    "buy_hi": 9.03,
+    "stop": 8.22,
+    "target": 9.74,
+    "rr": 0.8765432098765457,
+    "entry_ref": 9.03,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.3,
+   "score_news": 0.5,
+   "score_theme": 2.15,
+   "score_attention": 2.43,
+   "score_sector": 3.28,
+   "rsi": 42.5,
+   "trend": "周线空头",
+   "fwd_pe": 11.7,
+   "growth": 24.2,
+   "circ_mv_yi": 140.24,
+   "mom5": 3.9,
+   "mom20": -9.4,
+   "fund_reasons": [
+    "估值合理(FwdPE=11.7)+增速(+24%)",
+    "估值阶梯明显收缩(11.7→7.7→6.2),3年收缩47%",
+    "PEG=0.48(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "公告确认:利好事件",
+    "消息时效:近7日有公告"
+   ]
+  },
+  {
+   "name": "南华期货",
+   "code": "sh603093",
+   "sector_l2": "多元金融",
+   "sector_parent": "非银金融",
+   "price": 12.94,
+   "pct_chg": -1.52,
+   "total": 76.72,
+   "rating": "A",
+   "mf_score": 0.779,
+   "parts": {
+    "fund_pct": 97.0,
+    "news_pct": 13.7,
+    "rev_pct": 1.2,
+    "att_pct": 32.6,
+    "thm_pct": 34.0
+   },
+   "plan": {
+    "buy_lo": 12.64,
+    "buy_hi": 12.94,
+    "stop": 12.51,
+    "target": 13.9,
+    "rr": 2.2325581395348872,
+    "entry_ref": 12.94,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 5.0,
+   "score_news": 0.0,
+   "score_theme": 1.92,
+   "score_attention": 1.64,
+   "score_sector": 3.36,
+   "rsi": 48.7,
+   "trend": "周线多头",
+   "fwd_pe": 18.3,
+   "growth": 66.8,
+   "circ_mv_yi": 114.14,
+   "mom5": 0.5,
+   "mom20": 1.7,
+   "fund_reasons": [
+    "合理估值(FwdPE=18.3)+高增长(+67%)",
+    "估值阶梯合理收缩(18.3→15.5→13.1),3年收缩28%",
+    "PEG=0.27(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "无真实新闻/催化剂",
+    "消息时效:近7日有公告"
+   ]
+  },
+  {
+   "name": "艾力斯",
+   "code": "sh688578",
+   "sector_l2": "化学制药",
+   "sector_parent": "医药生物",
+   "price": 86.57,
+   "pct_chg": -1.76,
+   "total": 72.22,
+   "rating": "A",
+   "mf_score": 0.767,
+   "parts": {
+    "fund_pct": 74.8,
+    "news_pct": 82.7,
+    "rev_pct": 90.7,
+    "att_pct": 77.5,
+    "thm_pct": 53.5
+   },
+   "plan": {
+    "buy_lo": 83.8,
+    "buy_hi": 86.57,
+    "stop": 75.98,
+    "target": 104.57,
+    "rr": 1.6997167138810216,
+    "entry_ref": 86.57,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.2,
+   "score_news": 0.5,
+   "score_theme": 2.13,
+   "score_attention": 3.87,
+   "score_sector": 3.36,
+   "rsi": 42.2,
+   "trend": "周线空头",
+   "fwd_pe": 13.9,
+   "growth": 51.0,
+   "circ_mv_yi": 389.56,
+   "mom5": 4.3,
+   "mom20": -13.8,
+   "fund_reasons": [
+    "低估值(FwdPE=13.9)+高增长(+51%)",
+    "估值阶梯合理收缩(13.9→11.9→10.3),3年收缩26%",
+    "PEG=0.27(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "公告确认:利好事件",
+    "消息时效:近7日有公告"
+   ]
+  },
+  {
+   "name": "思泉新材",
+   "code": "sz301489",
+   "sector_l2": "电子化学品Ⅱ",
+   "sector_parent": "电子",
+   "price": 85.16,
+   "pct_chg": -2.94,
+   "total": 83.85,
+   "rating": "A",
+   "mf_score": 0.7663,
+   "parts": {
+    "fund_pct": 75.3,
+    "news_pct": 81.1,
+    "rev_pct": 87.3,
+    "att_pct": 49.5,
+    "thm_pct": 51.5
+   },
+   "plan": {
+    "buy_lo": 84.27,
+    "buy_hi": 85.16,
+    "stop": 83.03,
+    "target": 87.49,
+    "rr": 1.093896713615025,
+    "entry_ref": 85.16,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.22,
+   "score_news": 0.5,
+   "score_theme": 2.11,
+   "score_attention": 2.48,
+   "score_sector": 3.28,
+   "rsi": 33.5,
+   "trend": "双线空头",
+   "fwd_pe": 38.5,
+   "growth": 21.2,
+   "circ_mv_yi": 71.42,
+   "mom5": 0.4,
+   "mom20": -33.7,
+   "fund_reasons": [
+    "估值中等(FwdPE=38.5)+增速(+21%)",
+    "估值阶梯强收缩(38.5→18.1→12.5),3年收缩68%,中PE起始,阶梯加分适度",
+    "PEG=1.81(轻度高估)"
+   ],
+   "news_reasons": [
+    "公告确认:利好事件",
+    "消息时效:近7日有公告"
+   ]
+  }
+ ],
+ "boundaries": [
+  "反转块仅 8 个截面 → 弱先验，不是已验证因子",
+  "score_sector 池内 IC 全周期不显著（T+1 t=0.29 / T+5 t=-1.20）→ 未作为选股轴",
+  "池内头组净收益历史上为负 → 组合≠赚钱，须配合仓位纪律与止损",
+  "组合仅表达「相对排序」，不构成个股推荐",
+  "v4.3 买区过滤的收益代价在噪声内（audit_round16 配对检验 |NW t| 最大 1.54 < 2），但把可执行性从「10 只中约 4 只可当日成交」提升到「全部可当日成交」"
+ ]
+}
