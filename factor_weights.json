@@ -1,6 +1,6 @@
 {
  "version": "v3.6-fund-led",
- "fitted_at": "2026-10-26 16:03:34",
+ "fitted_at": "2026-10-27 16:12:53",
  "target_horizon": 1,
  "method": "v3.6 基本面主导: 以全样本可验证维度为主(fund/news)，反转块等权压缩消除共线性虚增，小样本维度降至地板; 走步验证(训练≥30截面,每5截面重拟,样本外比对); score_sector 有效样本<20 维持0.10(样本积累中)",
  "weights": {
@@ -16,7 +16,7 @@
   "score_sector": 0.1
  },
  "prior_weights": {
-  "score_fund": 0.436,
+  "score_fund": 0.437,
   "score_news": 0.218,
   "score_oversold60": 0.061,
   "score_bias60": 0.061,
@@ -34,19 +34,19 @@
   "oos_ic_new": null,
   "oos_t_new": null,
   "lambda": null,
-  "note": "十维池内截面 10 < MIN_TRAIN(30)，样本外观测不足 → 维持先验权重（每日重估登记，满 30 后自动启用走步验证）"
+  "note": "十维池内截面 11 < MIN_TRAIN(30)，样本外观测不足 → 维持先验权重（每日重估登记，满 30 后自动启用走步验证）"
  },
  "full_period_composite_ic": {
   "prior": {
    "1": {
     "n": 9,
     "ic_mean": -0.0087,
-    "nw_t": -0.2,
+    "nw_t": -0.19,
     "win_rate": 55.6
    },
    "5": {
     "n": 5,
-    "ic_mean": 0.0284,
+    "ic_mean": 0.0283,
     "nw_t": 1.0,
     "win_rate": 60.0
    },
@@ -61,12 +61,12 @@
    "1": {
     "n": 9,
     "ic_mean": -0.0087,
-    "nw_t": -0.2,
+    "nw_t": -0.19,
     "win_rate": 55.6
    },
    "5": {
     "n": 5,
-    "ic_mean": 0.0284,
+    "ic_mean": 0.0283,
     "nw_t": 1.0,
     "win_rate": 60.0
    },
