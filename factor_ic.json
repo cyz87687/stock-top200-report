@@ -1,6 +1,6 @@
 {
- "date": "2026-10-27",
- "generated_at": "2026-10-27 16:12:53",
+ "date": "2026-10-28",
+ "generated_at": "2026-10-28 17:02:32",
  "method": {
   "name": "Rank IC（Spearman 秩相关，修正口径）",
   "formula": "IC(t→t+h) = Spearman(因子值_t 截面秩, 收益率 t→第h个后续交易日)",
@@ -14,8 +14,8 @@
   "quantile_spread": "每截面按因子分 5 组，头部组均值收益 − 尾部组均值收益（未扣成本，毛利口径）",
   "bonferroni": "30 次检验（5因子×3周期），校正阈值 |NW t|≥3.08；宽松阈值 |t|≥2.0"
  },
- "n_snapshots": 80,
- "n_snapshots_raw": 87,
+ "n_snapshots": 81,
+ "n_snapshots_raw": 88,
  "stale_snapshots_dropped": [
   "2026-09-25",
   "2026-10-01",
@@ -32,7 +32,7 @@
  ],
  "snapshot_range": [
   "2026-06-26",
-  "2026-10-27"
+  "2026-10-28"
  ],
  "snapshot_dates": [
   "2026-06-26",
@@ -114,20 +114,21 @@
   "2026-10-22",
   "2026-10-23",
   "2026-10-26",
-  "2026-10-27"
+  "2026-10-27",
+  "2026-10-28"
  ],
  "price_backfill": {
   "available": true,
-  "n_codes": 1298,
-  "n_trading_days": 145,
-  "fetched_at": "2026-10-27 16:12:50"
+  "n_codes": 1615,
+  "n_trading_days": 146,
+  "fetched_at": "2026-10-28 17:02:30"
  },
  "factors": {
   "total": {
    "label": "综合总分",
    "horizons": {
     "1": {
-     "n": 78,
+     "n": 80,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -206,7 +207,9 @@
       "2026-10-20",
       "2026-10-21",
       "2026-10-22",
-      "2026-10-23"
+      "2026-10-23",
+      "2026-10-26",
+      "2026-10-27"
      ],
      "ic_series": [
       0.0436,
@@ -286,48 +289,50 @@
       0.13,
       -0.0326,
       0.1484,
-      -0.2199
+      -0.2199,
+      -0.1162,
+      0.2238
      ],
-     "ic_mean": 0.0186,
-     "ic_std": 0.1316,
-     "t_stat": 1.25,
-     "nw_t": 1.26,
+     "ic_mean": 0.0195,
+     "ic_std": 0.1328,
+     "t_stat": 1.31,
+     "nw_t": 1.32,
      "bonferroni_sig": false,
      "nw_lag": 0,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": 1.26,
-       "1": 1.22,
-       "2": 1.24,
-       "3": 1.27,
-       "4": 1.3,
-       "6": 1.39,
-       "8": 1.4,
-       "12": 1.44,
-       "19": 1.44
+       "0": 1.32,
+       "1": 1.28,
+       "2": 1.33,
+       "3": 1.35,
+       "4": 1.39,
+       "6": 1.5,
+       "8": 1.49,
+       "12": 1.54,
+       "19": 1.55
       },
-      "t_min": 1.22,
-      "t_max": 1.44,
+      "t_min": 1.28,
+      "t_max": 1.55,
       "lag_andrews": 2,
-      "t_andrews": 1.24,
+      "t_andrews": 1.33,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 59.0,
-     "spread_mean": 0.096,
+     "win_rate": 58.8,
+     "spread_mean": 0.106,
      "subperiod": {
-      "first_half_mean": 0.0363,
-      "second_half_mean": 0.0009,
-      "sign_stable_pct": 59.0,
+      "first_half_mean": 0.0354,
+      "second_half_mean": 0.0036,
+      "sign_stable_pct": 58.8,
       "regime_shift": false
      },
      "verdict": "无预测力",
      "verdict_color": "#64748b",
-     "verdict_note": "IC=+0.019，NW t=1.26"
+     "verdict_note": "IC=+0.019，NW t=1.32"
     },
     "5": {
-     "n": 74,
+     "n": 76,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -402,7 +407,9 @@
       "2026-10-14",
       "2026-10-15",
       "2026-10-16",
-      "2026-10-19"
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21"
      ],
      "ic_series": [
       0.1243,
@@ -478,49 +485,51 @@
       0.011,
       0.1325,
       0.1818,
-      0.0203
+      0.0203,
+      -0.1635,
+      -0.1872
      ],
-     "ic_mean": 0.0277,
-     "ic_std": 0.1294,
-     "t_stat": 1.84,
-     "nw_t": 1.15,
+     "ic_mean": 0.0224,
+     "ic_std": 0.1318,
+     "t_stat": 1.48,
+     "nw_t": 0.94,
      "bonferroni_sig": false,
      "nw_lag": 4,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": 1.86,
-       "1": 1.49,
-       "2": 1.32,
-       "3": 1.21,
-       "4": 1.15,
-       "6": 1.07,
-       "7": 1.05,
-       "8": 1.03,
-       "12": 1.01,
-       "19": 1.01
+       "0": 1.49,
+       "1": 1.2,
+       "2": 1.07,
+       "3": 0.99,
+       "4": 0.94,
+       "6": 0.88,
+       "7": 0.86,
+       "8": 0.85,
+       "12": 0.83,
+       "19": 0.83
       },
-      "t_min": 1.01,
-      "t_max": 1.86,
+      "t_min": 0.83,
+      "t_max": 1.49,
       "lag_andrews": 7,
-      "t_andrews": 1.05,
+      "t_andrews": 0.86,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 59.5,
-     "spread_mean": 0.355,
+     "win_rate": 57.9,
+     "spread_mean": 0.245,
      "subperiod": {
-      "first_half_mean": 0.0392,
-      "second_half_mean": 0.0163,
-      "sign_stable_pct": 59.5,
+      "first_half_mean": 0.0399,
+      "second_half_mean": 0.0049,
+      "sign_stable_pct": 57.9,
       "regime_shift": false
      },
      "verdict": "方向为正·不显著",
      "verdict_color": "#f59e0b",
-     "verdict_note": "IC=+0.028，NW t=1.15"
+     "verdict_note": "IC=+0.022，NW t=0.94"
     },
     "20": {
-     "n": 59,
+     "n": 61,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -580,7 +589,9 @@
       "2026-09-15",
       "2026-09-16",
       "2026-09-17",
-      "2026-09-18"
+      "2026-09-18",
+      "2026-09-21",
+      "2026-09-22"
      ],
      "ic_series": [
       0.325,
@@ -641,57 +652,59 @@
       -0.2163,
       -0.2191,
       -0.1416,
-      -0.1829
+      -0.1829,
+      -0.0456,
+      0.0054
      ],
-     "ic_mean": 0.0166,
-     "ic_std": 0.1543,
-     "t_stat": 0.82,
-     "nw_t": 0.33,
+     "ic_mean": 0.0154,
+     "ic_std": 0.1519,
+     "t_stat": 0.79,
+     "nw_t": 0.32,
      "bonferroni_sig": false,
      "nw_lag": 19,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": 0.83,
-       "1": 0.63,
-       "2": 0.54,
-       "3": 0.48,
-       "4": 0.44,
-       "6": 0.4,
-       "8": 0.37,
-       "10": 0.35,
-       "12": 0.35,
-       "19": 0.33
+       "0": 0.8,
+       "1": 0.6,
+       "2": 0.51,
+       "3": 0.46,
+       "4": 0.42,
+       "6": 0.38,
+       "8": 0.35,
+       "10": 0.34,
+       "12": 0.33,
+       "19": 0.32
       },
-      "t_min": 0.33,
-      "t_max": 0.83,
+      "t_min": 0.32,
+      "t_max": 0.8,
       "lag_andrews": 10,
-      "t_andrews": 0.35,
+      "t_andrews": 0.34,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 54.2,
-     "spread_mean": -0.236,
+     "win_rate": 54.1,
+     "spread_mean": -0.289,
      "subperiod": {
-      "first_half_mean": 0.0817,
-      "second_half_mean": -0.0464,
-      "sign_stable_pct": 54.2,
+      "first_half_mean": 0.0806,
+      "second_half_mean": -0.0478,
+      "sign_stable_pct": 54.1,
       "regime_shift": true
      },
      "verdict": "无预测力",
      "verdict_color": "#64748b",
-     "verdict_note": "IC=+0.017，NW t=0.33"
+     "verdict_note": "IC=+0.015，NW t=0.32"
     }
    },
    "verdict": "无预测力",
    "verdict_color": "#64748b",
-   "verdict_note": "IC=+0.019，NW t=1.26（T+1）"
+   "verdict_note": "IC=+0.019，NW t=1.32（T+1）"
   },
   "score_fund": {
    "label": "基本面",
    "horizons": {
     "1": {
-     "n": 78,
+     "n": 80,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -770,7 +783,9 @@
       "2026-10-20",
       "2026-10-21",
       "2026-10-22",
-      "2026-10-23"
+      "2026-10-23",
+      "2026-10-26",
+      "2026-10-27"
      ],
      "ic_series": [
       -0.0571,
@@ -850,48 +865,50 @@
       0.0574,
       -0.0658,
       0.1224,
-      -0.1544
+      -0.1544,
+      -0.0328,
+      0.0826
      ],
-     "ic_mean": 0.0406,
-     "ic_std": 0.1299,
-     "t_stat": 2.76,
-     "nw_t": 2.78,
+     "ic_mean": 0.0402,
+     "ic_std": 0.1286,
+     "t_stat": 2.79,
+     "nw_t": 2.81,
      "bonferroni_sig": false,
      "nw_lag": 0,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": 2.78,
-       "1": 2.66,
-       "2": 2.67,
-       "3": 2.86,
-       "4": 3.13,
-       "6": 3.57,
-       "8": 3.77,
-       "12": 3.92,
-       "19": 3.92
+       "0": 2.81,
+       "1": 2.68,
+       "2": 2.69,
+       "3": 2.88,
+       "4": 3.16,
+       "6": 3.6,
+       "8": 3.79,
+       "12": 3.9,
+       "19": 3.89
       },
-      "t_min": 2.66,
-      "t_max": 3.92,
+      "t_min": 2.68,
+      "t_max": 3.9,
       "lag_andrews": 2,
-      "t_andrews": 2.67,
+      "t_andrews": 2.69,
       "robust_bonferroni": false,
       "flips": true
      },
      "robust_bonferroni": false,
-     "win_rate": 59.0,
-     "spread_mean": 0.275,
+     "win_rate": 58.8,
+     "spread_mean": 0.272,
      "subperiod": {
-      "first_half_mean": 0.0567,
-      "second_half_mean": 0.0245,
-      "sign_stable_pct": 59.0,
+      "first_half_mean": 0.0551,
+      "second_half_mean": 0.0253,
+      "sign_stable_pct": 58.8,
       "regime_shift": false
      },
      "verdict": "弱有效",
      "verdict_color": "#84cc16",
-     "verdict_note": "IC=+0.041，NW t=2.78（宽松显著·未过多重校正）"
+     "verdict_note": "IC=+0.040，NW t=2.81（宽松显著·未过多重校正）"
     },
     "5": {
-     "n": 74,
+     "n": 76,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -966,7 +983,9 @@
       "2026-10-14",
       "2026-10-15",
       "2026-10-16",
-      "2026-10-19"
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21"
      ],
      "ic_series": [
       0.136,
@@ -1042,49 +1061,51 @@
       -0.0757,
       0.0124,
       0.0882,
-      -0.0224
+      -0.0224,
+      -0.0754,
+      -0.1234
      ],
-     "ic_mean": 0.0748,
-     "ic_std": 0.1254,
-     "t_stat": 5.13,
-     "nw_t": 3.45,
+     "ic_mean": 0.0702,
+     "ic_std": 0.1269,
+     "t_stat": 4.83,
+     "nw_t": 3.22,
      "bonferroni_sig": true,
      "nw_lag": 4,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": 5.17,
-       "1": 3.99,
-       "2": 3.59,
-       "3": 3.46,
-       "4": 3.45,
-       "6": 3.62,
-       "8": 3.9,
-       "9": 4.02,
-       "12": 4.1,
-       "19": 3.66
+       "0": 4.86,
+       "1": 3.75,
+       "2": 3.37,
+       "3": 3.24,
+       "4": 3.22,
+       "6": 3.33,
+       "8": 3.48,
+       "10": 3.57,
+       "12": 3.57,
+       "19": 3.23
       },
-      "t_min": 3.45,
-      "t_max": 5.17,
-      "lag_andrews": 9,
-      "t_andrews": 4.02,
+      "t_min": 3.22,
+      "t_max": 4.86,
+      "lag_andrews": 10,
+      "t_andrews": 3.57,
       "robust_bonferroni": true,
       "flips": false
      },
      "robust_bonferroni": true,
-     "win_rate": 70.3,
-     "spread_mean": 1.49,
+     "win_rate": 68.4,
+     "spread_mean": 1.411,
      "subperiod": {
-      "first_half_mean": 0.1059,
-      "second_half_mean": 0.0437,
-      "sign_stable_pct": 70.3,
+      "first_half_mean": 0.1049,
+      "second_half_mean": 0.0356,
+      "sign_stable_pct": 68.4,
       "regime_shift": false
      },
      "verdict": "显著有效",
      "verdict_color": "#22c55e",
-     "verdict_note": "IC=+0.075，NW t=3.45（校正后显著）"
+     "verdict_note": "IC=+0.070，NW t=3.22（校正后显著）"
     },
     "20": {
-     "n": 59,
+     "n": 61,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -1144,7 +1165,9 @@
       "2026-09-15",
       "2026-09-16",
       "2026-09-17",
-      "2026-09-18"
+      "2026-09-18",
+      "2026-09-21",
+      "2026-09-22"
      ],
      "ic_series": [
       0.2405,
@@ -1205,57 +1228,58 @@
       -0.1616,
       -0.0165,
       0.0179,
-      0.0989
+      0.0989,
+      0.3985,
+      0.0881
      ],
-     "ic_mean": 0.0915,
-     "ic_std": 0.1369,
-     "t_stat": 5.13,
-     "nw_t": 1.75,
+     "ic_mean": 0.0965,
+     "ic_std": 0.1402,
+     "t_stat": 5.37,
+     "nw_t": 1.97,
      "bonferroni_sig": false,
      "nw_lag": 19,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": 5.18,
-       "1": 3.81,
-       "2": 3.21,
-       "3": 2.85,
-       "4": 2.62,
-       "6": 2.33,
-       "8": 2.15,
-       "12": 1.94,
-       "15": 1.84,
-       "19": 1.75
+       "0": 5.42,
+       "1": 4.06,
+       "2": 3.45,
+       "3": 3.09,
+       "4": 2.85,
+       "6": 2.56,
+       "8": 2.38,
+       "12": 2.16,
+       "19": 1.97
       },
-      "t_min": 1.75,
-      "t_max": 5.18,
-      "lag_andrews": 15,
-      "t_andrews": 1.84,
+      "t_min": 1.97,
+      "t_max": 5.42,
+      "lag_andrews": 12,
+      "t_andrews": 2.16,
       "robust_bonferroni": false,
       "flips": true
      },
      "robust_bonferroni": false,
-     "win_rate": 72.9,
-     "spread_mean": 2.521,
+     "win_rate": 73.8,
+     "spread_mean": 2.627,
      "subperiod": {
-      "first_half_mean": 0.1806,
-      "second_half_mean": 0.0054,
-      "sign_stable_pct": 72.9,
+      "first_half_mean": 0.1801,
+      "second_half_mean": 0.0156,
+      "sign_stable_pct": 73.8,
       "regime_shift": false
      },
      "verdict": "弱有效",
      "verdict_color": "#84cc16",
-     "verdict_note": "IC=+0.091，NW t=1.75"
+     "verdict_note": "IC=+0.097，NW t=1.97"
     }
    },
    "verdict": "显著有效",
    "verdict_color": "#22c55e",
-   "verdict_note": "IC=+0.075，NW t=3.45（校正后显著）（T+5）"
+   "verdict_note": "IC=+0.070，NW t=3.22（校正后显著）（T+5）"
   },
   "score_news": {
    "label": "消息面",
    "horizons": {
     "1": {
-     "n": 78,
+     "n": 80,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -1334,7 +1358,9 @@
       "2026-10-20",
       "2026-10-21",
       "2026-10-22",
-      "2026-10-23"
+      "2026-10-23",
+      "2026-10-26",
+      "2026-10-27"
      ],
      "ic_series": [
       0.1282,
@@ -1414,48 +1440,50 @@
       0.1221,
       -0.0057,
       0.0962,
-      -0.0432
+      -0.0432,
+      0.1078,
+      -0.0187
      ],
-     "ic_mean": 0.043,
-     "ic_std": 0.1422,
-     "t_stat": 2.67,
-     "nw_t": 2.69,
+     "ic_mean": 0.0431,
+     "ic_std": 0.1408,
+     "t_stat": 2.74,
+     "nw_t": 2.75,
      "bonferroni_sig": false,
      "nw_lag": 0,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": 2.69,
-       "1": 2.71,
-       "2": 2.63,
-       "3": 2.53,
-       "4": 2.54,
-       "6": 2.61,
-       "8": 2.63,
-       "12": 2.84,
-       "19": 3.63
+       "0": 2.75,
+       "1": 2.78,
+       "2": 2.7,
+       "3": 2.6,
+       "4": 2.6,
+       "6": 2.68,
+       "8": 2.7,
+       "12": 2.92,
+       "19": 3.74
       },
-      "t_min": 2.53,
-      "t_max": 3.63,
+      "t_min": 2.6,
+      "t_max": 3.74,
       "lag_andrews": 1,
-      "t_andrews": 2.71,
+      "t_andrews": 2.78,
       "robust_bonferroni": false,
       "flips": true
      },
      "robust_bonferroni": false,
-     "win_rate": 59.0,
-     "spread_mean": 0.357,
+     "win_rate": 58.8,
+     "spread_mean": 0.363,
      "subperiod": {
-      "first_half_mean": 0.0561,
-      "second_half_mean": 0.03,
-      "sign_stable_pct": 59.0,
+      "first_half_mean": 0.0551,
+      "second_half_mean": 0.031,
+      "sign_stable_pct": 58.8,
       "regime_shift": false
      },
      "verdict": "弱有效",
      "verdict_color": "#84cc16",
-     "verdict_note": "IC=+0.043，NW t=2.69（宽松显著·未过多重校正）"
+     "verdict_note": "IC=+0.043，NW t=2.75（宽松显著·未过多重校正）"
     },
     "5": {
-     "n": 74,
+     "n": 76,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -1530,7 +1558,9 @@
       "2026-10-14",
       "2026-10-15",
       "2026-10-16",
-      "2026-10-19"
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21"
      ],
      "ic_series": [
       -0.0679,
@@ -1606,49 +1636,50 @@
       0.0403,
       -0.0568,
       0.0636,
-      0.0358
+      0.0358,
+      -0.0258,
+      -0.1515
      ],
-     "ic_mean": 0.0387,
-     "ic_std": 0.1324,
-     "t_stat": 2.51,
-     "nw_t": 1.58,
+     "ic_mean": 0.0353,
+     "ic_std": 0.1327,
+     "t_stat": 2.32,
+     "nw_t": 1.47,
      "bonferroni_sig": false,
      "nw_lag": 4,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": 2.53,
-       "1": 2.06,
-       "2": 1.81,
-       "3": 1.66,
-       "4": 1.58,
-       "6": 1.53,
-       "7": 1.53,
-       "8": 1.53,
-       "12": 1.64,
-       "19": 2.1
+       "0": 2.34,
+       "1": 1.9,
+       "2": 1.68,
+       "3": 1.54,
+       "4": 1.47,
+       "6": 1.42,
+       "8": 1.42,
+       "12": 1.5,
+       "19": 1.83
       },
-      "t_min": 1.53,
-      "t_max": 2.53,
-      "lag_andrews": 7,
-      "t_andrews": 1.53,
+      "t_min": 1.42,
+      "t_max": 2.34,
+      "lag_andrews": 6,
+      "t_andrews": 1.42,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 63.5,
-     "spread_mean": 0.755,
+     "win_rate": 61.8,
+     "spread_mean": 0.705,
      "subperiod": {
-      "first_half_mean": 0.0535,
-      "second_half_mean": 0.0238,
-      "sign_stable_pct": 63.5,
+      "first_half_mean": 0.0514,
+      "second_half_mean": 0.0193,
+      "sign_stable_pct": 61.8,
       "regime_shift": false
      },
-     "verdict": "弱有效",
-     "verdict_color": "#84cc16",
-     "verdict_note": "IC=+0.039，NW t=1.58"
+     "verdict": "方向为正·不显著",
+     "verdict_color": "#f59e0b",
+     "verdict_note": "IC=+0.035，NW t=1.47"
     },
     "20": {
-     "n": 59,
+     "n": 61,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -1708,7 +1739,9 @@
       "2026-09-15",
       "2026-09-16",
       "2026-09-17",
-      "2026-09-18"
+      "2026-09-18",
+      "2026-09-21",
+      "2026-09-22"
      ],
      "ic_series": [
       0.0365,
@@ -1769,56 +1802,59 @@
       -0.0916,
       -0.1308,
       -0.1418,
-      -0.1685
+      -0.1685,
+      -0.1898,
+      0.0222
      ],
-     "ic_mean": 0.0148,
-     "ic_std": 0.1222,
-     "t_stat": 0.93,
-     "nw_t": 0.52,
+     "ic_mean": 0.0116,
+     "ic_std": 0.1229,
+     "t_stat": 0.74,
+     "nw_t": 0.39,
      "bonferroni_sig": false,
      "nw_lag": 19,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": 0.94,
-       "1": 0.73,
-       "2": 0.64,
-       "3": 0.58,
-       "4": 0.54,
-       "6": 0.51,
-       "8": 0.49,
-       "12": 0.49,
-       "19": 0.52
+       "0": 0.74,
+       "1": 0.58,
+       "2": 0.5,
+       "3": 0.45,
+       "4": 0.43,
+       "6": 0.39,
+       "8": 0.38,
+       "9": 0.37,
+       "12": 0.37,
+       "19": 0.39
       },
-      "t_min": 0.49,
-      "t_max": 0.94,
-      "lag_andrews": 8,
-      "t_andrews": 0.49,
+      "t_min": 0.37,
+      "t_max": 0.74,
+      "lag_andrews": 9,
+      "t_andrews": 0.37,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 59.3,
-     "spread_mean": 0.429,
+     "win_rate": 59.0,
+     "spread_mean": 0.406,
      "subperiod": {
-      "first_half_mean": 0.0657,
-      "second_half_mean": -0.0343,
-      "sign_stable_pct": 59.3,
+      "first_half_mean": 0.0605,
+      "second_half_mean": -0.0357,
+      "sign_stable_pct": 59.0,
       "regime_shift": true
      },
      "verdict": "无预测力",
      "verdict_color": "#64748b",
-     "verdict_note": "IC=+0.015，NW t=0.52"
+     "verdict_note": "IC=+0.012，NW t=0.39"
     }
    },
    "verdict": "弱有效",
    "verdict_color": "#84cc16",
-   "verdict_note": "IC=+0.043，NW t=2.69（宽松显著·未过多重校正）（T+1）"
+   "verdict_note": "IC=+0.043，NW t=2.75（宽松显著·未过多重校正）（T+1）"
   },
   "score_oversold60": {
    "label": "超跌60反转",
    "horizons": {
     "1": {
-     "n": 9,
+     "n": 11,
      "dates": [
       "2026-10-13",
       "2026-10-14",
@@ -1828,7 +1864,9 @@
       "2026-10-20",
       "2026-10-21",
       "2026-10-22",
-      "2026-10-23"
+      "2026-10-23",
+      "2026-10-26",
+      "2026-10-27"
      ],
      "ic_series": [
       -0.3186,
@@ -1839,89 +1877,100 @@
       -0.0119,
       0.1301,
       0.1908,
-      -0.1039
+      -0.1039,
+      -0.1273,
+      0.2259
      ],
-     "ic_mean": 0.0025,
-     "ic_std": 0.1884,
-     "t_stat": 0.04,
-     "nw_t": 0.04,
+     "ic_mean": 0.011,
+     "ic_std": 0.1871,
+     "t_stat": 0.19,
+     "nw_t": 0.2,
      "bonferroni_sig": false,
      "nw_lag": 0,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": 0.04,
-       "1": 0.04,
-       "2": 0.04,
-       "3": 0.04,
-       "4": 0.04,
-       "6": 0.04,
-       "8": 0.05,
-       "12": 0.06,
-       "19": 0.07
+       "0": 0.2,
+       "1": 0.19,
+       "2": 0.2,
+       "3": 0.2,
+       "4": 0.21,
+       "6": 0.23,
+       "8": 0.25,
+       "12": 0.29,
+       "19": 0.36
       },
-      "t_min": 0.04,
-      "t_max": 0.07,
+      "t_min": 0.19,
+      "t_max": 0.36,
       "lag_andrews": 2,
-      "t_andrews": 0.04,
+      "t_andrews": 0.2,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 55.6,
-     "spread_mean": -0.34,
-     "subperiod": null,
+     "win_rate": 54.5,
+     "spread_mean": -0.266,
+     "subperiod": {
+      "first_half_mean": -0.0366,
+      "second_half_mean": 0.0506,
+      "sign_stable_pct": 54.5,
+      "regime_shift": true
+     },
      "verdict": "样本积累中",
      "verdict_color": "#94a3b8",
-     "verdict_note": "n=9<20"
+     "verdict_note": "n=11<20"
     },
     "5": {
-     "n": 5,
+     "n": 7,
      "dates": [
       "2026-10-13",
       "2026-10-14",
       "2026-10-15",
       "2026-10-16",
-      "2026-10-19"
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21"
      ],
      "ic_series": [
       -0.1625,
       -0.0024,
       0.1787,
       0.2415,
-      0.0796
+      0.0796,
+      -0.002,
+      0.0176
      ],
-     "ic_mean": 0.067,
-     "ic_std": 0.1586,
-     "t_stat": 0.94,
-     "nw_t": 1.26,
+     "ic_mean": 0.0501,
+     "ic_std": 0.1328,
+     "t_stat": 1.0,
+     "nw_t": 1.42,
      "bonferroni_sig": false,
      "nw_lag": 4,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": 1.06,
+       "0": 1.08,
        "1": 0.93,
-       "2": 0.98,
-       "3": 1.13,
-       "4": 1.26,
-       "6": 1.49,
-       "8": 1.69,
-       "12": 2.03,
-       "19": 2.52
+       "2": 1.0,
+       "3": 1.2,
+       "4": 1.42,
+       "6": 1.72,
+       "8": 1.95,
+       "12": 2.34,
+       "19": 2.91
       },
       "t_min": 0.93,
-      "t_max": 2.52,
+      "t_max": 2.91,
       "lag_andrews": 2,
-      "t_andrews": 0.98,
+      "t_andrews": 1.0,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 60.0,
-     "spread_mean": 1.739,
+     "win_rate": 57.1,
+     "spread_mean": 0.631,
      "subperiod": null,
      "verdict": "样本积累中",
      "verdict_color": "#94a3b8",
-     "verdict_note": "n=5<20"
+     "verdict_note": "n=7<20"
     },
     "20": {
      "n": 0,
@@ -1945,13 +1994,13 @@
    },
    "verdict": "样本积累中",
    "verdict_color": "#94a3b8",
-   "verdict_note": "n=5<20（T+5·小样本）"
+   "verdict_note": "n=7<20（T+5·小样本）"
   },
   "score_bias60": {
    "label": "乖离低位",
    "horizons": {
     "1": {
-     "n": 9,
+     "n": 11,
      "dates": [
       "2026-10-13",
       "2026-10-14",
@@ -1961,7 +2010,9 @@
       "2026-10-20",
       "2026-10-21",
       "2026-10-22",
-      "2026-10-23"
+      "2026-10-23",
+      "2026-10-26",
+      "2026-10-27"
      ],
      "ic_series": [
       -0.237,
@@ -1972,488 +2023,100 @@
       0.1275,
       0.0101,
       0.1006,
-      -0.2617
+      -0.2617,
+      -0.177,
+      0.3033
      ],
-     "ic_mean": 0.0049,
-     "ic_std": 0.1921,
-     "t_stat": 0.08,
-     "nw_t": 0.08,
+     "ic_mean": 0.0155,
+     "ic_std": 0.204,
+     "t_stat": 0.25,
+     "nw_t": 0.26,
      "bonferroni_sig": false,
      "nw_lag": 0,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": 0.08,
-       "1": 0.08,
-       "2": 0.07,
-       "3": 0.07,
-       "4": 0.08,
-       "6": 0.11,
-       "8": 0.13,
-       "12": 0.16,
-       "19": 0.19
+       "0": 0.26,
+       "1": 0.25,
+       "2": 0.27,
+       "3": 0.28,
+       "4": 0.32,
+       "6": 0.45,
+       "8": 0.5,
+       "12": 0.56,
+       "19": 0.7
       },
-      "t_min": 0.07,
-      "t_max": 0.19,
-      "lag_andrews": 2,
-      "t_andrews": 0.07,
+      "t_min": 0.25,
+      "t_max": 0.7,
+      "lag_andrews": 1,
+      "t_andrews": 0.25,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 66.7,
-     "spread_mean": -0.534,
-     "subperiod": null,
+     "win_rate": 63.6,
+     "spread_mean": -0.333,
+     "subperiod": {
+      "first_half_mean": 0.0135,
+      "second_half_mean": 0.0171,
+      "sign_stable_pct": 63.6,
+      "regime_shift": false
+     },
      "verdict": "样本积累中",
      "verdict_color": "#94a3b8",
-     "verdict_note": "n=9<20"
+     "verdict_note": "n=11<20"
     },
     "5": {
-     "n": 5,
+     "n": 7,
      "dates": [
       "2026-10-13",
       "2026-10-14",
       "2026-10-15",
       "2026-10-16",
-      "2026-10-19"
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21"
      ],
      "ic_series": [
       -0.0724,
       0.0611,
       0.2451,
       0.2565,
-      0.0701
+      0.0701,
+      -0.1766,
+      -0.111
      ],
-     "ic_mean": 0.1121,
-     "ic_std": 0.1387,
-     "t_stat": 1.81,
-     "nw_t": 2.78,
+     "ic_mean": 0.039,
+     "ic_std": 0.1696,
+     "t_stat": 0.61,
+     "nw_t": 0.76,
      "bonferroni_sig": false,
      "nw_lag": 4,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": 2.02,
-       "1": 1.84,
-       "2": 2.07,
-       "3": 2.48,
-       "4": 2.78,
-       "6": 3.29,
-       "8": 3.73,
-       "12": 4.48,
-       "19": 5.56
+       "0": 0.66,
+       "1": 0.54,
+       "2": 0.56,
+       "3": 0.65,
+       "4": 0.76,
+       "6": 0.93,
+       "8": 1.05,
+       "12": 1.27,
+       "19": 1.57
       },
-      "t_min": 1.84,
-      "t_max": 5.56,
-      "lag_andrews": 2,
-      "t_andrews": 2.07,
-      "robust_bonferroni": false,
-      "flips": true
-     },
-     "robust_bonferroni": false,
-     "win_rate": 80.0,
-     "spread_mean": 1.381,
-     "subperiod": null,
-     "verdict": "正向·小样本(待确认)",
-     "verdict_color": "#f59e0b",
-     "verdict_note": "IC=+0.112，NW t=2.78，胜率=80.0%，n=5<20；方向为正待更多样本确认"
-    },
-    "20": {
-     "n": 0,
-     "dates": [],
-     "ic_series": [],
-     "ic_mean": null,
-     "ic_std": null,
-     "t_stat": null,
-     "nw_t": null,
-     "bonferroni_sig": false,
-     "nw_lag": 19,
-     "nw_sensitivity": null,
-     "robust_bonferroni": null,
-     "win_rate": null,
-     "spread_mean": null,
-     "subperiod": null,
-     "verdict": "样本积累中",
-     "verdict_color": "#94a3b8",
-     "verdict_note": "n=0<20"
-    }
-   },
-   "verdict": "正向·小样本(待确认)",
-   "verdict_color": "#f59e0b",
-   "verdict_note": "IC=+0.112，NW t=2.78，胜率=80.0%，n=5<20；方向为正待更多样本确认（T+5·小样本）"
-  },
-  "score_rsi_rev": {
-   "label": "RSI反转",
-   "horizons": {
-    "1": {
-     "n": 9,
-     "dates": [
-      "2026-10-13",
-      "2026-10-14",
-      "2026-10-15",
-      "2026-10-16",
-      "2026-10-19",
-      "2026-10-20",
-      "2026-10-21",
-      "2026-10-22",
-      "2026-10-23"
-     ],
-     "ic_series": [
-      -0.2568,
-      -0.211,
-      0.1462,
-      0.0287,
-      0.2975,
-      0.1245,
-      -0.0837,
-      0.0263,
-      -0.2862
-     ],
-     "ic_mean": -0.0238,
-     "ic_std": 0.2004,
-     "t_stat": -0.36,
-     "nw_t": -0.38,
-     "bonferroni_sig": false,
-     "nw_lag": 0,
-     "nw_sensitivity": {
-      "t_by_lag": {
-       "0": -0.38,
-       "1": -0.35,
-       "2": -0.33,
-       "3": -0.34,
-       "4": -0.39,
-       "6": -0.52,
-       "8": -0.62,
-       "12": -0.75,
-       "19": -0.93
-      },
-      "t_min": -0.93,
-      "t_max": -0.33,
-      "lag_andrews": 2,
-      "t_andrews": -0.33,
+      "t_min": 0.54,
+      "t_max": 1.57,
+      "lag_andrews": 3,
+      "t_andrews": 0.65,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 55.6,
-     "spread_mean": -0.547,
+     "win_rate": 57.1,
+     "spread_mean": -0.061,
      "subperiod": null,
      "verdict": "样本积累中",
      "verdict_color": "#94a3b8",
-     "verdict_note": "n=9<20"
-    },
-    "5": {
-     "n": 5,
-     "dates": [
-      "2026-10-13",
-      "2026-10-14",
-      "2026-10-15",
-      "2026-10-16",
-      "2026-10-19"
-     ],
-     "ic_series": [
-      -0.0973,
-      0.0487,
-      0.2498,
-      0.2213,
-      -0.0157
-     ],
-     "ic_mean": 0.0813,
-     "ic_std": 0.1503,
-     "t_stat": 1.21,
-     "nw_t": 2.17,
-     "bonferroni_sig": false,
-     "nw_lag": 4,
-     "nw_sensitivity": {
-      "t_by_lag": {
-       "0": 1.35,
-       "1": 1.28,
-       "2": 1.54,
-       "3": 1.94,
-       "4": 2.17,
-       "6": 2.57,
-       "8": 2.91,
-       "12": 3.5,
-       "19": 4.34
-      },
-      "t_min": 1.28,
-      "t_max": 4.34,
-      "lag_andrews": 1,
-      "t_andrews": 1.28,
-      "robust_bonferroni": false,
-      "flips": true
-     },
-     "robust_bonferroni": false,
-     "win_rate": 60.0,
-     "spread_mean": 1.304,
-     "subperiod": null,
-     "verdict": "正向·小样本(待确认)",
-     "verdict_color": "#f59e0b",
-     "verdict_note": "IC=+0.081，NW t=2.17，胜率=60.0%，n=5<20；方向为正待更多样本确认"
-    },
-    "20": {
-     "n": 0,
-     "dates": [],
-     "ic_series": [],
-     "ic_mean": null,
-     "ic_std": null,
-     "t_stat": null,
-     "nw_t": null,
-     "bonferroni_sig": false,
-     "nw_lag": 19,
-     "nw_sensitivity": null,
-     "robust_bonferroni": null,
-     "win_rate": null,
-     "spread_mean": null,
-     "subperiod": null,
-     "verdict": "样本积累中",
-     "verdict_color": "#94a3b8",
-     "verdict_note": "n=0<20"
-    }
-   },
-   "verdict": "正向·小样本(待确认)",
-   "verdict_color": "#f59e0b",
-   "verdict_note": "IC=+0.081，NW t=2.17，胜率=60.0%，n=5<20；方向为正待更多样本确认（T+5·小样本）"
-  },
-  "score_vol_pulse": {
-   "label": "量能反向",
-   "horizons": {
-    "1": {
-     "n": 9,
-     "dates": [
-      "2026-10-13",
-      "2026-10-14",
-      "2026-10-15",
-      "2026-10-16",
-      "2026-10-19",
-      "2026-10-20",
-      "2026-10-21",
-      "2026-10-22",
-      "2026-10-23"
-     ],
-     "ic_series": [
-      -0.0963,
-      -0.1376,
-      0.0532,
-      0.0402,
-      0.2592,
-      0.1556,
-      -0.2065,
-      -0.0197,
-      -0.2361
-     ],
-     "ic_mean": -0.0209,
-     "ic_std": 0.1654,
-     "t_stat": -0.38,
-     "nw_t": -0.4,
-     "bonferroni_sig": false,
-     "nw_lag": 0,
-     "nw_sensitivity": {
-      "t_by_lag": {
-       "0": -0.4,
-       "1": -0.37,
-       "2": -0.36,
-       "3": -0.38,
-       "4": -0.44,
-       "6": -0.57,
-       "8": -0.66,
-       "12": -0.8,
-       "19": -0.99
-      },
-      "t_min": -0.99,
-      "t_max": -0.36,
-      "lag_andrews": 2,
-      "t_andrews": -0.36,
-      "robust_bonferroni": false,
-      "flips": false
-     },
-     "robust_bonferroni": false,
-     "win_rate": 44.4,
-     "spread_mean": -0.454,
-     "subperiod": null,
-     "verdict": "样本积累中",
-     "verdict_color": "#94a3b8",
-     "verdict_note": "n=9<20"
-    },
-    "5": {
-     "n": 5,
-     "dates": [
-      "2026-10-13",
-      "2026-10-14",
-      "2026-10-15",
-      "2026-10-16",
-      "2026-10-19"
-     ],
-     "ic_series": [
-      -0.0653,
-      0.1298,
-      0.1917,
-      0.1356,
-      -0.0358
-     ],
-     "ic_mean": 0.0712,
-     "ic_std": 0.1142,
-     "t_stat": 1.39,
-     "nw_t": 2.89,
-     "bonferroni_sig": false,
-     "nw_lag": 4,
-     "nw_sensitivity": {
-      "t_by_lag": {
-       "0": 1.56,
-       "1": 1.56,
-       "2": 1.9,
-       "3": 2.58,
-       "4": 2.89,
-       "6": 3.42,
-       "8": 3.88,
-       "12": 4.66,
-       "19": 5.78
-      },
-      "t_min": 1.56,
-      "t_max": 5.78,
-      "lag_andrews": 1,
-      "t_andrews": 1.56,
-      "robust_bonferroni": false,
-      "flips": true
-     },
-     "robust_bonferroni": false,
-     "win_rate": 60.0,
-     "spread_mean": 1.623,
-     "subperiod": null,
-     "verdict": "正向·小样本(待确认)",
-     "verdict_color": "#f59e0b",
-     "verdict_note": "IC=+0.071，NW t=2.89，胜率=60.0%，n=5<20；方向为正待更多样本确认"
-    },
-    "20": {
-     "n": 0,
-     "dates": [],
-     "ic_series": [],
-     "ic_mean": null,
-     "ic_std": null,
-     "t_stat": null,
-     "nw_t": null,
-     "bonferroni_sig": false,
-     "nw_lag": 19,
-     "nw_sensitivity": null,
-     "robust_bonferroni": null,
-     "win_rate": null,
-     "spread_mean": null,
-     "subperiod": null,
-     "verdict": "样本积累中",
-     "verdict_color": "#94a3b8",
-     "verdict_note": "n=0<20"
-    }
-   },
-   "verdict": "正向·小样本(待确认)",
-   "verdict_color": "#f59e0b",
-   "verdict_note": "IC=+0.071，NW t=2.89，胜率=60.0%，n=5<20；方向为正待更多样本确认（T+5·小样本）"
-  },
-  "score_overbought": {
-   "label": "超买反向",
-   "horizons": {
-    "1": {
-     "n": 9,
-     "dates": [
-      "2026-10-13",
-      "2026-10-14",
-      "2026-10-15",
-      "2026-10-16",
-      "2026-10-19",
-      "2026-10-20",
-      "2026-10-21",
-      "2026-10-22",
-      "2026-10-23"
-     ],
-     "ic_series": [
-      -0.1857,
-      -0.1026,
-      0.0536,
-      -0.0179,
-      0.1899,
-      0.0665,
-      -0.1373,
-      0.0577,
-      -0.1287
-     ],
-     "ic_mean": -0.0227,
-     "ic_std": 0.1239,
-     "t_stat": -0.55,
-     "nw_t": -0.58,
-     "bonferroni_sig": false,
-     "nw_lag": 0,
-     "nw_sensitivity": {
-      "t_by_lag": {
-       "0": -0.58,
-       "1": -0.59,
-       "2": -0.59,
-       "3": -0.59,
-       "4": -0.69,
-       "6": -0.88,
-       "8": -1.04,
-       "12": -1.25,
-       "19": -1.55
-      },
-      "t_min": -1.55,
-      "t_max": -0.58,
-      "lag_andrews": 1,
-      "t_andrews": -0.59,
-      "robust_bonferroni": false,
-      "flips": false
-     },
-     "robust_bonferroni": false,
-     "win_rate": 44.4,
-     "spread_mean": -0.487,
-     "subperiod": null,
-     "verdict": "样本积累中",
-     "verdict_color": "#94a3b8",
-     "verdict_note": "n=9<20"
-    },
-    "5": {
-     "n": 5,
-     "dates": [
-      "2026-10-13",
-      "2026-10-14",
-      "2026-10-15",
-      "2026-10-16",
-      "2026-10-19"
-     ],
-     "ic_series": [
-      -0.1018,
-      0.0301,
-      0.0861,
-      0.0748,
-      -0.0182
-     ],
-     "ic_mean": 0.0142,
-     "ic_std": 0.0768,
-     "t_stat": 0.41,
-     "nw_t": 0.7,
-     "bonferroni_sig": false,
-     "nw_lag": 4,
-     "nw_sensitivity": {
-      "t_by_lag": {
-       "0": 0.46,
-       "1": 0.45,
-       "2": 0.51,
-       "3": 0.63,
-       "4": 0.7,
-       "6": 0.83,
-       "8": 0.94,
-       "12": 1.14,
-       "19": 1.41
-      },
-      "t_min": 0.45,
-      "t_max": 1.41,
-      "lag_andrews": 1,
-      "t_andrews": 0.45,
-      "robust_bonferroni": false,
-      "flips": false
-     },
-     "robust_bonferroni": false,
-     "win_rate": 60.0,
-     "spread_mean": 1.199,
-     "subperiod": null,
-     "verdict": "样本积累中",
-     "verdict_color": "#94a3b8",
-     "verdict_note": "n=5<20"
+     "verdict_note": "n=7<20"
     },
     "20": {
      "n": 0,
@@ -2477,13 +2140,13 @@
    },
    "verdict": "样本积累中",
    "verdict_color": "#94a3b8",
-   "verdict_note": "各周期样本均 <20（最大 9）"
+   "verdict_note": "各周期样本均 <20（最大 11）"
   },
-  "score_theme_intrinsic": {
-   "label": "题材内禀",
+  "score_rsi_rev": {
+   "label": "RSI反转",
    "horizons": {
     "1": {
-     "n": 9,
+     "n": 11,
      "dates": [
       "2026-10-13",
       "2026-10-14",
@@ -2493,7 +2156,447 @@
       "2026-10-20",
       "2026-10-21",
       "2026-10-22",
-      "2026-10-23"
+      "2026-10-23",
+      "2026-10-26",
+      "2026-10-27"
+     ],
+     "ic_series": [
+      -0.2568,
+      -0.211,
+      0.1462,
+      0.0287,
+      0.2975,
+      0.1245,
+      -0.0837,
+      0.0263,
+      -0.2862,
+      -0.1223,
+      0.2156
+     ],
+     "ic_mean": -0.011,
+     "ic_std": 0.1966,
+     "t_stat": -0.19,
+     "nw_t": -0.19,
+     "bonferroni_sig": false,
+     "nw_lag": 0,
+     "nw_sensitivity": {
+      "t_by_lag": {
+       "0": -0.19,
+       "1": -0.18,
+       "2": -0.18,
+       "3": -0.19,
+       "4": -0.23,
+       "6": -0.33,
+       "8": -0.37,
+       "12": -0.42,
+       "19": -0.52
+      },
+      "t_min": -0.52,
+      "t_max": -0.18,
+      "lag_andrews": 2,
+      "t_andrews": -0.18,
+      "robust_bonferroni": false,
+      "flips": false
+     },
+     "robust_bonferroni": false,
+     "win_rate": 54.5,
+     "spread_mean": -0.341,
+     "subperiod": {
+      "first_half_mean": 0.0009,
+      "second_half_mean": -0.021,
+      "sign_stable_pct": 45.5,
+      "regime_shift": true
+     },
+     "verdict": "样本积累中",
+     "verdict_color": "#94a3b8",
+     "verdict_note": "n=11<20"
+    },
+    "5": {
+     "n": 7,
+     "dates": [
+      "2026-10-13",
+      "2026-10-14",
+      "2026-10-15",
+      "2026-10-16",
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21"
+     ],
+     "ic_series": [
+      -0.0973,
+      0.0487,
+      0.2498,
+      0.2213,
+      -0.0157,
+      -0.2976,
+      -0.1877
+     ],
+     "ic_mean": -0.0112,
+     "ic_std": 0.2026,
+     "t_stat": -0.15,
+     "nw_t": -0.17,
+     "bonferroni_sig": false,
+     "nw_lag": 4,
+     "nw_sensitivity": {
+      "t_by_lag": {
+       "0": -0.16,
+       "1": -0.13,
+       "2": -0.13,
+       "3": -0.15,
+       "4": -0.17,
+       "6": -0.2,
+       "8": -0.23,
+       "12": -0.28,
+       "19": -0.34
+      },
+      "t_min": -0.34,
+      "t_max": -0.13,
+      "lag_andrews": 3,
+      "t_andrews": -0.15,
+      "robust_bonferroni": false,
+      "flips": false
+     },
+     "robust_bonferroni": false,
+     "win_rate": 42.9,
+     "spread_mean": -0.7,
+     "subperiod": null,
+     "verdict": "样本积累中",
+     "verdict_color": "#94a3b8",
+     "verdict_note": "n=7<20"
+    },
+    "20": {
+     "n": 0,
+     "dates": [],
+     "ic_series": [],
+     "ic_mean": null,
+     "ic_std": null,
+     "t_stat": null,
+     "nw_t": null,
+     "bonferroni_sig": false,
+     "nw_lag": 19,
+     "nw_sensitivity": null,
+     "robust_bonferroni": null,
+     "win_rate": null,
+     "spread_mean": null,
+     "subperiod": null,
+     "verdict": "样本积累中",
+     "verdict_color": "#94a3b8",
+     "verdict_note": "n=0<20"
+    }
+   },
+   "verdict": "样本积累中",
+   "verdict_color": "#94a3b8",
+   "verdict_note": "各周期样本均 <20（最大 11）"
+  },
+  "score_vol_pulse": {
+   "label": "量能反向",
+   "horizons": {
+    "1": {
+     "n": 11,
+     "dates": [
+      "2026-10-13",
+      "2026-10-14",
+      "2026-10-15",
+      "2026-10-16",
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21",
+      "2026-10-22",
+      "2026-10-23",
+      "2026-10-26",
+      "2026-10-27"
+     ],
+     "ic_series": [
+      -0.0963,
+      -0.1376,
+      0.0532,
+      0.0402,
+      0.2592,
+      0.1556,
+      -0.2065,
+      -0.0197,
+      -0.2361,
+      -0.1644,
+      0.1009
+     ],
+     "ic_mean": -0.0229,
+     "ic_std": 0.1595,
+     "t_stat": -0.48,
+     "nw_t": -0.5,
+     "bonferroni_sig": false,
+     "nw_lag": 0,
+     "nw_sensitivity": {
+      "t_by_lag": {
+       "0": -0.5,
+       "1": -0.46,
+       "2": -0.45,
+       "3": -0.47,
+       "4": -0.55,
+       "6": -0.74,
+       "8": -0.85,
+       "12": -1.01,
+       "19": -1.26
+      },
+      "t_min": -1.26,
+      "t_max": -0.45,
+      "lag_andrews": 2,
+      "t_andrews": -0.45,
+      "robust_bonferroni": false,
+      "flips": false
+     },
+     "robust_bonferroni": false,
+     "win_rate": 45.5,
+     "spread_mean": -0.396,
+     "subperiod": {
+      "first_half_mean": 0.0237,
+      "second_half_mean": -0.0617,
+      "sign_stable_pct": 54.5,
+      "regime_shift": true
+     },
+     "verdict": "样本积累中",
+     "verdict_color": "#94a3b8",
+     "verdict_note": "n=11<20"
+    },
+    "5": {
+     "n": 7,
+     "dates": [
+      "2026-10-13",
+      "2026-10-14",
+      "2026-10-15",
+      "2026-10-16",
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21"
+     ],
+     "ic_series": [
+      -0.0653,
+      0.1298,
+      0.1917,
+      0.1356,
+      -0.0358,
+      -0.2731,
+      -0.2692
+     ],
+     "ic_mean": -0.0266,
+     "ic_std": 0.1913,
+     "t_stat": -0.37,
+     "nw_t": -0.36,
+     "bonferroni_sig": false,
+     "nw_lag": 4,
+     "nw_sensitivity": {
+      "t_by_lag": {
+       "0": -0.4,
+       "1": -0.32,
+       "2": -0.31,
+       "3": -0.32,
+       "4": -0.36,
+       "6": -0.42,
+       "8": -0.48,
+       "12": -0.58,
+       "19": -0.72
+      },
+      "t_min": -0.72,
+      "t_max": -0.31,
+      "lag_andrews": 4,
+      "t_andrews": -0.36,
+      "robust_bonferroni": false,
+      "flips": false
+     },
+     "robust_bonferroni": false,
+     "win_rate": 42.9,
+     "spread_mean": -0.642,
+     "subperiod": null,
+     "verdict": "样本积累中",
+     "verdict_color": "#94a3b8",
+     "verdict_note": "n=7<20"
+    },
+    "20": {
+     "n": 0,
+     "dates": [],
+     "ic_series": [],
+     "ic_mean": null,
+     "ic_std": null,
+     "t_stat": null,
+     "nw_t": null,
+     "bonferroni_sig": false,
+     "nw_lag": 19,
+     "nw_sensitivity": null,
+     "robust_bonferroni": null,
+     "win_rate": null,
+     "spread_mean": null,
+     "subperiod": null,
+     "verdict": "样本积累中",
+     "verdict_color": "#94a3b8",
+     "verdict_note": "n=0<20"
+    }
+   },
+   "verdict": "样本积累中",
+   "verdict_color": "#94a3b8",
+   "verdict_note": "各周期样本均 <20（最大 11）"
+  },
+  "score_overbought": {
+   "label": "超买反向",
+   "horizons": {
+    "1": {
+     "n": 11,
+     "dates": [
+      "2026-10-13",
+      "2026-10-14",
+      "2026-10-15",
+      "2026-10-16",
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21",
+      "2026-10-22",
+      "2026-10-23",
+      "2026-10-26",
+      "2026-10-27"
+     ],
+     "ic_series": [
+      -0.1857,
+      -0.1026,
+      0.0536,
+      -0.0179,
+      0.1899,
+      0.0665,
+      -0.1373,
+      0.0577,
+      -0.1287,
+      0.0072,
+      0.2062
+     ],
+     "ic_mean": 0.0008,
+     "ic_std": 0.1304,
+     "t_stat": 0.02,
+     "nw_t": 0.02,
+     "bonferroni_sig": false,
+     "nw_lag": 0,
+     "nw_sensitivity": {
+      "t_by_lag": {
+       "0": 0.02,
+       "1": 0.02,
+       "2": 0.02,
+       "3": 0.02,
+       "4": 0.03,
+       "6": 0.03,
+       "8": 0.03,
+       "12": 0.04,
+       "19": 0.05
+      },
+      "t_min": 0.02,
+      "t_max": 0.05,
+      "lag_andrews": 1,
+      "t_andrews": 0.02,
+      "robust_bonferroni": false,
+      "flips": false
+     },
+     "robust_bonferroni": false,
+     "win_rate": 54.5,
+     "spread_mean": -0.303,
+     "subperiod": {
+      "first_half_mean": -0.0125,
+      "second_half_mean": 0.0119,
+      "sign_stable_pct": 45.5,
+      "regime_shift": true
+     },
+     "verdict": "样本积累中",
+     "verdict_color": "#94a3b8",
+     "verdict_note": "n=11<20"
+    },
+    "5": {
+     "n": 7,
+     "dates": [
+      "2026-10-13",
+      "2026-10-14",
+      "2026-10-15",
+      "2026-10-16",
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21"
+     ],
+     "ic_series": [
+      -0.1018,
+      0.0301,
+      0.0861,
+      0.0748,
+      -0.0182,
+      -0.2058,
+      -0.1335
+     ],
+     "ic_mean": -0.0383,
+     "ic_std": 0.1114,
+     "t_stat": -0.91,
+     "nw_t": -1.05,
+     "bonferroni_sig": false,
+     "nw_lag": 4,
+     "nw_sensitivity": {
+      "t_by_lag": {
+       "0": -0.98,
+       "1": -0.82,
+       "2": -0.82,
+       "3": -0.91,
+       "4": -1.05,
+       "6": -1.26,
+       "8": -1.43,
+       "12": -1.72,
+       "19": -2.14
+      },
+      "t_min": -2.14,
+      "t_max": -0.82,
+      "lag_andrews": 3,
+      "t_andrews": -0.91,
+      "robust_bonferroni": false,
+      "flips": false
+     },
+     "robust_bonferroni": false,
+     "win_rate": 42.9,
+     "spread_mean": -0.513,
+     "subperiod": null,
+     "verdict": "样本积累中",
+     "verdict_color": "#94a3b8",
+     "verdict_note": "n=7<20"
+    },
+    "20": {
+     "n": 0,
+     "dates": [],
+     "ic_series": [],
+     "ic_mean": null,
+     "ic_std": null,
+     "t_stat": null,
+     "nw_t": null,
+     "bonferroni_sig": false,
+     "nw_lag": 19,
+     "nw_sensitivity": null,
+     "robust_bonferroni": null,
+     "win_rate": null,
+     "spread_mean": null,
+     "subperiod": null,
+     "verdict": "样本积累中",
+     "verdict_color": "#94a3b8",
+     "verdict_note": "n=0<20"
+    }
+   },
+   "verdict": "样本积累中",
+   "verdict_color": "#94a3b8",
+   "verdict_note": "n=7<20（T+5·小样本）"
+  },
+  "score_theme_intrinsic": {
+   "label": "题材内禀",
+   "horizons": {
+    "1": {
+     "n": 11,
+     "dates": [
+      "2026-10-13",
+      "2026-10-14",
+      "2026-10-15",
+      "2026-10-16",
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21",
+      "2026-10-22",
+      "2026-10-23",
+      "2026-10-26",
+      "2026-10-27"
      ],
      "ic_series": [
       -0.2253,
@@ -2504,89 +2607,100 @@
       0.0383,
       -0.1088,
       0.1289,
-      -0.233
+      -0.233,
+      -0.379,
+      0.226
      ],
-     "ic_mean": -0.0445,
-     "ic_std": 0.1509,
-     "t_stat": -0.88,
-     "nw_t": -0.94,
+     "ic_mean": -0.0503,
+     "ic_std": 0.1915,
+     "t_stat": -0.87,
+     "nw_t": -0.91,
      "bonferroni_sig": false,
      "nw_lag": 0,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": -0.94,
-       "1": -0.98,
-       "2": -0.99,
-       "3": -0.98,
-       "4": -1.09,
-       "6": -1.37,
-       "8": -1.64,
-       "12": -1.98,
-       "19": -2.45
+       "0": -0.91,
+       "1": -0.97,
+       "2": -1.13,
+       "3": -1.14,
+       "4": -1.29,
+       "6": -1.82,
+       "8": -2.15,
+       "12": -2.39,
+       "19": -2.97
       },
-      "t_min": -2.45,
-      "t_max": -0.94,
+      "t_min": -2.97,
+      "t_max": -0.91,
       "lag_andrews": 1,
-      "t_andrews": -0.98,
+      "t_andrews": -0.97,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 33.3,
-     "spread_mean": -0.35,
-     "subperiod": null,
+     "win_rate": 36.4,
+     "spread_mean": -0.272,
+     "subperiod": {
+      "first_half_mean": -0.0452,
+      "second_half_mean": -0.0546,
+      "sign_stable_pct": 63.6,
+      "regime_shift": false
+     },
      "verdict": "样本积累中",
      "verdict_color": "#94a3b8",
-     "verdict_note": "n=9<20"
+     "verdict_note": "n=11<20"
     },
     "5": {
-     "n": 5,
+     "n": 7,
      "dates": [
       "2026-10-13",
       "2026-10-14",
       "2026-10-15",
       "2026-10-16",
-      "2026-10-19"
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21"
      ],
      "ic_series": [
       -0.1392,
       -0.0485,
       -0.0594,
       0.0475,
-      -0.1017
+      -0.1017,
+      -0.2337,
+      -0.1851
      ],
-     "ic_mean": -0.0603,
-     "ic_std": 0.0702,
-     "t_stat": -1.92,
-     "nw_t": -3.67,
+     "ic_mean": -0.1029,
+     "ic_std": 0.0937,
+     "t_stat": -2.91,
+     "nw_t": -3.51,
      "bonferroni_sig": true,
      "nw_lag": 4,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": -2.15,
-       "1": -2.51,
-       "2": -2.6,
-       "3": -3.28,
-       "4": -3.67,
-       "6": -4.34,
-       "8": -4.92,
-       "12": -5.92,
-       "19": -7.34
+       "0": -3.14,
+       "1": -2.71,
+       "2": -2.77,
+       "3": -3.09,
+       "4": -3.51,
+       "6": -4.21,
+       "8": -4.77,
+       "12": -5.74,
+       "19": -7.11
       },
-      "t_min": -7.34,
-      "t_max": -2.15,
+      "t_min": -7.11,
+      "t_max": -2.71,
       "lag_andrews": 2,
-      "t_andrews": -2.6,
+      "t_andrews": -2.77,
       "robust_bonferroni": false,
       "flips": true
      },
      "robust_bonferroni": false,
-     "win_rate": 20.0,
-     "spread_mean": 0.06,
+     "win_rate": 14.3,
+     "spread_mean": -1.606,
      "subperiod": null,
      "verdict": "⚠️显著跑输·小样本",
      "verdict_color": "#ef4444",
-     "verdict_note": "IC=-0.060，NW t=-3.67，胜率=20.0%，n=5<20；方向性负alpha警示（样本未达标，待确认）"
+     "verdict_note": "IC=-0.103，NW t=-3.51，胜率=14.3%，n=7<20；方向性负alpha警示（样本未达标，待确认）"
     },
     "20": {
      "n": 0,
@@ -2610,13 +2724,13 @@
    },
    "verdict": "⚠️显著跑输·小样本",
    "verdict_color": "#ef4444",
-   "verdict_note": "IC=-0.060，NW t=-3.67，胜率=20.0%，n=5<20；方向性负alpha警示（样本未达标，待确认）（T+5·小样本）"
+   "verdict_note": "IC=-0.103，NW t=-3.51，胜率=14.3%，n=7<20；方向性负alpha警示（样本未达标，待确认）（T+5·小样本）"
   },
   "score_attention": {
    "label": "关注度相对",
    "horizons": {
     "1": {
-     "n": 9,
+     "n": 11,
      "dates": [
       "2026-10-13",
       "2026-10-14",
@@ -2626,7 +2740,9 @@
       "2026-10-20",
       "2026-10-21",
       "2026-10-22",
-      "2026-10-23"
+      "2026-10-23",
+      "2026-10-26",
+      "2026-10-27"
      ],
      "ic_series": [
       -0.0695,
@@ -2637,89 +2753,100 @@
       0.0759,
       -0.0351,
       0.0051,
-      -0.1433
+      -0.1433,
+      -0.0847,
+      0.073
      ],
-     "ic_mean": -0.036,
-     "ic_std": 0.066,
-     "t_stat": -1.64,
-     "nw_t": -1.73,
+     "ic_mean": -0.0305,
+     "ic_std": 0.0699,
+     "t_stat": -1.45,
+     "nw_t": -1.52,
      "bonferroni_sig": false,
      "nw_lag": 0,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": -1.73,
-       "1": -1.98,
-       "2": -2.3,
-       "3": -2.71,
-       "4": -3.12,
-       "6": -3.49,
-       "8": -4.22,
-       "12": -5.07,
-       "19": -6.29
+       "0": -1.52,
+       "1": -1.67,
+       "2": -2.15,
+       "3": -2.63,
+       "4": -3.6,
+       "6": -3.44,
+       "8": -4.32,
+       "12": -4.85,
+       "19": -6.01
       },
-      "t_min": -6.29,
-      "t_max": -1.73,
+      "t_min": -6.01,
+      "t_max": -1.52,
       "lag_andrews": 2,
-      "t_andrews": -2.3,
+      "t_andrews": -2.15,
       "robust_bonferroni": false,
       "flips": true
      },
      "robust_bonferroni": false,
-     "win_rate": 33.3,
-     "spread_mean": -0.617,
-     "subperiod": null,
+     "win_rate": 36.4,
+     "spread_mean": -0.451,
+     "subperiod": {
+      "first_half_mean": -0.0453,
+      "second_half_mean": -0.0181,
+      "sign_stable_pct": 63.6,
+      "regime_shift": false
+     },
      "verdict": "样本积累中",
      "verdict_color": "#94a3b8",
-     "verdict_note": "n=9<20"
+     "verdict_note": "n=11<20"
     },
     "5": {
-     "n": 5,
+     "n": 7,
      "dates": [
       "2026-10-13",
       "2026-10-14",
       "2026-10-15",
       "2026-10-16",
-      "2026-10-19"
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21"
      ],
      "ic_series": [
       -0.1792,
       -0.0574,
       -0.0559,
       -0.0325,
-      -0.0986
+      -0.0986,
+      -0.1164,
+      -0.063
      ],
-     "ic_mean": -0.0847,
-     "ic_std": 0.0579,
-     "t_stat": -3.27,
-     "nw_t": -5.45,
+     "ic_mean": -0.0861,
+     "ic_std": 0.0498,
+     "t_stat": -4.58,
+     "nw_t": -8.44,
      "bonferroni_sig": true,
      "nw_lag": 4,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": -3.66,
-       "1": -3.8,
-       "2": -4.05,
-       "3": -4.88,
-       "4": -5.45,
-       "6": -6.45,
-       "8": -7.31,
-       "12": -8.79,
-       "19": -10.9
+       "0": -4.94,
+       "1": -5.15,
+       "2": -5.76,
+       "3": -7.18,
+       "4": -8.44,
+       "6": -9.23,
+       "8": -10.47,
+       "12": -12.58,
+       "19": -15.6
       },
-      "t_min": -10.9,
-      "t_max": -3.66,
+      "t_min": -15.6,
+      "t_max": -4.94,
       "lag_andrews": 1,
-      "t_andrews": -3.8,
+      "t_andrews": -5.15,
       "robust_bonferroni": true,
       "flips": false
      },
      "robust_bonferroni": true,
      "win_rate": 0.0,
-     "spread_mean": -1.85,
+     "spread_mean": -2.12,
      "subperiod": null,
      "verdict": "⚠️显著跑输·小样本",
      "verdict_color": "#ef4444",
-     "verdict_note": "IC=-0.085，NW t=-5.45，胜率=0.0%，n=5<20；方向性负alpha警示（样本未达标，待确认）"
+     "verdict_note": "IC=-0.086，NW t=-8.44，胜率=0.0%，n=7<20；方向性负alpha警示（样本未达标，待确认）"
     },
     "20": {
      "n": 0,
@@ -2743,13 +2870,13 @@
    },
    "verdict": "⚠️显著跑输·小样本",
    "verdict_color": "#ef4444",
-   "verdict_note": "IC=-0.085，NW t=-5.45，胜率=0.0%，n=5<20；方向性负alpha警示（样本未达标，待确认）（T+5·小样本）"
+   "verdict_note": "IC=-0.086，NW t=-8.44，胜率=0.0%，n=7<20；方向性负alpha警示（样本未达标，待确认）（T+5·小样本）"
   },
   "score_sector": {
    "label": "板块动量",
    "horizons": {
     "1": {
-     "n": 19,
+     "n": 21,
      "dates": [
       "2026-09-21",
       "2026-09-22",
@@ -2769,7 +2896,9 @@
       "2026-10-20",
       "2026-10-21",
       "2026-10-22",
-      "2026-10-23"
+      "2026-10-23",
+      "2026-10-26",
+      "2026-10-27"
      ],
      "ic_series": [
       0.0356,
@@ -2790,48 +2919,50 @@
       0.011,
       0.1876,
       0.1215,
-      -0.0867
+      -0.0867,
+      0.0565,
+      0.0995
      ],
-     "ic_mean": 0.0044,
-     "ic_std": 0.1408,
-     "t_stat": 0.14,
-     "nw_t": 0.14,
+     "ic_mean": 0.0114,
+     "ic_std": 0.1355,
+     "t_stat": 0.38,
+     "nw_t": 0.39,
      "bonferroni_sig": false,
      "nw_lag": 0,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": 0.14,
-       "1": 0.16,
-       "2": 0.17,
-       "3": 0.18,
-       "4": 0.19,
-       "6": 0.2,
-       "8": 0.21,
-       "12": 0.25,
-       "19": 0.3
+       "0": 0.39,
+       "1": 0.46,
+       "2": 0.49,
+       "3": 0.49,
+       "4": 0.52,
+       "6": 0.5,
+       "8": 0.5,
+       "12": 0.56,
+       "19": 0.66
       },
-      "t_min": 0.14,
-      "t_max": 0.3,
+      "t_min": 0.39,
+      "t_max": 0.66,
       "lag_andrews": 3,
-      "t_andrews": 0.18,
+      "t_andrews": 0.49,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 52.6,
-     "spread_mean": -0.167,
+     "win_rate": 57.1,
+     "spread_mean": -0.088,
      "subperiod": {
-      "first_half_mean": -0.0254,
-      "second_half_mean": 0.0312,
-      "sign_stable_pct": 52.6,
+      "first_half_mean": -0.003,
+      "second_half_mean": 0.0244,
+      "sign_stable_pct": 57.1,
       "regime_shift": true
      },
-     "verdict": "样本积累中",
-     "verdict_color": "#94a3b8",
-     "verdict_note": "n=19<20"
+     "verdict": "无预测力",
+     "verdict_color": "#64748b",
+     "verdict_note": "IC=+0.011，NW t=0.39"
     },
     "5": {
-     "n": 15,
+     "n": 17,
      "dates": [
       "2026-09-21",
       "2026-09-22",
@@ -2847,7 +2978,9 @@
       "2026-10-14",
       "2026-10-15",
       "2026-10-16",
-      "2026-10-19"
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21"
      ],
      "ic_series": [
       -0.0261,
@@ -2864,76 +2997,84 @@
       -0.0506,
       0.0697,
       0.1164,
-      0.0865
+      0.0865,
+      -0.0111,
+      0.0323
      ],
-     "ic_mean": -0.0269,
-     "ic_std": 0.0919,
-     "t_stat": -1.13,
-     "nw_t": -0.85,
+     "ic_mean": -0.0225,
+     "ic_std": 0.0872,
+     "t_stat": -1.06,
+     "nw_t": -0.75,
      "bonferroni_sig": false,
      "nw_lag": 4,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": -1.17,
-       "1": -0.93,
-       "2": -0.85,
-       "3": -0.84,
-       "4": -0.85,
-       "5": -0.86,
-       "6": -0.89,
-       "8": -1.03,
-       "12": -1.41,
-       "19": -1.74
+       "0": -1.1,
+       "1": -0.86,
+       "2": -0.79,
+       "3": -0.76,
+       "4": -0.75,
+       "5": -0.76,
+       "6": -0.78,
+       "8": -0.87,
+       "12": -1.15,
+       "19": -1.44
       },
-      "t_min": -1.74,
-      "t_max": -0.84,
+      "t_min": -1.44,
+      "t_max": -0.75,
       "lag_andrews": 5,
-      "t_andrews": -0.86,
+      "t_andrews": -0.76,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 33.3,
-     "spread_mean": -1.004,
+     "win_rate": 35.3,
+     "spread_mean": -0.725,
      "subperiod": {
-      "first_half_mean": -0.0412,
-      "second_half_mean": -0.0144,
-      "sign_stable_pct": 66.7,
+      "first_half_mean": -0.0445,
+      "second_half_mean": -0.0029,
+      "sign_stable_pct": 64.7,
       "regime_shift": false
      },
      "verdict": "样本积累中",
      "verdict_color": "#94a3b8",
-     "verdict_note": "n=15<20"
+     "verdict_note": "n=17<20"
     },
     "20": {
-     "n": 0,
-     "dates": [],
-     "ic_series": [],
-     "ic_mean": null,
-     "ic_std": null,
-     "t_stat": null,
+     "n": 2,
+     "dates": [
+      "2026-09-21",
+      "2026-09-22"
+     ],
+     "ic_series": [
+      -0.0313,
+      0.0397
+     ],
+     "ic_mean": 0.0042,
+     "ic_std": 0.0502,
+     "t_stat": 0.12,
      "nw_t": null,
      "bonferroni_sig": false,
      "nw_lag": 19,
      "nw_sensitivity": null,
      "robust_bonferroni": null,
-     "win_rate": null,
-     "spread_mean": null,
+     "win_rate": 50.0,
+     "spread_mean": 2.37,
      "subperiod": null,
      "verdict": "样本积累中",
      "verdict_color": "#94a3b8",
-     "verdict_note": "n=0<20"
+     "verdict_note": "n=2<20"
     }
    },
    "verdict": "样本积累中",
    "verdict_color": "#94a3b8",
-   "verdict_note": "各周期样本均 <20（最大 19）"
+   "verdict_note": "各周期样本均 <20（最大 21）"
   },
   "score_theme": {
    "label": "题材热度（已拆解·对照）",
    "horizons": {
     "1": {
-     "n": 78,
+     "n": 80,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -3012,7 +3153,9 @@
       "2026-10-20",
       "2026-10-21",
       "2026-10-22",
-      "2026-10-23"
+      "2026-10-23",
+      "2026-10-26",
+      "2026-10-27"
      ],
      "ic_series": [
       0.2427,
@@ -3092,48 +3235,50 @@
       -0.001,
       -0.1455,
       0.1381,
-      0.1714
+      0.1714,
+      -0.0091,
+      -0.0371
      ],
-     "ic_mean": -0.0356,
-     "ic_std": 0.1794,
-     "t_stat": -1.75,
-     "nw_t": -1.77,
+     "ic_mean": -0.0353,
+     "ic_std": 0.1772,
+     "t_stat": -1.78,
+     "nw_t": -1.79,
      "bonferroni_sig": false,
      "nw_lag": 0,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": -1.77,
-       "1": -1.69,
-       "2": -1.61,
-       "3": -1.54,
-       "4": -1.5,
-       "6": -1.42,
-       "8": -1.34,
-       "12": -1.23,
-       "19": -1.14
+       "0": -1.79,
+       "1": -1.72,
+       "2": -1.64,
+       "3": -1.57,
+       "4": -1.52,
+       "6": -1.45,
+       "8": -1.36,
+       "12": -1.25,
+       "19": -1.16
       },
-      "t_min": -1.77,
-      "t_max": -1.14,
+      "t_min": -1.79,
+      "t_max": -1.16,
       "lag_andrews": 2,
-      "t_andrews": -1.61,
+      "t_andrews": -1.64,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 39.7,
-     "spread_mean": -0.177,
+     "win_rate": 38.8,
+     "spread_mean": -0.186,
      "subperiod": {
-      "first_half_mean": -0.035,
-      "second_half_mean": -0.0363,
-      "sign_stable_pct": 60.3,
+      "first_half_mean": -0.032,
+      "second_half_mean": -0.0386,
+      "sign_stable_pct": 61.3,
       "regime_shift": false
      },
      "verdict": "负向（可作反向指标）",
      "verdict_color": "#38bdf8",
-     "verdict_note": "IC=-0.036，NW t=-1.77"
+     "verdict_note": "IC=-0.035，NW t=-1.79"
     },
     "5": {
-     "n": 74,
+     "n": 76,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -3208,7 +3353,9 @@
       "2026-10-14",
       "2026-10-15",
       "2026-10-16",
-      "2026-10-19"
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21"
      ],
      "ic_series": [
       0.1894,
@@ -3284,48 +3431,50 @@
       -0.0545,
       -0.2441,
       -0.0548,
-      0.1143
+      0.1143,
+      0.1274,
+      -0.0748
      ],
-     "ic_mean": -0.0686,
-     "ic_std": 0.202,
-     "t_stat": -2.92,
-     "nw_t": -1.71,
+     "ic_mean": -0.0661,
+     "ic_std": 0.2005,
+     "t_stat": -2.87,
+     "nw_t": -1.69,
      "bonferroni_sig": false,
      "nw_lag": 4,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": -2.94,
-       "1": -2.31,
-       "2": -2.01,
-       "3": -1.83,
-       "4": -1.71,
-       "6": -1.54,
-       "8": -1.41,
-       "12": -1.28,
-       "19": -1.24
+       "0": -2.89,
+       "1": -2.27,
+       "2": -1.98,
+       "3": -1.8,
+       "4": -1.69,
+       "6": -1.52,
+       "8": -1.39,
+       "12": -1.26,
+       "19": -1.22
       },
-      "t_min": -2.94,
-      "t_max": -1.24,
+      "t_min": -2.89,
+      "t_max": -1.22,
       "lag_andrews": 8,
-      "t_andrews": -1.41,
+      "t_andrews": -1.39,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 36.5,
-     "spread_mean": -1.22,
+     "win_rate": 36.8,
+     "spread_mean": -1.158,
      "subperiod": {
-      "first_half_mean": -0.0814,
-      "second_half_mean": -0.0558,
-      "sign_stable_pct": 63.5,
+      "first_half_mean": -0.0818,
+      "second_half_mean": -0.0504,
+      "sign_stable_pct": 63.2,
       "regime_shift": false
      },
      "verdict": "负向（可作反向指标）",
      "verdict_color": "#38bdf8",
-     "verdict_note": "IC=-0.069，NW t=-1.71"
+     "verdict_note": "IC=-0.066，NW t=-1.69"
     },
     "20": {
-     "n": 59,
+     "n": 61,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -3385,7 +3534,9 @@
       "2026-09-15",
       "2026-09-16",
       "2026-09-17",
-      "2026-09-18"
+      "2026-09-18",
+      "2026-09-21",
+      "2026-09-22"
      ],
      "ic_series": [
       0.2796,
@@ -3446,56 +3597,58 @@
       -0.1557,
       -0.2953,
       -0.2186,
-      -0.3774
+      -0.3774,
+      -0.1042,
+      -0.0951
      ],
-     "ic_mean": -0.1122,
-     "ic_std": 0.16,
-     "t_stat": -5.39,
-     "nw_t": -2.81,
+     "ic_mean": -0.1118,
+     "ic_std": 0.1573,
+     "t_stat": -5.55,
+     "nw_t": -2.9,
      "bonferroni_sig": false,
      "nw_lag": 19,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": -5.43,
-       "1": -4.42,
-       "2": -3.83,
-       "3": -3.47,
-       "4": -3.24,
-       "6": -2.96,
-       "8": -2.81,
-       "12": -2.67,
-       "19": -2.81
+       "0": -5.6,
+       "1": -4.55,
+       "2": -3.95,
+       "3": -3.58,
+       "4": -3.35,
+       "6": -3.06,
+       "8": -2.9,
+       "12": -2.76,
+       "19": -2.9
       },
-      "t_min": -5.43,
-      "t_max": -2.67,
+      "t_min": -5.6,
+      "t_max": -2.76,
       "lag_andrews": 6,
-      "t_andrews": -2.96,
+      "t_andrews": -3.06,
       "robust_bonferroni": false,
       "flips": true
      },
      "robust_bonferroni": false,
-     "win_rate": 23.7,
-     "spread_mean": -3.182,
+     "win_rate": 23.0,
+     "spread_mean": -3.307,
      "subperiod": {
-      "first_half_mean": -0.1176,
-      "second_half_mean": -0.107,
-      "sign_stable_pct": 76.3,
+      "first_half_mean": -0.1141,
+      "second_half_mean": -0.1096,
+      "sign_stable_pct": 77.0,
       "regime_shift": false
      },
      "verdict": "负向（可作反向指标）",
      "verdict_color": "#38bdf8",
-     "verdict_note": "IC=-0.112，NW t=-2.81"
+     "verdict_note": "IC=-0.112，NW t=-2.9"
     }
    },
    "verdict": "负向（可作反向指标）",
    "verdict_color": "#38bdf8",
-   "verdict_note": "IC=-0.112，NW t=-2.81（T+20）"
+   "verdict_note": "IC=-0.112，NW t=-2.9（T+20）"
   },
   "score_tech": {
    "label": "技术面（已拆解·对照）",
    "horizons": {
     "1": {
-     "n": 78,
+     "n": 80,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -3574,7 +3727,9 @@
       "2026-10-20",
       "2026-10-21",
       "2026-10-22",
-      "2026-10-23"
+      "2026-10-23",
+      "2026-10-26",
+      "2026-10-27"
      ],
      "ic_series": [
       -0.0839,
@@ -3654,48 +3809,50 @@
       -0.2202,
       0.164,
       -0.1002,
-      0.2422
+      0.2422,
+      0.112,
+      -0.1615
      ],
-     "ic_mean": -0.0326,
-     "ic_std": 0.1562,
-     "t_stat": -1.84,
-     "nw_t": -1.85,
+     "ic_mean": -0.0324,
+     "ic_std": 0.1558,
+     "t_stat": -1.86,
+     "nw_t": -1.87,
      "bonferroni_sig": false,
      "nw_lag": 0,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": -1.85,
-       "1": -1.79,
-       "2": -1.68,
-       "3": -1.61,
-       "4": -1.58,
-       "6": -1.53,
-       "8": -1.56,
-       "12": -1.65,
-       "19": -1.94
+       "0": -1.87,
+       "1": -1.8,
+       "2": -1.7,
+       "3": -1.63,
+       "4": -1.6,
+       "6": -1.56,
+       "8": -1.58,
+       "12": -1.68,
+       "19": -1.97
       },
-      "t_min": -1.94,
-      "t_max": -1.53,
+      "t_min": -1.97,
+      "t_max": -1.56,
       "lag_andrews": 2,
-      "t_andrews": -1.68,
+      "t_andrews": -1.7,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 37.2,
-     "spread_mean": -0.227,
+     "win_rate": 37.5,
+     "spread_mean": -0.219,
      "subperiod": {
-      "first_half_mean": -0.0181,
-      "second_half_mean": -0.047,
-      "sign_stable_pct": 62.8,
+      "first_half_mean": -0.021,
+      "second_half_mean": -0.0438,
+      "sign_stable_pct": 62.5,
       "regime_shift": false
      },
      "verdict": "负向（可作反向指标）",
      "verdict_color": "#38bdf8",
-     "verdict_note": "IC=-0.033，NW t=-1.85"
+     "verdict_note": "IC=-0.032，NW t=-1.87"
     },
     "5": {
-     "n": 74,
+     "n": 76,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -3770,7 +3927,9 @@
       "2026-10-14",
       "2026-10-15",
       "2026-10-16",
-      "2026-10-19"
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21"
      ],
      "ic_series": [
       0.0175,
@@ -3846,48 +4005,51 @@
       -0.1266,
       -0.2178,
       -0.1982,
-      -0.0185
+      -0.0185,
+      0.1607,
+      0.2651
      ],
-     "ic_mean": -0.057,
-     "ic_std": 0.1474,
-     "t_stat": -3.33,
-     "nw_t": -1.79,
+     "ic_mean": -0.0499,
+     "ic_std": 0.152,
+     "t_stat": -2.86,
+     "nw_t": -1.59,
      "bonferroni_sig": false,
      "nw_lag": 4,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": -3.35,
-       "1": -2.52,
-       "2": -2.15,
-       "3": -1.93,
-       "4": -1.79,
-       "6": -1.64,
-       "8": -1.57,
-       "12": -1.56,
-       "19": -1.77
+       "0": -2.88,
+       "1": -2.18,
+       "2": -1.87,
+       "3": -1.7,
+       "4": -1.59,
+       "6": -1.46,
+       "8": -1.4,
+       "11": -1.37,
+       "12": -1.37,
+       "19": -1.54
       },
-      "t_min": -3.35,
-      "t_max": -1.56,
-      "lag_andrews": 12,
-      "t_andrews": -1.56,
+      "t_min": -2.88,
+      "t_max": -1.37,
+      "lag_andrews": 11,
+      "t_andrews": -1.37,
       "robust_bonferroni": false,
-      "flips": true
+      "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 32.4,
-     "spread_mean": -1.046,
+     "win_rate": 34.2,
+     "spread_mean": -0.886,
      "subperiod": {
-      "first_half_mean": -0.0401,
-      "second_half_mean": -0.0739,
-      "sign_stable_pct": 67.6,
+      "first_half_mean": -0.0343,
+      "second_half_mean": -0.0656,
+      "sign_stable_pct": 65.8,
       "regime_shift": false
      },
      "verdict": "负向（可作反向指标）",
      "verdict_color": "#38bdf8",
-     "verdict_note": "IC=-0.057，NW t=-1.79"
+     "verdict_note": "IC=-0.050，NW t=-1.59"
     },
     "20": {
-     "n": 59,
+     "n": 61,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -3947,7 +4109,9 @@
       "2026-09-15",
       "2026-09-16",
       "2026-09-17",
-      "2026-09-18"
+      "2026-09-18",
+      "2026-09-21",
+      "2026-09-22"
      ],
      "ic_series": [
       0.1938,
@@ -4008,57 +4172,59 @@
       -0.0737,
       -0.2023,
       -0.2161,
-      -0.3061
+      -0.3061,
+      -0.2889,
+      -0.2055
      ],
-     "ic_mean": -0.0379,
-     "ic_std": 0.123,
-     "t_stat": -2.37,
-     "nw_t": -1.43,
+     "ic_mean": -0.0448,
+     "ic_std": 0.1269,
+     "t_stat": -2.76,
+     "nw_t": -1.57,
      "bonferroni_sig": false,
      "nw_lag": 19,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": -2.39,
-       "1": -1.84,
-       "2": -1.59,
-       "3": -1.46,
-       "4": -1.37,
-       "6": -1.28,
-       "8": -1.25,
-       "9": -1.25,
-       "12": -1.29,
-       "19": -1.43
+       "0": -2.78,
+       "1": -2.11,
+       "2": -1.82,
+       "3": -1.65,
+       "4": -1.56,
+       "6": -1.46,
+       "8": -1.42,
+       "10": -1.43,
+       "12": -1.46,
+       "19": -1.57
       },
-      "t_min": -2.39,
-      "t_max": -1.25,
-      "lag_andrews": 9,
-      "t_andrews": -1.25,
+      "t_min": -2.78,
+      "t_max": -1.42,
+      "lag_andrews": 10,
+      "t_andrews": -1.43,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 33.9,
-     "spread_mean": -2.213,
+     "win_rate": 32.8,
+     "spread_mean": -2.488,
      "subperiod": {
-      "first_half_mean": -0.0546,
-      "second_half_mean": -0.0217,
-      "sign_stable_pct": 66.1,
+      "first_half_mean": -0.0569,
+      "second_half_mean": -0.033,
+      "sign_stable_pct": 67.2,
       "regime_shift": false
      },
      "verdict": "负向（可作反向指标）",
      "verdict_color": "#38bdf8",
-     "verdict_note": "IC=-0.038，NW t=-1.43"
+     "verdict_note": "IC=-0.045，NW t=-1.57"
     }
    },
    "verdict": "负向（可作反向指标）",
    "verdict_color": "#38bdf8",
-   "verdict_note": "IC=-0.033，NW t=-1.85（T+1）"
+   "verdict_note": "IC=-0.032，NW t=-1.87（T+1）"
   },
   "score_theme_neg": {
    "label": "题材反号（10−题材热度）",
    "horizons": {
     "1": {
-     "n": 78,
+     "n": 80,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -4137,7 +4303,9 @@
       "2026-10-20",
       "2026-10-21",
       "2026-10-22",
-      "2026-10-23"
+      "2026-10-23",
+      "2026-10-26",
+      "2026-10-27"
      ],
      "ic_series": [
       -0.2427,
@@ -4217,48 +4385,50 @@
       0.001,
       0.1455,
       -0.1381,
-      -0.1714
+      -0.1714,
+      0.0091,
+      0.0371
      ],
-     "ic_mean": 0.0356,
-     "ic_std": 0.1794,
-     "t_stat": 1.75,
-     "nw_t": 1.77,
+     "ic_mean": 0.0353,
+     "ic_std": 0.1772,
+     "t_stat": 1.78,
+     "nw_t": 1.79,
      "bonferroni_sig": false,
      "nw_lag": 0,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": 1.77,
-       "1": 1.69,
-       "2": 1.61,
-       "3": 1.54,
-       "4": 1.5,
-       "6": 1.42,
-       "8": 1.34,
-       "12": 1.23,
-       "19": 1.14
+       "0": 1.79,
+       "1": 1.72,
+       "2": 1.64,
+       "3": 1.57,
+       "4": 1.52,
+       "6": 1.45,
+       "8": 1.36,
+       "12": 1.25,
+       "19": 1.16
       },
-      "t_min": 1.14,
-      "t_max": 1.77,
+      "t_min": 1.16,
+      "t_max": 1.79,
       "lag_andrews": 2,
-      "t_andrews": 1.61,
+      "t_andrews": 1.64,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 60.3,
-     "spread_mean": 0.186,
+     "win_rate": 61.3,
+     "spread_mean": 0.195,
      "subperiod": {
-      "first_half_mean": 0.035,
-      "second_half_mean": 0.0363,
-      "sign_stable_pct": 60.3,
+      "first_half_mean": 0.032,
+      "second_half_mean": 0.0386,
+      "sign_stable_pct": 61.3,
       "regime_shift": false
      },
      "verdict": "弱有效",
      "verdict_color": "#84cc16",
-     "verdict_note": "IC=+0.036，NW t=1.77"
+     "verdict_note": "IC=+0.035，NW t=1.79"
     },
     "5": {
-     "n": 74,
+     "n": 76,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -4333,7 +4503,9 @@
       "2026-10-14",
       "2026-10-15",
       "2026-10-16",
-      "2026-10-19"
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21"
      ],
      "ic_series": [
       -0.1894,
@@ -4409,48 +4581,50 @@
       0.0545,
       0.2441,
       0.0548,
-      -0.1143
+      -0.1143,
+      -0.1274,
+      0.0748
      ],
-     "ic_mean": 0.0686,
-     "ic_std": 0.202,
-     "t_stat": 2.92,
-     "nw_t": 1.71,
+     "ic_mean": 0.0661,
+     "ic_std": 0.2005,
+     "t_stat": 2.87,
+     "nw_t": 1.69,
      "bonferroni_sig": false,
      "nw_lag": 4,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": 2.94,
-       "1": 2.31,
-       "2": 2.01,
-       "3": 1.83,
-       "4": 1.71,
-       "6": 1.54,
-       "8": 1.41,
-       "12": 1.28,
-       "19": 1.24
+       "0": 2.89,
+       "1": 2.27,
+       "2": 1.98,
+       "3": 1.8,
+       "4": 1.69,
+       "6": 1.52,
+       "8": 1.39,
+       "12": 1.26,
+       "19": 1.22
       },
-      "t_min": 1.24,
-      "t_max": 2.94,
+      "t_min": 1.22,
+      "t_max": 2.89,
       "lag_andrews": 8,
-      "t_andrews": 1.41,
+      "t_andrews": 1.39,
       "robust_bonferroni": false,
       "flips": false
      },
      "robust_bonferroni": false,
-     "win_rate": 63.5,
-     "spread_mean": 1.586,
+     "win_rate": 63.2,
+     "spread_mean": 1.51,
      "subperiod": {
-      "first_half_mean": 0.0814,
-      "second_half_mean": 0.0558,
-      "sign_stable_pct": 63.5,
+      "first_half_mean": 0.0818,
+      "second_half_mean": 0.0504,
+      "sign_stable_pct": 63.2,
       "regime_shift": false
      },
      "verdict": "弱有效",
      "verdict_color": "#84cc16",
-     "verdict_note": "IC=+0.069，NW t=1.71"
+     "verdict_note": "IC=+0.066，NW t=1.69"
     },
     "20": {
-     "n": 59,
+     "n": 61,
      "dates": [
       "2026-06-26",
       "2026-06-29",
@@ -4510,7 +4684,9 @@
       "2026-09-15",
       "2026-09-16",
       "2026-09-17",
-      "2026-09-18"
+      "2026-09-18",
+      "2026-09-21",
+      "2026-09-22"
      ],
      "ic_series": [
       -0.2796,
@@ -4571,56 +4747,58 @@
       0.1557,
       0.2953,
       0.2186,
-      0.3774
+      0.3774,
+      0.1042,
+      0.0951
      ],
-     "ic_mean": 0.1122,
-     "ic_std": 0.16,
-     "t_stat": 5.39,
-     "nw_t": 2.81,
+     "ic_mean": 0.1118,
+     "ic_std": 0.1573,
+     "t_stat": 5.55,
+     "nw_t": 2.9,
      "bonferroni_sig": false,
      "nw_lag": 19,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": 5.43,
-       "1": 4.42,
-       "2": 3.83,
-       "3": 3.47,
-       "4": 3.24,
-       "6": 2.96,
-       "8": 2.81,
-       "12": 2.67,
-       "19": 2.81
+       "0": 5.6,
+       "1": 4.55,
+       "2": 3.95,
+       "3": 3.58,
+       "4": 3.35,
+       "6": 3.06,
+       "8": 2.9,
+       "12": 2.76,
+       "19": 2.9
       },
-      "t_min": 2.67,
-      "t_max": 5.43,
+      "t_min": 2.76,
+      "t_max": 5.6,
       "lag_andrews": 6,
-      "t_andrews": 2.96,
+      "t_andrews": 3.06,
       "robust_bonferroni": false,
       "flips": true
      },
      "robust_bonferroni": false,
-     "win_rate": 76.3,
-     "spread_mean": 4.183,
+     "win_rate": 77.0,
+     "spread_mean": 4.276,
      "subperiod": {
-      "first_half_mean": 0.1176,
-      "second_half_mean": 0.107,
-      "sign_stable_pct": 76.3,
+      "first_half_mean": 0.1141,
+      "second_half_mean": 0.1096,
+      "sign_stable_pct": 77.0,
       "regime_shift": false
      },
      "verdict": "显著有效",
      "verdict_color": "#22c55e",
-     "verdict_note": "IC=+0.112，NW t=2.81（宽松显著·未过多重校正）"
+     "verdict_note": "IC=+0.112，NW t=2.9（宽松显著·未过多重校正）"
     }
    },
    "verdict": "显著有效",
    "verdict_color": "#22c55e",
-   "verdict_note": "IC=+0.112，NW t=2.81（宽松显著·未过多重校正）（T+20）"
+   "verdict_note": "IC=+0.112，NW t=2.9（宽松显著·未过多重校正）（T+20）"
   },
   "score_size": {
    "label": "小市值（池内流通市值分位）",
    "horizons": {
     "1": {
-     "n": 9,
+     "n": 11,
      "dates": [
       "2026-10-13",
       "2026-10-14",
@@ -4630,7 +4808,9 @@
       "2026-10-20",
       "2026-10-21",
       "2026-10-22",
-      "2026-10-23"
+      "2026-10-23",
+      "2026-10-26",
+      "2026-10-27"
      ],
      "ic_series": [
       -0.1298,
@@ -4641,89 +4821,100 @@
       0.094,
       -0.3155,
       -0.0507,
-      -0.2853
+      -0.2853,
+      -0.17,
+      0.1352
      ],
-     "ic_mean": -0.1355,
-     "ic_std": 0.1546,
-     "t_stat": -2.63,
-     "nw_t": -2.79,
+     "ic_mean": -0.114,
+     "ic_std": 0.1615,
+     "t_stat": -2.34,
+     "nw_t": -2.46,
      "bonferroni_sig": false,
      "nw_lag": 0,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": -2.79,
-       "1": -3.04,
-       "2": -3.48,
-       "3": -4.21,
-       "4": -4.86,
-       "6": -6.08,
-       "8": -6.87,
-       "12": -8.26,
-       "19": -10.24
+       "0": -2.46,
+       "1": -2.64,
+       "2": -3.15,
+       "3": -3.7,
+       "4": -4.88,
+       "6": -5.33,
+       "8": -5.44,
+       "12": -6.48,
+       "19": -8.04
       },
-      "t_min": -10.24,
-      "t_max": -2.79,
+      "t_min": -8.04,
+      "t_max": -2.46,
       "lag_andrews": 2,
-      "t_andrews": -3.48,
+      "t_andrews": -3.15,
       "robust_bonferroni": false,
       "flips": true
      },
      "robust_bonferroni": false,
-     "win_rate": 22.2,
-     "spread_mean": -1.006,
-     "subperiod": null,
+     "win_rate": 27.3,
+     "spread_mean": -0.78,
+     "subperiod": {
+      "first_half_mean": -0.1324,
+      "second_half_mean": -0.0987,
+      "sign_stable_pct": 72.7,
+      "regime_shift": false
+     },
      "verdict": "⚠️显著跑输·小样本",
      "verdict_color": "#ef4444",
-     "verdict_note": "IC=-0.136，NW t=-2.79，胜率=22.2%，n=9<20；方向性负alpha警示（样本未达标，待确认）"
+     "verdict_note": "IC=-0.114，NW t=-2.46，胜率=27.3%，n=11<20；方向性负alpha警示（样本未达标，待确认）"
     },
     "5": {
-     "n": 5,
+     "n": 7,
      "dates": [
       "2026-10-13",
       "2026-10-14",
       "2026-10-15",
       "2026-10-16",
-      "2026-10-19"
+      "2026-10-19",
+      "2026-10-20",
+      "2026-10-21"
      ],
      "ic_series": [
       -0.2108,
       -0.2099,
       -0.3626,
       -0.2421,
-      -0.223
+      -0.223,
+      -0.2266,
+      -0.1882
      ],
-     "ic_mean": -0.2497,
-     "ic_std": 0.0645,
-     "t_stat": -8.66,
-     "nw_t": -20.15,
+     "ic_mean": -0.2376,
+     "ic_std": 0.0576,
+     "t_stat": -10.91,
+     "nw_t": -17.86,
      "bonferroni_sig": true,
      "nw_lag": 4,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": -9.68,
-       "1": -10.94,
-       "2": -14.83,
-       "3": -18.03,
-       "4": -20.15,
-       "6": -23.85,
-       "8": -27.04,
-       "12": -32.5,
-       "19": -40.31
+       "0": -11.79,
+       "1": -12.27,
+       "2": -13.68,
+       "3": -14.97,
+       "4": -17.86,
+       "6": -21.81,
+       "8": -24.73,
+       "12": -29.72,
+       "19": -36.86
       },
-      "t_min": -40.31,
-      "t_max": -9.68,
-      "lag_andrews": 2,
-      "t_andrews": -14.83,
+      "t_min": -36.86,
+      "t_max": -11.79,
+      "lag_andrews": 1,
+      "t_andrews": -12.27,
       "robust_bonferroni": true,
       "flips": false
      },
      "robust_bonferroni": true,
      "win_rate": 0.0,
-     "spread_mean": -4.614,
+     "spread_mean": -4.562,
      "subperiod": null,
      "verdict": "⚠️显著跑输·小样本",
      "verdict_color": "#ef4444",
-     "verdict_note": "IC=-0.250，NW t=-20.15，胜率=0.0%，n=5<20；方向性负alpha警示（样本未达标，待确认）"
+     "verdict_note": "IC=-0.238，NW t=-17.86，胜率=0.0%，n=7<20；方向性负alpha警示（样本未达标，待确认）"
     },
     "20": {
      "n": 0,
@@ -4747,7 +4938,7 @@
    },
    "verdict": "⚠️显著跑输·小样本",
    "verdict_color": "#ef4444",
-   "verdict_note": "IC=-0.250，NW t=-20.15，胜率=0.0%，n=5<20；方向性负alpha警示（样本未达标，待确认）（T+5·小样本）"
+   "verdict_note": "IC=-0.238，NW t=-17.86，胜率=0.0%，n=7<20；方向性负alpha警示（样本未达标，待确认）（T+5·小样本）"
   }
  },
  "recommendation_ic": {
@@ -4904,7 +5095,7 @@
   "cost_bps_roundtrip": 20.0,
   "horizons": {
    "1": {
-    "n": 77,
+    "n": 79,
     "dates": [
      "2026-06-26",
      "2026-06-29",
@@ -4982,7 +5173,9 @@
      "2026-10-19",
      "2026-10-20",
      "2026-10-21",
-     "2026-10-22"
+     "2026-10-22",
+     "2026-10-23",
+     "2026-10-26"
     ],
     "ic_series": [
      0.1418,
@@ -5061,54 +5254,56 @@
      0.3181,
      0.0252,
      -0.0817,
-     0.1572
+     0.1572,
+     -0.2063,
+     -0.1547
     ],
-    "ic_mean": 0.0151,
-    "ic_std": 0.1415,
-    "t_stat": 0.94,
-    "nw_t": 0.94,
+    "ic_mean": 0.0101,
+    "ic_std": 0.1431,
+    "t_stat": 0.63,
+    "nw_t": 0.63,
     "bonferroni_sig": false,
     "nw_lag": 0,
     "nw_sensitivity": {
      "t_by_lag": {
-      "0": 0.94,
-      "1": 1.03,
-      "2": 1.11,
-      "3": 1.08,
-      "4": 1.09,
-      "6": 1.08,
-      "8": 1.09,
-      "12": 1.15,
-      "19": 1.24
+      "0": 0.63,
+      "1": 0.69,
+      "2": 0.74,
+      "3": 0.72,
+      "4": 0.73,
+      "6": 0.74,
+      "8": 0.75,
+      "12": 0.8,
+      "19": 0.83
      },
-     "t_min": 0.94,
-     "t_max": 1.24,
+     "t_min": 0.63,
+     "t_max": 0.83,
      "lag_andrews": 3,
-     "t_andrews": 1.08,
+     "t_andrews": 0.72,
      "robust_bonferroni": false,
      "flips": false
     },
     "robust_bonferroni": false,
-    "win_rate": 50.6,
-    "spread_mean": -0.013,
+    "win_rate": 49.4,
+    "spread_mean": -0.04,
     "subperiod": {
-     "first_half_mean": 0.0136,
-     "second_half_mean": 0.0165,
-     "sign_stable_pct": 50.6,
-     "regime_shift": false
+     "first_half_mean": 0.0215,
+     "second_half_mean": -0.001,
+     "sign_stable_pct": 49.4,
+     "regime_shift": true
     },
     "base": "open_next",
     "cost_bps": 20.0,
-    "long_mean": -0.877,
+    "long_mean": -0.922,
     "verdict": "无预测力",
     "verdict_color": "#64748b",
-    "verdict_note": "IC=+0.015，NW t=0.94",
-    "gross_ic_mean": 0.0151,
-    "gross_nw_t": 0.94,
-    "gross_spread_mean": -0.013
+    "verdict_note": "IC=+0.010，NW t=0.63",
+    "gross_ic_mean": 0.0101,
+    "gross_nw_t": 0.63,
+    "gross_spread_mean": -0.04
    },
    "5": {
-    "n": 73,
+    "n": 75,
     "dates": [
      "2026-06-26",
      "2026-06-29",
@@ -5182,7 +5377,9 @@
      "2026-10-13",
      "2026-10-14",
      "2026-10-15",
-     "2026-10-16"
+     "2026-10-16",
+     "2026-10-19",
+     "2026-10-20"
     ],
     "ic_series": [
      0.1509,
@@ -5257,54 +5454,56 @@
      -0.1148,
      0.1814,
      0.0285,
-     0.1752
+     0.1752,
+     0.0912,
+     -0.1133
     ],
-    "ic_mean": 0.0199,
-    "ic_std": 0.137,
-    "t_stat": 1.24,
-    "nw_t": 0.8,
+    "ic_mean": 0.019,
+    "ic_std": 0.1363,
+    "t_stat": 1.21,
+    "nw_t": 0.79,
     "bonferroni_sig": false,
     "nw_lag": 4,
     "nw_sensitivity": {
      "t_by_lag": {
-      "0": 1.25,
-      "1": 1.03,
-      "2": 0.92,
-      "3": 0.85,
-      "4": 0.8,
-      "6": 0.75,
-      "8": 0.72,
-      "12": 0.71,
-      "19": 0.71
+      "0": 1.22,
+      "1": 1.01,
+      "2": 0.9,
+      "3": 0.83,
+      "4": 0.79,
+      "6": 0.74,
+      "8": 0.71,
+      "12": 0.7,
+      "19": 0.7
      },
-     "t_min": 0.71,
-     "t_max": 1.25,
+     "t_min": 0.7,
+     "t_max": 1.22,
      "lag_andrews": 6,
-     "t_andrews": 0.75,
+     "t_andrews": 0.74,
      "robust_bonferroni": false,
      "flips": false
     },
     "robust_bonferroni": false,
-    "win_rate": 60.3,
-    "spread_mean": 0.145,
+    "win_rate": 60.0,
+    "spread_mean": 0.123,
     "subperiod": {
-     "first_half_mean": 0.0323,
-     "second_half_mean": 0.0078,
-     "sign_stable_pct": 60.3,
+     "first_half_mean": 0.0331,
+     "second_half_mean": 0.0053,
+     "sign_stable_pct": 60.0,
      "regime_shift": false
     },
     "base": "open_next",
     "cost_bps": 20.0,
-    "long_mean": -3.589,
+    "long_mean": -3.647,
     "verdict": "无预测力",
     "verdict_color": "#64748b",
-    "verdict_note": "IC=+0.020，NW t=0.8",
-    "gross_ic_mean": 0.0199,
-    "gross_nw_t": 0.8,
-    "gross_spread_mean": 0.145
+    "verdict_note": "IC=+0.019，NW t=0.79",
+    "gross_ic_mean": 0.019,
+    "gross_nw_t": 0.79,
+    "gross_spread_mean": 0.123
    },
    "20": {
-    "n": 58,
+    "n": 60,
     "dates": [
      "2026-06-26",
      "2026-06-29",
@@ -5363,7 +5562,9 @@
      "2026-09-14",
      "2026-09-15",
      "2026-09-16",
-     "2026-09-17"
+     "2026-09-17",
+     "2026-09-18",
+     "2026-09-21"
     ],
     "ic_series": [
      0.3245,
@@ -5423,65 +5624,67 @@
      -0.2588,
      -0.2264,
      -0.2305,
-     -0.1512
+     -0.1512,
+     -0.217,
+     -0.0393
     ],
-    "ic_mean": 0.0064,
-    "ic_std": 0.1556,
-    "t_stat": 0.31,
-    "nw_t": 0.13,
+    "ic_mean": 0.0019,
+    "ic_std": 0.1557,
+    "t_stat": 0.09,
+    "nw_t": 0.04,
     "bonferroni_sig": false,
     "nw_lag": 19,
     "nw_sensitivity": {
      "t_by_lag": {
-      "0": 0.31,
-      "1": 0.24,
-      "2": 0.21,
-      "3": 0.18,
-      "4": 0.17,
-      "6": 0.15,
-      "8": 0.14,
-      "9": 0.14,
-      "12": 0.13,
-      "19": 0.13
+      "0": 0.09,
+      "1": 0.07,
+      "2": 0.06,
+      "3": 0.05,
+      "4": 0.05,
+      "6": 0.05,
+      "8": 0.04,
+      "9": 0.04,
+      "12": 0.04,
+      "19": 0.04
      },
-     "t_min": 0.13,
-     "t_max": 0.31,
+     "t_min": 0.04,
+     "t_max": 0.09,
      "lag_andrews": 9,
-     "t_andrews": 0.14,
+     "t_andrews": 0.04,
      "robust_bonferroni": false,
      "flips": false
     },
     "robust_bonferroni": false,
-    "win_rate": 46.6,
-    "spread_mean": -0.525,
+    "win_rate": 45.0,
+    "spread_mean": -0.791,
     "subperiod": {
-     "first_half_mean": 0.0676,
-     "second_half_mean": -0.0548,
-     "sign_stable_pct": 46.6,
+     "first_half_mean": 0.0663,
+     "second_half_mean": -0.0626,
+     "sign_stable_pct": 45.0,
      "regime_shift": true
     },
     "base": "open_next",
     "cost_bps": 20.0,
-    "long_mean": -8.189,
+    "long_mean": -8.956,
     "verdict": "无预测力",
     "verdict_color": "#64748b",
-    "verdict_note": "IC=+0.006，NW t=0.13",
-    "gross_ic_mean": 0.0064,
-    "gross_nw_t": 0.13,
-    "gross_spread_mean": -0.525
+    "verdict_note": "IC=+0.002，NW t=0.04",
+    "gross_ic_mean": 0.0019,
+    "gross_nw_t": 0.04,
+    "gross_spread_mean": -0.791
    }
   },
   "note": "前视修正：日评分于 t 日收盘后生成，原 IC 用 t 日收盘价买入不可成交；本口径改为 t+1 开盘买入。gross=未扣成本，net=扣 20bp 往返成本。",
   "verdict": "样本积累中",
   "verdict_color": "#94a3b8",
-  "verdict_note": "各周期样本均 <20（最大 77）"
+  "verdict_note": "各周期样本均 <20（最大 79）"
  },
  "tradable_fund_ic": {
   "base": "仅按 score_fund（基本面）排序，t+1 开盘买入头组 / 持有 h 日后开盘卖出",
   "cost_bps_roundtrip": 20.0,
   "horizons": {
    "1": {
-    "n": 77,
+    "n": 79,
     "dates": [
      "2026-06-26",
      "2026-06-29",
@@ -5559,7 +5762,9 @@
      "2026-10-19",
      "2026-10-20",
      "2026-10-21",
-     "2026-10-22"
+     "2026-10-22",
+     "2026-10-23",
+     "2026-10-26"
     ],
     "ic_series": [
      0.0101,
@@ -5638,49 +5843,51 @@
      0.1168,
      -0.0185,
      -0.0572,
-     0.1042
+     0.1042,
+     -0.1498,
+     -0.029
     ],
-    "ic_mean": 0.0371,
-    "ic_std": 0.1327,
-    "t_stat": 2.45,
-    "nw_t": 2.47,
+    "ic_mean": 0.0339,
+    "ic_std": 0.1329,
+    "t_stat": 2.27,
+    "nw_t": 2.28,
     "bonferroni_sig": false,
     "nw_lag": 0,
     "nw_sensitivity": {
      "t_by_lag": {
-      "0": 2.47,
-      "1": 2.42,
-      "2": 2.54,
-      "3": 2.81,
-      "4": 3.14,
-      "6": 3.53,
-      "8": 3.88,
-      "12": 4.72,
-      "19": 5.17
+      "0": 2.28,
+      "1": 2.24,
+      "2": 2.34,
+      "3": 2.56,
+      "4": 2.84,
+      "6": 3.16,
+      "8": 3.42,
+      "12": 3.91,
+      "19": 4.19
      },
-     "t_min": 2.42,
-     "t_max": 5.17,
+     "t_min": 2.24,
+     "t_max": 4.19,
      "lag_andrews": 1,
-     "t_andrews": 2.42,
+     "t_andrews": 2.24,
      "robust_bonferroni": false,
      "flips": true
     },
     "robust_bonferroni": false,
-    "win_rate": 63.6,
-    "spread_mean": 0.259,
+    "win_rate": 62.0,
+    "spread_mean": 0.237,
     "subperiod": {
-     "first_half_mean": 0.0313,
-     "second_half_mean": 0.0428,
-     "sign_stable_pct": 63.6,
+     "first_half_mean": 0.0391,
+     "second_half_mean": 0.0288,
+     "sign_stable_pct": 62.0,
      "regime_shift": false
     },
     "base": "open_next",
     "cost_bps": 20.0,
-    "long_mean": -0.733,
-    "gross_ic_mean": 0.0371
+    "long_mean": -0.781,
+    "gross_ic_mean": 0.0339
    },
    "5": {
-    "n": 73,
+    "n": 75,
     "dates": [
      "2026-06-26",
      "2026-06-29",
@@ -5754,7 +5961,9 @@
      "2026-10-13",
      "2026-10-14",
      "2026-10-15",
-     "2026-10-16"
+     "2026-10-16",
+     "2026-10-19",
+     "2026-10-20"
     ],
     "ic_series": [
      0.1357,
@@ -5829,50 +6038,52 @@
      -0.0325,
      -0.0123,
      -0.0128,
-     0.1005
+     0.1005,
+     0.0634,
+     -0.0302
     ],
-    "ic_mean": 0.0704,
-    "ic_std": 0.1322,
-    "t_stat": 4.55,
-    "nw_t": 3.15,
+    "ic_mean": 0.069,
+    "ic_std": 0.1309,
+    "t_stat": 4.56,
+    "nw_t": 3.16,
     "bonferroni_sig": true,
     "nw_lag": 4,
     "nw_sensitivity": {
      "t_by_lag": {
-      "0": 4.58,
-      "1": 3.58,
-      "2": 3.23,
-      "3": 3.14,
-      "4": 3.15,
+      "0": 4.6,
+      "1": 3.59,
+      "2": 3.25,
+      "3": 3.15,
+      "4": 3.16,
       "6": 3.38,
-      "8": 3.76,
-      "9": 3.92,
-      "12": 4.03,
-      "19": 3.6
+      "8": 3.71,
+      "9": 3.86,
+      "12": 3.97,
+      "19": 3.56
      },
-     "t_min": 3.14,
-     "t_max": 4.58,
+     "t_min": 3.15,
+     "t_max": 4.6,
      "lag_andrews": 9,
-     "t_andrews": 3.92,
+     "t_andrews": 3.86,
      "robust_bonferroni": true,
      "flips": false
     },
     "robust_bonferroni": true,
-    "win_rate": 69.9,
-    "spread_mean": 1.27,
+    "win_rate": 69.3,
+    "spread_mean": 1.251,
     "subperiod": {
-     "first_half_mean": 0.0968,
-     "second_half_mean": 0.0448,
-     "sign_stable_pct": 69.9,
+     "first_half_mean": 0.0994,
+     "second_half_mean": 0.0394,
+     "sign_stable_pct": 69.3,
      "regime_shift": false
     },
     "base": "open_next",
     "cost_bps": 20.0,
-    "long_mean": -3.0,
-    "gross_ic_mean": 0.0704
+    "long_mean": -3.047,
+    "gross_ic_mean": 0.069
    },
    "20": {
-    "n": 58,
+    "n": 60,
     "dates": [
      "2026-06-26",
      "2026-06-29",
@@ -5931,7 +6142,9 @@
      "2026-09-14",
      "2026-09-15",
      "2026-09-16",
-     "2026-09-17"
+     "2026-09-17",
+     "2026-09-18",
+     "2026-09-21"
     ],
     "ic_series": [
      0.2465,
@@ -5991,52 +6204,54 @@
      -0.1603,
      -0.1738,
      -0.0231,
-     -0.0031
+     -0.0031,
+     0.1116,
+     0.3633
     ],
-    "ic_mean": 0.0824,
-    "ic_std": 0.1388,
-    "t_stat": 4.52,
-    "nw_t": 1.54,
+    "ic_mean": 0.0876,
+    "ic_std": 0.1412,
+    "t_stat": 4.81,
+    "nw_t": 1.76,
     "bonferroni_sig": false,
     "nw_lag": 19,
     "nw_sensitivity": {
      "t_by_lag": {
-      "0": 4.56,
-      "1": 3.38,
-      "2": 2.85,
-      "3": 2.53,
-      "4": 2.32,
-      "6": 2.07,
-      "8": 1.91,
-      "12": 1.71,
-      "14": 1.65,
-      "19": 1.54
+      "0": 4.85,
+      "1": 3.64,
+      "2": 3.09,
+      "3": 2.76,
+      "4": 2.55,
+      "6": 2.3,
+      "8": 2.13,
+      "11": 1.97,
+      "12": 1.93,
+      "19": 1.76
      },
-     "t_min": 1.54,
-     "t_max": 4.56,
-     "lag_andrews": 14,
-     "t_andrews": 1.65,
+     "t_min": 1.76,
+     "t_max": 4.85,
+     "lag_andrews": 11,
+     "t_andrews": 1.97,
      "robust_bonferroni": false,
      "flips": true
     },
     "robust_bonferroni": false,
-    "win_rate": 70.7,
-    "spread_mean": 2.238,
+    "win_rate": 71.7,
+    "spread_mean": 2.35,
     "subperiod": {
-     "first_half_mean": 0.1726,
-     "second_half_mean": -0.0077,
-     "sign_stable_pct": 70.7,
-     "regime_shift": true
+     "first_half_mean": 0.1722,
+     "second_half_mean": 0.003,
+     "sign_stable_pct": 71.7,
+     "regime_shift": false
     },
     "base": "open_next",
     "cost_bps": 20.0,
-    "long_mean": -6.387,
-    "gross_ic_mean": 0.0824
+    "long_mean": -6.91,
+    "gross_ic_mean": 0.0876
    }
   },
   "verdict": "显著有效",
   "verdict_color": "#22c55e",
-  "verdict_note": "IC=+0.070，NW t=3.15（校正后显著）（T+5）",
+  "verdict_note": "IC=+0.069，NW t=3.16（校正后显著）（T+5）",
   "monthly_drift": [
    {
     "month": "2026-06",
@@ -6064,9 +6279,9 @@
    },
    {
     "month": "2026-10",
-    "n": 7,
-    "ic": -0.0513,
-    "win_rate": 14.3
+    "n": 9,
+    "ic": -0.0362,
+    "win_rate": 22.2
    }
   ],
   "monthly_excess": [
@@ -6100,10 +6315,10 @@
    },
    {
     "month": "2026-10",
-    "n": 8,
-    "pool_mean_pct": -4.25,
-    "head_mean_pct": -6.8,
-    "excess_pct": -2.55
+    "n": 9,
+    "pool_mean_pct": -5.42,
+    "head_mean_pct": -6.35,
+    "excess_pct": -0.93
    }
   ],
   "note": "单维口径：剥离消息面/反转块/先验维度的影响，回答「只买基本面头组能否赚钱」。"
@@ -6126,7 +6341,7 @@
   },
   "horizons": {
    "1": {
-    "n": 77,
+    "n": 79,
     "dates": [
      "2026-06-26",
      "2026-06-29",
@@ -6204,7 +6419,9 @@
      "2026-10-19",
      "2026-10-20",
      "2026-10-21",
-     "2026-10-22"
+     "2026-10-22",
+     "2026-10-23",
+     "2026-10-26"
     ],
     "ic_series": [
      0.0228,
@@ -6283,48 +6500,50 @@
      0.225,
      0.0113,
      -0.0715,
-     0.1361
+     0.1361,
+     -0.198,
+     -0.0663
     ],
-    "ic_mean": 0.0407,
-    "ic_std": 0.1289,
-    "t_stat": 2.77,
-    "nw_t": 2.79,
+    "ic_mean": 0.0364,
+    "ic_std": 0.1305,
+    "t_stat": 2.48,
+    "nw_t": 2.49,
     "bonferroni_sig": false,
     "nw_lag": 0,
     "nw_sensitivity": {
      "t_by_lag": {
-      "0": 2.79,
-      "1": 2.97,
-      "2": 3.16,
-      "3": 3.33,
-      "4": 3.51,
-      "6": 3.7,
-      "8": 3.88,
-      "12": 4.36,
-      "19": 5.29
+      "0": 2.49,
+      "1": 2.64,
+      "2": 2.78,
+      "3": 2.89,
+      "4": 3.05,
+      "6": 3.2,
+      "8": 3.35,
+      "12": 3.56,
+      "19": 3.82
      },
-     "t_min": 2.79,
-     "t_max": 5.29,
+     "t_min": 2.49,
+     "t_max": 3.82,
      "lag_andrews": 2,
-     "t_andrews": 3.16,
+     "t_andrews": 2.78,
      "robust_bonferroni": false,
      "flips": true
     },
     "robust_bonferroni": false,
-    "win_rate": 58.4,
-    "spread_mean": 0.229,
+    "win_rate": 57.0,
+    "spread_mean": 0.204,
     "subperiod": {
-     "first_half_mean": 0.0394,
-     "second_half_mean": 0.042,
-     "sign_stable_pct": 58.4,
+     "first_half_mean": 0.0466,
+     "second_half_mean": 0.0264,
+     "sign_stable_pct": 57.0,
      "regime_shift": false
     },
     "base": "open_next",
     "cost_bps": 20.0,
-    "long_mean": -0.808
+    "long_mean": -0.853
    },
    "5": {
-    "n": 73,
+    "n": 75,
     "dates": [
      "2026-06-26",
      "2026-06-29",
@@ -6398,7 +6617,9 @@
      "2026-10-13",
      "2026-10-14",
      "2026-10-15",
-     "2026-10-16"
+     "2026-10-16",
+     "2026-10-19",
+     "2026-10-20"
     ],
     "ic_series": [
      0.0998,
@@ -6473,48 +6694,50 @@
      -0.0658,
      0.0972,
      0.0078,
-     0.1589
+     0.1589,
+     0.09,
+     -0.063
     ],
-    "ic_mean": 0.068,
-    "ic_std": 0.1155,
-    "t_stat": 5.03,
-    "nw_t": 3.6,
+    "ic_mean": 0.0666,
+    "ic_std": 0.115,
+    "t_stat": 5.01,
+    "nw_t": 3.62,
     "bonferroni_sig": true,
     "nw_lag": 4,
     "nw_sensitivity": {
      "t_by_lag": {
-      "0": 5.07,
+      "0": 5.05,
       "1": 4.13,
-      "2": 3.76,
-      "3": 3.61,
-      "4": 3.6,
+      "2": 3.77,
+      "3": 3.63,
+      "4": 3.62,
       "6": 3.86,
-      "8": 4.24,
-      "12": 4.71,
-      "19": 4.36
+      "8": 4.21,
+      "12": 4.64,
+      "19": 4.25
      },
-     "t_min": 3.6,
-     "t_max": 5.07,
+     "t_min": 3.62,
+     "t_max": 5.05,
      "lag_andrews": 6,
      "t_andrews": 3.86,
      "robust_bonferroni": true,
      "flips": false
     },
     "robust_bonferroni": true,
-    "win_rate": 69.9,
-    "spread_mean": 1.211,
+    "win_rate": 69.3,
+    "spread_mean": 1.185,
     "subperiod": {
-     "first_half_mean": 0.0981,
-     "second_half_mean": 0.0387,
-     "sign_stable_pct": 69.9,
+     "first_half_mean": 0.0991,
+     "second_half_mean": 0.0349,
+     "sign_stable_pct": 69.3,
      "regime_shift": false
     },
     "base": "open_next",
     "cost_bps": 20.0,
-    "long_mean": -3.075
+    "long_mean": -3.147
    },
    "20": {
-    "n": 58,
+    "n": 60,
     "dates": [
      "2026-06-26",
      "2026-06-29",
@@ -6573,7 +6796,9 @@
      "2026-09-14",
      "2026-09-15",
      "2026-09-16",
-     "2026-09-17"
+     "2026-09-17",
+     "2026-09-18",
+     "2026-09-21"
     ],
     "ic_series": [
      0.2258,
@@ -6633,58 +6858,60 @@
      -0.2626,
      -0.171,
      -0.0808,
-     -0.0601
+     -0.0601,
+     -0.0339,
+     0.1467
     ],
-    "ic_mean": 0.0728,
-    "ic_std": 0.1449,
-    "t_stat": 3.83,
-    "nw_t": 1.33,
+    "ic_mean": 0.0723,
+    "ic_std": 0.1434,
+    "t_stat": 3.9,
+    "nw_t": 1.35,
     "bonferroni_sig": false,
     "nw_lag": 19,
     "nw_sensitivity": {
      "t_by_lag": {
-      "0": 3.86,
-      "1": 2.87,
-      "2": 2.42,
-      "3": 2.15,
-      "4": 1.98,
-      "6": 1.76,
-      "8": 1.63,
-      "12": 1.47,
-      "13": 1.44,
-      "19": 1.33
+      "0": 3.94,
+      "1": 2.93,
+      "2": 2.47,
+      "3": 2.2,
+      "4": 2.02,
+      "6": 1.8,
+      "8": 1.66,
+      "12": 1.5,
+      "13": 1.47,
+      "19": 1.35
      },
-     "t_min": 1.33,
-     "t_max": 3.86,
+     "t_min": 1.35,
+     "t_max": 3.94,
      "lag_andrews": 13,
-     "t_andrews": 1.44,
+     "t_andrews": 1.47,
      "robust_bonferroni": false,
      "flips": true
     },
     "robust_bonferroni": false,
-    "win_rate": 70.7,
-    "spread_mean": 2.658,
+    "win_rate": 70.0,
+    "spread_mean": 2.554,
     "subperiod": {
-     "first_half_mean": 0.17,
-     "second_half_mean": -0.0244,
-     "sign_stable_pct": 70.7,
+     "first_half_mean": 0.1674,
+     "second_half_mean": -0.0229,
+     "sign_stable_pct": 70.0,
      "regime_shift": true
     },
     "base": "open_next",
     "cost_bps": 20.0,
-    "long_mean": -6.102
+    "long_mean": -6.778
    }
   },
   "verdict": "显著有效",
   "verdict_color": "#22c55e",
-  "verdict_note": "IC=+0.068，NW t=3.6（校正后显著）（T+5）",
+  "verdict_note": "IC=+0.067，NW t=3.62（校正后显著）（T+5）",
   "note": "与 tradable_ic 的区别：tradable_ic 用的是快照内 total 字段，该字段跨越 4→5→10 维三次口径变更，属分段混合口径；本项用当前权重在同一批截面上重算，口径统一，可直接与 tradable_fund_ic 对比。"
  },
  "pool_excess": {
-  "n_days": 59,
-  "median_excess_pct": -5.21,
-  "mean_excess_pct": -8.29,
-  "neg_ratio_pct": 96.6,
+  "n_days": 61,
+  "median_excess_pct": -5.32,
+  "mean_excess_pct": -8.7,
+  "neg_ratio_pct": 96.7,
   "hop": 20,
   "verdict": "负超额·稳定"
  },
@@ -6694,17 +6921,17 @@
   "hop": 20,
   "versions_seen": {
    "legacy": 78,
-   "v4.1-screening-then-scoring": 2
+   "v4.1-screening-then-scoring": 3
   },
-  "n_unclassified": 21,
+  "n_unclassified": 20,
   "legacy": {
    "label": "成交额旧母体（v4.1 前）",
-   "n_days": 59,
-   "n_pending": 19,
-   "median_excess_pct": -5.21,
-   "neg_ratio_pct": 96.6,
-   "pool_abs_med_pct": -8.47,
-   "bench_abs_med_pct": -2.01,
+   "n_days": 61,
+   "n_pending": 17,
+   "median_excess_pct": -5.32,
+   "neg_ratio_pct": 96.7,
+   "pool_abs_med_pct": -8.81,
+   "bench_abs_med_pct": -2.55,
    "mv_med_yi": null,
    "mv_known_days": 0,
    "verdict": "负超额·稳定"
@@ -6712,159 +6939,159 @@
   "size_pool": {
    "label": "SIZE 评分母体（v4.1+）",
    "n_days": 0,
-   "n_pending": 2,
+   "n_pending": 3,
    "median_excess_pct": null,
    "neg_ratio_pct": null,
    "mv_med_yi": null,
    "mv_known_days": 0,
    "verdict": "样本不足"
   },
-  "conclusion": "SIZE 评分母体已上线，但 2 个截面（2026-10-26 ~ 2026-10-27）的 T+20 收益尚未成熟 → 需等 20 个交易日才有首个体检结果。**当前不可引用任何新母体超额数字**。"
+  "conclusion": "SIZE 评分母体已上线，但 3 个截面（2026-10-26 ~ 2026-10-28）的 T+20 收益尚未成熟 → 需等 20 个交易日才有首个体检结果。**当前不可引用任何新母体超额数字**。"
  },
  "factor_correlation": {
   "score_fund|score_news": {
-   "mean": 0.178,
-   "n": 11
+   "mean": 0.183,
+   "n": 12
   },
   "score_fund|score_oversold60": {
-   "mean": 0.293,
-   "n": 11
+   "mean": 0.28,
+   "n": 12
   },
   "score_fund|score_bias60": {
-   "mean": 0.351,
-   "n": 11
+   "mean": 0.34,
+   "n": 12
   },
   "score_fund|score_rsi_rev": {
-   "mean": 0.369,
-   "n": 11
+   "mean": 0.355,
+   "n": 12
   },
   "score_fund|score_vol_pulse": {
-   "mean": 0.205,
-   "n": 11
+   "mean": 0.196,
+   "n": 12
   },
   "score_fund|score_overbought": {
-   "mean": 0.233,
-   "n": 11
+   "mean": 0.218,
+   "n": 12
   },
   "score_fund|score_theme_intrinsic": {
-   "mean": 0.224,
-   "n": 11
+   "mean": 0.215,
+   "n": 12
   },
   "score_fund|score_attention": {
    "mean": 0.14,
-   "n": 11
+   "n": 12
   },
   "score_news|score_oversold60": {
-   "mean": 0.312,
-   "n": 11
+   "mean": 0.301,
+   "n": 12
   },
   "score_news|score_bias60": {
-   "mean": 0.299,
-   "n": 11
+   "mean": 0.29,
+   "n": 12
   },
   "score_news|score_rsi_rev": {
-   "mean": 0.243,
-   "n": 11
+   "mean": 0.235,
+   "n": 12
   },
   "score_news|score_vol_pulse": {
-   "mean": 0.143,
-   "n": 11
+   "mean": 0.132,
+   "n": 12
   },
   "score_news|score_overbought": {
-   "mean": 0.062,
-   "n": 11
+   "mean": 0.053,
+   "n": 12
   },
   "score_news|score_theme_intrinsic": {
-   "mean": 0.204,
-   "n": 11
+   "mean": 0.196,
+   "n": 12
   },
   "score_news|score_attention": {
-   "mean": 0.365,
-   "n": 11
+   "mean": 0.367,
+   "n": 12
   },
   "score_oversold60|score_bias60": {
-   "mean": 0.821,
-   "n": 11
+   "mean": 0.812,
+   "n": 12
   },
   "score_oversold60|score_rsi_rev": {
-   "mean": 0.721,
-   "n": 11
+   "mean": 0.711,
+   "n": 12
   },
   "score_oversold60|score_vol_pulse": {
-   "mean": 0.372,
-   "n": 11
+   "mean": 0.363,
+   "n": 12
   },
   "score_oversold60|score_overbought": {
-   "mean": 0.361,
-   "n": 11
+   "mean": 0.351,
+   "n": 12
   },
   "score_oversold60|score_theme_intrinsic": {
-   "mean": 0.346,
-   "n": 11
+   "mean": 0.332,
+   "n": 12
   },
   "score_oversold60|score_attention": {
-   "mean": 0.144,
-   "n": 11
+   "mean": 0.134,
+   "n": 12
   },
   "score_bias60|score_rsi_rev": {
-   "mean": 0.881,
-   "n": 11
+   "mean": 0.879,
+   "n": 12
   },
   "score_bias60|score_vol_pulse": {
-   "mean": 0.53,
-   "n": 11
+   "mean": 0.528,
+   "n": 12
   },
   "score_bias60|score_overbought": {
-   "mean": 0.445,
-   "n": 11
+   "mean": 0.436,
+   "n": 12
   },
   "score_bias60|score_theme_intrinsic": {
-   "mean": 0.334,
-   "n": 11
+   "mean": 0.324,
+   "n": 12
   },
   "score_bias60|score_attention": {
-   "mean": 0.123,
-   "n": 11
+   "mean": 0.119,
+   "n": 12
   },
   "score_rsi_rev|score_vol_pulse": {
-   "mean": 0.616,
-   "n": 11
+   "mean": 0.61,
+   "n": 12
   },
   "score_rsi_rev|score_overbought": {
-   "mean": 0.589,
-   "n": 11
+   "mean": 0.576,
+   "n": 12
   },
   "score_rsi_rev|score_theme_intrinsic": {
-   "mean": 0.317,
-   "n": 11
+   "mean": 0.299,
+   "n": 12
   },
   "score_rsi_rev|score_attention": {
-   "mean": 0.09,
-   "n": 11
+   "mean": 0.08,
+   "n": 12
   },
   "score_vol_pulse|score_overbought": {
-   "mean": 0.445,
-   "n": 11
+   "mean": 0.432,
+   "n": 12
   },
   "score_vol_pulse|score_theme_intrinsic": {
-   "mean": 0.206,
-   "n": 11
+   "mean": 0.183,
+   "n": 12
   },
   "score_vol_pulse|score_attention": {
-   "mean": 0.029,
-   "n": 11
+   "mean": 0.014,
+   "n": 12
   },
   "score_overbought|score_theme_intrinsic": {
-   "mean": 0.223,
-   "n": 11
+   "mean": 0.213,
+   "n": 12
   },
   "score_overbought|score_attention": {
-   "mean": -0.024,
-   "n": 11
+   "mean": -0.032,
+   "n": 12
   },
   "score_theme_intrinsic|score_attention": {
-   "mean": 0.193,
-   "n": 11
+   "mean": 0.195,
+   "n": 12
   }
  },
  "collinearity": {
@@ -6872,36 +7099,36 @@
   "high_corr_pairs": [
    {
     "pair": "score_bias60|score_rsi_rev",
-    "corr": 0.881
+    "corr": 0.879
    },
    {
     "pair": "score_oversold60|score_bias60",
-    "corr": 0.821
+    "corr": 0.812
    },
    {
     "pair": "score_oversold60|score_rsi_rev",
-    "corr": 0.721
+    "corr": 0.711
    }
   ],
   "n_high_corr_pairs": 3,
-  "note": "存在 3 对高共线因子（|corr|≥0.7），多重计权会虚增该主题综合权重、并使 IC 驱动权重不稳定；建议正交化/分组降权（top: score_bias60|score_rsi_rev=0.881, score_oversold60|score_bias60=0.821, score_oversold60|score_rsi_rev=0.721）"
+  "note": "存在 3 对高共线因子（|corr|≥0.7），多重计权会虚增该主题综合权重、并使 IC 驱动权重不稳定；建议正交化/分组降权（top: score_bias60|score_rsi_rev=0.879, score_oversold60|score_bias60=0.812, score_oversold60|score_rsi_rev=0.711）"
  },
  "risk_gate": {
   "level": "high_risk",
   "triggered": [
    "推荐组合 T+1 IC=-0.110（NW t=-2.36）显著为负 → 历史推荐跑输基准池",
    "推荐组合 T+1 胜率仅 25.0%（<40%）",
-   "综合总分 T+1 IC=+0.019（NW t=1.26）未见显著正预测力",
-   "可交易口径（T+1 开盘买入扣20bp）IC=+0.015（NW t=0.94）不显著 → 前视修正后无可执行 alpha",
-   "可交易口径头部组净收益 -0.88%（持有 T+1）为负 → 买前排不赚钱",
-   "选股池本身系统性负超额：池内中位涨跌较全池低 -5.21pct（持有 20 日，96.6% 的入场日跑输）→ 池子选错了，任何因子加权都只是在负 alpha 集合内做相对排序",
+   "综合总分 T+1 IC=+0.019（NW t=1.32）未见显著正预测力",
+   "可交易口径（T+1 开盘买入扣20bp）IC=+0.010（NW t=0.63）不显著 → 前视修正后无可执行 alpha",
+   "可交易口径头部组净收益 -0.92%（持有 T+1）为负 → 买前排不赚钱",
+   "选股池本身系统性负超额：池内中位涨跌较全池低 -5.32pct（持有 20 日，96.7% 的入场日跑输）→ 池子选错了，任何因子加权都只是在负 alpha 集合内做相对排序",
    "存在 3 对高共线因子，综合权重虚增风险"
   ],
   "advice": "⚠️ 建议观望/不机械跟单：实测推荐跑输，综合分无显著正预测力；仅基本面 score_fund 经 Bonferroni 验证有效（T+5 IC=+0.075）。已切『基本面主导』口径（v3.6-fund-led），但须注意选股池本身的负超额问题——该问题无法靠调权重解决，需改造入选规则。"
  },
  "current_weights_composite_ic": {
   "1": {
-   "n": 78,
+   "n": 80,
    "dates": [
     "2026-06-26",
     "2026-06-29",
@@ -6980,7 +7207,9 @@
     "2026-10-20",
     "2026-10-21",
     "2026-10-22",
-    "2026-10-23"
+    "2026-10-23",
+    "2026-10-26",
+    "2026-10-27"
    ],
    "ic_series": [
     -0.0376,
@@ -7060,45 +7289,47 @@
     0.1137,
     -0.0476,
     0.1494,
-    -0.2029
+    -0.2029,
+    -0.0628,
+    0.1538
    ],
-   "ic_mean": 0.0467,
-   "ic_std": 0.1283,
-   "t_stat": 3.21,
-   "nw_t": 3.23,
+   "ic_mean": 0.0466,
+   "ic_std": 0.1278,
+   "t_stat": 3.26,
+   "nw_t": 3.28,
    "bonferroni_sig": true,
    "nw_lag": 0,
    "nw_sensitivity": {
     "t_by_lag": {
-     "0": 3.23,
-     "1": 3.24,
-     "2": 3.21,
-     "3": 3.34,
-     "4": 3.53,
-     "6": 3.88,
-     "8": 3.98,
-     "12": 4.08,
-     "19": 4.3
+     "0": 3.28,
+     "1": 3.27,
+     "2": 3.27,
+     "3": 3.39,
+     "4": 3.6,
+     "6": 3.96,
+     "8": 4.06,
+     "12": 4.14,
+     "19": 4.37
     },
-    "t_min": 3.21,
-    "t_max": 4.3,
+    "t_min": 3.27,
+    "t_max": 4.37,
     "lag_andrews": 1,
-    "t_andrews": 3.24,
+    "t_andrews": 3.27,
     "robust_bonferroni": true,
     "flips": false
    },
    "robust_bonferroni": true,
-   "win_rate": 64.1,
-   "spread_mean": 0.303,
+   "win_rate": 63.7,
+   "spread_mean": 0.305,
    "subperiod": {
-    "first_half_mean": 0.0671,
-    "second_half_mean": 0.0262,
-    "sign_stable_pct": 64.1,
+    "first_half_mean": 0.0656,
+    "second_half_mean": 0.0277,
+    "sign_stable_pct": 63.7,
     "regime_shift": false
    }
   },
   "5": {
-   "n": 74,
+   "n": 76,
    "dates": [
     "2026-06-26",
     "2026-06-29",
@@ -7173,7 +7404,9 @@
     "2026-10-14",
     "2026-10-15",
     "2026-10-16",
-    "2026-10-19"
+    "2026-10-19",
+    "2026-10-20",
+    "2026-10-21"
    ],
    "ic_series": [
     0.0948,
@@ -7249,46 +7482,48 @@
     -0.0238,
     0.0751,
     0.1538,
-    0.0153
+    0.0153,
+    -0.1161,
+    -0.1839
    ],
-   "ic_mean": 0.0786,
-   "ic_std": 0.1095,
-   "t_stat": 6.17,
-   "nw_t": 4.27,
+   "ic_mean": 0.0726,
+   "ic_std": 0.1143,
+   "t_stat": 5.54,
+   "nw_t": 3.85,
    "bonferroni_sig": true,
    "nw_lag": 4,
    "nw_sensitivity": {
     "t_by_lag": {
-     "0": 6.22,
-     "1": 4.96,
-     "2": 4.48,
-     "3": 4.3,
-     "4": 4.27,
-     "6": 4.54,
-     "7": 4.74,
-     "8": 4.94,
-     "12": 5.42,
-     "19": 4.79
+     "0": 5.57,
+     "1": 4.44,
+     "2": 4.03,
+     "3": 3.88,
+     "4": 3.85,
+     "6": 4.0,
+     "7": 4.1,
+     "8": 4.18,
+     "12": 4.34,
+     "19": 3.83
     },
-    "t_min": 4.27,
-    "t_max": 6.22,
+    "t_min": 3.83,
+    "t_max": 5.57,
     "lag_andrews": 7,
-    "t_andrews": 4.74,
+    "t_andrews": 4.1,
     "robust_bonferroni": true,
     "flips": false
    },
    "robust_bonferroni": true,
-   "win_rate": 73.0,
-   "spread_mean": 1.497,
+   "win_rate": 71.1,
+   "spread_mean": 1.353,
    "subperiod": {
-    "first_half_mean": 0.1114,
-    "second_half_mean": 0.0458,
-    "sign_stable_pct": 73.0,
+    "first_half_mean": 0.1098,
+    "second_half_mean": 0.0354,
+    "sign_stable_pct": 71.1,
     "regime_shift": false
    }
   },
   "20": {
-   "n": 59,
+   "n": 61,
    "dates": [
     "2026-06-26",
     "2026-06-29",
@@ -7348,7 +7583,9 @@
     "2026-09-15",
     "2026-09-16",
     "2026-09-17",
-    "2026-09-18"
+    "2026-09-18",
+    "2026-09-21",
+    "2026-09-22"
    ],
    "ic_series": [
     0.2223,
@@ -7409,41 +7646,43 @@
     -0.1568,
     -0.0747,
     -0.0363,
-    0.0037
+    0.0037,
+    0.1608,
+    0.085
    ],
-   "ic_mean": 0.0839,
-   "ic_std": 0.1427,
-   "t_stat": 4.52,
-   "nw_t": 1.56,
+   "ic_mean": 0.0852,
+   "ic_std": 0.1407,
+   "t_stat": 4.73,
+   "nw_t": 1.65,
    "bonferroni_sig": false,
    "nw_lag": 19,
    "nw_sensitivity": {
     "t_by_lag": {
-     "0": 4.56,
-     "1": 3.35,
-     "2": 2.83,
-     "3": 2.52,
-     "4": 2.32,
-     "6": 2.07,
-     "8": 1.91,
-     "12": 1.73,
-     "15": 1.64,
-     "19": 1.56
+     "0": 4.77,
+     "1": 3.52,
+     "2": 2.97,
+     "3": 2.65,
+     "4": 2.44,
+     "6": 2.18,
+     "8": 2.02,
+     "12": 1.83,
+     "15": 1.74,
+     "19": 1.65
     },
-    "t_min": 1.56,
-    "t_max": 4.56,
+    "t_min": 1.65,
+    "t_max": 4.77,
     "lag_andrews": 15,
-    "t_andrews": 1.64,
+    "t_andrews": 1.74,
     "robust_bonferroni": false,
     "flips": true
    },
    "robust_bonferroni": false,
-   "win_rate": 72.9,
-   "spread_mean": 2.882,
+   "win_rate": 73.8,
+   "spread_mean": 2.887,
    "subperiod": {
-    "first_half_mean": 0.1812,
-    "second_half_mean": -0.0101,
-    "sign_stable_pct": 72.9,
+    "first_half_mean": 0.1788,
+    "second_half_mean": -0.0053,
+    "sign_stable_pct": 73.8,
     "regime_shift": true
    }
   }
@@ -7463,7 +7702,7 @@
   "score_theme_neg": 0.0
  },
  "notes": [
-  "有效截面 80 个交易日（2026-06-26 ~ 2026-10-27），剔除非交易日陈旧快照 7 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差；价格 store 日常自动增量刷新，--bootstrap-prices 全量重建）",
+  "有效截面 81 个交易日（2026-06-26 ~ 2026-10-28），剔除非交易日陈旧快照 7 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差；价格 store 日常自动增量刷新，--bootstrap-prices 全量重建）",
   "IC 衡量排序能力而非绝对收益；分层多空为未扣成本毛利口径",
   "TOP200 为高换手关注度筛选池：动量/关注型因子的负向 IC 更可能反映'关注度脉冲后的均值回复'，而非因子构造错误；解读时须结合本池的选择机制",
   "⚠️ total 的 IC 使用历史快照中「当时实际产出的 total 字段」，跨越 4→5→10 维三次口径变更，故 total IC 是分段混合口径的加权结果，不代表当前 v3.6 权重的真实预测力；评估当前权重应看 current_weights_composite_ic（按现权重重算）与 tradable_ic。",
@@ -7472,7 +7711,7 @@
  ],
  "weight_optimization": {
   "version": "v3.6-fund-led",
-  "fitted_at": "2026-10-27 16:12:53",
+  "fitted_at": "2026-10-28 17:02:33",
   "target_horizon": 1,
   "method": "v3.6 基本面主导: 以全样本可验证维度为主(fund/news)，反转块等权压缩消除共线性虚增，小样本维度降至地板; 走步验证(训练≥30截面,每5截面重拟,样本外比对); score_sector 有效样本<20 维持0.10(样本积累中)",
   "weights": {
@@ -7506,21 +7745,21 @@
    "oos_ic_new": null,
    "oos_t_new": null,
    "lambda": null,
-   "note": "十维池内截面 11 < MIN_TRAIN(30)，样本外观测不足 → 维持先验权重（每日重估登记，满 30 后自动启用走步验证）"
+   "note": "十维池内截面 12 < MIN_TRAIN(30)，样本外观测不足 → 维持先验权重（每日重估登记，满 30 后自动启用走步验证）"
   },
   "full_period_composite_ic": {
    "prior": {
     "1": {
-     "n": 9,
-     "ic_mean": -0.0087,
-     "nw_t": -0.19,
-     "win_rate": 55.6
+     "n": 11,
+     "ic_mean": 0.0011,
+     "nw_t": 0.03,
+     "win_rate": 54.5
     },
     "5": {
-     "n": 5,
-     "ic_mean": 0.0283,
-     "nw_t": 1.0,
-     "win_rate": 60.0
+     "n": 7,
+     "ic_mean": -0.0226,
+     "nw_t": -0.64,
+     "win_rate": 42.9
     },
     "20": {
      "n": 0,
@@ -7531,16 +7770,16 @@
    },
    "lam_best": {
     "1": {
-     "n": 9,
-     "ic_mean": -0.0087,
-     "nw_t": -0.19,
-     "win_rate": 55.6
+     "n": 11,
+     "ic_mean": 0.0011,
+     "nw_t": 0.03,
+     "win_rate": 54.5
     },
     "5": {
-     "n": 5,
-     "ic_mean": 0.0283,
-     "nw_t": 1.0,
-     "win_rate": 60.0
+     "n": 7,
+     "ic_mean": -0.0226,
+     "nw_t": -0.64,
+     "win_rate": 42.9
     },
     "20": {
      "n": 0,
@@ -7551,15 +7790,15 @@
    }
   },
   "factor_ic_target_h": {
-   "score_fund": -0.0118,
-   "score_news": 0.0002,
-   "score_oversold60": 0.0025,
-   "score_bias60": 0.0049,
-   "score_rsi_rev": -0.0238,
-   "score_vol_pulse": -0.0209,
-   "score_overbought": -0.0227,
-   "score_theme_intrinsic": -0.0445,
-   "score_attention": -0.036
+   "score_fund": -0.0051,
+   "score_news": 0.0083,
+   "score_oversold60": 0.011,
+   "score_bias60": 0.0155,
+   "score_rsi_rev": -0.011,
+   "score_vol_pulse": -0.0229,
+   "score_overbought": 0.0008,
+   "score_theme_intrinsic": -0.0503,
+   "score_attention": -0.0305
   },
   "lambda_scan": [
    {

@@ -1,0 +1,687 @@
+{
+ "date": "2026-10-28",
+ "generated_at": "2026-10-28 17:02:59",
+ "method": "multifactor-v2（权重由池内实证反推，非手填；v4.3 起只选当日现价在买入区间内的个股）",
+ "top": 10,
+ "n_eligible": 496,
+ "n_scored": 139,
+ "zone_filter": {
+  "enabled": true,
+  "rule": "现价须落在买入区间内（严格口径，容差仅吸收 2 位小数舍入：相对 0.1% 或绝对 1 分钱取大）；买区由 gen_report_top200.build_trade_plan 同源推导，多头取 ma5~ma10 回踩区、弱势取 ma10~ma20 企稳区",
+  "tolerance_pct": 0.001,
+  "tolerance_abs": 0.01,
+  "counts": {
+   "no_plan": 0,
+   "above_zone": 314,
+   "below_zone": 0,
+   "in_zone": 182
+  },
+  "note": "build_trade_plan 中 buy_hi = min(ref_hi, price)，即买区上限永不高于现价 → 「现价在买区内」的实质含义是**股价已回踩到均线带内**，而不是现价夹在区间上下限之间。price > buy_hi 即需等回踩，当日挂单成交不了。⚠️ v4.3 曾误用页面 `_mf_n_in` 的 ±2% 容差做剔除，导致现价越界 1.04% 的巨人网络被放进组合，已改为严格口径"
+ },
+ "zone_stats": {
+  "no_plan": 0,
+  "above_zone": 314,
+  "below_zone": 0,
+  "in_zone": 182
+ },
+ "weights": {
+  "score_fund": 0.7678,
+  "score_news": 0.2008,
+  "__rev__": 0.0314
+ },
+ "weight_reason": {
+  "score_fund": "t_min=2.81（T+1/T+5 均显著；但 T+20 t=1.97，长周期已明显衰减）",
+  "score_news": "t_min=1.47，但 T+20 t=0.39，长周期失效 → 砍半",
+  "__rev__": "块内 2 维均 t_min=0.23，仅 8 截面 → 折半"
+ },
+ "rev_parts": [
+  "score_oversold60",
+  "score_bias60"
+ ],
+ "ic_evidence": {
+  "score_fund": {
+   "1": {
+    "ic": 0.0402,
+    "t": 2.81,
+    "n": 80,
+    "wr": 58.8
+   },
+   "5": {
+    "ic": 0.0702,
+    "t": 3.22,
+    "n": 76,
+    "wr": 68.4
+   },
+   "20": {
+    "ic": 0.0965,
+    "t": 1.97,
+    "n": 61,
+    "wr": 73.8
+   }
+  },
+  "score_news": {
+   "1": {
+    "ic": 0.0431,
+    "t": 2.75,
+    "n": 80,
+    "wr": 58.8
+   },
+   "5": {
+    "ic": 0.0353,
+    "t": 1.47,
+    "n": 76,
+    "wr": 61.8
+   },
+   "20": {
+    "ic": 0.0116,
+    "t": 0.39,
+    "n": 61,
+    "wr": 59.0
+   }
+  },
+  "score_attention": {
+   "1": {
+    "ic": -0.0305,
+    "t": -1.52,
+    "n": 11,
+    "wr": 36.4
+   },
+   "5": {
+    "ic": -0.0861,
+    "t": -8.44,
+    "n": 7,
+    "wr": 0.0
+   }
+  },
+  "score_theme": {
+   "1": {
+    "ic": -0.0353,
+    "t": -1.79,
+    "n": 80,
+    "wr": 38.8
+   },
+   "5": {
+    "ic": -0.0661,
+    "t": -1.69,
+    "n": 76,
+    "wr": 36.8
+   },
+   "20": {
+    "ic": -0.1118,
+    "t": -2.9,
+    "n": 61,
+    "wr": 23.0
+   }
+  },
+  "score_sector": {
+   "1": {
+    "ic": 0.0114,
+    "t": 0.39,
+    "n": 21,
+    "wr": 57.1
+   },
+   "5": {
+    "ic": -0.0225,
+    "t": -0.75,
+    "n": 17,
+    "wr": 35.3
+   },
+   "20": {
+    "ic": 0.0042,
+    "t": null,
+    "n": 2,
+    "wr": 50.0
+   }
+  },
+  "score_tech": {
+   "1": {
+    "ic": -0.0324,
+    "t": -1.87,
+    "n": 80,
+    "wr": 37.5
+   },
+   "5": {
+    "ic": -0.0499,
+    "t": -1.59,
+    "n": 76,
+    "wr": 34.2
+   },
+   "20": {
+    "ic": -0.0448,
+    "t": -1.57,
+    "n": 61,
+    "wr": 32.8
+   }
+  }
+ },
+ "drop_rules": {
+  "score_attention": "分位 >= 80% 剔除",
+  "score_theme": "分位 >= 80% 剔除"
+ },
+ "excluded": {
+  "现价不在买入区间": 204,
+  "关注度过高(attention 前20%)": 100,
+  "题材过热(theme 前20%)": 52,
+  "RSI>70 追高": 1
+ },
+ "eligibility_dropped": {},
+ "capped": [
+  {
+   "name": "中化国际",
+   "reason": "一级行业 基础化工 已满 2"
+  },
+  {
+   "name": "卫星化学",
+   "reason": "一级行业 基础化工 已满 2"
+  }
+ ],
+ "picks": [
+  {
+   "name": "荣盛石化",
+   "code": "sz002493",
+   "sector_l2": "炼化及贸易",
+   "sector_parent": "石油石化",
+   "price": 11.77,
+   "pct_chg": 0.94,
+   "total": 66.52,
+   "rating": "A",
+   "mf_score": 0.89,
+   "parts": {
+    "fund_pct": 91.5,
+    "news_pct": 87.1,
+    "rev_pct": 39.8,
+    "att_pct": 70.5,
+    "thm_pct": 57.0
+   },
+   "plan": {
+    "buy_lo": 11.6,
+    "buy_hi": 11.77,
+    "stop": 10.59,
+    "target": 13.05,
+    "rr": 1.0847457627118657,
+    "entry_ref": 11.77,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.7,
+   "score_news": 0.65,
+   "score_theme": 2.52,
+   "score_attention": 3.53,
+   "score_sector": 2.64,
+   "rsi": 40.6,
+   "trend": "偏空",
+   "fwd_pe": 13.2,
+   "growth": 370.0,
+   "circ_mv_yi": 1101.93,
+   "mom5": 1.2,
+   "mom20": -10.4,
+   "fund_reasons": [
+    "低基数失真修正: 单点增速641%→370%(超出三年CAGR=-23.4%可支持上限,已饱和)",
+    "低估值(FwdPE=13.2)+高增长(+370%)",
+    "估值阶梯合理收缩(13.2→11.7→10.3),3年收缩22%"
+   ],
+   "news_reasons": [
+    "财报披露(定期报告,中性)",
+    "近7日研报覆盖×2篇(机构关注度高)"
+   ]
+  },
+  {
+   "name": "永和股份",
+   "code": "sh605020",
+   "sector_l2": "化学制品",
+   "sector_parent": "基础化工",
+   "price": 28.66,
+   "pct_chg": 2.94,
+   "total": 77.28,
+   "rating": "A",
+   "mf_score": 0.8723,
+   "parts": {
+    "fund_pct": 90.3,
+    "news_pct": 79.0,
+    "rev_pct": 64.8,
+    "att_pct": 46.5,
+    "thm_pct": 44.4
+   },
+   "plan": {
+    "buy_lo": 28.3,
+    "buy_hi": 28.66,
+    "stop": 26.55,
+    "target": 31.55,
+    "rr": 1.3696682464454983,
+    "entry_ref": 28.66,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.7,
+   "score_news": 0.5,
+   "score_theme": 2.35,
+   "score_attention": 2.33,
+   "score_sector": 2.92,
+   "rsi": 43.3,
+   "trend": "双线空头",
+   "fwd_pe": 13.7,
+   "growth": 78.7,
+   "circ_mv_yi": 146.4,
+   "mom5": -0.6,
+   "mom20": -8.3,
+   "fund_reasons": [
+    "低估值(FwdPE=13.7)+高增长(+79%)",
+    "估值阶梯合理收缩(13.7→11.3→9.7),3年收缩29%",
+    "PEG=0.17(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "公告确认:利好事件",
+    "消息时效:近7日有公告"
+   ]
+  },
+  {
+   "name": "兴发集团",
+   "code": "sh600141",
+   "sector_l2": "农化制品",
+   "sector_parent": "基础化工",
+   "price": 23.81,
+   "pct_chg": 1.36,
+   "total": 84.19,
+   "rating": "A",
+   "mf_score": 0.8622,
+   "parts": {
+    "fund_pct": 83.2,
+    "news_pct": 98.4,
+    "rev_pct": 81.4,
+    "att_pct": 59.4,
+    "thm_pct": 56.6
+   },
+   "plan": {
+    "buy_lo": 23.5,
+    "buy_hi": 23.81,
+    "stop": 22.31,
+    "target": 28.61,
+    "rr": 3.2000000000000006,
+    "entry_ref": 23.81,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.5,
+   "score_news": 3.5,
+   "score_theme": 2.52,
+   "score_attention": 2.97,
+   "score_sector": 3.28,
+   "rsi": 35.7,
+   "trend": "周线空头",
+   "fwd_pe": 13.9,
+   "growth": 30.9,
+   "circ_mv_yi": 284.81,
+   "mom5": -0.2,
+   "mom20": -18.4,
+   "fund_reasons": [
+    "合理估值(FwdPE=13.9)+高增长(+31%)",
+    "估值阶梯合理收缩(13.9→11.4→9.8),3年收缩29%",
+    "PEG=0.45(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "磷化工龙头+有机硅+电子化学品",
+    "⚠️磷化工周期+环保政策"
+   ]
+  },
+  {
+   "name": "东方证券",
+   "code": "sh600958",
+   "sector_l2": "证券Ⅱ",
+   "sector_parent": "非银金融",
+   "price": 8.37,
+   "pct_chg": -1.3,
+   "total": 70.06,
+   "rating": "A",
+   "mf_score": 0.8457,
+   "parts": {
+    "fund_pct": 86.9,
+    "news_pct": 80.8,
+    "rev_pct": 52.3,
+    "att_pct": 56.6,
+    "thm_pct": 12.7
+   },
+   "plan": {
+    "buy_lo": 8.29,
+    "buy_hi": 8.37,
+    "stop": 8.16,
+    "target": 8.92,
+    "rr": 2.619047619047634,
+    "entry_ref": 8.37,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.6,
+   "score_news": 0.5,
+   "score_theme": 1.87,
+   "score_attention": 2.83,
+   "score_sector": 3.36,
+   "rsi": 37.0,
+   "trend": "双线空头",
+   "fwd_pe": 10.2,
+   "growth": 31.0,
+   "circ_mv_yi": 625.2,
+   "mom5": 0.0,
+   "mom20": -6.7,
+   "fund_reasons": [
+    "合理估值(FwdPE=10.2)+高增长(+31%)",
+    "估值阶梯合理收缩(10.2→9.4→8.5),3年收缩17%",
+    "PEG=0.33(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "公告确认:利好事件",
+    "消息时效:近7日有公告"
+   ]
+  },
+  {
+   "name": "上海家化",
+   "code": "sh600315",
+   "sector_l2": "化妆品",
+   "sector_parent": "美容护理",
+   "price": 17.45,
+   "pct_chg": -2.89,
+   "total": 76.78,
+   "rating": "A",
+   "mf_score": 0.842,
+   "parts": {
+    "fund_pct": 85.3,
+    "news_pct": 87.7,
+    "rev_pct": 36.4,
+    "att_pct": 62.4,
+    "thm_pct": 7.5
+   },
+   "plan": {
+    "buy_lo": 17.29,
+    "buy_hi": 17.45,
+    "stop": 17.01,
+    "target": 18.1,
+    "rr": 1.4772727272727397,
+    "entry_ref": 17.45,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.52,
+   "score_news": 0.8,
+   "score_theme": 1.73,
+   "score_attention": 3.12,
+   "score_sector": 3.28,
+   "rsi": 40.5,
+   "trend": "周线多头",
+   "fwd_pe": 20.2,
+   "growth": 63.0,
+   "circ_mv_yi": 117.3,
+   "mom5": -3.5,
+   "mom20": -5.3,
+   "fund_reasons": [
+    "估值合理(FwdPE=20.2)+增速(+63%)",
+    "估值阶梯收缩不足(20.2→20.4→18.0),3年仅收缩11%",
+    "PEG=0.32(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "财报披露(定期报告,中性)",
+    "近7日研报覆盖×3篇(机构关注度高)"
+   ]
+  },
+  {
+   "name": "盛新锂能",
+   "code": "sz002240",
+   "sector_l2": "能源金属",
+   "sector_parent": "有色金属",
+   "price": 19.91,
+   "pct_chg": 0.45,
+   "total": 88.56,
+   "rating": "S",
+   "mf_score": 0.822,
+   "parts": {
+    "fund_pct": 77.6,
+    "news_pct": 97.8,
+    "rev_pct": 95.8,
+    "att_pct": 77.0,
+    "thm_pct": 42.0
+   },
+   "plan": {
+    "buy_lo": 19.69,
+    "buy_hi": 19.91,
+    "stop": 19.41,
+    "target": 27.14,
+    "rr": 14.46,
+    "entry_ref": 19.91,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.3,
+   "score_news": 3.5,
+   "score_theme": 2.32,
+   "score_attention": 3.85,
+   "score_sector": 3.28,
+   "rsi": 21.6,
+   "trend": "双线空头",
+   "fwd_pe": 9.2,
+   "growth": 276.9,
+   "circ_mv_yi": 181.74,
+   "mom5": -4.1,
+   "mom20": -27.5,
+   "fund_reasons": [
+    "低估值(FwdPE=9.2)+高增长(+277%)",
+    "估值阶梯明显收缩(9.2→8.5→5.8),3年收缩37%",
+    "PEG=0.03(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "锂矿+锂盐+新能源材料",
+    "⚠️锂价波动+产能释放压力"
+   ]
+  },
+  {
+   "name": "高德红外",
+   "code": "sz002414",
+   "sector_l2": "军工电子Ⅱ",
+   "sector_parent": "国防军工",
+   "price": 10.45,
+   "pct_chg": 1.36,
+   "total": 75.3,
+   "rating": "A",
+   "mf_score": 0.8064,
+   "parts": {
+    "fund_pct": 97.8,
+    "news_pct": 13.3,
+    "rev_pct": 91.9,
+    "att_pct": 63.8,
+    "thm_pct": 47.9
+   },
+   "plan": {
+    "buy_lo": 10.26,
+    "buy_hi": 10.45,
+    "stop": 10.16,
+    "target": 11.92,
+    "rr": 5.068965517241397,
+    "entry_ref": 10.45,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 5.0,
+   "score_news": 0.0,
+   "score_theme": 2.4,
+   "score_attention": 3.19,
+   "score_sector": 3.12,
+   "rsi": 32.9,
+   "trend": "双线空头",
+   "fwd_pe": 40.2,
+   "growth": 138.2,
+   "circ_mv_yi": 355.15,
+   "mom5": -4.0,
+   "mom20": -14.6,
+   "fund_reasons": [
+    "低基数失真修正: 单点增速767%→138%(超出三年CAGR=11.3%可支持上限,已饱和)",
+    "估值偏高(FwdPE=40.2)+适度增长(+138%)",
+    "估值阶梯明显收缩(40.2→31.7→22.3),3年收缩45%,高PE起始,阶梯加分受限"
+   ],
+   "news_reasons": [
+    "无真实新闻/催化剂",
+    "消息时效:近7日无消息"
+   ]
+  },
+  {
+   "name": "吉林敖东",
+   "code": "sz000623",
+   "sector_l2": "中药Ⅱ",
+   "sector_parent": "医药生物",
+   "price": 16.72,
+   "pct_chg": -0.42,
+   "total": 74.73,
+   "rating": "A",
+   "mf_score": 0.8001,
+   "parts": {
+    "fund_pct": 98.2,
+    "news_pct": 15.2,
+    "rev_pct": 50.5,
+    "att_pct": 16.0,
+    "thm_pct": 21.8
+   },
+   "plan": {
+    "buy_lo": 16.51,
+    "buy_hi": 16.72,
+    "stop": 16.3,
+    "target": 17.5,
+    "rr": 1.857142857142868,
+    "entry_ref": 16.72,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 5.0,
+   "score_news": 0.0,
+   "score_theme": 2.03,
+   "score_attention": 0.81,
+   "score_sector": 3.36,
+   "rsi": 40.1,
+   "trend": "双线空头",
+   "fwd_pe": 6.3,
+   "growth": 90.9,
+   "circ_mv_yi": 199.14,
+   "mom5": -0.6,
+   "mom20": -4.9,
+   "fund_reasons": [
+    "低估值(FwdPE=6.3)+高增长(+91%)",
+    "低估值(FwdPE=6.3)无阶梯数据,保守加分",
+    "PEG=0.07(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "无真实新闻/催化剂",
+    "消息时效:近7日无消息"
+   ]
+  },
+  {
+   "name": "洽洽食品",
+   "code": "sz002557",
+   "sector_l2": "休闲食品",
+   "sector_parent": "食品饮料",
+   "price": 18.15,
+   "pct_chg": -1.04,
+   "total": 77.34,
+   "rating": "A",
+   "mf_score": 0.7761,
+   "parts": {
+    "fund_pct": 96.8,
+    "news_pct": 10.9,
+    "rev_pct": 36.0,
+    "att_pct": 12.3,
+    "thm_pct": 16.4
+   },
+   "plan": {
+    "buy_lo": 17.73,
+    "buy_hi": 18.15,
+    "stop": 17.55,
+    "target": 18.89,
+    "rr": 1.233333333333341,
+    "entry_ref": 18.15,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 5.0,
+   "score_news": 0.0,
+   "score_theme": 1.94,
+   "score_attention": 0.63,
+   "score_sector": 2.2,
+   "rsi": 43.1,
+   "trend": "偏空",
+   "fwd_pe": 14.9,
+   "growth": 191.3,
+   "circ_mv_yi": 91.37,
+   "mom5": -3.3,
+   "mom20": -0.2,
+   "fund_reasons": [
+    "低估值(FwdPE=14.9)+高增长(+191%)",
+    "估值阶梯合理收缩(14.9→12.7→11.1),3年收缩26%",
+    "PEG=0.08(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "财报披露(定期报告,中性)",
+    "消息时效:近7日有公告"
+   ]
+  },
+  {
+   "name": "浙富控股",
+   "code": "sz002266",
+   "sector_l2": "环境治理",
+   "sector_parent": "环保",
+   "price": 3.87,
+   "pct_chg": 0.52,
+   "total": 80.52,
+   "rating": "A",
+   "mf_score": 0.7709,
+   "parts": {
+    "fund_pct": 95.6,
+    "news_pct": 5.7,
+    "rev_pct": 82.4,
+    "att_pct": 39.0,
+    "thm_pct": 28.1
+   },
+   "plan": {
+    "buy_lo": 3.83,
+    "buy_hi": 3.87,
+    "stop": 3.77,
+    "target": 4.0,
+    "rr": 1.2999999999999978,
+    "entry_ref": 3.87,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 5.0,
+   "score_news": 0.0,
+   "score_theme": 2.12,
+   "score_attention": 1.96,
+   "score_sector": 3.36,
+   "rsi": 27.9,
+   "trend": "双线空头",
+   "fwd_pe": 9.1,
+   "growth": 183.5,
+   "circ_mv_yi": 187.41,
+   "mom5": -7.2,
+   "mom20": -22.4,
+   "fund_reasons": [
+    "低估值(FwdPE=9.1)+高增长(+184%)",
+    "估值阶梯合理收缩(9.1→8.3→7.7),3年收缩15%",
+    "PEG=0.05(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "财报披露(定期报告,中性)",
+    "消息时效:近7日有公告"
+   ]
+  }
+ ],
+ "boundaries": [
+  "反转块仅 8 个截面 → 弱先验，不是已验证因子",
+  "score_sector 池内 IC 全周期不显著（T+1 t=0.29 / T+5 t=-1.20）→ 未作为选股轴",
+  "池内头组净收益历史上为负 → 组合≠赚钱，须配合仓位纪律与止损",
+  "组合仅表达「相对排序」，不构成个股推荐",
+  "v4.3 买区过滤的收益代价在噪声内（audit_round16 配对检验 |NW t| 最大 1.54 < 2），但把可执行性从「10 只中约 4 只可当日成交」提升到「全部可当日成交」"
+ ]
+}

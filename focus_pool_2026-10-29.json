@@ -1,0 +1,733 @@
+{
+ "date": "2026-10-29",
+ "generated_at": "2026-10-28 17:03:08",
+ "title": "每日 AI 焦点池",
+ "method": "机器源(东财人气榜/涨跌停池/强势股池) + 本地AI联网检索(题材催化/公告/政策/龙虎榜)",
+ "generated_by": "fetch_focus_list.py (互联网搜索: 东财人气榜/涨跌停池/强势股池 + Agent 检索)",
+ "sources_used": {
+  "hot_rank": 30,
+  "zt_pool": 72,
+  "dt_pool": 0,
+  "strong_pool": 20
+ },
+ "n_raw": 89,
+ "elapsed_s": 6.5,
+ "agent_search": {
+  "merged": false,
+  "n_additions": 0
+ },
+ "ai_summary": "",
+ "n_in_pool": 0,
+ "n_out_pool": 40,
+ "quote_source": null,
+ "quote_date": null,
+ "quote_ok": false,
+ "focus": [
+  {
+   "name": "襄阳轴承",
+   "code": "sz000678",
+   "score": 5.5,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第2位；涨停5连板 首板09:32",
+   "ai_reason": "",
+   "rank": 1,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "光洋股份",
+   "code": "sz002708",
+   "score": 4.5,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第4位；涨停3连板 首板09:30",
+   "ai_reason": "",
+   "rank": 2,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "青岛食品",
+   "code": "sz001219",
+   "score": 4.5,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第26位；涨停3连板 首板09:25",
+   "ai_reason": "",
+   "rank": 3,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "东贝集团",
+   "code": "sh601956",
+   "score": 4.0,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第16位；涨停2连板 首板09:30",
+   "ai_reason": "",
+   "rank": 4,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "茂业商业",
+   "code": "sh600828",
+   "score": 4.0,
+   "sources": [
+    "人气榜",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第23位；涨停2连板 首板09:56；强势股池（近期多次涨停）",
+   "ai_reason": "",
+   "rank": 5,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "万向钱潮",
+   "code": "sz000559",
+   "score": 3.5,
+   "sources": [
+    "人气榜",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第3位；涨停 首板09:44；强势股池（近期多次涨停）",
+   "ai_reason": "",
+   "rank": 6,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "五洲新春",
+   "code": "sh603667",
+   "score": 3.5,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第5位；涨停 首板09:33",
+   "ai_reason": "",
+   "rank": 7,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "金安国纪",
+   "code": "sz002636",
+   "score": 3.5,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第7位；涨停 首板09:25",
+   "ai_reason": "",
+   "rank": 8,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "方正科技",
+   "code": "sh600601",
+   "score": 3.5,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第10位；涨停 首板09:48",
+   "ai_reason": "",
+   "rank": 9,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "宁波东力",
+   "code": "sz002164",
+   "score": 3.5,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第17位；涨停 首板09:31",
+   "ai_reason": "",
+   "rank": 10,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "山东矿机",
+   "code": "sz002526",
+   "score": 3.5,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第18位；涨停 首板09:33",
+   "ai_reason": "",
+   "rank": 11,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "盈方微",
+   "code": "sz000670",
+   "score": 3.5,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第27位；涨停 首板09:37",
+   "ai_reason": "",
+   "rank": 12,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "豪恩汽电",
+   "code": "sz301488",
+   "score": 3.5,
+   "sources": [
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:30",
+   "ai_reason": "",
+   "rank": 13,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "联明股份",
+   "code": "sh603006",
+   "score": 3.5,
+   "sources": [
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:30",
+   "ai_reason": "",
+   "rank": 14,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "长城科技",
+   "code": "sh603897",
+   "score": 3.5,
+   "sources": [
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:30",
+   "ai_reason": "",
+   "rank": 15,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "索通发展",
+   "code": "sh603612",
+   "score": 3.5,
+   "sources": [
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:30",
+   "ai_reason": "",
+   "rank": 16,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "振邦智能",
+   "code": "sz003028",
+   "score": 3.5,
+   "sources": [
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:31；强势股池（60日新高）",
+   "ai_reason": "",
+   "rank": 17,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "澄星股份",
+   "code": "sh600078",
+   "score": 3.5,
+   "sources": [
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:31",
+   "ai_reason": "",
+   "rank": 18,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "东南电子",
+   "code": "sz301359",
+   "score": 3.5,
+   "sources": [
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:32",
+   "ai_reason": "",
+   "rank": 19,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "富瀚微",
+   "code": "sz300613",
+   "score": 3.5,
+   "sources": [
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:32",
+   "ai_reason": "",
+   "rank": 20,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "大丰实业",
+   "code": "sh603081",
+   "score": 3.5,
+   "sources": [
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:34；强势股池（近期多次涨停）",
+   "ai_reason": "",
+   "rank": 21,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "卧龙新能",
+   "code": "sh600173",
+   "score": 3.5,
+   "sources": [
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:34",
+   "ai_reason": "",
+   "rank": 22,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "神驰机电",
+   "code": "sh603109",
+   "score": 3.5,
+   "sources": [
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:35",
+   "ai_reason": "",
+   "rank": 23,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "飞科电器",
+   "code": "sh603868",
+   "score": 3.5,
+   "sources": [
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:37",
+   "ai_reason": "",
+   "rank": 24,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "徕木股份",
+   "code": "sh603633",
+   "score": 3.5,
+   "sources": [
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:38",
+   "ai_reason": "",
+   "rank": 25,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "旺成科技",
+   "code": "bj920896",
+   "score": 3.5,
+   "sources": [
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:46；强势股池（60日新高）",
+   "ai_reason": "",
+   "rank": 26,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "科森科技",
+   "code": "sh603626",
+   "score": 3.5,
+   "sources": [
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:47",
+   "ai_reason": "",
+   "rank": 27,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "光华科技",
+   "code": "sz002741",
+   "score": 3.5,
+   "sources": [
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:48",
+   "ai_reason": "",
+   "rank": 28,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "恒工精密",
+   "code": "sz301261",
+   "score": 3.5,
+   "sources": [
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:48；强势股池（60日新高）",
+   "ai_reason": "",
+   "rank": 29,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "富佳股份",
+   "code": "sh603219",
+   "score": 3.5,
+   "sources": [
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:49",
+   "ai_reason": "",
+   "rank": 30,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "凯迪股份",
+   "code": "sh605288",
+   "score": 3.5,
+   "sources": [
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:51",
+   "ai_reason": "",
+   "rank": 31,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "宇树科技-W",
+   "code": "sh688836",
+   "score": 3.0,
+   "sources": [
+    "人气榜"
+   ],
+   "reason": "东财人气榜第1位",
+   "ai_reason": "",
+   "rank": 32,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "文投控股",
+   "code": "sh600715",
+   "score": 3.0,
+   "sources": [
+    "人气榜",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第15位；涨停2连板 首板10:52；强势股池（60日新高且近期多次涨停）",
+   "ai_reason": "",
+   "rank": 33,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "凯众股份",
+   "code": "sh603037",
+   "score": 3.0,
+   "sources": [
+    "人气榜",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第22位；涨停2连板 首板10:14；强势股池（60日新高且近期多次涨停）",
+   "ai_reason": "",
+   "rank": 34,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "江顺科技",
+   "code": "sz001400",
+   "score": 3.0,
+   "sources": [
+    "涨停池"
+   ],
+   "reason": "涨停2连板 首板11:05",
+   "ai_reason": "",
+   "rank": 35,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "中际旭创",
+   "code": "sz300308",
+   "score": 2.5,
+   "sources": [
+    "人气榜"
+   ],
+   "reason": "东财人气榜第6位",
+   "ai_reason": "",
+   "rank": 36,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "百洋股份",
+   "code": "sz002696",
+   "score": 2.5,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第11位；涨停 首板14:49",
+   "ai_reason": "",
+   "rank": 37,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "澳洋健康",
+   "code": "sz002172",
+   "score": 2.5,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第13位；涨停 首板13:29",
+   "ai_reason": "",
+   "rank": 38,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "掌阅科技",
+   "code": "sh603533",
+   "score": 2.5,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第19位；涨停 首板10:49",
+   "ai_reason": "",
+   "rank": 39,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "上海沪工",
+   "code": "sh603131",
+   "score": 2.5,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第24位；涨停 首板11:04",
+   "ai_reason": "",
+   "rank": 40,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  }
+ ]
+}
