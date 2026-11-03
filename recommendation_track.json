@@ -54294,6 +54294,6106 @@
     "5": null,
     "20": null
    }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "中嘉博创",
+   "code": "sz000889",
+   "base_price": 2.92,
+   "total": 95.59,
+   "date": "2026-11-03",
+   "pick_price": 2.92,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "长裕集团",
+   "code": "sh603407",
+   "base_price": 40.11,
+   "total": 94.41,
+   "date": "2026-11-03",
+   "pick_price": 40.11,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "阿拉丁",
+   "code": "sh688179",
+   "base_price": 13.6,
+   "total": 94.33,
+   "date": "2026-11-03",
+   "pick_price": 13.6,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "同宇新材",
+   "code": "sz301630",
+   "base_price": 144.25,
+   "total": 93.06,
+   "date": "2026-11-03",
+   "pick_price": 144.25,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "蜀道装备",
+   "code": "sz300540",
+   "base_price": 19.09,
+   "total": 92.48,
+   "date": "2026-11-03",
+   "pick_price": 19.09,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "敦煌种业",
+   "code": "sh600354",
+   "base_price": 6.75,
+   "total": 92.28,
+   "date": "2026-11-03",
+   "pick_price": 6.75,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "鸿仕达",
+   "code": "sz920125",
+   "base_price": 90.4,
+   "total": 91.82,
+   "date": "2026-11-03",
+   "pick_price": 90.4,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "隆达股份",
+   "code": "sh688231",
+   "base_price": 18.23,
+   "total": 91.22,
+   "date": "2026-11-03",
+   "pick_price": 18.23,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "宝光股份",
+   "code": "sh600379",
+   "base_price": 10.63,
+   "total": 90.24,
+   "date": "2026-11-03",
+   "pick_price": 10.63,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "嘉元科技",
+   "code": "sh688388",
+   "base_price": 20.34,
+   "total": 90.22,
+   "date": "2026-11-03",
+   "pick_price": 20.34,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "阿石创",
+   "code": "sz300706",
+   "base_price": 34.93,
+   "total": 89.31,
+   "date": "2026-11-03",
+   "pick_price": 34.93,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "百奥赛图",
+   "code": "sh688796",
+   "base_price": 71.3,
+   "total": 89.09,
+   "date": "2026-11-03",
+   "pick_price": 71.3,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "瑞迈特",
+   "code": "sz301367",
+   "base_price": 39.47,
+   "total": 88.49,
+   "date": "2026-11-03",
+   "pick_price": 39.47,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "汉森制药",
+   "code": "sz002412",
+   "base_price": 7.67,
+   "total": 88.17,
+   "date": "2026-11-03",
+   "pick_price": 7.67,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "金百泽",
+   "code": "sz301041",
+   "base_price": 26.85,
+   "total": 87.95,
+   "date": "2026-11-03",
+   "pick_price": 26.85,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "中邮科技",
+   "code": "sh688648",
+   "base_price": 28.11,
+   "total": 87.77,
+   "date": "2026-11-03",
+   "pick_price": 28.11,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "赛诺医疗",
+   "code": "sh688108",
+   "base_price": 12.69,
+   "total": 87.27,
+   "date": "2026-11-03",
+   "pick_price": 12.69,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "德福科技",
+   "code": "sz301511",
+   "base_price": 48.86,
+   "total": 87.22,
+   "date": "2026-11-03",
+   "pick_price": 48.86,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "银禧科技",
+   "code": "sz300221",
+   "base_price": 9.06,
+   "total": 87.22,
+   "date": "2026-11-03",
+   "pick_price": 9.06,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "甘化科工",
+   "code": "sz000576",
+   "base_price": 7.2,
+   "total": 87.06,
+   "date": "2026-11-03",
+   "pick_price": 7.2,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "德龙激光",
+   "code": "sh688170",
+   "base_price": 44.2,
+   "total": 86.69,
+   "date": "2026-11-03",
+   "pick_price": 44.2,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "中科仪",
+   "code": "sz920186",
+   "base_price": 52.31,
+   "total": 86.49,
+   "date": "2026-11-03",
+   "pick_price": 52.31,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "圣邦股份",
+   "code": "sz300661",
+   "base_price": 75.0,
+   "total": 86.36,
+   "date": "2026-11-03",
+   "pick_price": 75.0,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "大恒科技",
+   "code": "sh600288",
+   "base_price": 9.68,
+   "total": 86.36,
+   "date": "2026-11-03",
+   "pick_price": 9.68,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "东方铁塔",
+   "code": "sz002545",
+   "base_price": 11.39,
+   "total": 85.47,
+   "date": "2026-11-03",
+   "pick_price": 11.39,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "国际复材",
+   "code": "sz301526",
+   "base_price": 19.2,
+   "total": 85.24,
+   "date": "2026-11-03",
+   "pick_price": 19.2,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "金杨精密",
+   "code": "sz301210",
+   "base_price": 30.48,
+   "total": 85.14,
+   "date": "2026-11-03",
+   "pick_price": 30.48,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "S",
+   "name": "云汉芯城",
+   "code": "sz301563",
+   "base_price": 96.42,
+   "total": 85.08,
+   "date": "2026-11-03",
+   "pick_price": 96.42,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "中天科技",
+   "code": "sh600522",
+   "base_price": 22.48,
+   "total": 84.68,
+   "date": "2026-11-03",
+   "pick_price": 22.48,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "任子行",
+   "code": "sz300311",
+   "base_price": 4.76,
+   "total": 84.37,
+   "date": "2026-11-03",
+   "pick_price": 4.76,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "洪通燃气",
+   "code": "sh605169",
+   "base_price": 12.27,
+   "total": 84.33,
+   "date": "2026-11-03",
+   "pick_price": 12.27,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "永安药业",
+   "code": "sz002365",
+   "base_price": 12.0,
+   "total": 84.28,
+   "date": "2026-11-03",
+   "pick_price": 12.0,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "台华新材",
+   "code": "sh603055",
+   "base_price": 8.28,
+   "total": 84.19,
+   "date": "2026-11-03",
+   "pick_price": 8.28,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "江丰电子",
+   "code": "sz300666",
+   "base_price": 154.61,
+   "total": 84.08,
+   "date": "2026-11-03",
+   "pick_price": 154.61,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "宏英智能",
+   "code": "sz001266",
+   "base_price": 34.68,
+   "total": 84.05,
+   "date": "2026-11-03",
+   "pick_price": 34.68,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "万顺新材",
+   "code": "sz300057",
+   "base_price": 5.17,
+   "total": 83.93,
+   "date": "2026-11-03",
+   "pick_price": 5.17,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "纽威数控",
+   "code": "sh688697",
+   "base_price": 11.21,
+   "total": 83.92,
+   "date": "2026-11-03",
+   "pick_price": 11.21,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "远东股份",
+   "code": "sh600869",
+   "base_price": 13.22,
+   "total": 83.76,
+   "date": "2026-11-03",
+   "pick_price": 13.22,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "润欣科技",
+   "code": "sz300493",
+   "base_price": 11.01,
+   "total": 83.67,
+   "date": "2026-11-03",
+   "pick_price": 11.01,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "灵康药业",
+   "code": "sh603669",
+   "base_price": 5.19,
+   "total": 83.67,
+   "date": "2026-11-03",
+   "pick_price": 5.19,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "铭普光磁",
+   "code": "sz002902",
+   "base_price": 18.47,
+   "total": 83.41,
+   "date": "2026-11-03",
+   "pick_price": 18.47,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "固德威",
+   "code": "sh688390",
+   "base_price": 47.96,
+   "total": 83.4,
+   "date": "2026-11-03",
+   "pick_price": 47.96,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "北陆药业",
+   "code": "sz300016",
+   "base_price": 7.85,
+   "total": 83.38,
+   "date": "2026-11-03",
+   "pick_price": 7.85,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "潍柴重机",
+   "code": "sz000880",
+   "base_price": 19.73,
+   "total": 83.2,
+   "date": "2026-11-03",
+   "pick_price": 19.73,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "博杰股份",
+   "code": "sz002975",
+   "base_price": 70.3,
+   "total": 83.05,
+   "date": "2026-11-03",
+   "pick_price": 70.3,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "智微智能",
+   "code": "sz001339",
+   "base_price": 51.91,
+   "total": 83.04,
+   "date": "2026-11-03",
+   "pick_price": 51.91,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "德邦科技",
+   "code": "sh688035",
+   "base_price": 48.33,
+   "total": 83.01,
+   "date": "2026-11-03",
+   "pick_price": 48.33,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "新益昌",
+   "code": "sh688383",
+   "base_price": 71.49,
+   "total": 82.84,
+   "date": "2026-11-03",
+   "pick_price": 71.49,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "广西能源",
+   "code": "sh600310",
+   "base_price": 4.16,
+   "total": 82.82,
+   "date": "2026-11-03",
+   "pick_price": 4.16,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "金禄电子",
+   "code": "sz301282",
+   "base_price": 32.22,
+   "total": 82.66,
+   "date": "2026-11-03",
+   "pick_price": 32.22,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "晨丰科技",
+   "code": "sh603685",
+   "base_price": 24.07,
+   "total": 82.6,
+   "date": "2026-11-03",
+   "pick_price": 24.07,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "华新科技",
+   "code": "sz301265",
+   "base_price": 19.84,
+   "total": 82.47,
+   "date": "2026-11-03",
+   "pick_price": 19.84,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "松霖科技",
+   "code": "sh603992",
+   "base_price": 19.95,
+   "total": 82.2,
+   "date": "2026-11-03",
+   "pick_price": 19.95,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "联讯仪器",
+   "code": "sh688808",
+   "base_price": 831.0,
+   "total": 82.07,
+   "date": "2026-11-03",
+   "pick_price": 831.0,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "思泉新材",
+   "code": "sz301489",
+   "base_price": 72.22,
+   "total": 82.03,
+   "date": "2026-11-03",
+   "pick_price": 72.22,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "安凯微",
+   "code": "sh688620",
+   "base_price": 11.22,
+   "total": 81.96,
+   "date": "2026-11-03",
+   "pick_price": 11.22,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "沪电股份",
+   "code": "sz002463",
+   "base_price": 78.14,
+   "total": 81.91,
+   "date": "2026-11-03",
+   "pick_price": 78.14,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "三环集团",
+   "code": "sz300408",
+   "base_price": 68.92,
+   "total": 81.86,
+   "date": "2026-11-03",
+   "pick_price": 68.92,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "协创数据",
+   "code": "sz300857",
+   "base_price": 138.02,
+   "total": 81.77,
+   "date": "2026-11-03",
+   "pick_price": 138.02,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "汽轮科技",
+   "code": "sz300277",
+   "base_price": 10.94,
+   "total": 81.68,
+   "date": "2026-11-03",
+   "pick_price": 10.94,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "盛达资源",
+   "code": "sz000603",
+   "base_price": 21.53,
+   "total": 81.64,
+   "date": "2026-11-03",
+   "pick_price": 21.53,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "采纳股份",
+   "code": "sz301122",
+   "base_price": 48.25,
+   "total": 81.58,
+   "date": "2026-11-03",
+   "pick_price": 48.25,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "联化科技",
+   "code": "sz002250",
+   "base_price": 13.55,
+   "total": 81.53,
+   "date": "2026-11-03",
+   "pick_price": 13.55,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "怡球资源",
+   "code": "sh601388",
+   "base_price": 2.98,
+   "total": 81.53,
+   "date": "2026-11-03",
+   "pick_price": 2.98,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "逸豪新材",
+   "code": "sz301176",
+   "base_price": 35.3,
+   "total": 81.31,
+   "date": "2026-11-03",
+   "pick_price": 35.3,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "德赛电池",
+   "code": "sz000049",
+   "base_price": 20.68,
+   "total": 81.21,
+   "date": "2026-11-03",
+   "pick_price": 20.68,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "腾信精密",
+   "code": "sz920298",
+   "base_price": 72.77,
+   "total": 81.18,
+   "date": "2026-11-03",
+   "pick_price": 72.77,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "菲利华",
+   "code": "sz300395",
+   "base_price": 62.58,
+   "total": 81.13,
+   "date": "2026-11-03",
+   "pick_price": 62.58,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "飞凯材料",
+   "code": "sz300398",
+   "base_price": 26.72,
+   "total": 81.11,
+   "date": "2026-11-03",
+   "pick_price": 26.72,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "泰金新能",
+   "code": "sh688813",
+   "base_price": 76.61,
+   "total": 81.03,
+   "date": "2026-11-03",
+   "pick_price": 76.61,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "华正新材",
+   "code": "sh603186",
+   "base_price": 132.02,
+   "total": 80.9,
+   "date": "2026-11-03",
+   "pick_price": 132.02,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "欧莱新材",
+   "code": "sh688530",
+   "base_price": 37.51,
+   "total": 80.77,
+   "date": "2026-11-03",
+   "pick_price": 37.51,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "英集芯",
+   "code": "sh688209",
+   "base_price": 21.89,
+   "total": 80.61,
+   "date": "2026-11-03",
+   "pick_price": 21.89,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "澜起科技",
+   "code": "sh688008",
+   "base_price": 150.01,
+   "total": 80.55,
+   "date": "2026-11-03",
+   "pick_price": 150.01,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "广合科技",
+   "code": "sz001389",
+   "base_price": 82.03,
+   "total": 80.45,
+   "date": "2026-11-03",
+   "pick_price": 82.03,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "源杰科技",
+   "code": "sh688498",
+   "base_price": 604.9,
+   "total": 80.33,
+   "date": "2026-11-03",
+   "pick_price": 604.9,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "日海智能",
+   "code": "sz002313",
+   "base_price": 7.73,
+   "total": 80.23,
+   "date": "2026-11-03",
+   "pick_price": 7.73,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "鼎龙股份",
+   "code": "sz300054",
+   "base_price": 54.2,
+   "total": 80.0,
+   "date": "2026-11-03",
+   "pick_price": 54.2,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "海目星",
+   "code": "sh688559",
+   "base_price": 36.47,
+   "total": 79.79,
+   "date": "2026-11-03",
+   "pick_price": 36.47,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "四会富仕",
+   "code": "sz300852",
+   "base_price": 49.75,
+   "total": 79.78,
+   "date": "2026-11-03",
+   "pick_price": 49.75,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "南大光电",
+   "code": "sz300346",
+   "base_price": 36.73,
+   "total": 79.74,
+   "date": "2026-11-03",
+   "pick_price": 36.73,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "川能动力",
+   "code": "sz000155",
+   "base_price": 8.85,
+   "total": 79.57,
+   "date": "2026-11-03",
+   "pick_price": 8.85,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "博通集成",
+   "code": "sh603068",
+   "base_price": 31.63,
+   "total": 79.44,
+   "date": "2026-11-03",
+   "pick_price": 31.63,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "图南股份",
+   "code": "sz300855",
+   "base_price": 29.1,
+   "total": 79.41,
+   "date": "2026-11-03",
+   "pick_price": 29.1,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "厦门港务",
+   "code": "sz000905",
+   "base_price": 8.23,
+   "total": 79.4,
+   "date": "2026-11-03",
+   "pick_price": 8.23,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "永创智能",
+   "code": "sh603901",
+   "base_price": 9.95,
+   "total": 79.34,
+   "date": "2026-11-03",
+   "pick_price": 9.95,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "时空科技",
+   "code": "sh605178",
+   "base_price": 51.16,
+   "total": 79.26,
+   "date": "2026-11-03",
+   "pick_price": 51.16,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "药康生物",
+   "code": "sh688046",
+   "base_price": 27.15,
+   "total": 79.24,
+   "date": "2026-11-03",
+   "pick_price": 27.15,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "科泰电源",
+   "code": "sz300153",
+   "base_price": 21.41,
+   "total": 79.14,
+   "date": "2026-11-03",
+   "pick_price": 21.41,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "鹏欣资源",
+   "code": "sh600490",
+   "base_price": 5.24,
+   "total": 79.09,
+   "date": "2026-11-03",
+   "pick_price": 5.24,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "三只松鼠",
+   "code": "sz300783",
+   "base_price": 17.21,
+   "total": 78.96,
+   "date": "2026-11-03",
+   "pick_price": 17.21,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "钧崴电子",
+   "code": "sz301458",
+   "base_price": 28.86,
+   "total": 78.9,
+   "date": "2026-11-03",
+   "pick_price": 28.86,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "深科技",
+   "code": "sz000021",
+   "base_price": 24.54,
+   "total": 78.83,
+   "date": "2026-11-03",
+   "pick_price": 24.54,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "章源钨业",
+   "code": "sz002378",
+   "base_price": 16.77,
+   "total": 78.82,
+   "date": "2026-11-03",
+   "pick_price": 16.77,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "华自科技",
+   "code": "sz300490",
+   "base_price": 8.28,
+   "total": 78.67,
+   "date": "2026-11-03",
+   "pick_price": 8.28,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "兰花科创",
+   "code": "sh600123",
+   "base_price": 6.24,
+   "total": 78.63,
+   "date": "2026-11-03",
+   "pick_price": 6.24,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "东材科技",
+   "code": "sh601208",
+   "base_price": 30.28,
+   "total": 78.58,
+   "date": "2026-11-03",
+   "pick_price": 30.28,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "卓易信息",
+   "code": "sh688258",
+   "base_price": 71.26,
+   "total": 78.58,
+   "date": "2026-11-03",
+   "pick_price": 71.26,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "星宸科技",
+   "code": "sz301536",
+   "base_price": 78.61,
+   "total": 78.48,
+   "date": "2026-11-03",
+   "pick_price": 78.61,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "永和股份",
+   "code": "sh605020",
+   "base_price": 27.56,
+   "total": 78.45,
+   "date": "2026-11-03",
+   "pick_price": 27.56,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "跨境通",
+   "code": "sz002640",
+   "base_price": 3.14,
+   "total": 78.42,
+   "date": "2026-11-03",
+   "pick_price": 3.14,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "派斯林",
+   "code": "sh600215",
+   "base_price": 6.0,
+   "total": 78.2,
+   "date": "2026-11-03",
+   "pick_price": 6.0,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "王子新材",
+   "code": "sz002735",
+   "base_price": 9.13,
+   "total": 78.08,
+   "date": "2026-11-03",
+   "pick_price": 9.13,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "四方达",
+   "code": "sz300179",
+   "base_price": 24.25,
+   "total": 77.92,
+   "date": "2026-11-03",
+   "pick_price": 24.25,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "联合光电",
+   "code": "sz300691",
+   "base_price": 13.26,
+   "total": 77.83,
+   "date": "2026-11-03",
+   "pick_price": 13.26,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "善水科技",
+   "code": "sz301190",
+   "base_price": 30.81,
+   "total": 77.75,
+   "date": "2026-11-03",
+   "pick_price": 30.81,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "药明康德",
+   "code": "sh603259",
+   "base_price": 135.28,
+   "total": 77.72,
+   "date": "2026-11-03",
+   "pick_price": 135.28,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "天创股份",
+   "code": "sh603608",
+   "base_price": 15.95,
+   "total": 77.67,
+   "date": "2026-11-03",
+   "pick_price": 15.95,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "华天科技",
+   "code": "sz002185",
+   "base_price": 13.88,
+   "total": 77.62,
+   "date": "2026-11-03",
+   "pick_price": 13.88,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "赢合科技",
+   "code": "sz300457",
+   "base_price": 18.31,
+   "total": 77.55,
+   "date": "2026-11-03",
+   "pick_price": 18.31,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "永兴材料",
+   "code": "sz002756",
+   "base_price": 34.7,
+   "total": 77.54,
+   "date": "2026-11-03",
+   "pick_price": 34.7,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "方盛制药",
+   "code": "sh603998",
+   "base_price": 10.1,
+   "total": 77.45,
+   "date": "2026-11-03",
+   "pick_price": 10.1,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "金海通",
+   "code": "sh603061",
+   "base_price": 207.9,
+   "total": 77.43,
+   "date": "2026-11-03",
+   "pick_price": 207.9,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "丽人丽妆",
+   "code": "sh605136",
+   "base_price": 8.68,
+   "total": 77.38,
+   "date": "2026-11-03",
+   "pick_price": 8.68,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "蘅东光",
+   "code": "sz920045",
+   "base_price": 300.5,
+   "total": 77.28,
+   "date": "2026-11-03",
+   "pick_price": 300.5,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "通合科技",
+   "code": "sz300491",
+   "base_price": 20.32,
+   "total": 77.26,
+   "date": "2026-11-03",
+   "pick_price": 20.32,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "联赢激光",
+   "code": "sh688518",
+   "base_price": 20.35,
+   "total": 77.25,
+   "date": "2026-11-03",
+   "pick_price": 20.35,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "顶点软件",
+   "code": "sh603383",
+   "base_price": 27.13,
+   "total": 77.17,
+   "date": "2026-11-03",
+   "pick_price": 27.13,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "鸿富诚",
+   "code": "sz301716",
+   "base_price": 400.05,
+   "total": 77.16,
+   "date": "2026-11-03",
+   "pick_price": 400.05,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "武汉凡谷",
+   "code": "sz002194",
+   "base_price": 8.79,
+   "total": 77.03,
+   "date": "2026-11-03",
+   "pick_price": 8.79,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "品高股份",
+   "code": "sh688227",
+   "base_price": 56.86,
+   "total": 77.02,
+   "date": "2026-11-03",
+   "pick_price": 56.86,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "亚钾国际",
+   "code": "sz000893",
+   "base_price": 35.48,
+   "total": 77.0,
+   "date": "2026-11-03",
+   "pick_price": 35.48,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "天齐锂业",
+   "code": "sz002466",
+   "base_price": 35.05,
+   "total": 76.93,
+   "date": "2026-11-03",
+   "pick_price": 35.05,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "超声电子",
+   "code": "sz000823",
+   "base_price": 16.68,
+   "total": 76.85,
+   "date": "2026-11-03",
+   "pick_price": 16.68,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "天山电子",
+   "code": "sz301379",
+   "base_price": 14.26,
+   "total": 76.55,
+   "date": "2026-11-03",
+   "pick_price": 14.26,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "紫光股份",
+   "code": "sz000938",
+   "base_price": 23.0,
+   "total": 76.53,
+   "date": "2026-11-03",
+   "pick_price": 23.0,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "晶瑞电材",
+   "code": "sz300655",
+   "base_price": 9.64,
+   "total": 76.53,
+   "date": "2026-11-03",
+   "pick_price": 9.64,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "海南发展",
+   "code": "sz002163",
+   "base_price": 6.83,
+   "total": 76.49,
+   "date": "2026-11-03",
+   "pick_price": 6.83,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "奥瑞金",
+   "code": "sz002701",
+   "base_price": 4.26,
+   "total": 76.44,
+   "date": "2026-11-03",
+   "pick_price": 4.26,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "长城科技",
+   "code": "sh603897",
+   "base_price": 25.86,
+   "total": 76.43,
+   "date": "2026-11-03",
+   "pick_price": 25.86,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "银邦股份",
+   "code": "sz300337",
+   "base_price": 8.33,
+   "total": 76.32,
+   "date": "2026-11-03",
+   "pick_price": 8.33,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "宝鼎科技",
+   "code": "sz002552",
+   "base_price": 30.49,
+   "total": 76.18,
+   "date": "2026-11-03",
+   "pick_price": 30.49,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "银河电子",
+   "code": "sz002519",
+   "base_price": 4.93,
+   "total": 76.12,
+   "date": "2026-11-03",
+   "pick_price": 4.93,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "抚顺特钢",
+   "code": "sh600399",
+   "base_price": 4.08,
+   "total": 75.91,
+   "date": "2026-11-03",
+   "pick_price": 4.08,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "甘咨询",
+   "code": "sz000779",
+   "base_price": 7.74,
+   "total": 75.69,
+   "date": "2026-11-03",
+   "pick_price": 7.74,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "世联行",
+   "code": "sz002285",
+   "base_price": 2.3,
+   "total": 75.53,
+   "date": "2026-11-03",
+   "pick_price": 2.3,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "达实智能",
+   "code": "sz002421",
+   "base_price": 2.82,
+   "total": 75.5,
+   "date": "2026-11-03",
+   "pick_price": 2.82,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "洛阳钼业",
+   "code": "sh603993",
+   "base_price": 13.41,
+   "total": 75.46,
+   "date": "2026-11-03",
+   "pick_price": 13.41,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "歌华有线",
+   "code": "sh600037",
+   "base_price": 6.51,
+   "total": 75.46,
+   "date": "2026-11-03",
+   "pick_price": 6.51,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "威星智能",
+   "code": "sz002849",
+   "base_price": 13.52,
+   "total": 75.36,
+   "date": "2026-11-03",
+   "pick_price": 13.52,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "博盈特焊",
+   "code": "sz301468",
+   "base_price": 23.3,
+   "total": 75.33,
+   "date": "2026-11-03",
+   "pick_price": 23.3,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "杰美特",
+   "code": "sz300868",
+   "base_price": 45.62,
+   "total": 75.3,
+   "date": "2026-11-03",
+   "pick_price": 45.62,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "中国巨石",
+   "code": "sh600176",
+   "base_price": 26.68,
+   "total": 75.05,
+   "date": "2026-11-03",
+   "pick_price": 26.68,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "上海新阳",
+   "code": "sz300236",
+   "base_price": 66.59,
+   "total": 75.05,
+   "date": "2026-11-03",
+   "pick_price": 66.59,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "灿勤科技",
+   "code": "sh688182",
+   "base_price": 17.53,
+   "total": 75.04,
+   "date": "2026-11-03",
+   "pick_price": 17.53,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "纳微科技",
+   "code": "sh688690",
+   "base_price": 35.84,
+   "total": 75.01,
+   "date": "2026-11-03",
+   "pick_price": 35.84,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "大中矿业",
+   "code": "sz001203",
+   "base_price": 17.87,
+   "total": 74.94,
+   "date": "2026-11-03",
+   "pick_price": 17.87,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "奥士康",
+   "code": "sz002913",
+   "base_price": 52.87,
+   "total": 74.81,
+   "date": "2026-11-03",
+   "pick_price": 52.87,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "天德钰",
+   "code": "sh688252",
+   "base_price": 19.09,
+   "total": 74.81,
+   "date": "2026-11-03",
+   "pick_price": 19.09,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "永太科技",
+   "code": "sz002326",
+   "base_price": 14.33,
+   "total": 74.78,
+   "date": "2026-11-03",
+   "pick_price": 14.33,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "晶方科技",
+   "code": "sh603005",
+   "base_price": 20.4,
+   "total": 74.72,
+   "date": "2026-11-03",
+   "pick_price": 20.4,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "恒邦股份",
+   "code": "sz002237",
+   "base_price": 10.97,
+   "total": 74.68,
+   "date": "2026-11-03",
+   "pick_price": 10.97,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "盈方微",
+   "code": "sz000670",
+   "base_price": 6.1,
+   "total": 74.66,
+   "date": "2026-11-03",
+   "pick_price": 6.1,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "新金路",
+   "code": "sz000510",
+   "base_price": 8.99,
+   "total": 74.65,
+   "date": "2026-11-03",
+   "pick_price": 8.99,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "莲花控股",
+   "code": "sh600186",
+   "base_price": 8.23,
+   "total": 74.52,
+   "date": "2026-11-03",
+   "pick_price": 8.23,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "昊华科技",
+   "code": "sh600378",
+   "base_price": 30.84,
+   "total": 74.5,
+   "date": "2026-11-03",
+   "pick_price": 30.84,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "新疆众和",
+   "code": "sh600888",
+   "base_price": 8.77,
+   "total": 74.39,
+   "date": "2026-11-03",
+   "pick_price": 8.77,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "上海钢联",
+   "code": "sz300226",
+   "base_price": 16.24,
+   "total": 74.36,
+   "date": "2026-11-03",
+   "pick_price": 16.24,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "信诺维",
+   "code": "sh688837",
+   "base_price": 33.45,
+   "total": 74.33,
+   "date": "2026-11-03",
+   "pick_price": 33.45,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "智翔金泰",
+   "code": "sh688443",
+   "base_price": 25.32,
+   "total": 74.26,
+   "date": "2026-11-03",
+   "pick_price": 25.32,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "中青宝",
+   "code": "sz300052",
+   "base_price": 9.64,
+   "total": 74.04,
+   "date": "2026-11-03",
+   "pick_price": 9.64,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "生物股份",
+   "code": "sh600201",
+   "base_price": 11.99,
+   "total": 73.99,
+   "date": "2026-11-03",
+   "pick_price": 11.99,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "读客文化",
+   "code": "sz301025",
+   "base_price": 9.5,
+   "total": 73.88,
+   "date": "2026-11-03",
+   "pick_price": 9.5,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "新亚制程",
+   "code": "sz002388",
+   "base_price": 5.01,
+   "total": 73.87,
+   "date": "2026-11-03",
+   "pick_price": 5.01,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "盈峰环境",
+   "code": "sz000967",
+   "base_price": 6.29,
+   "total": 73.74,
+   "date": "2026-11-03",
+   "pick_price": 6.29,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "领先股份",
+   "code": "sh603991",
+   "base_price": 108.2,
+   "total": 73.73,
+   "date": "2026-11-03",
+   "pick_price": 108.2,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "通鼎互联",
+   "code": "sz002491",
+   "base_price": 12.94,
+   "total": 73.64,
+   "date": "2026-11-03",
+   "pick_price": 12.94,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "兰卫医学",
+   "code": "sz301060",
+   "base_price": 9.78,
+   "total": 73.64,
+   "date": "2026-11-03",
+   "pick_price": 9.78,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "宝丽迪",
+   "code": "sz300905",
+   "base_price": 27.36,
+   "total": 73.64,
+   "date": "2026-11-03",
+   "pick_price": 27.36,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "双杰电气",
+   "code": "sz300444",
+   "base_price": 7.11,
+   "total": 73.62,
+   "date": "2026-11-03",
+   "pick_price": 7.11,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "中兵红箭",
+   "code": "sz000519",
+   "base_price": 13.67,
+   "total": 73.46,
+   "date": "2026-11-03",
+   "pick_price": 13.67,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "地素时尚",
+   "code": "sh603587",
+   "base_price": 13.9,
+   "total": 73.46,
+   "date": "2026-11-03",
+   "pick_price": 13.9,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "同星科技",
+   "code": "sz301252",
+   "base_price": 27.63,
+   "total": 73.32,
+   "date": "2026-11-03",
+   "pick_price": 27.63,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "铂科新材",
+   "code": "sz300811",
+   "base_price": 59.1,
+   "total": 73.29,
+   "date": "2026-11-03",
+   "pick_price": 59.1,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "数字认证",
+   "code": "sz300579",
+   "base_price": 21.61,
+   "total": 73.24,
+   "date": "2026-11-03",
+   "pick_price": 21.61,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "国电南自",
+   "code": "sh600268",
+   "base_price": 9.44,
+   "total": 73.23,
+   "date": "2026-11-03",
+   "pick_price": 9.44,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "德尔股份",
+   "code": "sz300473",
+   "base_price": 35.23,
+   "total": 73.19,
+   "date": "2026-11-03",
+   "pick_price": 35.23,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "永吉股份",
+   "code": "sh603058",
+   "base_price": 7.6,
+   "total": 73.16,
+   "date": "2026-11-03",
+   "pick_price": 7.6,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "三祥新材",
+   "code": "sh603663",
+   "base_price": 27.73,
+   "total": 73.05,
+   "date": "2026-11-03",
+   "pick_price": 27.73,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "泰尔股份",
+   "code": "sz002347",
+   "base_price": 6.5,
+   "total": 73.04,
+   "date": "2026-11-03",
+   "pick_price": 6.5,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "洪田股份",
+   "code": "sh603800",
+   "base_price": 34.0,
+   "total": 73.04,
+   "date": "2026-11-03",
+   "pick_price": 34.0,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "华脉科技",
+   "code": "sh603042",
+   "base_price": 11.61,
+   "total": 72.91,
+   "date": "2026-11-03",
+   "pick_price": 11.61,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "华谊集团",
+   "code": "sh600623",
+   "base_price": 8.23,
+   "total": 72.83,
+   "date": "2026-11-03",
+   "pick_price": 8.23,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "爱迪特",
+   "code": "sz301580",
+   "base_price": 39.33,
+   "total": 72.73,
+   "date": "2026-11-03",
+   "pick_price": 39.33,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "聚飞光电",
+   "code": "sz300303",
+   "base_price": 5.58,
+   "total": 72.57,
+   "date": "2026-11-03",
+   "pick_price": 5.58,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "遥望科技",
+   "code": "sz002291",
+   "base_price": 5.4,
+   "total": 72.46,
+   "date": "2026-11-03",
+   "pick_price": 5.4,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "和仁科技",
+   "code": "sz300550",
+   "base_price": 11.4,
+   "total": 72.28,
+   "date": "2026-11-03",
+   "pick_price": 11.4,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "中英科技",
+   "code": "sz300936",
+   "base_price": 46.92,
+   "total": 72.17,
+   "date": "2026-11-03",
+   "pick_price": 46.92,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "高澜股份",
+   "code": "sz300499",
+   "base_price": 22.36,
+   "total": 72.14,
+   "date": "2026-11-03",
+   "pick_price": 22.36,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "会稽山",
+   "code": "sh601579",
+   "base_price": 21.41,
+   "total": 71.94,
+   "date": "2026-11-03",
+   "pick_price": 21.41,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "麦捷科技",
+   "code": "sz300319",
+   "base_price": 13.52,
+   "total": 71.85,
+   "date": "2026-11-03",
+   "pick_price": 13.52,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "莱宝高科",
+   "code": "sz002106",
+   "base_price": 8.87,
+   "total": 71.75,
+   "date": "2026-11-03",
+   "pick_price": 8.87,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "圣泉集团",
+   "code": "sh605589",
+   "base_price": 25.58,
+   "total": 71.72,
+   "date": "2026-11-03",
+   "pick_price": 25.58,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "海光信息",
+   "code": "sh688041",
+   "base_price": 170.0,
+   "total": 71.48,
+   "date": "2026-11-03",
+   "pick_price": 170.0,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "丽江股份",
+   "code": "sz002033",
+   "base_price": 8.35,
+   "total": 71.44,
+   "date": "2026-11-03",
+   "pick_price": 8.35,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "苏大维格",
+   "code": "sz300331",
+   "base_price": 28.38,
+   "total": 71.41,
+   "date": "2026-11-03",
+   "pick_price": 28.38,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "高凯技术",
+   "code": "sh688835",
+   "base_price": 247.73,
+   "total": 71.4,
+   "date": "2026-11-03",
+   "pick_price": 247.73,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "海能达",
+   "code": "sz002583",
+   "base_price": 7.92,
+   "total": 71.31,
+   "date": "2026-11-03",
+   "pick_price": 7.92,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "仁东控股",
+   "code": "sz002647",
+   "base_price": 6.93,
+   "total": 71.19,
+   "date": "2026-11-03",
+   "pick_price": 6.93,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "奥普光电",
+   "code": "sz002338",
+   "base_price": 35.15,
+   "total": 70.95,
+   "date": "2026-11-03",
+   "pick_price": 35.15,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "天利科技",
+   "code": "sz300399",
+   "base_price": 17.32,
+   "total": 70.93,
+   "date": "2026-11-03",
+   "pick_price": 17.32,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "天海防务",
+   "code": "sz300008",
+   "base_price": 5.7,
+   "total": 70.91,
+   "date": "2026-11-03",
+   "pick_price": 5.7,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "财达证券",
+   "code": "sh600906",
+   "base_price": 5.74,
+   "total": 70.88,
+   "date": "2026-11-03",
+   "pick_price": 5.74,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "燕麦科技",
+   "code": "sh688312",
+   "base_price": 29.61,
+   "total": 70.64,
+   "date": "2026-11-03",
+   "pick_price": 29.61,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "峰岹科技",
+   "code": "sh688279",
+   "base_price": 171.51,
+   "total": 70.6,
+   "date": "2026-11-03",
+   "pick_price": 171.51,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "厦门象屿",
+   "code": "sh600057",
+   "base_price": 6.22,
+   "total": 70.46,
+   "date": "2026-11-03",
+   "pick_price": 6.22,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "天奈科技",
+   "code": "sh688116",
+   "base_price": 33.0,
+   "total": 70.22,
+   "date": "2026-11-03",
+   "pick_price": 33.0,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "有友食品",
+   "code": "sh603697",
+   "base_price": 10.11,
+   "total": 70.16,
+   "date": "2026-11-03",
+   "pick_price": 10.11,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "马钢股份",
+   "code": "sh600808",
+   "base_price": 2.27,
+   "total": 70.07,
+   "date": "2026-11-03",
+   "pick_price": 2.27,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "孩子王",
+   "code": "sz301078",
+   "base_price": 6.59,
+   "total": 70.07,
+   "date": "2026-11-03",
+   "pick_price": 6.59,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "百隆东方",
+   "code": "sh601339",
+   "base_price": 7.59,
+   "total": 69.94,
+   "date": "2026-11-03",
+   "pick_price": 7.59,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "瑞可达",
+   "code": "sh688800",
+   "base_price": 31.66,
+   "total": 69.93,
+   "date": "2026-11-03",
+   "pick_price": 31.66,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "石英股份",
+   "code": "sh603688",
+   "base_price": 31.88,
+   "total": 69.93,
+   "date": "2026-11-03",
+   "pick_price": 31.88,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "英杰电气",
+   "code": "sz300820",
+   "base_price": 46.62,
+   "total": 69.85,
+   "date": "2026-11-03",
+   "pick_price": 46.62,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "科达利",
+   "code": "sz002850",
+   "base_price": 160.4,
+   "total": 69.79,
+   "date": "2026-11-03",
+   "pick_price": 160.4,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "祥鑫科技",
+   "code": "sz002965",
+   "base_price": 22.12,
+   "total": 69.74,
+   "date": "2026-11-03",
+   "pick_price": 22.12,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "天邑股份",
+   "code": "sz300504",
+   "base_price": 16.42,
+   "total": 69.71,
+   "date": "2026-11-03",
+   "pick_price": 16.42,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "中马传动",
+   "code": "sh603767",
+   "base_price": 14.19,
+   "total": 69.63,
+   "date": "2026-11-03",
+   "pick_price": 14.19,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "中简科技",
+   "code": "sz300777",
+   "base_price": 18.52,
+   "total": 69.63,
+   "date": "2026-11-03",
+   "pick_price": 18.52,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "东杰智能",
+   "code": "sz300486",
+   "base_price": 15.95,
+   "total": 69.59,
+   "date": "2026-11-03",
+   "pick_price": 15.95,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "江顺科技",
+   "code": "sz001400",
+   "base_price": 95.01,
+   "total": 69.38,
+   "date": "2026-11-03",
+   "pick_price": 95.01,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "华菱线缆",
+   "code": "sz001208",
+   "base_price": 11.96,
+   "total": 69.25,
+   "date": "2026-11-03",
+   "pick_price": 11.96,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "三人行",
+   "code": "sh605168",
+   "base_price": 37.99,
+   "total": 69.17,
+   "date": "2026-11-03",
+   "pick_price": 37.99,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "芯朋微",
+   "code": "sh688508",
+   "base_price": 48.81,
+   "total": 69.15,
+   "date": "2026-11-03",
+   "pick_price": 48.81,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "江龙船艇",
+   "code": "sz300589",
+   "base_price": 12.12,
+   "total": 68.94,
+   "date": "2026-11-03",
+   "pick_price": 12.12,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "苏州天脉",
+   "code": "sz301626",
+   "base_price": 191.48,
+   "total": 68.86,
+   "date": "2026-11-03",
+   "pick_price": 191.48,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "宇特光电",
+   "code": "sz920157",
+   "base_price": 43.09,
+   "total": 68.79,
+   "date": "2026-11-03",
+   "pick_price": 43.09,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "强力新材",
+   "code": "sz300429",
+   "base_price": 8.33,
+   "total": 68.76,
+   "date": "2026-11-03",
+   "pick_price": 8.33,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "捷邦科技",
+   "code": "sz301326",
+   "base_price": 71.89,
+   "total": 68.73,
+   "date": "2026-11-03",
+   "pick_price": 71.89,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "云意电气",
+   "code": "sz300304",
+   "base_price": 9.24,
+   "total": 68.66,
+   "date": "2026-11-03",
+   "pick_price": 9.24,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "金牛化工",
+   "code": "sh600722",
+   "base_price": 11.14,
+   "total": 68.64,
+   "date": "2026-11-03",
+   "pick_price": 11.14,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "红棉股份",
+   "code": "sz000523",
+   "base_price": 2.86,
+   "total": 68.55,
+   "date": "2026-11-03",
+   "pick_price": 2.86,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "中新赛克",
+   "code": "sz002912",
+   "base_price": 23.06,
+   "total": 68.47,
+   "date": "2026-11-03",
+   "pick_price": 23.06,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "华勤技术",
+   "code": "sh603296",
+   "base_price": 62.76,
+   "total": 68.42,
+   "date": "2026-11-03",
+   "pick_price": 62.76,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "通化东宝",
+   "code": "sh600867",
+   "base_price": 7.97,
+   "total": 68.34,
+   "date": "2026-11-03",
+   "pick_price": 7.97,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "钢研高纳",
+   "code": "sz300034",
+   "base_price": 13.55,
+   "total": 68.33,
+   "date": "2026-11-03",
+   "pick_price": 13.55,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "协鑫能科",
+   "code": "sz002015",
+   "base_price": 12.07,
+   "total": 68.32,
+   "date": "2026-11-03",
+   "pick_price": 12.07,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "武汉天源",
+   "code": "sz301127",
+   "base_price": 12.66,
+   "total": 68.23,
+   "date": "2026-11-03",
+   "pick_price": 12.66,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "东方盛虹",
+   "code": "sz000301",
+   "base_price": 10.51,
+   "total": 68.22,
+   "date": "2026-11-03",
+   "pick_price": 10.51,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "亨通股份",
+   "code": "sh600226",
+   "base_price": 3.98,
+   "total": 68.1,
+   "date": "2026-11-03",
+   "pick_price": 3.98,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "富临精工",
+   "code": "sz300432",
+   "base_price": 14.2,
+   "total": 68.09,
+   "date": "2026-11-03",
+   "pick_price": 14.2,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "朗迪集团",
+   "code": "sh603726",
+   "base_price": 21.13,
+   "total": 67.96,
+   "date": "2026-11-03",
+   "pick_price": 21.13,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "广发证券",
+   "code": "sz000776",
+   "base_price": 19.5,
+   "total": 67.91,
+   "date": "2026-11-03",
+   "pick_price": 19.5,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "卫星化学",
+   "code": "sz002648",
+   "base_price": 25.28,
+   "total": 67.87,
+   "date": "2026-11-03",
+   "pick_price": 25.28,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "芯瑞达",
+   "code": "sz002983",
+   "base_price": 21.67,
+   "total": 67.86,
+   "date": "2026-11-03",
+   "pick_price": 21.67,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "中金黄金",
+   "code": "sh600489",
+   "base_price": 18.63,
+   "total": 67.72,
+   "date": "2026-11-03",
+   "pick_price": 18.63,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "万向德农",
+   "code": "sh600371",
+   "base_price": 9.86,
+   "total": 67.63,
+   "date": "2026-11-03",
+   "pick_price": 9.86,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "探路者",
+   "code": "sz300005",
+   "base_price": 8.57,
+   "total": 67.63,
+   "date": "2026-11-03",
+   "pick_price": 8.57,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "森马服饰",
+   "code": "sz002563",
+   "base_price": 5.8,
+   "total": 67.61,
+   "date": "2026-11-03",
+   "pick_price": 5.8,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "中原证券",
+   "code": "sh601375",
+   "base_price": 3.81,
+   "total": 67.55,
+   "date": "2026-11-03",
+   "pick_price": 3.81,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "良品铺子",
+   "code": "sh603719",
+   "base_price": 9.71,
+   "total": 67.53,
+   "date": "2026-11-03",
+   "pick_price": 9.71,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "威迈斯",
+   "code": "sh688612",
+   "base_price": 24.96,
+   "total": 67.25,
+   "date": "2026-11-03",
+   "pick_price": 24.96,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "首钢股份",
+   "code": "sz000959",
+   "base_price": 3.04,
+   "total": 67.09,
+   "date": "2026-11-03",
+   "pick_price": 3.04,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "富春股份",
+   "code": "sz300299",
+   "base_price": 6.11,
+   "total": 67.08,
+   "date": "2026-11-03",
+   "pick_price": 6.11,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "苏州科达",
+   "code": "sh603660",
+   "base_price": 8.1,
+   "total": 67.07,
+   "date": "2026-11-03",
+   "pick_price": 8.1,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "国风新材",
+   "code": "sz000859",
+   "base_price": 7.79,
+   "total": 67.01,
+   "date": "2026-11-03",
+   "pick_price": 7.79,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "中石科技",
+   "code": "sz300684",
+   "base_price": 63.32,
+   "total": 66.95,
+   "date": "2026-11-03",
+   "pick_price": 63.32,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "大胜达",
+   "code": "sh603687",
+   "base_price": 12.01,
+   "total": 66.86,
+   "date": "2026-11-03",
+   "pick_price": 12.01,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "胜通能源",
+   "code": "sz001331",
+   "base_price": 28.5,
+   "total": 66.82,
+   "date": "2026-11-03",
+   "pick_price": 28.5,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "珂玛科技",
+   "code": "sz301611",
+   "base_price": 58.4,
+   "total": 66.81,
+   "date": "2026-11-03",
+   "pick_price": 58.4,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "大金重工",
+   "code": "sz002487",
+   "base_price": 29.96,
+   "total": 66.68,
+   "date": "2026-11-03",
+   "pick_price": 29.96,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "广百股份",
+   "code": "sz002187",
+   "base_price": 5.72,
+   "total": 66.65,
+   "date": "2026-11-03",
+   "pick_price": 5.72,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "儒竞科技",
+   "code": "sz301525",
+   "base_price": 42.06,
+   "total": 66.64,
+   "date": "2026-11-03",
+   "pick_price": 42.06,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "川恒股份",
+   "code": "sz002895",
+   "base_price": 28.47,
+   "total": 66.61,
+   "date": "2026-11-03",
+   "pick_price": 28.47,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "泰坦股份",
+   "code": "sz003036",
+   "base_price": 27.88,
+   "total": 66.59,
+   "date": "2026-11-03",
+   "pick_price": 27.88,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "道氏技术",
+   "code": "sz300409",
+   "base_price": 12.91,
+   "total": 66.54,
+   "date": "2026-11-03",
+   "pick_price": 12.91,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "世名科技",
+   "code": "sz300522",
+   "base_price": 10.76,
+   "total": 66.45,
+   "date": "2026-11-03",
+   "pick_price": 10.76,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "西藏城投",
+   "code": "sh600773",
+   "base_price": 8.58,
+   "total": 66.38,
+   "date": "2026-11-03",
+   "pick_price": 8.58,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "线上线下",
+   "code": "sz300959",
+   "base_price": 61.67,
+   "total": 66.36,
+   "date": "2026-11-03",
+   "pick_price": 61.67,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "领益智造",
+   "code": "sz002600",
+   "base_price": 11.28,
+   "total": 66.29,
+   "date": "2026-11-03",
+   "pick_price": 11.28,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "三生国健",
+   "code": "sh688336",
+   "base_price": 30.92,
+   "total": 66.16,
+   "date": "2026-11-03",
+   "pick_price": 30.92,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "昌红科技",
+   "code": "sz300151",
+   "base_price": 14.23,
+   "total": 66.09,
+   "date": "2026-11-03",
+   "pick_price": 14.23,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "大众公用",
+   "code": "sh600635",
+   "base_price": 4.01,
+   "total": 66.09,
+   "date": "2026-11-03",
+   "pick_price": 4.01,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "东土科技",
+   "code": "sz300353",
+   "base_price": 14.84,
+   "total": 66.07,
+   "date": "2026-11-03",
+   "pick_price": 14.84,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "方大炭素",
+   "code": "sh600516",
+   "base_price": 4.46,
+   "total": 65.99,
+   "date": "2026-11-03",
+   "pick_price": 4.46,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "德龙汇能",
+   "code": "sz000593",
+   "base_price": 16.32,
+   "total": 65.99,
+   "date": "2026-11-03",
+   "pick_price": 16.32,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "爱丽家居",
+   "code": "sh603221",
+   "base_price": 16.75,
+   "total": 65.91,
+   "date": "2026-11-03",
+   "pick_price": 16.75,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "妙可蓝多",
+   "code": "sh600882",
+   "base_price": 19.63,
+   "total": 65.87,
+   "date": "2026-11-03",
+   "pick_price": 19.63,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "华仁药业",
+   "code": "sz300110",
+   "base_price": 2.62,
+   "total": 65.82,
+   "date": "2026-11-03",
+   "pick_price": 2.62,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "禾盛新材",
+   "code": "sz002290",
+   "base_price": 37.93,
+   "total": 65.69,
+   "date": "2026-11-03",
+   "pick_price": 37.93,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "兆丰股份",
+   "code": "sz300695",
+   "base_price": 46.05,
+   "total": 65.66,
+   "date": "2026-11-03",
+   "pick_price": 46.05,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "碧水源",
+   "code": "sz300070",
+   "base_price": 3.28,
+   "total": 65.63,
+   "date": "2026-11-03",
+   "pick_price": 3.28,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "新瀚新材",
+   "code": "sz301076",
+   "base_price": 20.92,
+   "total": 65.6,
+   "date": "2026-11-03",
+   "pick_price": 20.92,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "芯能科技",
+   "code": "sh603105",
+   "base_price": 7.54,
+   "total": 65.58,
+   "date": "2026-11-03",
+   "pick_price": 7.54,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "安井食品",
+   "code": "sh603345",
+   "base_price": 87.49,
+   "total": 65.51,
+   "date": "2026-11-03",
+   "pick_price": 87.49,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "百普赛斯",
+   "code": "sz301080",
+   "base_price": 81.56,
+   "total": 65.29,
+   "date": "2026-11-03",
+   "pick_price": 81.56,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "悦康药业",
+   "code": "sh688658",
+   "base_price": 10.74,
+   "total": 65.21,
+   "date": "2026-11-03",
+   "pick_price": 10.74,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "胜科纳米",
+   "code": "sh688757",
+   "base_price": 21.55,
+   "total": 65.12,
+   "date": "2026-11-03",
+   "pick_price": 21.55,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "怡 亚 通",
+   "code": "sz002183",
+   "base_price": 3.67,
+   "total": 65.09,
+   "date": "2026-11-03",
+   "pick_price": 3.67,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "恒辉安防",
+   "code": "sz300952",
+   "base_price": 17.97,
+   "total": 65.05,
+   "date": "2026-11-03",
+   "pick_price": 17.97,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "旋极信息",
+   "code": "sz300324",
+   "base_price": 3.13,
+   "total": 65.05,
+   "date": "2026-11-03",
+   "pick_price": 3.13,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "ai_portfolio",
+   "label": "AI组合",
+   "name": "孩子王",
+   "code": "sz301078",
+   "base_price": 6.59,
+   "total": 70.07,
+   "date": "2026-11-03",
+   "pick_price": 6.59,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "ai_portfolio",
+   "label": "AI组合",
+   "name": "美的集团",
+   "code": "sz000333",
+   "base_price": 88.88,
+   "total": 44.05,
+   "date": "2026-11-03",
+   "pick_price": 88.88,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "ai_portfolio",
+   "label": "AI组合",
+   "name": "东瑞股份",
+   "code": "sz001201",
+   "base_price": 15.39,
+   "total": 63.4,
+   "date": "2026-11-03",
+   "pick_price": 15.39,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "ai_portfolio",
+   "label": "AI组合",
+   "name": "大北农",
+   "code": "sz002385",
+   "base_price": 2.97,
+   "total": 63.91,
+   "date": "2026-11-03",
+   "pick_price": 2.97,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "药明康德",
+   "code": "sh603259",
+   "base_price": 135.28,
+   "total": 77.72,
+   "date": "2026-11-03",
+   "pick_price": 135.28,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "皓元医药",
+   "code": "sh688131",
+   "base_price": 89.88,
+   "total": 62.29,
+   "date": "2026-11-03",
+   "pick_price": 89.88,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "泉阳泉",
+   "code": "sh600189",
+   "base_price": 9.4,
+   "total": 61.26,
+   "date": "2026-11-03",
+   "pick_price": 9.4,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "捷成股份",
+   "code": "sz300182",
+   "base_price": 5.57,
+   "total": 53.02,
+   "date": "2026-11-03",
+   "pick_price": 5.57,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "凡拓数创",
+   "code": "sz301313",
+   "base_price": 60.0,
+   "total": 46.78,
+   "date": "2026-11-03",
+   "pick_price": 60.0,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "顺鑫农业",
+   "code": "sz000860",
+   "base_price": 12.14,
+   "total": 42.36,
+   "date": "2026-11-03",
+   "pick_price": 12.14,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "民生银行",
+   "code": "sh600016",
+   "base_price": 3.45,
+   "total": 37.15,
+   "date": "2026-11-03",
+   "pick_price": 3.45,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "交通银行",
+   "code": "sh601328",
+   "base_price": 8.39,
+   "total": 35.85,
+   "date": "2026-11-03",
+   "pick_price": 8.39,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_reversal",
+   "label": "量化·reversal",
+   "name": "圣邦股份",
+   "code": "sz300661",
+   "base_price": 75.0,
+   "total": 86.36,
+   "date": "2026-11-03",
+   "pick_price": 75.0,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_reversal",
+   "label": "量化·reversal",
+   "name": "源杰科技",
+   "code": "sh688498",
+   "base_price": 604.9,
+   "total": 80.33,
+   "date": "2026-11-03",
+   "pick_price": 604.9,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
   }
  ]
 }
