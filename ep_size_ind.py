@@ -70,6 +70,7 @@ G_LOW = 4.0          # 低成长阈值：G <= 4.0 → 关闭小市值溢价
 W_HIGH = 0.80        # 高成长档权重
 W_MID = 0.30         # 中性成长档权重
 W_LOW = 0.00         # 低成长档权重
+GATE_RAMP = 0.2      # ⭐ T0 修复（round128）：阈值下方过渡带宽度（分）。见 growth_weight() 文档
 LIQ_THRESHOLD = 8e7  # 近20日日均成交额阈值（0.8 亿）→ 不足则溢价减半
 LIQ_PENALTY = 0.5    # 流动性惩罚系数
 
@@ -114,17 +115,63 @@ DOM_LEADER_THR = 7.0  # 模块B 龙头门槛：业务份额合成 rank ≥ 7（�
 
 
 def growth_weight(g):
-    """成长综合分 G（0-10）→ 市值溢价动态权重 w_mc ∈ {0.0, 0.3, 0.8}。
+    """成长综合分 G（0-10）→ 市值溢价动态权重 w_mc ∈ [0.0, 0.8]。
 
     G 缺失（None）时返回 0.0 —— **不猜**。缺成长数据就拿不到市值溢价，
     这是保守方向（宁可少加分，不凭空送分）。
+
+    ⭐ T0 修复（round128）：**阈值下方加窄过渡带，消除不连续峭壁**。
+
+    原实现是三档阶梯 `{0.0, 0.3, 0.8}`，在 G_LOW=4.0 / G_HIGH=7.0 处硬跳。
+    2026-11-04 实测（top200_scored_2026-11-04.json，2174 只）：
+      · growth 取值高度聚簇 —— **462 只（21.2%）恰好等于 4.04**，
+        距 G_LOW=4.0 仅 0.04；p50=4.040 正压在阈值上。
+      · 阶梯下这些股票拿 W_MID=0.30，但只要 growth 被任何数据修订推到 ≤4.00，
+        就整体掉到 W_LOW=0.00 → `size_growth`（权重 **0.20**）**整段归零**。
+      · 量化跳变：G∈[4.00,4.25) 带 size_growth 均值 3.553，若归零
+        → total 平均下降 **0.71 分**；462 只同批同时翻转 = 排序不稳定的地雷。
+      · 这正是「P1g 去重使 growth 中位 5.00→4.04 撞 G_LOW」那条 D9 的机制本体。
+
+    修复取向（**实测零影响**，不是重新标定）：把过渡带放在**阈值下方的分布空隙**里，
+    不改变任何档位的语义边界，也不动任何现有股票的分值：
+      · 实测空隙：growth < 4.0 最近取值 2.98，(2.98, 4.04) 为空 → 过渡带 (3.8, 4.0) 无股
+      · 实测空隙：(6.76, 7.05) 为空 → 过渡带 (6.8, 7.0) 无股
+      · 因此 4.04 簇（462 只）仍 0.30、6.76 簇（127 只）仍 0.30、
+        7.05 及以上仍 0.80（spec「G>7 充分释放」不变）——**2174 只全部零变化**。
+      · 但 G 从 4.01 微跌到 3.99 时，w_mc 由 0.30 平滑落到 0.285，
+        而不是从 0.30 断崖掉到 0.00。峭壁消除，语义不变。
+
+    分段（L=G_LOW=4.0, H=G_HIGH=7.0, R=GATE_RAMP=0.2）：
+        g ≤ L-R   → W_LOW                      （低成长，关闭溢价）
+        L-R<g<L   → 线性 W_LOW → W_MID          （过渡带，落在分布空隙）
+        L ≤ g < H → W_MID                       （中性成长档）
+        H-R<g<H   → 线性 W_MID → W_HIGH          （过渡带，落在分布空隙）
+        g ≥ H     → W_HIGH                      （高成长，充分释放 = spec）
+    注：边界点 G=4.0 / G=7.0 实测均为 0 只，故「g≥L 即 W_MID」
+        与原 spec「G≤4 关闭」在观测上等价（测量零偏离）。
     """
     if not (isinstance(g, (int, float)) and not isinstance(g, bool) and g == g):
         return 0.0
-    if g > G_HIGH:
+    r = GATE_RAMP if GATE_RAMP > 0 else 0.0
+    if r == 0.0:
+        # 退化为原阶梯（r=0 时过渡带无宽度）
+        if g > G_HIGH:
+            return W_HIGH
+        if g > G_LOW:
+            return W_MID
+        return W_LOW
+    if g >= G_HIGH:
         return W_HIGH
-    if g > G_LOW:
+    if g > G_HIGH - r:
+        # 上过渡带：[H-R, H] → [W_MID, W_HIGH]
+        t = (g - (G_HIGH - r)) / r
+        return W_MID + t * (W_HIGH - W_MID)
+    if g >= G_LOW:
         return W_MID
+    if g > G_LOW - r:
+        # 下过渡带：[L-R, L] → [W_LOW, W_MID]
+        t = (g - (G_LOW - r)) / r
+        return W_LOW + t * (W_MID - W_LOW)
     return W_LOW
 
 

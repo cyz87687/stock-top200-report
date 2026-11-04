@@ -24,13 +24,17 @@ from scipy.stats import rankdata
 HERE = os.path.dirname(os.path.abspath(__file__))
 MAT = os.path.join(HERE, "data", "panel_r124_mat.npz")
 KL = os.path.join(HERE, "data", "klines_2020.npz")
-OUT = os.path.join(HERE, "data", "weight_scheme_curve.json")
+# ⭐ round128：支持用环境变量改输出路径，避免"复验"覆盖掉 P0-4 的原始历史依据。
+#   python3 weight_scheme_curve.py                       → 原路径（默认，日链/护栏读它）
+#   WEIGHT_CURVE_OUT=data/weight_scheme_curve_round128.json python3 weight_scheme_curve.py
+OUT = os.environ.get("WEIGHT_CURVE_OUT") or os.path.join(
+    HERE, "data", "weight_scheme_curve.json")
 
 # round125: dim_max 改为**单一来源**（原为硬编码，且漏了 score_fund: 5.0）。
 #   铁律：量程只能来自 factor_weights.json；本文件用到的维度在此显式声明，
 #   缺失由 dim_cfg 直接报错而非静默按 10.0 处理。
 from dim_cfg import load_dim_max
-DIM_MAX = load_dim_max(['score_bias60', 'score_rsi_rev', 'score_lowvol20', 'score_tech_neg', 'score_size_growth', 'score_ep', 'score_quality', 'score_growth'], strict=True)
+DIM_MAX = load_dim_max(['score_bias60', 'score_rsi_rev', 'score_lowvol20', 'score_tech_neg', 'score_size_growth', 'score_ep', 'score_quality', 'score_growth', 'score_dominant'], strict=True)
 MIN_CS = 200
 MIN_AMOUNT = 2000.0
 H = 20
@@ -46,6 +50,11 @@ SCHEMES = {
     "S0_v417_composite": W_CUR,
     "ONLY_size_growth": {**{d: 0.0 for d in DIM_MAX}, "score_size_growth": 1.0},
     "ONLY_lowvol20": {**{d: 0.0 for d in DIM_MAX}, "score_lowvol20": 1.0},
+    # ⭐ round128 复验：C1 的原始依据（data/weight_p04_constrained.json）是在
+    #   「长面板不含 dominant，effective Σ=0.70」口径下做的；本轮修了 em 转置
+    #   bug 并给矩阵加了第 9 维，生效 Σ 变成 0.80。**口径已变，必须复验 C1
+    #   是否仍全档优于基线**，不能拿旧结论直接套新面板。
+    "S_C1_v418_adopted": {**W_CUR, "score_tech_neg": 0.0, "score_growth": 0.20},
 }
 
 
@@ -176,6 +185,10 @@ def main():
             "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
             "horizon": H, "n_dates": nd,
             "min_cross_section": MIN_CS, "min_amount_wan": MIN_AMOUNT,
+            "panel_dims": dims,
+            "panel_dim_note": ("round128：pack_panel_npz.SDIMS 已含第 9 维 "
+                               "score_dominant；score_fund 仍是真盲区。"
+                               "有效 Σ 由 0.70 升到 0.80，与旧版曲线**不同口径，禁直接比数**"),
             "schemes": {k2: v for k2, v in SCHEMES.items()},
             "results": res, "summary": summary,
             "caveat": ("⚠️ 逐日等权持 N 只、h=20 后平仓、**未扣成本**的毛超额；"

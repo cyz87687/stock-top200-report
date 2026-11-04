@@ -411,8 +411,8 @@ class TestWeightsConsistency(unittest.TestCase):
             self.skipTest("factor_weights.json 不存在")
         h = hashlib.sha1(open(p, "rb").read()).hexdigest()
         self.assertEqual(
-            h, "c98df667b5f9353060bedb3d35866edcc06dc1de",
-            "factor_weights.json 指纹变了（v4.17-cycle-rules）。"
+            h, "d29ada11259336596768a04955a36f2bedf8a91e",
+            "factor_weights.json 指纹变了（v4.18-c1-head-excess）。"
             "若确为有意的权重变更，请同步八处入口 + verify_weights_round36.py "
             "并把本断言更新为新指纹。")
 
@@ -829,7 +829,7 @@ class TestGatedDatesConsecutive(unittest.TestCase):
         self.assertEqual(sp["n_in_axis"], 0)
 
     def test_real_data_is_consecutive(self):
-        """实测锁定：2026-11-03 快照的门槛后 14 个截面是连续交易日
+        """实测锁定：2026-11-04 快照的门槛后 16 个截面是连续交易日
 
         `current_weights_composite_ic|h1` 的 dates_after_gate 在 snapshot_dates
         中严格连续。若未来数据变化导致不再连续，这条会失败——
@@ -843,6 +843,16 @@ class TestGatedDatesConsecutive(unittest.TestCase):
            ——全部涨幅都来自「补回缺失收盘价后，更多截面能算出前向收益」，
            **不是** P1-6 的代码改动（classify_n_zero 是纯读，不改 n）。
            同时锁住这个数字的意义：下次它再变，必须能回答「是哪一步改的」。
+
+        ⚠️ 2026-11-05（round128）14 → 16，变化来源已定位（非代码改动）：
+           ① `factor_history.json` 相对 HEAD(`8bf24f0`) **只多一条快照**
+              —— 补回 `2026-10-27`（`git diff factor_history.json` 仅 1 行变更，
+              快照集合 92→93，新增项恰为 10-27，无任何既有快照被改动或删除）；
+           ② 价格轴末端由 11-03 推进到 11-04，使 10-27 同时满足「有字段值 +
+              起止两端有收盘价」→ 进入 dates_after_gate。
+           ③ 新增的两个日期为 `2026-10-27` 与 `2026-11-03`，集合是**只增不减**
+              （旧 14 个全部保留），且仍严格连续 → 「连续」的披露文案无需改动。
+           ⇒ 与 P0-5 同性质：数据覆盖变好，不是判据放宽。
         """
         import json
         import cs_consecutive as C
@@ -858,9 +868,10 @@ class TestGatedDatesConsecutive(unittest.TestCase):
         sp = C.consecutive_span(ds, axis)
         self.assertTrue(sp["is_consecutive"],
                         f"门槛后日期不再连续（{sp}）—— 页面披露文案需同步复核")
-        self.assertEqual(sp["n"], 14,
+        self.assertEqual(sp["n"], 16,
                          "门槛后截面数变了 —— 请先回答「是哪一步改动的」再更新本数字"
-                         "（P0-5 价格补洞时 10→14，见上方注释）")
+                         "（P0-5 价格补洞时 10→14；round128 数据推进到 11-04 且"
+                         "factor_history 补回 10-27 快照后 14→16，见 docstring）")
         self.assertEqual(sp["n"], len(ds),
                          "连续性探针的 n 必须等于 dates_after_gate 的真实长度")
 
@@ -1403,15 +1414,49 @@ class TestNZeroClassification(unittest.TestCase):
         self.assertIn("时间未到", z["detail"])
 
     def test_stripped_contaminated_detected(self):
-        """score_quality / score_growth 的 h=5 唯一两个到期截面被污染剔除 → 必须能识别。
+        """被污染点名的到期截面必须判「污染剔除」，不能落进「配对不足」。
 
-        这是本轮最严重的一处误判：原文案写「样本积累中」，
-        但真相是「仅有的样本被主动清空了」。两者的处置方向完全相反。
+        ⚠️ 2026-11-05（round128）此用例从「真实数据」改为「构造数据」。原因：
+           它原先依赖「10-28 在 h=5 上尚未到期」这一时点巧合 —— 当时 quality 的
+           到期截面只剩被剔空的 10-23 / 10-26。价格轴推进到 11-04 后 10-28 到期，
+           且它在 h=5 上有 **1813 只有效配对**（远 > 5），于是真实数据再也不会
+           进入 stripped 分支。继续用真实数据测，等于是让「数据时点」决定断言
+           能否通过 —— 这不是在测逻辑，而是在测日历。
+
+        本用例要守的是 `classify_n_zero` 的**分支优先级**：
+           被 CONTAMINATED_FIELDS 点名的截面 → stripped 桶（不论值是否置空），
+           只有未被点名的截面才进 has / has_mature。
+        构造数据能把它测干净，且永久有效。
         """
-        for f in ("score_quality", "score_growth"):
-            z = self.F.classify_n_zero(f, 5, self.snaps, self.tdays)
-            self.assertEqual(z["reason"], self.F.N_ZERO_STRIPPED, (f, z))
-            self.assertIn("污染剔除", z["label"])
+        tdays = ["2026-01-05", "2026-01-06", "2026-01-07", "2026-01-08", "2026-01-09",
+                 "2026-01-12", "2026-01-13"]
+        # 10-28 未被点名：有值且到期 → 进 has_mature（正常可用样本）
+        # 10-23 被点名且被置空、10-26 被点名但值仍在 → 两者都必须进 stripped
+        snaps = [
+            {"date": "2026-01-05", "rows": [{"score_quality": None}]},   # 未点名、无值
+            {"date": "2026-01-06", "rows": [{"score_quality": 5.0}]},    # 未点名、到期
+            {"date": "2026-01-12", "rows": [{"score_quality": 5.0}]},    # 未点名、未到期
+        ]
+        stripped = {"2026-01-05": ("score_quality",),
+                    "2026-01-07": ("score_quality",)}
+        # 只剩被点名的到期截面 → 必须是 STRIPPED
+        # 说明：这里刻意让「未点名的到期截面」不存在，模拟「仅有的样本被剔空」
+        snaps_only_stripped = [
+            {"date": "2026-01-05", "rows": [{"score_quality": None}]},
+            {"date": "2026-01-07", "rows": [{"score_quality": 5.0}]},  # 被点名但值仍在
+            {"date": "2026-01-12", "rows": [{"score_quality": 5.0}]},  # 未到期
+        ]
+        z = self.F.classify_n_zero("score_quality", 2, snaps_only_stripped, tdays,
+                                   stripped=stripped)
+        self.assertEqual(z["reason"], self.F.N_ZERO_STRIPPED, z)
+        self.assertIn("污染剔除", z["label"])
+        # 关键：被点名但**值仍在**的 01-07 也必须计入 stripped（不依赖置空时序）
+        self.assertEqual(z["n_stripped_mature"], 2, z)
+
+        # 反向守卫：一旦存在未被点名的到期截面，就必须让位给 PAIRS，
+        # 不能因为「有污染样本」就把整行的成因说成被剔空。
+        z2 = self.F.classify_n_zero("score_quality", 2, snaps, tdays, stripped=stripped)
+        self.assertEqual(z2["reason"], self.F.N_ZERO_PAIRS, z2)
 
     def test_insufficient_pairs(self):
         """score_size_growth 的 h=5 只有 1 个到期截面且配对不足 → 判「配对不足」。"""

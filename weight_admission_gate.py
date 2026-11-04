@@ -395,6 +395,23 @@ STABLE_DIMS = ["score_fund", "score_quality", "score_size_growth"]
 DEFAULT_WF_PASS_RATE = 0.5
 
 
+def ic_evidence_audit():
+    """⭐ round128 G-C：短面板 IC 的证据准入审计（**只读诊断，不改五门裁决**）。
+
+    记忆里那条「门槛后 IC 不可复现，不得作为权重依据」此前只是一句文案，
+    闸门代码从未读 cross_section_audit。这里把 usable=False 的口径显式列出，
+    让「哪些 IC 能进权重讨论」变成可查询的机器判据。
+
+    不把它做成第六道门禁是有意的：G1~G5 的统计含义已经固定，
+    悄悄加一道会改变历史裁决的可比性。故只披露，供人/上层脚本取用。
+    """
+    try:
+        from guard_ic_driven_weights import ic_evidence_audit as _audit
+        return _audit()
+    except Exception as e:
+        return {"available": False, "error": f"{type(e).__name__}: {e}"}
+
+
 # ═══════════════ 数值/序列化工具（numpy 标量陷阱）═══════════════
 
 def _fnum(v):
@@ -980,6 +997,7 @@ def evaluate(wmap, X, M, Y, RY, dates, pool_mask, used_idx,
         "break_gap": gap,
         "break_significant": brk_sig,
         "walkforward": wf,
+        "ic_evidence_audit": ic_evidence_audit(),
         "caveat": (
             "⚠️ 本条裁决的边界："
             "(1) 域为 round91 逐截面重建池，股本用跨期常数（无拆股调整）→ 历史市值有近似误差；"

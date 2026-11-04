@@ -13,9 +13,15 @@
 产出（data/panel_r124_mat.npz）：
     dates  (D,)        str
     codes  (N,)        str
-    S      (D, N, 8)   float32  8 个分数维（缺失=NaN）
+    S      (D, N, 9)   float32  9 个分数维（缺失=NaN）
     P      (D, N, 4)   float32  price / circ_mv / amount / turnover_ratio
-    dims   (8,)        str      S 轴2 的维名顺序
+    dims   (9,)        str      S 轴2 的维名顺序
+
+⭐ round128：新增第 9 维 score_dominant。
+   此前 SDIMS 只有 8 维（无 dominant / fund），所以即使 build_panel_long
+   回填了 dominant，下游 IC 也**根本看不到这一维**，实际生效 Σ 恒为 0.70。
+   fund 仍是真盲区，不加入（加入只会得到全 NaN 列，徒增内存）。
+   ⇒ 修复后 effective Σ = 0.80。
 """
 import json
 import os
@@ -29,7 +35,8 @@ SRC = os.path.join(HERE, "data", "panel_round124_long.json")
 OUT = os.path.join(HERE, "data", "panel_r124_mat.npz")
 
 SDIMS = ["score_bias60", "score_rsi_rev", "score_lowvol20", "score_tech_neg",
-         "score_size_growth", "score_ep", "score_quality", "score_growth"]
+         "score_size_growth", "score_ep", "score_quality", "score_growth",
+         "score_dominant"]   # ⭐ round128：第 9 维，见文件头说明
 PDIMS = ["price", "circ_mv", "amount", "turnover_ratio"]
 
 

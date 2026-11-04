@@ -5,13 +5,17 @@
     v2 读 pack_panel_npz.py 产出的紧凑矩阵 data/panel_r124_mat.npz（78 MB），
        全程 numpy 向量化，峰值 < 1 GB。
 
-口径（与生产 v4.17 严格一致）：
-    权重 fund .20 / size_growth .20 / tech_neg .10 / quality .10 / ep .10 /
-         dominant .10 / growth .10 / bias60 .05 / rsi_rev .05
-    ⚠️ fund 与 dominant 在长面板全 None → **从分母剔除**再重归一化，
-       不能用 `or 0`（那等于把「没测」当「0 分」，系统性压低总分）。
-    实际生效：6 维（size_growth .20 / tech_neg .10 / quality .10 / ep .10 /
-              growth .10 / bias60 .05 / rsi_rev .05）= Σ0.70 → 逐行除以 0.70
+口径（权重**运行时读 factor_weights.json**，不再硬编码，改权重不会静默错位）：
+    ⭐ round128（2026-11-04）：
+      · 权重版本 v4.18-c1-head-excess（C1：tech_neg .10→0 / growth .10→.20）
+      · 修了 build_panel_long.py 的 em 转置 bug，长面板 score_dominant **已回填**；
+        pack_panel_npz.py 的 SDIMS 同步加了第 9 维 → 该维终于进入 IC。
+      · 仍不可回填：**score_fund**（逐日资金流快照无历史）→ 真盲区 0.20。
+    ⚠️ 缺维一律**从分母剔除**再重归一化，不能用 `or 0`
+       （那等于把「没测」当「0 分」，系统性压低总分）。
+    实际生效 Σ 由 0.70（round124，fund+dominant 双缺）提升到 **0.80**
+       （round128，只剩 fund 一缺）；逐行除以该有效和。
+    产物里 blind_weight_sum / effective_weight_sum 会显式写出这两个数字。
 
 ⚠️ 三档过滤（必须都报，否则无法判断 alpha 是否只在不可交易样本里）：
     raw   —— 无过滤（与旧结论可直接比）
@@ -32,10 +36,23 @@ MAT = os.path.join(HERE, "data", "panel_r124_mat.npz")
 KL = os.path.join(HERE, "data", "klines_2020.npz")
 OUT = os.path.join(HERE, "data", "ic_long_2020.json")
 
-# 生产权重（与 factor_weights.json v4.17-cycle-rules 一致）
-W = {"score_fund": 0.20, "score_size_growth": 0.20, "score_tech_neg": 0.10,
-     "score_quality": 0.10, "score_ep": 0.10, "score_dominant": 0.10,
-     "score_growth": 0.10, "score_bias60": 0.05, "score_rsi_rev": 0.05}
+# ⭐ round128：生产权重改为 **factor_weights.json 单一来源**。
+#   原为硬编码字典，是 verify_weights_round36 检查的六处之外的「第七处」：
+#   改权重时极易漏掉，导致长面板 IC 悄悄按旧口径算出来的结论被当成新权重的证据。
+#   2026-11-04 落地 C1 时实测确认这一处确实存在 → 改为运行时读取 + 断言。
+def _load_prod_weights():
+    with open(os.path.join(HERE, "factor_weights.json"), encoding="utf-8") as _f:
+        _cfg = json.load(_f)
+    _w = {k: float(v) for k, v in (_cfg.get("weights") or {}).items()
+          if float(v or 0) > 0}
+    if abs(sum(_w.values()) - 1.0) > 1e-9:
+        raise RuntimeError(f"factor_weights.json Σw={sum(_w.values())} ≠ 1.0")
+    return _w, _cfg.get("version"), int(_cfg.get("target_horizon") or 0)
+
+
+W, W_VERSION, TARGET_H = _load_prod_weights()
+print(f"生产权重来源 = factor_weights.json  {W_VERSION} / h={TARGET_H} / "
+      f"生效 {len(W)} 维 Σ=1.0")
 # round125: dim_max 改为**单一来源**（原为硬编码，且漏了 score_fund: 5.0）。
 #   铁律：量程只能来自 factor_weights.json；本文件用到的维度在此显式声明，
 #   缺失由 dim_cfg 直接报错而非静默按 10.0 处理。
@@ -93,6 +110,22 @@ def main():
     S = z["S"]                                   # (D, N, 8)
     P = z["P"]                                   # (D, N, 4)
     print(f"  面板 {len(pdates)} 日 × {len(codes)} 只 × {len(dims)} 维  {S.shape}")
+
+    # ⭐ round128 硬守卫：日链的 long_panel_ic 分支**只重算 IC，不重建面板矩阵**
+    #   （run_daily_local.sh 里没有 build_panel_long / pack_panel_npz）。
+    #   若有人拿旧的 8 维 npz 跑本脚本，dominant 会被静默当成"不可回填"，
+    #   effective Σ 悄悄退回 0.70，而产物看起来完全正常 —— 同型静默事故已踩多次。
+    #   ⇒ 除已知真盲区 score_fund 外，任何 w>0 的维缺列都直接拒绝出结论。
+    KNOWN_UNBACKFILLABLE = {"score_fund"}   # 主力净流入无逐日历史快照
+    _missing = [d for d in W if d not in dims and d not in KNOWN_UNBACKFILLABLE]
+    if _missing:
+        raise SystemExit(
+            "❌ 紧凑矩阵缺列 " + ", ".join(_missing)
+            + "（这些维有生效权重但矩阵里没有）→ 请先跑 pack_panel_npz.py 重建。\n"
+            "   ⚠️ 不可通过「忽略该维」绕过：那会让 effective Σ 静默退回 0.70，"
+            "   与 factor_weights.json 的口径不符。")
+    print(f"  ✅ 矩阵列守卫 PASS：除真盲区 {sorted(KNOWN_UNBACKFILLABLE)} 外，"
+          f"所有生效维都在矩阵里")
 
     k = np.load(KL, allow_pickle=False)
     close = k["X"][:, :, 1]                       # (Nk, Kd)
@@ -259,8 +292,19 @@ def main():
             "n_dates": len(pdates),
             "range": [pdates[0], pdates[-1]],
             "weight_used": W,
+            "weight_version": W_VERSION,
+            "target_horizon": TARGET_H,
             "weight_effective": {d: round(float(wv[i]), 4) for i, d in enumerate(dims)},
             "missing_dims": [d for d in W if d not in dims],
+            # ⭐ round128：盲区必须把「多少名义权重从未进过检验」写成数字，
+            #   而不是只留一个列名让人自己算。fund 是真盲区，dominant 已回填。
+            "blind_weight_sum": round(sum(float(W.get(d, 0))
+                                          for d in W if d not in dims), 4),
+            "effective_weight_sum": round(sum(float(W.get(d, 0))
+                                              for d in dims), 4),
+            "coverage_note": ("长面板 IC 只在「面板里实际有列」的维度上成立；"
+                              "缺维从分母剔除、禁 or 0。effective_weight_sum < 1.0 "
+                              "的差额即从未被本检验覆盖的名义权重。"),
             "dim_max": DIM_MAX,
             "min_cross_section": MIN_CS,
             "min_amount_wan": MIN_AMOUNT,

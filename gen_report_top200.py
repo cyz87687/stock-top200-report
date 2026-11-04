@@ -224,7 +224,7 @@ def _load_dim_weights():
     #   fund 0.12→0.242（8 维里唯一消融 t>4：+4.41/+4.32，最硬）；
     #   tech_neg 0.06→0.030（10−score_tech 方差过小，σ 贡献仅 2.1%、近乎常数）。
     #   释放的 9.2pp 全部给 fund，Σ=1.0 不变。
-    _fb = {"score_fund": 0.200000, "score_news": 0.000000, "score_theme_neg": 0.000000, "score_size": 0.000000, "score_sector": 0.000000, "score_quality": 0.100000, "score_growth": 0.100000, "score_tech_neg": 0.100000, "score_oversold60": 0.000000, "score_bias60": 0.050000, "score_rsi_rev": 0.050000, "score_vol_pulse": 0.000000, "score_overbought": 0.000000, "score_theme_intrinsic": 0.000000, "score_attention": 0.000000, "score_lowvol20": 0.000000, "score_ep": 0.100000, "score_size_ind": 0.000000, "score_size_growth": 0.200000, "score_dominant": 0.100000}
+    _fb = {"score_fund": 0.200000, "score_news": 0.000000, "score_theme_neg": 0.000000, "score_size": 0.000000, "score_sector": 0.000000, "score_quality": 0.100000, "score_growth": 0.200000, "score_tech_neg": 0.000000, "score_oversold60": 0.000000, "score_bias60": 0.050000, "score_rsi_rev": 0.050000, "score_vol_pulse": 0.000000, "score_overbought": 0.000000, "score_theme_intrinsic": 0.000000, "score_attention": 0.000000, "score_lowvol20": 0.000000, "score_ep": 0.100000, "score_size_ind": 0.000000, "score_size_growth": 0.200000, "score_dominant": 0.100000}
     try:
         _p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "factor_weights.json")
         with open(_p, encoding="utf-8") as _f:
@@ -1778,11 +1778,14 @@ try:
                    f'🧺 {_pool_note} · 成交额排名 · {_N_EFF_DIM} 维评分</div>')
     # ═══ round125 P0：闸门盲区披露（页面必须说实话）═══
     # 谁在做这个判定：weight_admission_gate.resolve_eval_dims()，以**实读面板的列**
-    #   为准。长面板 panel_round124_long 里没有 score_fund / score_dominant 两列
-    #   （2020 起回补，主力净流入与龙头判定无历史快照）→ 合计 0.30 名义权重
-    #   **从未经过任何一道闸门**。
+    #   为准。⭐ round128：修了 build_panel_long.py 的 em 转置 bug 后，
+    #   score_dominant 已回填（0.10 不再是盲区）；pack_panel_npz.py 也加了第 9 维。
+    #   现在长面板只剩 **score_fund 一列全 None**（主力净流入无逐日历史快照），
+    #   盲区由 0.30 降为 **0.20**，可验名义权重由 70% 升到 **80%**。
+    #   ⚠️ 下面的文案全部由 _gate_coverage() 动态生成，**禁写死数字**——
+    #      历史注释里写 0.30/70% 曾让后来人误判，改口径时务必同步实读。
     # 为什么必须显示在 Hero：读者只看得见「9 维评分」，会默认 9 维都通过检验。
-    #   实际可被检验的只有 70%。这是「伪造验证覆盖」的反面——主动说破。
+    #   这是「伪造验证覆盖」的反面——主动说破。
     try:
         import weight_admission_gate as _G
         _cov_g = _G._gate_coverage()
@@ -4185,7 +4188,7 @@ try:
             _rf51_cmp = _rf51.get("compare_factor_ic") or {}
             _rf51_miss_w = 0.0          # 证据不足（n<20 或无记录）的名义权重合计
             _rf51_miss_dims = []
-            _rf_W_ACT = {"score_fund": 0.200000, "score_quality": 0.100000, "score_growth": 0.100000, "score_ep": 0.100000, "score_size_growth": 0.200000, "score_bias60": 0.050000, "score_rsi_rev": 0.050000, "score_dominant": 0.100000, "score_tech_neg": 0.100000}
+            _rf_W_ACT = {"score_fund": 0.200000, "score_quality": 0.100000, "score_growth": 0.200000, "score_ep": 0.100000, "score_size_growth": 0.200000, "score_bias60": 0.050000, "score_rsi_rev": 0.050000, "score_dominant": 0.100000, "score_tech_neg": 0.000000}
             _rf51_seen = set()
             for _dk, _dv in _rf51_cmp.items():
                 if not isinstance(_dv, dict):
@@ -6026,7 +6029,9 @@ if quant_json or ai_pick_names:
     #
     #   ⇒ 横幅的诚实结论是：
     #       ① h=20 已有可计算的 IC 与 t（不再是「零可复现截面」）
-    #       ② 但**仍然零样本外**（n_oos_dates=0），且 fund/dominant 在长面板 0 覆盖
+    #       ② 但**仍然零样本外**（n_oos_dates=0）。⭐ round128：修了 em 转置 bug
+    #          后 dominant 已回填，盲区只剩 fund(0.20)、生效 Σ 0.70→0.80
+    #          （下方数字一律由 _gate_coverage() 实读，禁再写死）
     #       ③ 所以「禁当已验证 alpha」这句不变 —— 理由从「无法复现」换成「无样本外」
     try:
         _aud = (_ic or {}).get("cross_section_audit") or {}
@@ -6035,8 +6040,15 @@ if quant_json or ai_pick_names:
         _h1a = _aud.get("current_weights_composite_ic|h1") or {}
         _msc = (_ic or {}).get("min_cross_section")
         _wf = {}
+        _wfo = {}
         try:
             import glob as _g
+            # ⭐ round128：优先读 walkforward_oos.py 的新产物 —— 它把
+            #   「构造期时间稳定性」和「真·前瞻样本外」分开记录，避免把
+            #   历史分段检验包装成 OOS。旧的 optimized 文件只作 fallback。
+            _wp = os.path.join(_ai_dir, "data", "walkforward_oos.json")
+            if os.path.exists(_wp):
+                _wfo = json.load(open(_wp, encoding="utf-8")) or {}
             _ofs = sorted(_g.glob(os.path.join(_ai_dir, "factor_weights_optimized_*.json")), reverse=True)
             if _ofs:
                 _wf = (json.load(open(_ofs[0], encoding="utf-8")).get("walkforward") or {})
@@ -6045,7 +6057,7 @@ if quant_json or ai_pick_names:
         _nh20 = _h20a.get("n_after_gate")
         _nh5 = _h5a.get("n_after_gate")
         _nh1 = _h1a.get("n_after_gate")
-        _noos = _wf.get("n_oos_dates")
+        _noos = _wfo.get("n_oos_dates", _wf.get("n_oos_dates"))
 
         # ── 长面板权威 IC（round124 P0-1 写入 factor_ic.json 的 long_panel_ic 块）──
         _lp = (_ic or {}).get("long_panel_ic") or {}
@@ -6083,11 +6095,39 @@ if quant_json or ai_pick_names:
                     f'每截面中位仅约 194 只 → 在「每截面 ≥{_msc} 只」门槛下 h=20 剩 '
                     f'<b>0</b> 个截面。<b>这只说明近端短窗样本量不足，'
                     f'不构成「h=20 无证据」</b>。')
-            # ③ 不变的那条：零样本外
+            # ③ 时间稳定性（IN-SAMPLE）—— round128 新增，明确标注不是 OOS
+            _st = _wfo.get("time_stability") or {}
+            if _st:
+                _st_ic = (_st.get("overall") or {}).get("ic_mean")
+                _rows_ev.append(
+                    f'<b>时间稳定性（IN-SAMPLE，非样本外）</b>：固定权重 '
+                    f'{_st.get("folds")} 折 / {_st.get("n_stability_dates")} 日'
+                    f'（折间 embargo {_st.get("embargo_days")} 日、逐折不重拟）→ '
+                    f'通过率 <b>{_st.get("pass_rate")}</b>，全域 IC <b>{_st_ic}</b>。'
+                    '<b>⚠️ 权重本就是用整段 2020~2026 调出来的，'
+                    '通过只说明「不靠单一年份撑起」，不说明未来有效。</b>')
+            # ④ 不变的那条：零样本外 + 动态盲区（禁再写死 0.30 / 0.70）
+            #    round128 修了 em 转置 bug 后 dominant 已回填，盲区只剩 fund(0.20)，
+            #    硬编码数字会让页面在修复后仍显示错误结论。
+            _blind_txt, _blind_w, _eff_pct = "（闸门不可读）", None, None
+            try:
+                import weight_admission_gate as _GG
+                _gc = _GG._gate_coverage()
+                _bd = _gc.get("blind_dims") or {}
+                _blind_txt = "、".join(
+                    "%s(%.2f)" % (k.replace("score_", ""), float(v))
+                    for k, v in _bd.items()) or "无"
+                _blind_w = sum(float(v) for v in _bd.values())
+                _eff_pct = float(_gc.get("evaluable_ratio") or 0) * 100
+            except Exception:
+                pass
+            _blind_seg = ("；长面板盲区 <code>%s</code> 合计 <b>%.2f</b> 名义权重"
+                          "（闸门实读可验 <b>%.0f%%</b>）"
+                          % (_blind_txt, _blind_w, _eff_pct)) if _blind_w else ""
             _rows_ev.append(
-                f'<b>仍然成立的红线</b>：走步验证样本外交易日 <b>{_noos}</b> 个 → '
-                '<b>零样本外证据</b>；且 <code>fund(.20)+dominant(.10)=0.30</code> '
-                '在长面板中 <b>0 覆盖</b>（实际生效权重仅 0.70）。')
+                f'<b>仍然成立的红线</b>：真·前瞻样本外交易日 <b>{_noos}</b> 个 → '
+                f'<b>零样本外证据</b>{_blind_seg}。'
+                'G5 需「时间稳定性通过 + 前瞻独立观测≥30」同时成立，当前仅前者可测。')
             _ev_gap = (
                 '<div style="margin:12px 0;padding:12px 14px;background:rgba(239,68,68,0.10);'
                 'border-left:4px solid #ef4444;border-radius:8px;font-size:12px;color:#fca5a5;'

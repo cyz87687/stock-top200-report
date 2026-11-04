@@ -2,6 +2,9 @@ __pycache__/
 *.pyc
 .trae/
 .workbuddy/
+# macOS 系统文件：无信息量且每次打开 Finder 就变 → 不该入库（2026-11-05 移出索引）
+.DS_Store
+*/.DS_Store
 *.json
 !package.json
 # ⚠️ 以下 json 不是「每日数据产物」，而是**代码逻辑的直接输入**（缺了会静默失效）。
@@ -20,6 +23,7 @@ __pycache__/
 !data/dim_ic_long.json
 !data/ic_dsr_long.json
 !data/weight_scheme_curve.json
+!data/weight_scheme_curve_round128.json
 !data/backtest_universe_summary.json
 update_rating.py
 # 本地 LLM 凭据（严禁入库；GitHub Actions 请用 repository secrets）

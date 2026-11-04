@@ -27,7 +27,7 @@ W_NEWS, W_TECH, W_FUND, W_THEME = 0.20, 0.20, 0.30, 0.30
 # 计算 total 必须走十维公式，禁止再用旧的四维 0-20 量纲公式——
 # 否则单独重跑本脚本会把 total 打回 20 分制，与 apply_sector_momentum 的
 # 百分制十维口径冲突（历史事故：页面出现 11~18 与 28~93 两套量纲并存）。
-_W_PRIOR_10D = {"score_fund": 0.200000, "score_news": 0.000000, "score_theme_neg": 0.000000, "score_size": 0.000000, "score_sector": 0.000000, "score_quality": 0.100000, "score_growth": 0.100000, "score_tech_neg": 0.100000, "score_oversold60": 0.000000, "score_bias60": 0.050000, "score_rsi_rev": 0.050000, "score_vol_pulse": 0.000000, "score_overbought": 0.000000, "score_theme_intrinsic": 0.000000, "score_attention": 0.000000, "score_lowvol20": 0.000000, "score_ep": 0.100000, "score_size_ind": 0.000000, "score_size_growth": 0.200000, "score_dominant": 0.100000}  # v4.14-evidence-aligned：quality 0.212→0.12（实证 h20 IC −0.147 负），fund 0.12→0.242（消融 t=+4.41 唯一>4），# tech_neg 0.06→0.03（σ 贡献仅 2.1% 近乎常数）；Σ=1.0
+_W_PRIOR_10D = {"score_fund": 0.200000, "score_news": 0.000000, "score_theme_neg": 0.000000, "score_size": 0.000000, "score_sector": 0.000000, "score_quality": 0.100000, "score_growth": 0.200000, "score_tech_neg": 0.000000, "score_oversold60": 0.000000, "score_bias60": 0.050000, "score_rsi_rev": 0.050000, "score_vol_pulse": 0.000000, "score_overbought": 0.000000, "score_theme_intrinsic": 0.000000, "score_attention": 0.000000, "score_lowvol20": 0.000000, "score_ep": 0.100000, "score_size_ind": 0.000000, "score_size_growth": 0.200000, "score_dominant": 0.100000}  # v4.14-evidence-aligned：quality 0.212→0.12（实证 h20 IC −0.147 负），fund 0.12→0.242（消融 t=+4.41 唯一>4），# tech_neg 0.06→0.03（σ 贡献仅 2.1% 近乎常数）；Σ=1.0
 def _load_w10():
     """读 factor_weights.json 的 weights（十维）；失败回退兜底先验。"""
     try:
@@ -376,7 +376,30 @@ def main():
     #   实际评分版本（如 v4.15-constraint-cap）改写成假版本 —— 违反 gen_report 的
     #   「评分层版本以 scored json 的 model 字段为准，重跑不虚标」口径。
     #   现仅在缺失时兜底填旧串，已有版本保持不动。
-    data["model"] = data.get("model") or "stock-scorer v2.30 (AI-augmented)"
+    #
+    # ⭐ round128 追加：上面那条「保持不动」在**改权重时是错的**。
+    #   实测（2026-11-04 落地 C1）：重跑 enhance 后 total 已按 v4.18 新权重算，
+    #   但 scored 里 model 仍写 v4.17、data["weights"] 仍是旧权重快照 →
+    #   页面权重条、分数、数据文件自述三者各说各话，属典型静默口径漂移。
+    #   修法：保留 model 里的 AI / sector-momentum 描述，**只替换版本 token**，
+    #   并把产线权重快照与版本号一并写回。
+    import re as _re_mod
+    _cfg_ver = "unknown"
+    try:
+        with open(os.path.join(here, "factor_weights.json"), encoding="utf-8") as _vf:
+            _cfg_ver = (json.load(_vf) or {}).get("version") or "unknown"
+    except Exception:
+        pass
+    _old_model = str(data.get("model") or "")
+    _new_model = _re_mod.sub(r"v\d+\.\d+[\w.\-]*", str(_cfg_ver),
+                             _old_model, count=1)
+    data["model"] = (_new_model if _new_model != _old_model
+                     else f"stock-scorer {_cfg_ver} (AI + sector-momentum[evidence])")
+    data["weights"] = dict(_load_w10())
+    data["weights_version"] = _cfg_ver
+    data["weights_note"] = ("factor_weights.json 产线权重快照；"
+                            "score_sector 由 apply_sector_momentum.py 按全权重并入")
+    print(f"   🔄 元数据同步：model → {_cfg_ver}，weights 快照已刷新")
     data["stats"]["rating_dist"] = {k: rc.get(k, 0) for k in "SABCD"}
     data["stats"]["sector_avg"] = {
         s: {"count": len(v), "avg": round(sum(v) / len(v), 1)}

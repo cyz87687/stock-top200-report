@@ -3,12 +3,13 @@
 目的：回答三个必须回答的问题，否则权重无从调整。
 
 D1 每一维单独的 h=20 IC 与 NW t 是多少？
-   现行 9 维权重里 fund(.20)+dominant(.10)=.30 在长面板是**结构性缺失**
-   （fund 无历史快照、dominant 无业务份额数据）→ 实际只有 7 维在起作用，
-   但权重仍按 9 维口径标注。必须量化：这 7 维各自的真实贡献。
+   ⭐ round128 事实更正：旧注释说「fund+dominant=.30 结构性缺失、实际只有 7 维」，
+   那只是 round125 的 em 转置 bug 造成的**假象**。修好后 dominant 已回填
+   （1653/1653 满覆盖），长面板只缺 fund(.20) 一列 → 生效 Σ 0.70→0.80。
+   ⚠️ 权重从 factor_weights.json 运行时读取，禁再硬编码。
 
 D2 三维共线（P0-3）：bias60 / rsi_rev / tech_neg 相关系数多少？
-   若 ρ>0.7 → 名义 0.05+0.05+0.10=0.20 的实际独立信息量远小于 0.20。
+   ⭐ C1 落地后 tech_neg 权重归零，该簇名义由 0.20 降为 0.10（bias60 .05 + rsi_rev .05）。
    记忆已实测 bias60 vs rsi_rev ρ=+0.7625，本轮在 1653 天上复核。
 
 D3 Bonferroni：本轮检验了多少次？
@@ -31,12 +32,23 @@ MAT = os.path.join(HERE, "data", "panel_r124_mat.npz")
 KL = os.path.join(HERE, "data", "klines_2020.npz")
 OUT = os.path.join(HERE, "data", "dim_ic_long.json")
 
-W = {"score_fund": 0.20, "score_size_growth": 0.20, "score_tech_neg": 0.10,
-     "score_quality": 0.10, "score_ep": 0.10, "score_dominant": 0.10,
-     "score_growth": 0.10, "score_bias60": 0.05, "score_rsi_rev": 0.05}
+# ⭐ round128：第十处权重硬编码 → 改为 factor_weights.json 单一来源。
+#   分维 IC 的 "weight" 字段若停在 v4.17，改权重后页面会拿旧权重解释新组合，
+#   且 guard_ic_driven_weights.py 的 ρ 计算也会用到它 —— 属静默口径漂移。
+with open(os.path.join(HERE, "factor_weights.json"), encoding="utf-8") as _f:
+    _cfg = json.load(_f)
+W = {k: float(v) for k, v in (_cfg.get("weights") or {}).items()
+     if float(v or 0) > 0}
+W_VERSION = _cfg.get("version")
+if abs(sum(W.values()) - 1.0) > 1e-9:
+    raise RuntimeError(f"factor_weights.json Σw={sum(W.values())} ≠ 1.0")
 MIN_CS = 200
 MIN_AMOUNT = 2000.0
 H = 20
+# ⚠️ 断言必须在 H 定义之后（round128 首次写时放在上面导致 NameError，已修）
+if int(_cfg.get("target_horizon") or 0) != H:
+    raise RuntimeError(f"target_horizon={_cfg.get('target_horizon')} ≠ 本脚本 H={H} "
+                       f"—— 改周期前先确认，禁止静默算错周期")
 
 
 def nw_t(xs, lag):
@@ -235,6 +247,8 @@ def main():
                      "两口径都要报，只报一个会误导。"),
         },
         "missing_dims": [d for d in W if d not in dims],
+        "weight_version": W_VERSION,
+        "target_horizon": H,
         "weight_declared_sum": round(sum(W.values()), 2),
         "weight_effective_sum": round(
             sum(W.get(d, 0.0) for d in dims), 2),

@@ -62,11 +62,44 @@ DIM_MAX_STD = 10.0     # 其余维度
 #   score_fund = 主力净流入，依赖**逐日资金流快照**，历史接口不提供 →
 #   多家脚本一致声明不可重建（backfill_panel_round123.py:29/282 等）。
 #   这一项确实是真盲区，只能披露、不能回填。
+def fin_to_em(fin):
+    """⭐ round128 T0：把 load_fin 的结构转置为 build_shares 期望的结构。
+
+    load_fin(code) 返回  **{报告期: {指标: 值}}**（按报告期索引，供 pit_pick 用）
+    build_shares(em) 期望 **{c6: {指标: {报告期: 值}}}**（按指标索引，供
+    pit_period / ttm_sum 用 —— 见 ep_size_ind.py:
+        periods_desc = sorted({p for dd in ind.values() for p in dd}, ...)
+        ttm_sum 里 ind.get(name).get(p)
+    ）
+
+    round125 加了 dominant 回填调用却**没转置**，直接把 fin 传给 build_shares：
+    periods_desc 拿到的会是「营业总收入」这类**指标名**而不是 "20250930"，
+    disclosure_date(p) 全部返回 None → pit_period 返回 None → rev/prof 全 None
+    → score_dominant 仍是全 None。代码"在跑"，实为空转，且无任何报错。
+
+    ⚠️ 不要在别处复制这个转换：口径分叉会让面板 dominant 与生产 step2 不可比。
+    """
+    out = {}
+    for c6, by_period in (fin or {}).items():
+        by_ind = {}
+        for period, inds in (by_period or {}).items():
+            if not (isinstance(period, str) and len(period) == 8 and period.isdigit()):
+                continue
+            for ind, v in (inds or {}).items():
+                if isinstance(v, (int, float)) and v == v:
+                    by_ind.setdefault(ind, {})[period] = float(v)
+        if by_ind:
+            out[c6] = by_ind
+    return out
+
+
 def _build_shares_for_day(day_rows, asof, em, sw_map, mv_key="circ_mv"):
     """当日截面的业务份额 + 龙头分。返回 {code6: score_dominant}。
 
     直接复用 ep_size_ind 的两个函数，**不重写算法** —— 任何口径分叉都会让
     面板里的 dominant 与生产 step2 算出的 dominant 不可比。
+
+    ⚠️ em 必须是 fin_to_em(fin) 的**转置后**结构，见 fin_to_em 文档。
     """
     try:
         import ep_size_ind as EP
@@ -256,6 +289,13 @@ def main():
             fin[c] = f
     print(f"  有财务数据 {len(fin)}/{len(codes)} 只")
 
+    # ⭐ round128：一次性转置，供 dominant 回填（build_shares 的 em 口径）
+    #   不能每天转置一次（1653 日 × 3357 只 = 550 万次字典操作）。
+    em_shares = fin_to_em(fin)
+    _n_ind = sum(len(v) for v in em_shares.values()) / max(1, len(em_shares))
+    print(f"  EM 转置完成：{len(em_shares)} 只 / 平均 {_n_ind:.1f} 个指标"
+          f"（build_shares 口径）")
+
     # round125：行业映射（dominant 回填要用；静态文件，不随时间变）
     _SW_MAP = {}
     try:
@@ -393,7 +433,7 @@ def main():
         #   ⚠️ 必须整池一起算（份额分母=同行业本池合计），不能在单只上算。
         _day_rows = [{"code": c, "circ_mv": cmv.get(c),
                       "price": px.get(c)} for c in px]
-        s_dom = _build_shares_for_day(_day_rows, asof, fin, _SW_MAP)
+        s_dom = _build_shares_for_day(_day_rows, asof, em_shares, _SW_MAP)
 
         # ── 组装当日行 ──
         day = {}
@@ -451,6 +491,14 @@ def main():
                                    "→ 可历史重建。与生产 step2 共用 ep_size_ind.build_shares，"
                                    "禁在此重写算法。"),
             },
+            "round128_fix": {
+                "em_transpose": ("fin_to_em() 把 {报告期:{指标:值}} 转置为 "
+                                 "build_shares 期望的 {指标:{报告期:值}}；"
+                                 "round125 未转置导致 dominant 回填空转（全 None）"),
+                "dominant_guard": "有效截面率 <50% 时 exit 2，拒绝静默交付",
+                "effective_weight_sum": 0.80,
+                "note": "fund(0.20) 仍是真盲区；effective Σ=0.80 而非 1.00",
+            },
             "dim_max": {"score_bias60": DIM_MAX_REV, "score_rsi_rev": DIM_MAX_REV,
                         "其余": DIM_MAX_STD},
             "pit": {"mode": "strict", "rule": _PERIOD_DEADLINE,
@@ -471,6 +519,19 @@ def main():
     for k, arr in dim_stat.items():
         ok = sum(1 for x in arr if x >= 200)
         print(f"  {k:<20} {ok}/{len(arr)}  最低 {min(arr)}")
+
+    # ⭐ round128 守卫：dominant 若仍全空 ⇒ em 结构又错了（或依赖缺失），
+    #   绝不能静默写出一份"看起来有回填"的面板让下游闸门误判覆盖率。
+    _dom = dim_stat.get("score_dominant") or []
+    if _dom:
+        _ok = sum(1 for x in _dom if x >= 200)
+        _rate = _ok / len(_dom)
+        print(f"\n  score_dominant 有效截面 {_ok}/{len(_dom)} ({_rate:.1%})")
+        if _rate < 0.5:
+            print("  ❌ dominant 覆盖率 <50% —— 疑似 em 未转置 / sw_map 缺失 / "
+                  "财务缓存损坏。拒绝以『已回填』名义交付面板。")
+            return 2
+        print("  ✅ dominant 回填生效，闸门覆盖率可由 0.70 提升到 0.80")
     return 0
 
 

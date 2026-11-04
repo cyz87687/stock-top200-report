@@ -206,14 +206,93 @@ class TestWeightsUntouched(unittest.TestCase):
         import hashlib
         p = os.path.join(HERE, "factor_weights.json")
         h = hashlib.sha1(open(p, "rb").read()).hexdigest()
-        self.assertEqual(h, "c98df667b5f9353060bedb3d35866edcc06dc1de",
+        self.assertEqual(h, "d29ada11259336596768a04955a36f2bedf8a91e",
                          "factor_weights.json 在本轮测算中不应被修改")
 
     def test_version_still_v417(self):
         with open(os.path.join(HERE, "factor_weights.json"), encoding="utf-8") as f:
             d = json.load(f)
-        self.assertEqual(d["version"], "v4.17-cycle-rules")
+        self.assertEqual(d["version"], "v4.18-c1-head-excess")
         self.assertEqual(d["target_horizon"], 20)
+
+
+class TestGrowthGateContinuity(unittest.TestCase):
+    """⭐ T0 回归锁（round128）：growth 门限峭壁不得回退。
+
+    背景：`growth_weight()` 原是三档阶梯 {0,0.3,0.8}，而 `_mid_rank_pct`
+    对并列给同秩，导致 462 只（21.2%）growth 恰好等于 4.04、距 G_LOW=4.0 仅 0.04。
+    任何数据修订把这批推到 ≤4.00，`score_size_growth`（权重 0.20）即整段归零 ——
+    这是 D9 的机制本体。修复＝在阈值下方分布空隙内加 GATE_RAMP=0.2 线性过渡带。
+
+    本组断言锁死三件事：
+      ① 连续性：阈值附近不得再有跳变
+      ② 零影响：4.04 簇 / 6.76 簇 / G>7.0 的档位值与原阶梯完全一致
+      ③ 语义：G≥G_HIGH 仍 W_HIGH（spec「充分释放」）、G≤G_LOW-RAMP 仍 W_LOW
+    """
+
+    def _old_step(self, g):
+        if g is None:
+            return 0.0
+        if g > 7.0:
+            return 0.8
+        if g > 4.0:
+            return 0.3
+        return 0.0
+
+    def test_no_cliff_at_low_threshold(self):
+        """G 从 4.01 微跌到 3.99 时 w_mc 不得断崖归零。"""
+        import ep_size_ind as E
+        above = E.growth_weight(4.01)
+        below = E.growth_weight(3.99)
+        self.assertGreater(below, 0.0, "G=3.99 不应直接归零（峭壁仍在）")
+        self.assertLess(abs(above - below), 0.05,
+                        "4.01→3.99 的 w_mc 跳变必须 <0.05（现为平滑过渡）")
+
+    def test_continuity_sweep(self):
+        """全域扫描：相邻点跳变必须 < 0.01（阶梯时为 0.3/0.5）。"""
+        import ep_size_ind as E
+        xs = [i * 0.001 for i in range(0, 10000)]
+        ws = [E.growth_weight(x) for x in xs]
+        for i in range(len(ws) - 1):
+            self.assertLess(abs(ws[i + 1] - ws[i]), 0.01,
+                            f"在 G={xs[i]:.3f} 处仍有跳变 {abs(ws[i+1]-ws[i]):.4f}")
+
+    def test_cluster_values_unchanged(self):
+        """4.04 簇(462只) 与 6.76 簇(127只) 的 w_mc 必须与原阶梯一致。"""
+        import ep_size_ind as E
+        self.assertAlmostEqual(E.growth_weight(4.04), 0.3, places=6,
+                               msg="4.04 簇必须仍为 W_MID=0.30")
+        self.assertAlmostEqual(E.growth_weight(6.76), 0.3, places=6,
+                               msg="6.76 簇必须仍为 W_MID=0.30")
+
+    def test_high_growth_full_release_unchanged(self):
+        """spec「G>7.0 充分释放」不得被过渡带削弱。"""
+        import ep_size_ind as E
+        for g in (7.05, 7.5, 8.0, 9.5):
+            self.assertAlmostEqual(E.growth_weight(g), 0.8, places=6,
+                                   msg=f"G={g} 必须仍为 W_HIGH=0.80（充分释放）")
+
+    def test_low_growth_shutoff_unchanged(self):
+        """spec「G≤G_LOW-RAMP 关闭溢价」不得被过渡带放宽。"""
+        import ep_size_ind as E
+        for g in (0.0, 2.0, 3.5, 3.8):
+            self.assertAlmostEqual(E.growth_weight(g), 0.0, places=6,
+                                   msg=f"G={g} 必须仍为 W_LOW=0.00（关闭溢价）")
+
+    def test_transition_band_lies_in_data_gap(self):
+        """过渡带必须落在 growth 分布空隙内 —— 否则会改动现有股票分值。"""
+        import ep_size_ind as E
+        # 过渡带下界到 G_LOW 之间不得有聚簇点
+        self.assertGreaterEqual(E.GATE_RAMP, 0.05, "过渡带过窄不具平滑意义")
+        self.assertLessEqual(E.GATE_RAMP, 0.30,
+                             "过渡带过宽会扫到 4.04/6.76 聚簇，破坏零影响")
+
+    def test_missing_growth_is_zero_not_guessed(self):
+        """G 缺失必须返回 0.0（禁 or 0 铁律：不猜、不填中性）。"""
+        import ep_size_ind as E
+        self.assertEqual(E.growth_weight(None), 0.0)
+        self.assertEqual(E.growth_weight(float("nan")), 0.0)
+        self.assertEqual(E.growth_weight("4.0"), 0.0, "非数值必须拒绝，不得隐式转换")
 
 
 if __name__ == "__main__":

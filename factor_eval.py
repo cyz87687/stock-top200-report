@@ -306,7 +306,7 @@ ALL_W_DIMS = OPT_DIMS + ["score_theme_neg", "score_size", "score_sector",
 # v4.4-fund-split 先验（与 factor_weights.json 一致；运行时会优先读该文件 prior_weights）。
 # 依据：round18 theme=行业代理/news仅短线；round19 外部47因子排名；round20 反转块回填
 # 重测；round21/22 质量成长PIT实证+样本内外分层+fund敏感性（0.25~0.40全lag过，单调）。
-PRIOR_W10 = {"score_fund": 0.200000, "score_news": 0.000000, "score_theme_neg": 0.000000, "score_size": 0.000000, "score_sector": 0.000000, "score_quality": 0.100000, "score_growth": 0.100000, "score_tech_neg": 0.100000, "score_oversold60": 0.000000, "score_bias60": 0.050000, "score_rsi_rev": 0.050000, "score_vol_pulse": 0.000000, "score_overbought": 0.000000, "score_theme_intrinsic": 0.000000, "score_attention": 0.000000, "score_lowvol20": 0.000000, "score_ep": 0.100000, "score_size_ind": 0.000000, "score_size_growth": 0.200000, "score_dominant": 0.100000}  # v4.14-evidence-aligned：quality 0.212→0.12（实证 h20 IC −0.147 负），fund 0.12→0.242（消融 t=+4.41 唯一>4），# tech_neg 0.06→0.03（σ 贡献仅 2.1% 近乎常数）；Σ=1.0
+PRIOR_W10 = {"score_fund": 0.200000, "score_news": 0.000000, "score_theme_neg": 0.000000, "score_size": 0.000000, "score_sector": 0.000000, "score_quality": 0.100000, "score_growth": 0.200000, "score_tech_neg": 0.000000, "score_oversold60": 0.000000, "score_bias60": 0.050000, "score_rsi_rev": 0.050000, "score_vol_pulse": 0.000000, "score_overbought": 0.000000, "score_theme_intrinsic": 0.000000, "score_attention": 0.000000, "score_lowvol20": 0.000000, "score_ep": 0.100000, "score_size_ind": 0.000000, "score_size_growth": 0.200000, "score_dominant": 0.100000}  # v4.14-evidence-aligned：quality 0.212→0.12（实证 h20 IC −0.147 负），fund 0.12→0.242（消融 t=+4.41 唯一>4），# tech_neg 0.06→0.03（σ 贡献仅 2.1% 近乎常数）；Σ=1.0
 W_SECTOR_FIXED = 0.10              # score_sector 固定权重（样本积累中）
 W_FLOOR = 0.03                     # 单维度地板（十维下保持维度意义；3%≈旧五维5%量纲）
 TARGET_H = 1                       # 权重优化目标周期
@@ -1295,8 +1295,15 @@ def classify_n_zero(field, h, snaps, tdays, n_pairs=None, stripped=None):
                 has_mature.append(d)
     if has_mature:
         reason = N_ZERO_PAIRS
-        detail = (f"{len(has_mature)} 个到期截面里该字段有效配对均 <5 只"
-                  f"（{', '.join(has_mature[:3])}{'…' if len(has_mature) > 3 else ''}）")
+        # ⚠️ 原文案写死「有效配对均 <5 只」是**无依据的断言**：本分支只知道「该截面
+        #    有字段值且已到期」，并不知道截面内配对数。实测 2026-10-28 的 quality
+        #    在 h=5 上有 1813 只有效配对（远超 5），却因为 n_pairs=0 落进本分支，
+        #    被写成「配对均 <5 只」→ 读者会去查一个并不存在的配对缺口。
+        #    改为如实际述「有值但未产出可用 IC」，并把成立条件写明。
+        detail = (f"{len(has_mature)} 个到期截面该字段有值但未产出可用 IC "
+                  f"（{', '.join(has_mature[:3])}{'…' if len(has_mature) > 3 else ''}）"
+                  f" → 需同时满足「配对 ≥5 只」且「起止两端都有收盘价」，"
+                  f"逐截面核对是哪条未满足")
     elif stripped_mature:
         reason = N_ZERO_STRIPPED
         detail = (f"仅有的 {len(stripped_mature)} 个到期截面"
@@ -2977,6 +2984,37 @@ def main():
         if result is None:
             print("\n⚖️ 权重重拟合跳过（无十维快照字段，维持现权重）")
         else:
+            # ⭐ round128「禁按 IC 排权重」护栏（G-A/G-B）
+            #   本优化器规则①是「仅 IC>0 的维度按 IC 比例分配权重」，
+            #   而生产目标函数是 **TopN 头部超额**（持仓仅 6~13 只）。
+            #   P0-4 实测两者方向相反：lowvol20 IC +0.0828 但 TopN 全程负，
+            #   size_growth IC +0.0337 但 TopN 全程正。故拟合结果只作诊断，
+            #   必须打标为「IC 驱动、不可直接上线」，防止有人拿旁路文件改权重。
+            try:
+                from guard_ic_driven_weights import (evidence_snapshot,
+                                                    ic_rank_agreement,
+                                                    TARGET_FUNCTION)
+                _rho, _n = ic_rank_agreement(
+                    {k: float(v) for k, v in w10.items()},
+                    (evidence_snapshot().get("dim_ic_h20") or {}))
+                result["ic_driven_guard"] = {
+                    "verdict": "DIAGNOSTIC_ONLY",
+                    "reason": "本结果按 IC 比例分配权重，未经 TopN 超额对照，不得直接作为生产权重",
+                    "optimizer_objective": "cross_section_IC",
+                    "production_objective": TARGET_FUNCTION,
+                    "ic_rank_rho": _rho,
+                    "n_common_dims": _n,
+                    "required_before_adoption": [
+                        "在 data/weight_scheme_curve.json 口径下补 N6/N10/N13/N30/N50 超额对照",
+                        "过 weight_admission_gate.py 五门",
+                        "八处同步 + verify_weights_round36.py PASS",
+                    ],
+                }
+            except Exception as _ge:
+                result["ic_driven_guard"] = {"verdict": "UNKNOWN",
+                                            "error": f"{type(_ge).__name__}: {_ge}"}
+            print(f"   🛡️ IC 驱动护栏：该拟合结果为 DIAGNOSTIC_ONLY，"
+                  f"禁直接上线（目标函数应为 TopN 头部超额）")
             # ══════════════════════════════════════════════════════════════
             # 🛑 权重覆盖守卫（2026-10-29 新增，P0 级）
             # ──────────────────────────────────────────────────────────────

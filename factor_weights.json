@@ -1,12 +1,12 @@
 {
-  "version": "v4.17-cycle-rules",
-  "fitted_at": "2026-11-02 20:25:00",
+  "version": "v4.18-c1-head-excess",
+  "fitted_at": "2026-11-04 23:49:54",
   "target_horizon": 20,
-  "method": "v4.17-cycle-rules：2026-11-02 round108「指令D 落地」——老大三条指令全采纳。①P0/P1 修订：C1 growth 纳入「业绩动量」大类（cap .30，补 round105 治理缺口）；C2 加 accel 与 P1g 去重互斥，采纳 P1g（D3 路A，growth 合成分改纯 rank_Gq，QoQ 一阶导不再重复计量）；C3 防呆改数据驱动（规则1/2 取代拍脑袋阈值）；C4 panel 待补 score_growth。②周期标签：新建 sector/cycle_industry.json 单一来源（20 个申万二级，含光伏），正面清单 gate，成长/消费/医药天然豁免。③两条规则（仅强周期生效）：规则1 盈利持续性=毛利率水平抬升>3pp 扣成长分 10%（原方案「毛利率波动 std>行业p60」实测 lift 0.945<1 方向反了，已换口径）；规则2 二阶导可持续性=按期去均值 ΔG_q≥周期组 p80 扣 15%；叠加上限 25%。权重变动：growth .05→.10（业绩动量通道加倍，否则规则扣分只传导 −0.12 分形同虚设）、rsi_rev .10→.05（反转簇让出）；Σ=1.0 不变。门禁：G1~G4 沿用 v4.16.1 结论、G5 仍未过（1/6 折），panel_round66 无 score_growth 列 → growth 维仍是门禁盲区，权重为产品裁决非 IC 背书。灰度性质存续——禁止表述为『经验证的 alpha』。",
+  "method": "v4.18-c1-head-excess：2026-11-04 round128「全部改动」裁决，采纳 P0-4 实证里唯一全档改善的 C1 方案。tech_neg .10→0（IC −0.0069 / NW t −0.67，与 0 无法区分，属机会成本而非负 alpha）、growth .10→.20。依据 data/weight_p04_constrained.json（C1_min_techneg_to_growth）：N6/N10/N13/N30/N50 全档优于现行（+0.14~+1.13pp），代价复合 IC −10%（+0.0539→+0.0485）。⭐ 目标函数是 **TopN 头部超额**（生产持仓 6~13 只），不是全截面 IC —— 实测两者方向相反：lowvol20 IC +0.0828 但 TopN 全区间负，size_growth IC +0.0337 但 TopN 全程正。**禁按 IC 排权重**。⚠️ 仍是产品裁决、非 IC 背书：G5 样本外未闭合、fund(0.20) 长面板无历史快照，禁止表述为『经验证的 alpha』。target_horizon=20 不变。 实测逐档：N6 −0.879→+0.250、N10 −0.531→+0.140、N13 −0.283→+0.378、N30 +0.366→+0.573、N50 +0.578→+0.718（pp）。",
   "weights": {
     "score_bias60": 0.05,
     "score_rsi_rev": 0.05,
-    "score_tech_neg": 0.1,
+    "score_tech_neg": 0.0,
     "score_lowvol20": 0.0,
     "score_quality": 0.1,
     "score_size_growth": 0.2,
@@ -18,7 +18,7 @@
     "score_theme_neg": 0.0,
     "score_size": 0.0,
     "score_sector": 0.0,
-    "score_growth": 0.1,
+    "score_growth": 0.2,
     "score_oversold60": 0.0,
     "score_vol_pulse": 0.0,
     "score_overbought": 0.0,
@@ -28,7 +28,7 @@
   "prior_weights": {
     "score_bias60": 0.05,
     "score_rsi_rev": 0.05,
-    "score_tech_neg": 0.1,
+    "score_tech_neg": 0.0,
     "score_lowvol20": 0.0,
     "score_quality": 0.1,
     "score_size_growth": 0.2,
@@ -40,7 +40,7 @@
     "score_theme_neg": 0.0,
     "score_size": 0.0,
     "score_sector": 0.0,
-    "score_growth": 0.1,
+    "score_growth": 0.2,
     "score_oversold60": 0.0,
     "score_vol_pulse": 0.0,
     "score_overbought": 0.0,
@@ -484,6 +484,7 @@
   "factor_ic_target_h": {},
   "lambda_scan": [],
   "notes": [
+    "【v4.18-c1-head-excess】2026-11-04 round128 落地 C1：tech_neg .10→0 / growth .10→.20。八处同步（本 json 的 weights+prior_weights、factor_eval.PRIOR_W10、step2/enhance/apply 的 _W_PRIOR_10D、gen_report._fb 与 _rf_W_ACT）+ 测试指纹锁同步。约束校验 PASS：Σ=1.00 / growth .20 恰为单因子上限 / 业绩动量组 .20≤.30 / 技术反转组 .20→.10。代价 IC −10%，收益是头部超额全档改善。⚠️ 本轮同时修了长面板 dominant 回填的 em 转置 bug，长面板有效权重 Σ 由 0.70 提升到 0.80（fund .20 仍是真盲区）。",
     "【v4.17-cycle-rules】2026-11-02 round108 指令D 落地：growth .05→.10 / rsi_rev .10→.05；新增「业绩动量」大类（cap .30）；growth 合成分 P1g 去重（纯 rank_Gq）；新增周期标签单一来源 sector/cycle_industry.json（20 个申万二级，含光伏）；新增规则1（毛利率抬升>3pp 扣 10%）+规则2（去均值 ΔG_q≥p80 扣 15%，上限 25%），仅强周期股生效。⚠️ 规则1 原方案「毛利率波动 std>行业p60」实测 lift 0.945 方向反了已换口径；⚠️ 相同阈值下周期/非周期次期回落幅度几乎相同 → 门控合法性来自 autocorr 结构差异（去均值后周期 −0.55 vs 非周期 −0.02），禁宣称『只有周期股会回落』。",
     "【v4.16.1-gray-growth】v4.16.1-gray-growth：2026-10-31 round105 P0-2「业绩动量进总分」。score_growth 0→0.05（方式B·单季扣非 G_q/QoQ 合成分，产品裁决=业绩变脸响应通道；round105 实锤旧 total 对业绩变脸零响应），score_tech_neg 0.15→0.10（近乎常数注记维让渡）。门禁裁决=FAIL（G1=True/G2=True/G3=True/G4=True/G5=False）。⚠️ 面板 panel_round66 无 score_growth 列——门禁对该维是盲区，其判定仅覆盖 tech_neg 变化后的 8 维归一复合；growth .05 非 IC 证据背书。灰度性质同 v4.16（G5 样本量缺口未闭合，P0 池前视重建仍开放）——禁止表述为『经验证的 alpha』。v4.15 约束沿用：单因子≤0.20/5 大类各≤0.30/Σ=1。",
     "【v4.16-gray-icir】v4.16-gray-icir：2026-10-31 老大指令「按方案改造，重新计算评分」。依据 R103 §5.4/§6 裁决路径——audit_round104 细网格约束内重解（step=0.05、quality≤0.10 邻域含 0、重建池域 pit_pool median 260 只）+ round92 RSI/乖离有效性核查（rsi_rev 近窗 IC 为负、bias60 弱而不显著）选取 quality 邻域稳定解。门禁裁决=FAIL（G1=True/G2=True/G3=True/G4=True/G5=False）。v4.15 约束沿用：单因子≤0.20 / 5 大类各≤0.30 / Σ=1。⚠️ 灰度状态：G5 样本量缺口未闭合（仅 219 截面），P0（池前视重建严格重算 α）仍开放——禁止表述为『经验证的 alpha』。",
@@ -530,5 +531,39 @@
       ]
     },
     "enforcement": "verify_weights_round36.py 必须逐项校验，FAIL 则不出图"
+  },
+  "weight_scheme_decision": {
+    "adopted": "C1",
+    "target_function": "TopN_head_excess",
+    "not_target_function": "cross_section_IC",
+    "evidence": "data/weight_p04_constrained.json",
+    "ic_cost_pct": -10.0,
+    "head_excess_gain_pp": [
+      0.14,
+      1.13
+    ],
+    "note": "生产持仓 6~13 只，IC 是全池排序指标；两者方向相反已被实测，见 guard_ic_driven_weights.py",
+    "evidence_detail": {
+      "scheme": "C1_min_techneg_to_growth",
+      "horizon": 20,
+      "n_dates": 1635,
+      "holdings_tested": [
+        6,
+        10,
+        13,
+        30,
+        50
+      ],
+      "ic_before": 0.0539,
+      "ic_after": 0.0485,
+      "delta_excess_pp": {
+        "N6": 1.129,
+        "N10": 0.671,
+        "N13": 0.661,
+        "N30": 0.207,
+        "N50": 0.14
+      },
+      "caveat": "只做 5 个手工方案、非样本外、n_eff≈82、N 之间高度相关；长面板 fund/dominant 覆盖 0/1653（round124 口径），故结论只回答方向，不构成收益承诺。"
+    }
   }
 }

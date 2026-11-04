@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-04 02:49:37",
+ "generated_at": "2026-11-05 00:03:28",
  "horizon": 20,
  "min_cross_section": 200,
  "min_amount_wan": 2000.0,
@@ -34,7 +34,7 @@
    "ic_mean": -0.0069,
    "nw_t": -0.67,
    "win_rate": 0.519,
-   "weight": 0.1
+   "weight": 0.0
   },
   "score_size_growth": {
    "n": 1635,
@@ -66,6 +66,14 @@
    "ic_mean": 0.0132,
    "nw_t": 1.37,
    "win_rate": 0.56,
+   "weight": 0.2
+  },
+  "score_dominant": {
+   "n": 1635,
+   "n_effective_obs": 81.8,
+   "ic_mean": 0.0142,
+   "nw_t": 1.11,
+   "win_rate": 0.528,
    "weight": 0.1
   }
  },
@@ -81,14 +89,14 @@
   }
  },
  "bonferroni": {
-  "k_lower": 380,
-  "k_upper": 820,
+  "k_lower": 381,
+  "k_upper": 821,
   "k_trial_log_n": 364,
   "k_range_upper": 804,
-  "k_this_round": 16,
+  "k_this_round": 17,
   "k_source": "trial_log.n_trials()=legacy.k+试验轮次；k_range().k_upper_estimate 为估计上界",
-  "threshold_abs_t_lower_k": 3.8235,
-  "threshold_abs_t_upper_k": 4.009,
+  "threshold_abs_t_lower_k": 3.8241,
+  "threshold_abs_t_upper_k": 4.0093,
   "k_detail": {
    "k_lower": 364,
    "k_upper_estimate": 804,
@@ -118,9 +126,10 @@
   "note": "k 必须走 trial_log.n_trials()/k_range()，禁手算；下界=legacy.k(304)+轮次，上界=估计补齐。两口径都要报，只报一个会误导。"
  },
  "missing_dims": [
-  "score_fund",
-  "score_dominant"
+  "score_fund"
  ],
+ "weight_version": "v4.18-c1-head-excess",
+ "target_horizon": 20,
  "weight_declared_sum": 1.0,
- "weight_effective_sum": 0.7
+ "weight_effective_sum": 0.8
 }
