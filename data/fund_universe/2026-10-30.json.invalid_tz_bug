@@ -1,0 +1,1 @@
+{"schema": 1, "date": "2026-10-30", "generated_at": "2026-10-30T07:38:32", "domain_size": 0, "price_source": "klines_long", "coverage": {"pe": 0, "fwd_pe": 0, "growth": 0, "roe": 0, "gross_margin": 0, "cagr3": 0}, "caveat": "pe/growth/roe/gm/cagr3 为 PIT 可重算；fwd_pe/pe_ladder 为当日机构预期快照，历史不可回溯，缺失即留空（严禁用静态PE代理）。本目录不含 score_fund 分数本身，避免把当期规则永久固化。", "rows": {}}

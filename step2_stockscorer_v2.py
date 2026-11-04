@@ -11,6 +11,11 @@ import concurrent.futures
 from datetime import datetime, timedelta
 from collections import Counter
 
+# v4.9：EP / SIZE_IND_NEUT 两维打分（唯一实现来源，与审计 round26/27b/27c 同构）
+import ep_size_ind
+# v4.10（2026-10-27 P0-4）：复合分量尺唯一实现来源（分母恒定 + 缺维中性填充）
+import scale_calc
+
 # 清除代理环境变量: 本地代理可能不通(HTTP 502), 行情接口需直连
 for _k in ('HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy', 'ALL_PROXY', 'all_proxy'):
     os.environ.pop(_k, None)
@@ -37,13 +42,12 @@ WEIGHTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "factor_
 # v3.6-fund-led (2026-10-24 口径切换)：基本面主导，反转块等权压缩以消除共线性虚增。
 # 切换依据见 factor_weights.json → regime_switch；回退先验必须与之同步，
 # 否则 load_factor_weights 失败时会静默退回旧十维均摊口径。
-_W_PRIOR_10D = {
-    "score_fund": 0.34, "score_news": 0.22, "score_sector": 0.10,
-    "score_oversold60": 0.055, "score_bias60": 0.055, "score_rsi_rev": 0.055,
-    "score_vol_pulse": 0.055, "score_overbought": 0.02,
-    "score_theme_intrinsic": 0.08, "score_attention": 0.02,
-}
-# 旧五维(v2.41-ic) → 十维映射：tech 拆 3 维、theme 拆 2 维，按十维先验比例缩放
+# v4.4-fund-split (2026-10-25 口径切换)：fund 拆出质量/成长两维 + 反转块集中化。
+# 切换依据：round18（theme=行业代理/news 仅短线）、round19（外部 47 因子排名无消息
+# 情绪因子、量价候选与反转块共线）、round20（反转块入库事故+回填重测）、round21/22
+# （质量/成长 PIT 回填实证 + 样本内外分层 + fund 敏感性）。详见 factor_weights.json
+# → regime_switch。回退先验必须与之同步，否则 load_factor_weights 失败时会静默退回旧口径。
+_W_PRIOR_10D = {"score_fund": 0.200000, "score_news": 0.000000, "score_theme_neg": 0.000000, "score_size": 0.000000, "score_sector": 0.000000, "score_quality": 0.100000, "score_growth": 0.100000, "score_tech_neg": 0.100000, "score_oversold60": 0.000000, "score_bias60": 0.050000, "score_rsi_rev": 0.050000, "score_vol_pulse": 0.000000, "score_overbought": 0.000000, "score_theme_intrinsic": 0.000000, "score_attention": 0.000000, "score_lowvol20": 0.000000, "score_ep": 0.100000, "score_size_ind": 0.000000, "score_size_growth": 0.200000, "score_dominant": 0.100000}  # v4.14-evidence-aligned：quality 0.212→0.12（实证 h20 IC −0.147 负），fund 0.12→0.242（消融 t=+4.41 唯一>4），# tech_neg 0.06→0.03（σ 贡献仅 2.1% 近乎常数）；Σ=1.0
 _W_MAP_FROM_5D = {
     "score_fund": [("score_fund", 1.0)],
     "score_news": [("score_news", 1.0)],
@@ -81,10 +85,101 @@ def load_factor_weights():
 
 
 FW, FW_META = load_factor_weights()
+
+
+def load_dim_max():
+    """读 factor_weights.json 的 dim_max（各维满分量程）→ dict。
+
+    ⚠️ 2026-10-26 P0：量程不统一是总分层最深的静默缺陷 ——
+    12 维是 0-5 制（score_fund/news/theme/oversold60/bias60/rsi_rev/vol_pulse/
+    overbought/theme_intrinsic/attention/sector），只有 size/quality/growth/
+    tech_neg 是 0-10 制。原 total 公式按「每维满分 10」直接加权，后果：
+      ① 理论天花板 = Σ(w×真实量程)/Σw×10 = 67.5 → S≥85 / A≥65 永不可达，
+         490 只评级只有 B/C/D，评级体系实质失效；
+      ② 名义权重被静默扭曲：tech_neg 15% → 实占 22.2%（+7.2pp），
+         bias60+rsi_rev 名义 35% → 实占 26%（-9pp），fund 30% → 22.2%（-7.8pp）。
+    回退默认值与 factor_weights.json 的 dim_max 必须一致（漏同步=静默回退旧口径）。
+    """
+    try:
+        with open(WEIGHTS_FILE, encoding="utf-8") as f:
+            d = json.load(f)
+        dm = d.get("dim_max") or {}
+        out = {}
+        for k in _W_PRIOR_10D:
+            v = dm.get(k)
+            out[k] = float(v) if isinstance(v, (int, float)) and v > 0 else _DIM_MAX_DEFAULT[k]
+        return out
+    except Exception:
+        return dict(_DIM_MAX_DEFAULT)
+
+
+# 各维满分量程默认值（与 factor_weights.json 的 dim_max 同源，禁单方面修改）
+_DIM_MAX_DEFAULT = {
+    "score_fund": 5.0, "score_news": 5.0, "score_theme_neg": 10.0,
+    "score_size": 10.0, "score_sector": 5.0, "score_quality": 10.0,
+    "score_growth": 10.0, "score_tech_neg": 10.0, "score_oversold60": 5.0,
+    "score_bias60": 5.0, "score_rsi_rev": 5.0, "score_vol_pulse": 5.0,
+    "score_overbought": 5.0, "score_theme_intrinsic": 5.0, "score_attention": 5.0,
+    # v4.8：低波20。池内分位分，量程 0-10（与其他池内分位族一致）
+    "score_lowvol20": 10.0,
+    # v4.9：EP 与 SIZE_IND_NEUT 均为池内 rank 分位分，量程 0-10
+    "score_ep": 10.0, "score_size_ind": 10.0,
+    # v4.13-size2d：市值双维度拆分（A 小盘成长 / B 业务份额龙头），量程 0-10
+    "score_size_growth": 10.0, "score_dominant": 10.0,
+}
+DIM_MAX = load_dim_max()
+
+# v4.10（P0-4）：维度中文短名 —— 供 neutral_filled_note / reasons 披露用。
+#   与 gen_report_top200._DIM_LABEL_SHORT 语义一致（那边是渲染层，这里是数据层，
+#   两处都要能独立工作，故各自保存；改名字须同步）。
+_DIM_LABEL_CN = {
+    "score_fund": "估值", "score_quality": "质量", "score_tech_neg": "技术反向",
+    "score_bias60": "乖离反转", "score_rsi_rev": "RSI反转", "score_lowvol20": "低波",
+    "score_ep": "EP估值", "score_size_ind": "行业内小市值",
+    "score_size_growth": "小盘成长", "score_dominant": "行业龙头",
+    "score_news": "消息面", "score_theme_neg": "题材反向", "score_size": "市值",
+    "score_growth": "成长", "score_oversold60": "超跌60", "score_vol_pulse": "量能脉冲",
+    "score_overbought": "超买", "score_theme_intrinsic": "题材内禀",
+    "score_attention": "关注度", "score_sector": "板块动量",
+}
+
 W_FUND, W_NEWS, W_SECTOR_W = FW["score_fund"], FW["score_news"], FW["score_sector"]
 W_OVERSOLD60, W_BIAS60, W_RSI_REV = FW["score_oversold60"], FW["score_bias60"], FW["score_rsi_rev"]
 W_VOL_PULSE, W_OVERBOUGHT = FW["score_vol_pulse"], FW["score_overbought"]
 W_THEME_INT, W_ATTENTION = FW["score_theme_intrinsic"], FW["score_attention"]
+# v4.1 新增两维（老大 2026-10-25 裁决）：
+#   score_theme_neg = 10 − score_theme，把 IC 表全场唯一过 Bonferroni 的负 alpha 反号利用；
+#   score_size      = 池内流通市值分位（越小越高分），SIZE 从「筛选条件」降级为「评分加分」。
+# 用 .get 兜底：旧 weights 文件（v3.6 及以前）无这两键，缺失时按 0 处理不报错，
+#   但 load_factor_weights 已随 _W_PRIOR_10D 一起升级，正常路径必然取到新值。
+# v4.4 新增三维（老大 2026-10-25 裁决，round21/22 实证）：
+#   score_quality   = 质量族（资本回报/现金流盈余质量/稳健风控 三组等权）池内分位
+#   score_growth    = 成长族（历史增速.6/边际改善.4）池内分位
+#   score_tech_neg  = 10 − score_tech（技术面反号：与反转块相关 −0.69，正权=内部对冲）
+# 用 .get 兜底：旧 weights 文件无这些键，缺失时按 0 处理不报错。
+W_QUALITY = FW.get("score_quality", 0.0)
+W_GROWTH = FW.get("score_growth", 0.0)
+W_TECH_NEG = FW.get("score_tech_neg", 0.0)
+W_THEME_NEG = FW.get("score_theme_neg", 0.0)
+W_SIZE = FW.get("score_size", 0.0)
+# v4.8（round24 落地）：低波20。round23 Q4 唯一不冗余候选，round24d 复测通过。
+#   score_growth 归零（0.13→0），score_lowvol20 顶上 0.13，Σ 保持 1.0。
+W_LOWVOL20 = FW.get("score_lowvol20", 0.0)
+# v4.9（round26/27 落地，老大 2026-10-26 裁决）：
+#   score_ep        = 扣非净利润TTM / 总市值（飞书 EP 因子），fund 让出 0.075 与其各半；
+#   score_size_ind  = 申万一级**行业内** LN(流通市值) winsorize+Z 取负，替换 score_size 的 0.10。
+#   唯一实现来源 ep_size_ind.py（与 audit_round26/27/27b/27c 同构）。
+#   ⚠️ score_size 保留字段与计算，但权重归零 → 不影响 total，仅供展示/审计对照。
+W_EP = FW.get("score_ep", 0.0)
+W_SIZE_IND = FW.get("score_size_ind", 0.0)   # v4.13：已拆为下两维，权重归零留档对照
+# v4.13-size2d（2026-10-28 老大裁决）：单一 score_size_ind(0.10) 拆成两个独立维度 ——
+#   score_size_growth（小盘成长溢价，0.20）= 原 v4.12 成长条件交互分，**仅对非龙头生效**；
+#   score_dominant（龙头壁垒溢价，0.10）= 业务份额(营收+利润)申万二级行业内 rank，
+#     **P0-3（round118）起全池落分**（原仅组内前30%）。两维不再互斥 →
+#     ⚠️ 非龙头同时持有两维（市值大类 0.30），龙头仅 dominant（0.10），暴露差 3 倍。
+#   差额 0.04 由 score_quality(0.252→0.212) 回吐，Σ=1.0 不变。
+W_SIZE_GROWTH = FW.get("score_size_growth", 0.0)
+W_DOMINANT = FW.get("score_dominant", 0.0)
 SCORER_VER = FW_META.get("version", "v3.0-10dim") if FW_META else "v3.0-10dim"
 
 SECTOR = {
@@ -1456,7 +1551,11 @@ INDUSTRY_PROSPECT_LABELS = {
 
 
 # 周期性行业板块(盈利随景气大幅波动, 低PE常处盈利高峰, 需论证持续性)
-CYCLICAL_SECTORS = {
+# ⚠️ round125（老大 2026-11-04「周期规则需要能配置修改」）：本集合原为硬编码，
+#   现改为**读 sector/cycle_industry.json → step2_cycle_lists.theme_list**，
+#   后台改周期规则即全链生效。此处的值降级为**兜底默认**（配置文件缺失/该键缺失时才用），
+#   取值与 round108 硬编码逐字一致，切换本身不改变任何一只股票的判定。
+_CYCLICAL_SECTORS_FALLBACK = {
     "有色资源", "化工", "电子面板", "面板", "电力", "煤炭", "航运",
     "钢铁", "石油", "建材", "基础材料",
 }
@@ -1481,6 +1580,11 @@ CYCLICAL_SECTORS = {
 GROWTH_SATURATE_KNEE = 110.0   # v3.5.1: 60→110（中报口径 p75=110.8）
 GROWTH_SATURATE_CAP = 370.0    # v3.5.1: 150→370（中报口径 p88=372.9）
 GROWTH_ANCHOR_MULT = 2.5       # 存续期锚容忍倍数：单点增速 ≤ CAGR×倍数+拐点 视为被趋势支持
+
+# v4.10（2026-10-27 T0-4）：当前亏损股（PE≤0）的 fund 分上限。
+#   见 score_fund() 内详细论证。选 3.0 的依据：实测 4 种修法中唯一
+#   「0 只上升 / 仅 30 只下降 / Top50 保留 50/50」的方案。
+LOSS_FUND_CAP = 3.0
 
 
 def _effective_growth(growth, cagr3):
@@ -1514,10 +1618,57 @@ def _effective_growth(growth, cagr3):
     return eff, True, note
 
 
+def _roe_to_decimal(roe, unit=None):
+    """ROE 统一换算为**小数**（0.4384 = 43.84%）。无法确定量纲时返回 None。
+
+    ⚠️⚠️ P0 量纲血案（2026-10-27）：roe 有三条来源，量纲历史上不一致：
+      ① iFinD `fparsed["roe"]`：`parse_fin_text` 里 `if 0.01 < v < 2` 只接受**小数**
+         （例 0.4384），且**会丢弃 ROE>2% 的真值**——这个启发式本身就是缺陷。
+      ② ths `ths_extra_map[code]["roe"]`：同花顺摘要原始串 `"24.47%"` → 去 % 后
+         是**百分数 24.47**。经 `fparsed.get("roe") or _ths_ex.get("roe")` 兜底后
+         占绝大多数，而下游按小数阈值判 → 24.47 >= 0.3 恒真 → 99.4% 判「优秀」。
+      ③ 落库字段 `scored['roe']`：= `_ths_ex.get("roe")`，即**百分数**。
+
+    ⚠️ 为什么不能只靠「数值大小猜量纲」（第一版修法，实测有真实误判）：
+      · `roe=0.87`（=0.87%）会被 `>1` 判成小数 → 当成 87% → 判「优秀」+0.5分。
+        当日全池 `0 < roe <= 1` 有 **82 只**落在该危险区（必易微 0.87、先河环保 0.79…）。
+      · `roe=1.96`（=1.96%）会被 `>1` 判成百分数 → /100 得 0.0196 → 判「弱」−0.5分。
+        当日全池 `1 < roe <= 2` 有 **110 只**。
+      根因：「百分数存的值」与「小数存的值」在 [0.01, 2] 区间**值域重叠**，任何纯数值
+      阈值都只能覆盖一侧，另一侧必然错。量纲是**元数据**，不能从数值反推。
+
+    故改为**显式量纲优先**：
+      unit="pct"  → 一定是百分数，/100
+      unit="frac" → 一定是小数，原样
+      unit=None   → 无法确定，返回 None（本维不计 ROE 加分，但不会给出错分）
+    仅当调用方未提供 unit 且值明显超出重叠区（>2）时，才按百分数兜底处理并留痕。
+    """
+    if roe is None or not isinstance(roe, (int, float)) or isinstance(roe, bool):
+        return None
+    if roe <= 0:
+        return None
+    if unit == "pct":
+        return float(roe) / 100.0
+    if unit == "frac":
+        return float(roe)
+    # unit 未知：只用「不可能重叠」的区间做兜底推断，重叠区一律不猜。
+    if roe > 2.0:
+        # ROE > 200% 只可能出现在百分数口径（小数口径 ROE=2.0 已是 200%，极罕见）
+        return float(roe) / 100.0
+    return None
+
+
+# round105 P1-4/P1-5（2026-10-31）：方式B（growth_factor_b）结果缓存——
+#   score_fund() 的增长描述双口径 + ep 增速恶化封顶共用此单一来源（禁再实现）。
+#   键 = 完整代码（sz002111）与 6 位码双写；由主流程 compute_growth 后填充。
+_GFB_MAP = {}
+_EP_CAP_LOG = []   # P1-5 ep 封顶审计留痕（name(code) 列表，收尾汇总打印）
+
+
 def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
                roe=None, gross_margin=None, sub_theme_label=None,
                hist_loss_free=False, fwd_np=None, sw_l2=None, cagr3=None,
-               q3_info=None):
+               q3_info=None, roe_unit=None):
     """基本面+竞争力评分 0-5，用估值阶梯替代单年PEG
     v2.8: 增加PEG指标、ROE、毛利率评分
     v2.10: 增加公司持续性/低PE可持续性子评分(周期股/存储链重点论证)
@@ -1552,20 +1703,45 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
     #   本修复只改展示透传字段，不动评分逻辑（total/rating 逐只不变，可回归验证）。
     _growth_out = growth if growth is not None else None
 
+    # ⚠️⚠️ P0 兜底血案（2026-10-27 修，老大裁决「先修兜底再降权」）：
+    #   原实现在「无有效估值（PE 与 FwdPE 均缺失/<=0）」时，用**增速单一维度**伪造出
+    #   2/3/2/1/0 的分数，等于把「估值因子」偷偷换成了「成长因子」，且分数落在正常区间
+    #   （1.2~3.4），页面完全看不出这只股票其实没有估值数据。
+    #   实测 2026-10-26 全池：268 只（14.1%）pe=0 且 fwd_pe=None，仍拿到 1.2~3.4 的"正常分"，
+    #   其中 100 只落在 0.6、71 只落在 3.4 —— 这些分数在 _parts 里按 0.075 权重计入 total，
+    #   属于**凭空加分**（估值维是唯一需要 PE 的维度，没有 PE 就不该有分）。
+    #   修复（对齐本项目既有铁律「缺维一律从分母剔除、禁用 or 0 / 禁臆造中位分」）：
+    #     无有效估值 → 返回 None，由 _parts 剔除该维、权重按可用维度归一（与 ep/size_ind 同构）。
+    #     reasons 改为明确披露「不计分」标签，让下游/页面可审计。
+    #   ⚠️ 下游必须能接住 None：score_fund 落库、missing_fund 统计两处已同步改造。
     if effective_pe is None or effective_pe <= 0:
         if growth is None:
-            return 2, ["数据不足"], _fwd_pe_out, _growth_out, _ladder_out, _sustain_empty
+            return None, ["缺估值数据(PE/FwdPE均缺失),本维不计分"], _fwd_pe_out, _growth_out, _ladder_out, _sustain_empty
         if growth > 100:
-            return 3, [f"高增长(+{growth:.0f}%)但缺估值"], _fwd_pe_out, _growth_out, _ladder_out, _sustain_empty
+            return None, [f"缺估值数据(仅增速+{growth:.0f}%),本维不计分"], _fwd_pe_out, _growth_out, _ladder_out, _sustain_empty
         elif growth > 20:
-            return 3, [f"中速增长(+{growth:.0f}%)"], _fwd_pe_out, _growth_out, _ladder_out, _sustain_empty
+            return None, [f"缺估值数据(仅增速+{growth:.0f}%),本维不计分"], _fwd_pe_out, _growth_out, _ladder_out, _sustain_empty
         elif growth > 0:
-            return 2, [f"低增长(+{growth:.0f}%)"], _fwd_pe_out, _growth_out, _ladder_out, _sustain_empty
+            return None, [f"缺估值数据(仅增速+{growth:.0f}%),本维不计分"], _fwd_pe_out, _growth_out, _ladder_out, _sustain_empty
         else:
-            return (1 if growth > -20 else 0), [f"负增长({growth:.0f}%)"], _fwd_pe_out, _growth_out, _ladder_out, _sustain_empty
+            return None, [f"缺估值数据(仅增速{growth:.0f}%),本维不计分"], _fwd_pe_out, _growth_out, _ladder_out, _sustain_empty
 
     if growth is None:
         growth = 15
+
+    # ---- round105 P1-4（2026-10-31）：增长描述改「G_q 单季同比 + QoQ 环比」双口径 ----
+    #   累计同比降为背景注释：防负基数/变脸季粉饰（敦煌 +188%、巨人 +109% 掩盖
+    #   单季环比 −30% 的教训）。数据源 = _GFB_MAP（方式B 唯一实现，主流程预计算）。
+    #   仅改展示口径；评分档位（growth 阈值）不动——分数层由 P1-5/P0-2 管。
+    _mb_g = _GFB_MAP.get(code) or {}
+    _gq_d, _qq_d = _mb_g.get("g_q"), _mb_g.get("qoq")
+    if isinstance(_gq_d, (int, float)) or isinstance(_qq_d, (int, float)):
+        _gq_s = f"{_gq_d * 100:+.0f}%" if isinstance(_gq_d, (int, float)) else "缺"
+        _qq_s = f"{_qq_d * 100:+.0f}%" if isinstance(_qq_d, (int, float)) else "缺"
+        _gseg = (f"单季G_q{_gq_s}/环比{_qq_s}"
+                 f"（累计{growth:+.0f}%仅作背景）")
+    else:
+        _gseg = f"增速({growth:+.0f}%)"
 
     # 低基数修正如触发，挂到 reasons 头部（数据可审计）
     if _g_capped and _g_note:
@@ -1576,28 +1752,28 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
     #   问题已由增速压缩从根源消除（失真值 ≤150，真实高增长按其存续期趋势保留）。
     if effective_pe < 15 and growth > 50:
         s = 5
-        reasons.append(f"低估值(FwdPE={effective_pe:.1f})+高增长(+{growth:.0f}%)")
+        reasons.append(f"低估值(FwdPE={effective_pe:.1f})+{_gseg}")
     elif effective_pe < 20 and growth > 30:
         s = 4
-        reasons.append(f"合理估值(FwdPE={effective_pe:.1f})+高增长(+{growth:.0f}%)")
+        reasons.append(f"合理估值(FwdPE={effective_pe:.1f})+{_gseg}")
     elif effective_pe < 30 and growth > 20:
         s = 4
-        reasons.append(f"估值合理(FwdPE={effective_pe:.1f})+增速(+{growth:.0f}%)")
+        reasons.append(f"估值合理(FwdPE={effective_pe:.1f})+{_gseg}")
     elif effective_pe < 40 and growth > 15:
         s = 3
-        reasons.append(f"估值中等(FwdPE={effective_pe:.1f})+增速(+{growth:.0f}%)")
+        reasons.append(f"估值中等(FwdPE={effective_pe:.1f})+{_gseg}")
     elif effective_pe < 60 and growth > 10:
         s = 3
-        reasons.append(f"估值偏高(FwdPE={effective_pe:.1f})+适度增长(+{growth:.0f}%)")
+        reasons.append(f"估值偏高(FwdPE={effective_pe:.1f})+{_gseg}")
     elif effective_pe < 100 and growth > 20:
         s = 2
-        reasons.append(f"高估值(FwdPE={effective_pe:.1f})但有增长(+{growth:.0f}%)")
+        reasons.append(f"高估值(FwdPE={effective_pe:.1f})但有增长:{_gseg}")
     elif effective_pe < 80:
         s = 2
-        reasons.append(f"估值偏高(FwdPE={effective_pe:.1f})+增长一般(+{growth:.0f}%)")
+        reasons.append(f"估值偏高(FwdPE={effective_pe:.1f})+{_gseg}")
     elif growth < 0:
         s = 1 if growth > -20 else 0
-        reasons.append(f"高估值(FwdPE={effective_pe:.1f})+负增长({growth:.0f}%)")
+        reasons.append(f"高估值(FwdPE={effective_pe:.1f})+{_gseg}")
     else:
         s = 1
         reasons.append(f"高估值(FwdPE={effective_pe:.1f})")
@@ -1660,17 +1836,22 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
             s = max(0, s - 1)
 
     # ===== ROE评分 =====
-    if roe is not None and roe > 0:
-        if roe >= 0.3:
+    # ⚠️ P0 量纲血案（2026-10-27 修）：roe 有多条来源、量纲不一致，详见
+    #   _roe_to_decimal 的完整注释。这里只做「取小数形式 + 按阈值判断 + 正确显示」。
+    #   实测修复面：判「优秀」从 1397/1406（99.4%）→ 25 只（1.8%）；
+    #   「高ROE护城河→持续性4.0」触发从 1406（74.2%）→ 161（8.5%）。
+    _roe = _roe_to_decimal(roe, roe_unit)
+    if _roe is not None:
+        if _roe >= 0.3:
             s = min(5, s + 0.5)
-            reasons.append(f"ROE={roe*100:.1f}%(优秀盈利能力)")
-        elif roe >= 0.15:
-            reasons.append(f"ROE={roe*100:.1f}%(良好盈利能力)")
-        elif roe >= 0.08:
-            reasons.append(f"ROE={roe*100:.1f}%(一般盈利能力)")
-        elif roe < 0.03:
+            reasons.append(f"ROE={_roe*100:.1f}%(优秀盈利能力)")
+        elif _roe >= 0.15:
+            reasons.append(f"ROE={_roe*100:.1f}%(良好盈利能力)")
+        elif _roe >= 0.08:
+            reasons.append(f"ROE={_roe*100:.1f}%(一般盈利能力)")
+        elif _roe < 0.03:
             s = max(0, s - 0.5)
-            reasons.append(f"ROE={roe*100:.1f}%(盈利能力弱)")
+            reasons.append(f"ROE={_roe*100:.1f}%(盈利能力弱)")
 
     # ===== 毛利率评分 =====
     if gross_margin is not None and gross_margin > 0:
@@ -1686,7 +1867,9 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
     # 论证低PE是否可持续: 用估值阶梯轨迹(收缩=周期底部错杀/扩张=顶部陷阱)+增速+ROE
     # v2.46: 周期股判定 = 主题粗分类命中 或 真实申万二级行业命中
     #   (粗分类如"周期资源"会覆盖煤炭/石油/钢铁, 但"综合"里的周期行业需靠 sw_l2 兜底)
-    is_cyclic = sector in CYCLICAL_SECTORS or (bool(sw_l2) and sw_l2 in SW_CYCLICAL)
+    # round125：两套集合改为读 cycle_industry.json（单一来源），硬编码降级为兜底。
+    _cyc_theme, _cyc_sw = load_step2_cycle_lists()
+    is_cyclic = sector in _cyc_theme or (bool(sw_l2) and sw_l2 in _cyc_sw)
     # v2.12: 存储产业链(芯片/模组/控制器/分销)均为强价格周期环节,
     # 与有色/化工等周期股同等对待, 需论证低PE可持续性(此前仅识别"存储模组"过窄)
     STORAGE_CYCLIC_KW = ("存储芯片", "存储模组", "存储控制器", "存储分销")
@@ -1767,9 +1950,14 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
                 sustain_note = "周期性行业,盈利随景气波动,持续性中性" + (
                     ";" + ";".join(reason_parts) if reason_parts else "")
     else:
-        if roe is not None and roe >= 0.15 and (growth is None or growth > 0):
+        # ⚠️ 与上方 ROE 评分同一 P0，共用 _roe_to_decimal（显式量纲优先，重叠区不猜）。
+        #    实操影响：触发面从 1406 只(74.2%) 降到 161 只(8.5%)，即
+        #    "高ROE护城河→持续性 4.0 分" 的标的少了 88%。
+        _roe_s = _roe_to_decimal(roe, roe_unit)
+        if _roe_s is not None and _roe_s >= 0.15 \
+                and (growth is None or growth > 0):
             sustain_score = 4.0
-            sustain_note = f"高ROE({roe*100:.0f}%)护城河,盈利可持续"
+            sustain_note = f"高ROE({_roe_s*100:.0f}%)护城河,盈利可持续"
         elif growth is not None and growth < 0:
             sustain_score = 2.0
             sustain_note = "盈利下滑,持续性偏弱"
@@ -1874,6 +2062,45 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
         "q3_note": q3_audit.get("note", ""),
         "q3_src": q3_audit.get("src"),
     }
+
+    # ══════════════════════════════════════════════════════════════════════
+    # v4.10（2026-10-27 T0-4）：**当前亏损股**（pe<=0）的 fund 分封顶 3.0
+    #
+    # 问题（生产实证 2026-10-27，n=1895）：
+    #   421 只 pe==0 的亏损股里，155 只因券商给了 fwd_pe 而拿到 fund 分
+    #   （均 2.12，**最高 4.60**，15 只 ≥4）；266 只无 fwd_pe → None → 中性填充 2.5。
+    #   即：同为当前亏损，仅因"有没有盈利预测"就待遇不同，且能拿到近满分。
+    #
+    #   4.60 分的典型结构（海目星 688559）：
+    #     "合理估值(FwdPE=19.1)+高增长(+103%) | 估值阶梯 19.1→11.5 | PEG=0.19(严重低估)"
+    #   但 pe=0 说明**当前亏损**，+103% 是从负转正的基数效应，PEG 分母是伪增速。
+    #   用"明年预测盈利"给"今年亏损"打近满分，推理链本身不可验证。
+    #
+    # 为什么不是「一律不计分」：
+    #   实测 4 种修法（见 audit_round31/33 系列）——
+    #     A 一律 None  → 分差 [−3.15, **+2.85**]，**110 只上升**（原本 0.6~2.4 分
+    #                    的"高估值+负增长"股，置 None 后拿中性 2.5 = 反向奖励，
+    #                    比不改更糟）。否决。
+    #     B 封顶 3.0   → 分差 [−2.40, **+0.00**]，**0 只上升** / 30 只下降，
+    #                    Top50 保留 50/50。✅ 采用
+    #     C 封顶 2.5   → 0 上升 / 43 下降，但会把 2.5~3.0 的真有效分也压掉。
+    #     D 封顶 2.0   → Top50 开始掉（49/50），过度。
+    #
+    # 为什么不裁到 2.5（中性值）：2.5 是"未知"的占位，而 3.0 是"已知有前瞻估值
+    #   但当前亏损"的合理上限——保留 fwd_pe 的增量信息，只截断极端高分。
+    # 影响面：全池仅 30 只分变，max −2.40（帝科股份 65.58→63.18），
+    #   Top100 内 0 只，Top50 完全不变。
+    # ══════════════════════════════════════════════════════════════════════
+    try:
+        _pe_cur = pe
+        if isinstance(_pe_cur, (int, float)) and not isinstance(_pe_cur, bool) and _pe_cur <= 0:
+            if s is not None and s > LOSS_FUND_CAP:
+                reasons.append(
+                    f"当前亏损(PE≤0),前瞻估值分封顶{LOSS_FUND_CAP:.1f}"
+                    f"(原{s:.2f}→{LOSS_FUND_CAP:.1f})")
+                s = LOSS_FUND_CAP
+    except Exception as _pce:
+        reasons.append(f"亏损封顶判定异常({_pce}),未封顶")
 
     return s, reasons, _fwd_pe_out, _growth_out, _ladder_out, sustain_info
 
@@ -2268,13 +2495,47 @@ STATIC2THEME = {
 
 # 申万层面的周期行业集合: 主题粗分类(如"周期资源")会丢失周期属性时,
 # 用真实申万二级名补充 is_cyclic 判定(周期股低PE陷阱保护)。
-SW_CYCLICAL = {
+# ⚠️ round125：改为读 sector/cycle_industry.json → step2_cycle_lists.sw_cyclic_list，
+#   此处降级为**兜底默认**（值与原硬编码逐字一致，切换不改判定）。
+#   ⚠️ 这套 31 项与 l2_list 20 项**语义不同、互不替换**：本套是「低PE可持续性保护」，
+#   l2_list 是「规则1/2 gate 正面清单」。多出的 15 项（水泥/玻璃玻纤/房地产开发/
+#   航空机场/电力/燃气Ⅱ/橡胶/塑料/种植业/饲料/渔业/林业Ⅱ/农产品加工/农业综合Ⅱ/
+#   装修建材）是老大清单未点名、但仍在低PE保护集合里的行业 —— 故意保留。
+_SW_CYCLICAL_FALLBACK = {
     "贵金属", "工业金属", "小金属", "能源金属", "金属新材料", "煤炭开采",
     "油气开采Ⅱ", "油服工程", "焦炭Ⅱ", "普钢", "特钢Ⅱ", "冶钢原料", "水泥",
     "玻璃玻纤", "装修建材", "航运港口", "航空机场", "电力", "燃气Ⅱ", "橡胶",
     "塑料", "化学纤维", "造纸", "种植业", "养殖业", "饲料", "渔业", "林业Ⅱ",
     "农产品加工", "农业综合Ⅱ", "房地产开发",
 }
+
+_CYCLE_LISTS_CACHE = None
+
+
+def load_step2_cycle_lists():
+    """读 cycle_industry.json → (theme_set, sw_l2_set)，带缓存。
+
+    单一来源铁律：cycle_industry.json 自己的 note 写明「三个消费方必须全部读本文件，
+    禁各自硬编码」——本函数就是 step2 这一路唯一的读取入口。
+    配置缺失/键缺失 → 退化为硬编码兜底（**保守不误杀**，行为与 round108 一致）。
+    """
+    global _CYCLE_LISTS_CACHE
+    if _CYCLE_LISTS_CACHE is not None:
+        return _CYCLE_LISTS_CACHE
+    theme, sw_l2 = set(_CYCLICAL_SECTORS_FALLBACK), set(_SW_CYCLICAL_FALLBACK)
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        "sector", "cycle_industry.json")
+    try:
+        _cfg = json.load(open(path, encoding="utf-8"))
+        _s2 = _cfg.get("step2_cycle_lists") or {}
+        if _s2.get("theme_list"):
+            theme = set(_s2["theme_list"])
+        if _s2.get("sw_cyclic_list"):
+            sw_l2 = set(_s2["sw_cyclic_list"])
+    except Exception as e:
+        print(f"⚠️ step2: cycle_industry.json 读取失败({e}) → 周期判定用硬编码兜底")
+    _CYCLE_LISTS_CACHE = (theme, sw_l2)
+    return _CYCLE_LISTS_CACHE
 
 _SW_MAP_CACHE = None
 
@@ -2512,7 +2773,12 @@ def score_bias60(price, ma60):
 
 def score_rsi_rev(rsi14):
     """F4 RSI 反转（Top5#3，h20 超额 +1.13%, t=5.21, 六年全正；实证七档单调递减）。
-    替代旧技术面 RSI 子因子并修复 <20 档得分矛盾（旧代码 3.0 < 20-35 档 4.8）。"""
+    替代旧技术面 RSI 子因子并修复 <20 档得分矛盾（旧代码 3.0 < 20-35 档 4.8）。
+
+    ⚠️ round121（2026-11-03）：本函数仅作**绝对阈值兜底**（池内分位不可算时用）。
+       生产路径已改为 `score_reversal_rank()` 的池内分位连续口径，理由见该函数。
+       实测 h=20：绝对阈值口径丢失连续信息（bias_raw IC +0.0461 > 分档 +0.0360）。
+    """
     if rsi14 is None:
         return 2.5
     if rsi14 < 30: return 5.0
@@ -2520,6 +2786,70 @@ def score_rsi_rev(rsi14):
     if rsi14 < 50: return 3.0
     if rsi14 < 60: return 2.0
     return 1.0
+
+
+def reversal_rank(raw_vals, higher_is_better):
+    """把一批原始反转指标转成池内 rank 分位分（0-5）。
+
+    raw_vals: {code: float}；返回 {code: score(0-5)}。
+    higher_is_better: True → 原始值越大分越高（此处传 False：RSI/bias 越负越好）。
+
+    ⚠️ 必须整池一起算 —— 池逐日变化，任何固定阈值都会失真
+      （同 score_size / lowvol20 / quality 纪律，round121 实测：h=20 下
+       池内分位版 bias 维 IC +0.0450 vs 绝对阈值 +0.0348，逐季度方向一致）。
+    ⚠️ 与 score_lowvol20_rank 口径一致（rank → pct → ×量程），但量程为 5 不是 10，
+      因为 score_bias60/score_rsi_rev 的 DIM_MAX = 5.0（见 factor_weights.json）。
+    """
+    out = {}
+    items = [(c, v) for c, v in (raw_vals or {}).items()
+             if isinstance(v, (int, float))]
+    n = len(items)
+    if n < 2:
+        return out
+    order = sorted(range(n), key=lambda i: items[i][1])
+    pct = [0.0] * n
+    i = 0
+    while i < n:
+        j = i
+        while j + 1 < n and items[order[j + 1]][1] == items[order[i]][1]:
+            j += 1
+        avg = (i + j) / 2.0 / max(1, n - 1)
+        for k in range(i, j + 1):
+            pct[order[k]] = avg
+        i = j + 1
+    for k in range(n):
+        p = pct[k] if higher_is_better else (1.0 - pct[k])
+        out[items[k][0]] = round(p * 5.0, 2)
+    return out
+
+
+def reversal_confirm_gate(kl, n_low=20):
+    """止跌确认门（round121 实测：仅对 RSI<30 深跌股有效，+1.321pp / t_NW=3.75）。
+
+    确认 = 至少满足其一：①未创 20 日收盘新低 ②收盘站上 MA5 ③当日收阳
+
+    ⚠️ 刻意**不含「站上MA20」**：实测 495,587 个观测里「站上MA20」的最小 RSI = 35.45，
+       RSI<30 的 20,449 个样本中命中 0 个 —— 该条件在深跌股里是**结构性空集**。
+       任何「趋势确认」前置条件只要含 MA20，就等价于把深跌样本全部剔除（方法论㉛）。
+    ⚠️ 也**不含「企稳信号≥2个」**：实测企稳信号个数与未来收益**反向**
+       （0个 +0.000 / 2个 −1.497 / 3个 −2.609），不能当加分条件用。
+    ⚠️ t_sub（不重叠子样本）仅 1.55、子样本 8 天 → **不足以单独支撑加分实证**，
+       因此本门只用于「深跌股不给满分」的**罚分**，不给任何股加分。
+    """
+    try:
+        if not kl or len(kl) < n_low + 1:
+            return None
+        closes = [k["close"] for k in kl]
+        cur = closes[-1]
+        prev = closes[-(n_low + 1):-1]
+        if len(prev) < n_low - 1:
+            return None
+        not_new_low = cur > min(prev) + 1e-12
+        above_ma5 = cur > sum(closes[-5:]) / 5.0
+        yang = kl[-1].get("open") is not None and cur > float(kl[-1]["open"])
+        return bool(not_new_low or above_ma5 or yang)
+    except (KeyError, TypeError, ValueError, IndexError):
+        return None
 
 
 def score_vol_pulse(amt_ratio):
@@ -2532,6 +2862,60 @@ def score_vol_pulse(amt_ratio):
     if amt_ratio >= 1.0: return 3.0
     if amt_ratio >= 0.7: return 4.0
     return 5.0
+
+
+def raw_lowvol20(kl):
+    """过去 20 个交易日**日收益率标准差**（原始值，越小=波动越低）。返回 float 或 None。
+
+    v4.8（round24 落地）：低波因子的原始度量。必须返回原始值而非分数——分数需要
+    **池内截面 rank 分位**才能得到（与 score_size / quality / growth 同口径），
+    逐股独立打分会让不同波动水平的股票拿到不可比的分。
+
+    口径（与 audit_round24d 逐字一致，改这里必须重跑 round24 验证）：
+      · 取最近 21 个收盘价 → 20 个日收益 → 样本标准差（除以 n−1）
+      · 只用 d0 及之前的数据（无前视）
+      · 不足 21 个收盘价（次新股/长期停牌）→ None，该维缺失并从分母剔除（禁 or 0）
+    """
+    if not kl or len(kl) < 21:
+        return None
+    closes = [k["close"] for k in kl[-21:]]
+    if any(c is None or c <= 0 for c in closes):
+        return None
+    rets = [(closes[i] / closes[i - 1] - 1.0) for i in range(1, len(closes))]
+    n = len(rets)
+    if n < 2:
+        return None
+    mu = sum(rets) / n
+    return (sum((r - mu) ** 2 for r in rets) / (n - 1)) ** 0.5
+
+
+def score_lowvol20_rank(raw_vals):
+    """把一批原始波动率转成池内 rank 分位分（0-10，低波=高分）。
+
+    raw_vals: {code: float}；返回 {code: score}。
+    ⚠️ 必须整池一起算：池逐日变化，任何固定阈值都会失真（同 score_size 纪律）。
+    """
+    out = {}
+    items = [(c, v) for c, v in (raw_vals or {}).items()
+             if isinstance(v, (int, float))]
+    n = len(items)
+    if n < 2:
+        return out
+    order = sorted(range(n), key=lambda i: items[i][1])
+    pct = [0.0] * n
+    i = 0
+    while i < n:
+        j = i
+        while j + 1 < n and items[order[j + 1]][1] == items[order[i]][1]:
+            j += 1
+        avg = (i + j) / 2.0 / max(1, n - 1)
+        for k in range(i, j + 1):
+            pct[order[k]] = avg
+        i = j + 1
+    for k in range(n):
+        # 取负：原始波动率越低 → 分位越小 → 1−pct 越高分
+        out[items[k][0]] = round((1.0 - pct[k]) * 10.0, 2)
+    return out
 
 
 def score_overbought(rsi14):
@@ -3855,6 +4239,25 @@ def build_market_review(market_breadth, stats, results):
 # Main
 # ============================================================
 def main():
+    # ⚠️ 2026-10-26 性能审计（老大需求②）：逐步计时。
+    #   背景：改造后 K 线已降到 24s，但 step2 整体仍 831.9s，说明瓶颈已转移到
+    #   「未被改造的串行网络段」。原先只能看到一个总数，无法定位到具体 Step。
+    #   故此处埋一个极轻量的计时器：每次 _T("标签") 打印「本段耗时 + 累计」。
+    #   实测已确认的串行段（样本外推 500 只）：
+    #     · Step 3  iFinD 新闻 100 只   ≈ 86s
+    #     · Step 4  iFinD 财务 TOP20    ≈ 87s
+    #     · Step 4.5 THS 机构预测 500只 ≈ 100s（唯一确认的逐股串行 akshare 调用）
+    #     · Step 4.8 公告覆盖            ≈ 26s
+    #   这些是「未改造」部分，与本次三项提速需求并列存在，留待后续并行化。
+    _T0 = time.time()
+    _T_last = [time.time()]
+
+    def _T(tag):
+        now = time.time()
+        print("      ⏱  %-22s 本段 %6.1fs   累计 %6.1fs"
+              % (tag, now - _T_last[0], now - _T0))
+        _T_last[0] = now
+
     inp = sys.argv[1] if len(sys.argv) > 1 else "top500_all_a.json"
     out = sys.argv[2] if len(sys.argv) > 2 else f"top200_scored_{datetime.now().strftime('%Y-%m-%d')}.json"
 
@@ -3901,61 +4304,494 @@ def main():
                 "liquid_ok": _s.get("liquid_ok", True),
                 "suspended": _s.get("suspended", False),
                 "is_new": _s.get("is_new", False),
+                # v4.11（2026-10-26）：追高标记（fetch 打标，组合层拦截）。
+                #   fetch 不再删高涨幅股（否则它拿不到分数），只标记；
+                #   若此处不透传，pick_portfolio 读不到 → 追高规则静默失效。
+                "chase_hi": bool(_s.get("chase_hi", False)),
             }
     _em = raw.get("eligible_marks") or {}
     if _em:
         print(f"   🏷️ 资格标记: 次新 {_em.get('new_stock', 0)} / 停牌 {_em.get('suspended', 0)}"
               f" / 流动性不达标 {_em.get('illiquid', 0)} / 低换手 {_em.get('low_turnover', 0)}")
+
+    # v4.1: 池内流通市值分位表（供 score_size 打分）。
+    #   SIZE 已从「筛选条件」改为「评分加分」，必须按**当日池内**分位归一——
+    #   分层抽样后池内市值分布逐日变化，任何固定阈值都会失真。
+    _mv_rank = {}
+    _mv_vals = sorted(v["circ_mv"] for v in _elig_map.values()
+                      if isinstance(v.get("circ_mv"), (int, float)) and v["circ_mv"] > 0)
+    if _mv_vals:
+        _n_mv = len(_mv_vals)
+        for _code, _v in _elig_map.items():
+            _mv = _v.get("circ_mv")
+            if not isinstance(_mv, (int, float)) or _mv <= 0:
+                continue
+            # 二分定位：分位越小（市值越小）→ 得分越高（10 分制满分 10）
+            import bisect as _bs
+            _pos = _bs.bisect_left(_mv_vals, _mv)
+            _pct = _pos / max(1, _n_mv - 1)
+            _mv_rank[_code] = round((1.0 - _pct) * 10.0, 2)
+        print(f"   📐 SIZE 评分表: {len(_mv_rank)} 只（池内流通市值中位 "
+              f"{_mv_vals[_n_mv // 2] / 1e8:.1f} 亿，最小 {_mv_vals[0] / 1e8:.1f} / "
+              f"最大 {_mv_vals[-1] / 1e8:.1f} 亿）")
+    else:
+        # ⚠️ 2026-10-26 P0：此处原为**完全静默**分支 —— 若当日 raw 的 main_pool 缺
+        #   circ_mv（或字段名为 total_mv/mv 等），_mv_rank 会整个变空，
+        #   于是所有行的 s_size = None → score_size 全池缺失 → 0.10 权重空转，
+        #   而流程不报错、页面照常出。实测 2026-10-23 的 scored：
+        #   490/490 只 score_size 缺失（连键都没有），total 实际只反映 0.90 权重。
+        #   这类「权重静默空转」只能靠显式告警 + selfcheck 的覆盖度闸拦住。
+        print("   🚨 SIZE 评分表为空！main_pool 中无可用 circ_mv → "
+              "score_size 将全池缺失、0.10 权重空转。"
+              "请检查 fetch 阶段是否透传 circ_mv（key 名应为 'circ_mv'，单位元）。")
+
+    # v4.4: 质量/成长池内分位表（fund 拆分；round21/22 实证，实现见 fund_split.py）。
+    #   数据源：data/fin_cache_em/ 东财财务摘要（80 指标 × 20 报告期，TTL 7 天）。
+    #   point-in-time：只用披露截止日 ≤ 截面日期的报告期（年报/一季报→4/30、中报→8/31、
+    #   三季报→10/31）。缺维从分母剔除（v4.3 铁律），禁 or 0。
+    #   ⚠️ 与 audit_round21/22 同一实现来源（fund_split.py）——单方面修改必须重跑
+    #      round21 验证 IC 不漂移（round17 教训：两处实现必然漂移且不报错）。
+    _as_of = raw.get("date") or datetime.now().strftime("%Y-%m-%d")
+    # v4.10：本轮 501 黑洞黑名单（async_fetch 返回）。下游据此把技术维按缺失处理，
+    #   并在 scored 里留痕，禁止把这些股票当成「分数低」而不是「没数据」。
+    _KL_BLACKLIST = set()
+    _quality_rank, _growth_rank = {}, {}
+    _fin_cache_stats = None
+    try:
+        import fund_split as _fs_mod
+        # ⚠️ 2026-10-26 性能改造（老大需求①）：财报因子增量化。
+        #   现状问题：fund_split.load_em_cache() 逐文件读 1096 个 JSON（合计 126.8MB），
+        #   实测 **50.4 秒**；而真正的因子计算只要 **0.05 秒**。
+        #   即 99.9% 的时间花在「重复解析不会变的财报数据」上。
+        #   改后：fin_factor_cache 把「(code, 报告期) → 原始因子值」持久化，
+        #   只有该股报告期变化（发新财报）或 EM 缓存文件 mtime 变新才重算。
+        #   注意分工：
+        #     · fin_factor_cache  → 原始因子值（截面无关，可跨日缓存）
+        #     · fund_split.rank_pct → 池内 rank 分位（截面相关，必须每日重算）
+        #   所以这里仍然调用 score_rows，只是让它吃预热的 em 缓存。
+        try:
+            import fin_factor_cache as _ffc
+            _em_all = _fs_mod.load_em_cache()
+            _fcodes = [s["code"] for s in stocks]
+            _fin_res, _fin_cache_stats = _ffc.compute_fin_factors(
+                _fcodes, _as_of, em_all=_em_all)
+            for _ln in _ffc.report_lines(_fin_cache_stats):
+                print("   " + _ln)
+        except Exception as _fe:
+            print(f"   ⚠️ 财报因子缓存不可用（退回全量计算）: {_fe}")
+        _qg_rows = [{"code": s["code"]} for s in stocks]
+        # ⚠️ 2026-10-28（round36）：growth 走 pit_mode="actual_ok"。
+        #   成因：pit_period() 按法定截止日（三季报→10/31）判定，而 A 股三季报
+        #   实际多在 10/20~10/30 已披露完毕。10-26 截面下严格 PIT 会退回中报，
+        #   成长维看到的是 6 个月前的数据 —— 实测威海广泰中报口径 G=8.43（进入
+        #   G>7 高成长档，拿满 w_mc=0.8），三季报口径 G=2.47（落入 G≤4 档，w_mc=0）。
+        #   actual_ok 允许报告期「法定截止日 − 5 天」即视为可用，grace=5 是让
+        #   三季报在 10-26 生效的最小值（3 天不足、5 天恰好）。**仅成长维放宽，
+        #   质量维仍走严格 PIT**（质量是存量指标，对 1 个季度不敏感；成长是流量
+        #   指标，口径差一个季度会直接颠倒档位）。
+        _nq, _ng = _fs_mod.score_rows(_qg_rows, _as_of, pit_mode="actual_ok")
+        _quality_rank = {r["code"]: r["score_quality"] for r in _qg_rows
+                         if isinstance(r.get("score_quality"), (int, float))}
+        _growth_rank = {r["code"]: r["score_growth"] for r in _qg_rows
+                        if isinstance(r.get("score_growth"), (int, float))}
+        print(f"   🧬 质量/成长评分表 (fund_split, PIT≤{_as_of}): "
+              f"quality {len(_quality_rank)}/{len(stocks)}，growth {len(_growth_rank)}/{len(stocks)}")
+        # ⚠️ 2026-10-31 成长维度单源改造：一律以 growth_factor_b（方式B·单季度扣非
+        #   口径 G_q/ΔG_q，老大指定算法）为准；fund_split 的 growth 输出仅兜底。
+        #   两套口径并存不报错 = 静默漂移（round17 教训），模块失败必须 loud 告警。
+        #   ⚠️ _growth_rank 下游按**完整代码**（sz002111）取值（line 5148/4459），
+        #   模块返回 code6 键 → 必须映射回完整代码，否则成长维恒取 None（round57 教训）。
+        try:
+            import growth_factor_b as _gfb2
+            _gf2 = _gfb2.compute_growth(
+                [{"code": _s.get("code"), "name": _s.get("name"),
+                  "sector_parent": _s.get("sector_parent")} for _s in stocks],
+                style="steady", as_of=_as_of)
+            _gf2.pop("__meta__", None)
+            _gr2 = {}
+            _GFB_MAP.clear()
+            for _s in stocks:
+                _c6 = str(_s.get("code") or "").strip().lower()
+                if len(_c6) > 6 and _c6[:2] in ("sh", "sz", "bj"):
+                    _c6 = _c6[2:]
+                _v2 = _gf2.get(_c6)
+                if _v2:
+                    # round105 P1-4/P1-5：缓存方式B全量结果（键=完整码+6位码双写）
+                    _GFB_MAP[_s["code"]] = _v2
+                    _GFB_MAP[_c6] = _v2
+                if _v2 and isinstance(_v2.get("score_growth"), (int, float)):
+                    _gr2[_s["code"]] = _v2["score_growth"]
+            if _gr2:
+                _growth_rank = _gr2
+                print(f"   🧬 方式B 成长（G_q/ΔG_q 单季扣非）覆盖 fund_split growth: "
+                      f"{len(_growth_rank)}/{len(stocks)}")
+        except Exception as _ge2:
+            print(f"   🚨 方式B 成长计算失败（保留 fund_split 兜底口径，需排查）: {_ge2!r}")
+        # ⚠️ 2026-10-26 P0 覆盖度闸：quality 权重 0.12，若半数股票缺值会被
+        #   「缺维从分母剔除」静默吸收 —— 结果是同一页面里一半股票按 7 维算、
+        #   一半按 8 维算，total 域不可比，但页面没有任何提示（血案：10-26 首跑
+        #   quality 仅 250/500 却无告警）。故此处强制留痕。
+        #   已知成因：Step 4.5 fetch_em_growth_cached 会往 data/fin_cache_em 写文件，
+        #   而本段 load_em_cache 同时读同一目录，慢路径逐文件 json.load 可能撞上
+        #   写了一半的文件 → 该股被静默跳过。修复方向见 fund_split.load_em_cache
+        #   的指纹判据（改用 (文件数, 总mtime, 总size) 且写入先落 .tmp 再 os.replace）。
+        _qcov = len(_quality_rank) / max(1, len(stocks))
+        if _qcov < 0.95:
+            print(f"   🚨 quality 覆盖仅 {_qcov*100:.1f}%（{len(_quality_rank)}/{len(stocks)}）"
+                  f"—— 低于 95% 阈值，0.12 权重将对缺失股空转，total 域跨股不可比。"
+                  f"请检查 data/fin_cache_em 是否被并发写入。")
+        if len(_growth_rank) / max(1, len(stocks)) < 0.95:
+            print(f"   ⚠️ growth 覆盖仅 {len(_growth_rank)}/{len(stocks)}"
+                  f"（权重 0，不计分，仅记录）")
+    except Exception as _e:
+        print(f"   ⚠️ 质量/成长评分失败（不影响其他维度，两维按缺失处理）: {_e}")
     
     print(f"📊 Stock-Scorer v2.7 | {len(stocks)}只标的")
     print(f"   权重: 题材热度30% 基本面30%(含行业前景) 消息20% 技术面20%")
     
-    # --- Step 1: K-lines (serial with delay to avoid API throttling) ---
-    print(f"\n📈 Step 1: K线获取 ({len(stocks)}只, 腾讯前复权优先)")
+    # --- Step 1: K-lines（v4.10 异步并发，替代逐股 sleep 死等）---
+    # ⚠️ 2026-10-26 性能改造（老大指令）：原实现是
+    #      for s in stocks: fetch_klines(s); sleep(0.5) ... 每10只再 sleep(3)
+    #    实测 490 只耗时 **28.5 分钟**，根因不是「抓得慢」而是「白等」：
+    #      · 腾讯 ifzq 三域名与东财 push2his 自 2026-10 起持续失败
+    #        （HTTP 501 / RemoteDisconnected，实测各 0.06~0.16s 即返回错误）
+    #        但旧代码对每只股票仍在这 4 个源上退避重试，累计 sleep 2.5s/只；
+    #      · 加上主循环 sleep 0.5s/只 + 每10只 3s = 再 6.5 分钟。
+    #    改造后走 async_fetch（Semaphore 并发 + 令牌桶 QPS + 指数退避 + 501 黑名单），
+    #    实测并发10/QPS20 下 490 只约 20 秒。旧实现保留为 --legacy-fetch 兜底。
+    _T("Step1 前(财报+EP表)")
+    print(f"\n📈 Step 1: K线获取 ({len(stocks)}只, 异步并发)")
+    _use_async = os.environ.get("SCORER_LEGACY_FETCH", "") not in ("1", "true", "yes")
     klines = {}
-    for i, s in enumerate(stocks):
+    _af_stats = None
+    if _use_async:
         try:
-            klines[s["code"]] = fetch_klines(s["code"])
-        except:
-            klines[s["code"]] = []
-        if (i + 1) % 10 == 0:
-            print(f"   [{i+1}/{len(stocks)}] 已获取...")
-            time.sleep(3)
-        else:
-            time.sleep(0.5)
-    ok = sum(1 for v in klines.values() if v)
-    print(f"   ✅ {ok}/{len(stocks)}只K线获取成功")
-    
-    # Fallback: 串行获取失败的K线
-    failed = [s for s in stocks if not klines.get(s["code"])]
-    if failed:
-        print(f"   🔄 串行补获取 {len(failed)} 只K线...")
-        for i, s in enumerate(failed):
+            import async_fetch as _AF
+            _af_cfg = {}
+            try:
+                _af_cfg = (json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                      "config.json"), encoding="utf-8"))
+                           .get("fetch", {}) or {}).get("async_fetch") or {}
+            except Exception:
+                pass
+            _codes = [s["code"] for s in stocks]
+            klines, _af_stats = _AF.fetch_many_klines(
+                _codes,
+                datalen=KLINES_N,
+                concurrency=int(_af_cfg.get("concurrency", _AF.MAX_CONCURRENCY)),
+                qps=float(_af_cfg.get("qps", _AF.QPS_LIMIT)),
+                as_of=_as_of,               # 抓取时即按 as_of 截断（防前视，见下段说明）
+                progress_every=int(_af_cfg.get("progress_every", 100)))
+            # ⚠️ 2026-10-26 P0：打印统计必须与抓取结果**解耦**。
+            #   原实现把 `_af_stats.lines()` 和 `fetch_many_klines()` 放在同一个 try 里，
+            #   lines() 因混合类型排序抛 TypeError → 异常冒到这一层 →
+            #   **klines（95 秒的成果）随 except 一起被丢弃**，_use_async 置 False
+            #   后回退串行重抓 1895 只（约 28 分钟）。已实际发生一次。
+            #   纪律：抓取成功就一定要用它的结果，装饰性的统计打印绝不能有否决权。
+            try:
+                for _ln in _af_stats.lines():
+                    print("   " + _ln)
+            except Exception as _le:
+                print(f"   ⚠️ 抓取统计打印失败（不影响已获取的 K 线）: {_le}")
+                print(f"   ✅ 实际已抓取 {len(klines)} 只")
+            # 黑名单留着给下游报告层披露（本轮未抓到的股票，其技术维按缺失处理）
+            try:
+                if _af_stats.blacklisted:
+                    _KL_BLACKLIST.update(_af_stats.blacklisted)
+            except Exception:
+                pass
+        except Exception as _e:
+            print(f"   ⚠️ 异步抓取失败（回退串行）: {_e}")
+            _use_async = False
+
+    if not _use_async:
+        for i, s in enumerate(stocks):
             try:
                 klines[s["code"]] = fetch_klines(s["code"])
-            except:
+            except Exception:
                 klines[s["code"]] = []
-            time.sleep(0.5)
+            if (i + 1) % 10 == 0:
+                print(f"   [{i+1}/{len(stocks)}] 已获取...")
+                time.sleep(3)
+            else:
+                time.sleep(0.5)
+
+    ok = sum(1 for v in klines.values() if v)
+    # 补齐未抓到的（值为 None/缺失键），保证下游 for 循环不会 KeyError
+    for s in stocks:
+        if not klines.get(s["code"]):
+            klines.setdefault(s["code"], [])
+    print(f"   ✅ {ok}/{len(stocks)}只K线获取成功")
+
+    # Fallback: 只补抓真正失败的（异步模式下失败数已很少，避免全量重抓）
+    failed = [s for s in stocks if not klines.get(s["code"])
+              and s["code"] not in _KL_BLACKLIST]
+    if failed and len(failed) <= max(20, len(stocks) // 10):
+        print(f"   🔄 补获取 {len(failed)} 只K线...")
+        if _use_async:
+            try:
+                import async_fetch as _AF
+                _r2, _st2 = _AF.fetch_many_klines([s["code"] for s in failed],
+                                                  datalen=KLINES_N, as_of=_as_of,
+                                                  concurrency=6, qps=10.0, progress_every=0)
+                for _c, _v in _r2.items():
+                    if _v:
+                        klines[_c] = _v
+            except Exception:
+                pass
+        else:
+            for s in failed:
+                try:
+                    klines[s["code"]] = fetch_klines(s["code"])
+                except Exception:
+                    klines[s["code"]] = []
+                time.sleep(0.5)
         ok2 = sum(1 for v in klines.values() if v)
         print(f"   ✅ 最终 {ok2}/{len(stocks)}只K线获取成功")
-    
-    # --- Step 1.5: 周线K线获取 ---
-    print(f"\n📈 Step 1.5: 周线K线获取 ({len(stocks)}只)")
+    elif failed:
+        print(f"   ⚠️ {len(failed)} 只K线缺失（超过阈值，不再全量补抓；"
+              f"其中黑名单 {len(_KL_BLACKLIST)} 只，技术维按缺失处理、从分母剔除）")
+
+    # ⚠️ 2026-10-26 P0（前视污染）：K 线接口返回的是**实时**行情，最后一根是当日
+    #   未收盘/刚收盘的 bar。而 raw 快照的 date（=_as_of）才是本截面的口径日。
+    #   两者不一致时（历史回补、或盘中重跑当日），未截断会：
+    #     · lowvol20 多算一根未定盘 bar → 池内 rank 全池漂移
+    #     · bias60 / rsi_rev / 均线 / 动量 全部吃进当日盘中价
+    #   截图里 fetch_top200_sina.py 抓快照是 T 日盘后，step2 却在 T+1 14:45 重跑，
+    #   若不截断就等于用未来数据算过去截面 —— 回测与实盘口径同时失真。
+    #   截断后不足 21 根的股票自然按缺失处理（禁 or 0）。
+    _kl_cut = 0
+    if _as_of:
+        for _c6 in list(klines.keys()):
+            _raw_kl = klines.get(_c6) or []
+            _kept = [k for k in _raw_kl if str(k.get("date") or "")[:10] <= _as_of]
+            if len(_kept) != len(_raw_kl):
+                _kl_cut += 1
+            klines[_c6] = _kept
+        if _kl_cut:
+            print(f"   ✂️ K线按 as_of≤{_as_of} 截断: {_kl_cut} 只有超出当日的数据被剔除"
+                  f"（防前视；其余 {len(klines)-_kl_cut} 只本就不含未来 bar）")
+
+    # v4.8（round24 落地）：低波20 池内 rank 分位表 —— 必须放在 K 线抓取之后。
+    #   口径：过去 20 个交易日日收益率标准差取负，**整池一起做 rank**（池逐日变化，
+    #   任何固定阈值都会失真，与 score_size / quality / growth 同纪律）。
+    #   ⚠️ 不足 21 根收盘价（次新股/长期停牌）→ 该股无分，评分时从分母剔除（禁 or 0）。
+    _lv_raw = {}
+    for _s in stocks:
+        _v = raw_lowvol20(klines.get(_s["code"]) or [])
+        if _v is not None:
+            _lv_raw[_s["code"]] = _v
+    _lowvol_rank = score_lowvol20_rank(_lv_raw)
+    if _lowvol_rank:
+        _lv_vals = sorted(_lv_raw.values())
+        _lv_mid = _lv_vals[len(_lv_vals) // 2]
+        print(f"   📉 LOWVOL20 评分表: {len(_lowvol_rank)}/{len(stocks)} 只"
+              f"（池内20日波动率中位 {_lv_mid:.4f}，"
+              f"最小 {_lv_vals[0]:.4f} / 最大 {_lv_vals[-1]:.4f}）")
+    else:
+        # ⚠️ 静默空转防护（同 SIZE 的教训）：K 线全失败时该维会整池变空，
+        #   0.13 权重空转但流程不报错、页面照常出 → 必须显式告警。
+        print("   🚨 LOWVOL20 评分表为空！K 线不足 21 根 → "
+              "score_lowvol20 将全池缺失、0.13 权重空转。请检查 fetch_klines。")
+
+    # ══ round121（2026-11-03）：反转两维改池内分位连续口径 ══
+    # 为什么要改（全部为 h=20 主目标 target_horizon 实测，data/audit_round121*.json）：
+    #   ① 现行绝对阈值**丢失连续信息**：bias 维池内分位 IC +0.0450 vs 绝对阈值 +0.0348
+    #      （+29%）；原始连续口径 bias_raw IC +0.0461 为全表最高。
+    #   ② 两维高度共线：分数 Spearman +0.7625 / 原始 +0.8597，合并 IC(0.0348)
+    #      **不优于**任一单维（rsi 0.0341 / bias 0.0360）→ 两维都留，但都要提高分辨率。
+    #   ③ 「RSI<30 一律 5.0」浪费面值：<30 内部细分档配对差
+    #      [0,20) +6.459 / [20,25) +2.418 / [25,30) +1.408 —— 差 5pp 却同分。
+    #   ④ 生益科技型（RSI 19.5 跌停 + 完全空头排列 + 5 项企稳信号全 False）
+    #      原先拿双满分 → 页面反转块 10.00/10、total 81.43 → A 级「逢低加仓」。
+    #      在池内分位口径下它只能拿到池内最深 10% 的分位，且叠加确认门罚分。
+    # ⚠️ 权重值不变（bias60 .05 + rsi_rev .05），八处权重同步不受影响。
+    # ⚠️ 量程不变（0–5，DIM_MAX=5.0），消费方（enhance/apply_sector/pick_pf/
+    #    gen_report/factor_eval）全部只读字段值 → 零改动。
+    _rev_raw_rsi, _rev_raw_bias, _rev_gate = {}, {}, {}
+    for _s in stocks:
+        _c = _s["code"]
+        _kl = klines.get(_c) or []
+        if len(_kl) < 61:
+            continue
+        _cls = [k["close"] for k in _kl]
+        _r = rsi(_cls, 14)
+        if _r is not None:
+            _rev_raw_rsi[_c] = _r
+        _m60 = sum(_cls[-60:]) / 60.0
+        if _m60 > 0:
+            _rev_raw_bias[_c] = (_cls[-1] - _m60) / _m60 * 100.0
+        _g = reversal_confirm_gate(_kl)
+        if _g is not None:
+            _rev_gate[_c] = _g
+    # ⚠️ 方向：RSI 越低 → 反转候选越强；bias 越负 → 乖离越深 → 都是 higher_is_better=False
+    _rsi_rank5 = reversal_rank(_rev_raw_rsi, higher_is_better=False)
+    _bias_rank5 = reversal_rank(_rev_raw_bias, higher_is_better=False)
+    if _rsi_rank5 and _bias_rank5:
+        _rq = sorted(_rev_raw_rsi.values())
+        _bq = sorted(_rev_raw_bias.values())
+        _n_conf = sum(1 for v in _rev_gate.values() if v)
+        print(f"   🔁 反转两维池内分位表: RSI {len(_rsi_rank5)}/{len(stocks)} 只"
+              f"（池内中位 {_rq[len(_rq)//2]:.1f}），"
+              f"BIAS60 {len(_bias_rank5)}/{len(stocks)} 只"
+              f"（池内中位 {_bq[len(_bq)//2]:+.1f}%）")
+        print(f"      止跌确认门: {_n_conf}/{len(_rev_gate)} 只已确认"
+              f"（未确认的深跌股不给满分，见 reversal_confirm_gate 说明）")
+    else:
+        # ⚠️ 静默空转防护（同 SIZE/LOWVOL20 的教训）：K 线全失败 → 两维退回绝对阈值兜底，
+        #   行为可预期但分辨率下降，必须显式告警而不是静默换口径。
+        print("   🚨 反转两维池内分位表为空！将退回绝对阈值兜底"
+              "（score_bias60 / score_rsi_rev），分辨率下降。请检查 fetch_klines。")
+
+    # v4.9（round26/27 落地）→ v4.13-size2d（2026-10-28 拆分）：EP + 市值双维度池内分位表。
+    #   唯一实现来源 ep_size_ind.py（与审计 round26/27b/27c 同构，禁在此另写一份）。
+    #   · score_ep           = 扣非净利润TTM / 总市值，池内 rank10
+    #   · score_size_growth  = 小盘成长溢价（**仅非龙头**，原 v4.12 成长条件交互分）
+    #   · score_dominant     = 龙头壁垒溢价（业务份额组内 rank）
+    #     ⚠️ P0-3（round118）起 **全池落分**（默认 dominant_scope="pool"），不再只限前 30%。
+    #        覆盖率 26.1% → 99.1%；复合 IC 三周期全升（round118f 实测）。
+    #        代价：非龙头同时持有 size_growth(.20)+dominant(.10)=0.30，龙头仅 0.10。见 ep_size_ind.py 顶部说明。
+    #   ⚠️ 必须在 _elig_map（含 circ_mv）与 price 就绪之后、逐股评分之前算。
+    _ep_rank, _sg_rank, _dom_rank = {}, {}, {}
+    try:
+        # ⚠️ price 不在 _elig_map 里（它只透传 turnover_ratio/circ_mv/total_mv/amount/pe/pb），
+        #   必须取 stocks 行自身的 price；circ_mv 反过来只在 _elig_map 里。
+        _esi_rows = [{"code": s["code"],
+                      "price": s.get("price"),
+                      "circ_mv": (_elig_map.get(s["code"], {}) or {}).get("circ_mv"),
+                      # v4.12（2026-10-28）：成长条件交互所需两字段。
+                      #   ⚠️ 缺 score_growth → growth_weight() 返回 0.0 → 该股市值溢价
+                      #   归零（保守方向，不是报错）。故此处必须真接上，否则全池市值维
+                      #   一起塌成 0，而流程不报错、页面照常出（本项目典型静默 P0）。
+                      #   ⚠️ avg_amt_20d 用当日 amount 近似（老大选定口径）——真 20 日均额
+                      #   需要日线逐日成交额，当期 scored 的 tech 段无 amt20 字段。
+                      #   已知边界：单日 amount 会被异动放量日高估、被缩量日低估，
+                      #   且本池已在上游过滤「成交额≥1亿」，全池无一只触发 0.8 亿阈值
+                      #   → 流动性扣减层当前恒不生效，属设计冗余而非缺陷。
+                      #   ⚠️ key 必须是**完整代码**（sz002111）：_growth_rank 由
+                      #   _qg_rows 构造，其 key 就是 s["code"] 原样。写成 [-6:] 会
+                      #   全部取到 None → 全池 w_mc=0 → 市值维静默塌成 0。
+                      "score_growth": _growth_rank.get(s["code"]),
+                      "avg_amt_20d": (_elig_map.get(s["code"], {}) or {}).get("amount")}
+                     for s in stocks]
+        _n_ep, _n_sg, _drop = ep_size_ind.score_rows(_esi_rows, _as_of)
+        _ep_rank = {r["code"][-6:]: r["score_ep"] for r in _esi_rows
+                    if isinstance(r.get("score_ep"), (int, float))}
+        _sg_rank = {r["code"][-6:]: r["score_size_growth"] for r in _esi_rows
+                    if isinstance(r.get("score_size_growth"), (int, float))}
+        _dom_rank = {r["code"][-6:]: r["score_dominant"] for r in _esi_rows
+                     if isinstance(r.get("score_dominant"), (int, float))}
+        print(f"   🧮 EP 评分表: {len(_ep_rank)}/{len(stocks)} 只"
+              f"（扣非净利润TTM/总市值，池内分位取正）")
+        print(f"   🧮 市值双维度: 小盘成长 {len(_sg_rank)}/{len(stocks)} 只"
+              f" + 行业龙头 {len(_dom_rank)}/{len(stocks)} 只"
+              f"（min_grp={ep_size_ind.MIN_GRP}"
+              f"，丢弃 {len(_drop)} 个行业共 {sum(_drop.values())} 只）")
+        if not _ep_rank:
+            print("   🚨 EP 评分表为空！EM 缓存缺「扣非净利润/归母净利润/基本每股收益」"
+                  "→ score_ep 将全池缺失、0.12 权重空转。")
+        if not _sg_rank and not _dom_rank:
+            print("   🚨 市值双维度评分表为空！circ_mv 或申万一二級映射缺失"
+                  "→ score_size_growth/score_dominant 将全池缺失、0.14 权重空转。")
+    except Exception as _e:
+        print(f"   ⚠️ EP/市值双维度 评分失败（按缺失处理，不影响其他维度）: {_e}")
+
+    # --- Step 1.5: 周线K线获取（v4.10 异步并发）---
+    #   原实现 sleep 0.3s/只 + 每10只 3s → 490 只约 3.4 分钟（全是死等）。
+    #   腾讯周线源已 501，fetch_weekly_klines 内部同样走多源轮询 → 与日线同病。
+    #   实测异步化后 490 只约 25 秒。
+    #   ⚠️ 周线只影响展示字段（wma5/10/20）与周线趋势，不参与任何生效维评分，
+    #      故失败可容忍：不足的按 None 展示，不阻断。
+    _T("Step1 日线")
+    print(f"\n📈 Step 1.5: 周线K线获取 ({len(stocks)}只, 异步并发)")
     wklines = {}
-    for i, s in enumerate(stocks):
+    _wk_stats = None
+    if _use_async:
         try:
-            wklines[s["code"]] = fetch_weekly_klines(s["code"])
-        except:
-            wklines[s["code"]] = None
-        if (i + 1) % 10 == 0:
-            print(f"   [{i+1}/{len(stocks)}] 已获取...")
-            time.sleep(3)
-        else:
-            time.sleep(0.3)
+            import async_fetch as _AF
+            # 周线 = 腾讯 fqkline 的 week 参数；新浪 scale=1200 可近似周线（240*5）
+            _WK_URL = ("https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/"
+                       "CN_MarketData.getKLineData?symbol=%s&scale=1200&ma=no&datalen=30")
+
+            def _wk_parse(txt):
+                d = json.loads(txt)
+                if not isinstance(d, list):
+                    return None
+                return [{"date": str(k.get("day"))[:10],
+                         "open": float(k.get("open")), "close": float(k.get("close")),
+                         "high": float(k.get("high")), "low": float(k.get("low")),
+                         "vol": float(k.get("volume") or 0)}
+                        for k in d] or None
+
+            _wcodes = [s["code"] for s in stocks]
+            wklines, _wk_stats = _AF.run_async_sync(
+                _wcodes,
+                lambda c: _WK_URL % _AF._sym(c),
+                _wk_parse, concurrency=10, qps=20.0,
+                progress_every=200, progress_label="周线")
+            # ⚠️ 2026-10-26 P0（与 Step1 日线同病，一并加固）：
+            #   lines() 内部若因混合类型/格式问题抛异常，原实现会走到 except 里
+            #   执行 `wklines = {}` —— 把已抓到的周线全部丢弃并串行重抓。
+            #   统计打印是装饰，不能有否决权。
+            try:
+                for _ln in _wk_stats.lines():
+                    print("   " + _ln)
+            except Exception as _le:
+                print(f"   ⚠️ 周线统计打印失败（不影响已获取的周线）: {_le}")
+                print(f"   ✅ 实际已抓取 {len(wklines)} 只")
+        except Exception as _e:
+            print(f"   ⚠️ 周线异步抓取失败（不影响评分）: {_e}")
+            wklines = {}
+    if not wklines:
+        for i, s in enumerate(stocks):
+            try:
+                wklines[s["code"]] = fetch_weekly_klines(s["code"])
+            except Exception:
+                wklines[s["code"]] = None
+            if (i + 1) % 20 == 0:
+                print(f"   [{i+1}/{len(stocks)}] 已获取...")
+            time.sleep(0.05)
+    for s in stocks:
+        wklines.setdefault(s["code"], None)
     wok = sum(1 for v in wklines.values() if v)
     print(f"   ✅ {wok}/{len(stocks)}只周线获取成功")
-    
+
+    # ⚠️ 2026-10-26 P0（同 Step 1 前视污染）：周线最后一根是**未走完的本周**，
+    #   其 close 等于周中某日的实时价。把它计入「周线趋势/周线量能」等于用
+    #   半个周期的数据冒充完整周 → 周中重跑与周末重跑结论不一致。
+    #   判据：把每根 bar 的日期换算成**它所属交易周的周五**，只有周五 ≤ as_of
+    #   才算「该周已走完」。这样不依赖腾讯返回的 date 是周一还是周五，
+    #   且 as_of 落在周末时（如 10-25 周日）上一周（10-23 周五）仍被保留 ——
+    #   首版用「上周日」为界会把刚收盘那一周整块砍掉，是错的。
+    _wk_cut = 0
+    if _as_of:
+        try:
+            _d0 = datetime.strptime(_as_of[:10], "%Y-%m-%d").date()
+
+            def _wk_done(_ds):
+                try:
+                    _d = datetime.strptime(str(_ds)[:10], "%Y-%m-%d").date()
+                except Exception:
+                    return False
+                _fri = _d + timedelta(days=(4 - _d.weekday()))
+                return _fri <= _d0
+
+            for _c6 in list(wklines.keys()):
+                _w = wklines.get(_c6)
+                if not _w:
+                    continue
+                _kept = [k for k in _w if _wk_done(k.get("date"))]
+                if len(_kept) != len(_w):
+                    _wk_cut += 1
+                wklines[_c6] = _kept
+            if _wk_cut:
+                print(f"   ✂️ 周线截断(as_of={_as_of})：{_wk_cut} 只剔除未走完的本周 bar"
+                      f"（判据=bar 所属周周五 ≤ as_of）")
+        except Exception as _e:
+            print(f"   ⚠️ 周线截断失败（按原样使用）: {_e}")
+
     # --- Step 2: 板块分布预计算 + 板块行情数据获取 ---
+    _T("Step1.5 周线")
     print(f"\n🔥 Step 2: 板块分布分析 + 板块行情获取")
     all_top200_sectors = [resolve_sector(s["name"], s["code"])[0] for s in stocks]
     sector_cnt = Counter(all_top200_sectors)
@@ -3980,6 +4816,7 @@ def main():
         print(f"   涨停分布: {zt_summary}")
     
     # --- Step 3: iFinD News (priority stocks) --- (原Step3不变)
+    _T("Step2 板块")
     print(f"\n📰 Step 3: iFinD新闻 (重点标的)")
     priority = []
     for s in stocks[:15]:
@@ -3988,28 +4825,64 @@ def main():
         pct = s.get("pct_chg", 0) or 0
         if abs(pct) > 5 and s not in priority:
             priority.append(s)
-    
+
+    # v4.11（2026-10-26 老大「并行与向量化」要求）：串行 subprocess → 线程池并行。
+    #   原实现逐只 `subprocess.run` 串行，单只实测 0.9~3.4s，100 只 = 102.4s，是全链路第三大瓶颈。
+    #   实测标定（12/20/32 线程 × 60 只，全部返回正常）：6.8 / 8.3 / 7.8 只/s
+    #   → W=20 最优（12 线程因 GIL 与子进程启动开销未吃满，32 反而略降）。
+    #   并发安全：每只一个独立子进程，无共享状态；iFinD 侧实测 20 并发无 429/501。
+    #   ⚠️ 不设 QPS 令牌桶：该接口是**本地 CLI 子进程**（读 iFinD skill 缓存/接口），
+    #      与新浪行情那种「对方限流」场景不同，瓶颈在进程调度不在对端限流。
     news_map = {}
-    for i, s in enumerate(priority):
-        print(f"   [{i+1}/{len(priority)}] {s['name']}", end=" ", flush=True)
-        news_map[s["code"]] = run_ifind_news(s["name"], s["code"])
-        print("✓" if news_map[s["code"]] else "✗")
+    _news_w = int(os.environ.get("SCORER_NEWS_WORKERS", "20") or 20)
+    _nw_done = [0]
+    def _news_one(s):
+        try:
+            return s["code"], run_ifind_news(s["name"], s["code"])
+        except Exception:
+            return s["code"], ""
+
+    if priority:
+        _t_news = time.time()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=_news_w) as _ex:
+            _futs = {_ex.submit(_news_one, s): s for s in priority}
+            for _f in concurrent.futures.as_completed(_futs):
+                _c, _v = _f.result()
+                news_map[_c] = _v
+                _nw_done[0] += 1
+                if _nw_done[0] % 20 == 0 or _nw_done[0] == len(priority):
+                    _hit = sum(1 for v in news_map.values() if v)
+                    print(f"   iFinD新闻 [{_nw_done[0]}/{len(priority)}] 命中 {_hit}  "
+                          f"{time.time()-_t_news:.1f}s ({_nw_done[0]/max(0.1, time.time()-_t_news):.1f} 只/s)")
+        print(f"   ✅ iFinD新闻完成: {len(news_map)} 只，非空 {sum(1 for v in news_map.values() if v)} 只")
     
     # --- Step 4: iFinD Fundamentals (top 20) --- (原Step4不变)
+    _T("Step3 iFinD新闻")
     print(f"\n📋 Step 4: iFinD基本面 (TOP20)")
     fund_map = {}
-    for i, s in enumerate(stocks[:20]):
-        print(f"   [{i+1}/20] {s['name']}", end=" ", flush=True)
+    # v4.11：串行 → 并行。20 只串行实测 ~87s（单只 4.35s，比新闻重得多）。
+    #   仅 TOP20，故并发 8 足够（8×4.35s ≈ 11s），不必开 20 线程抢本地 CPU。
+    def _fin_one(s):
         try:
-            fund_map[s["code"]] = run_ifind_fin(s["name"], s["code"])
-        except Exception as e:
-            fund_map[s["code"]] = ""
-            print(f"⚠️err={e}", end=" ")
-        print("✓" if fund_map[s["code"]] else "✗")
+            return s["code"], run_ifind_fin(s["name"], s["code"])
+        except Exception as _e:
+            return s["code"], ""
+
+    _t_fin = time.time()
+    _fund_top = stocks[:20]
+    if _fund_top:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as _ex:
+            for _f in concurrent.futures.as_completed(
+                    {_ex.submit(_fin_one, s): s for s in _fund_top}):
+                _c, _v = _f.result()
+                fund_map[_c] = _v
+    print(f"   ✅ iFinD基本面: {len(fund_map)} 只，非空 {sum(1 for v in fund_map.values() if v)} 只"
+          f"（{time.time()-_t_fin:.1f}s）")
     
     # --- Step 4.5: akshare 财务增速 + 机构预测 + 腾讯行情PE ---
     #   v3.0 B2: 摘要接口改走缓存+退避重试(fetch_ths_abstract_cached);
     #   扩容解析 ROE/资产负债率/每股经营现金流(OCFG YoY) → ths_extra_map
+    _T("Step4 iFinD财务")
     print(f"\n📊 Step 4.5: akshare财务数据 ({len(stocks)}只, 摘要缓存+退避重试)")
     import akshare as ak
     growth_map = {}
@@ -4017,10 +4890,35 @@ def main():
     cagr3_map = {}
     hist_loss_free_map = {}  # v2.14: 近4年扣非净利全为正(穿越周期盈利稳定)
     ths_extra_map = {}       # v3.0 B2: {code: {roe, debt_ratio, ocf_ps, ocfg}}
-    for i, s in enumerate(stocks):
-        code = s["code"]
-        sym = code[2:]
-        name = s["name"]
+
+    # v4.11（2026-10-26 老大「并行与向量化」要求）：整段串行 → 线程池并行。
+    #
+    # 【为什么必须改】原实现「for s in stocks」逐只串行，500 只实测 ~100s；
+    #   放开到 1518 只后线性膨胀到 ~300s，是放开池上限后的头号拦路虎。
+    #
+    # 【为什么两个接口一起并行、却分别限流】
+    #   · fetch_ths_abstract_cached：带 7 天文件缓存，命中直接读盘（毫秒级），
+    #     只有冷启动才走网络。实测 W=16 时热态几乎瞬时，冷态受 THS 限流影响。
+    #   · ak.stock_profit_forecast_ths：无缓存，每次都打网络。
+    #     实测 40 只：W=8 → 16.9 只/s；W=16 → 23.7 只/s（均无异常）。
+    #   两段分开跑、各自限流，避免「缓存命中段被网络段拖住」。
+    #
+    # 【并发安全】两者写入的 map 均为**独立 code 键**，无同键竞争；
+    #   唯一的共享是 fetch_ths_abstract_cached 往 data/fin_cache 写文件，
+    #   按 sym 命名天然隔离（同 sym 不会被两个任务同时处理，因 stocks 内 code 唯一）。
+    #   ⚠️ 但 data/fin_cache 与 data/fin_cache_em 是**不同目录**，与 P0 并发血案
+    #      （EM 缓存被 step4.5 边写边读）无关，不会重演。
+    _ths_w = int(os.environ.get("SCORER_THS_WORKERS", "16") or 16)
+    _t_ths = time.time()
+
+    def _ths_abstract_one(s):
+        """拉+解析同花顺财务摘要。返回 (code, growth, cagr3, loss_free, extra)。
+        解析逻辑逐字搬运自原串行循环，仅封装为纯函数以便并发。"""
+        code, sym = s["code"], s["code"][2:]
+        _g = None
+        _cagr = None
+        _lf = None
+        _ex = {}
         try:
             df = fetch_ths_abstract_cached(sym)
             if df is not None and len(df) > 0:
@@ -4028,41 +4926,45 @@ def main():
                 pg = latest.get('扣非净利润同比增长率', None)
                 if pg and pg != False and pg != 'False':
                     try:
-                        pg_str = str(pg).replace('%', '').strip()
-                        growth_map[code] = float(pg_str)
-                    except:
-                        pass
+                        _g = float(str(pg).replace('%', '').strip())
+                    except Exception:
+                        _g = None
                 np_col = df.get('扣非净利润', None)
                 if np_col is not None and len(df) >= 4:
                     try:
                         def parse_np(v):
                             if v is None or v is False:
                                 return None
-                            s = str(v).replace('亿','').replace('万','').strip()
-                            val = float(s)
+                            _s = str(v).replace('亿', '').replace('万', '').strip()
+                            val = float(_s)
                             if '万' in str(v):
                                 val /= 10000
                             return val
-                        vals = []
-                        for idx_r in range(max(0, len(df)-4), len(df)):
-                            v = parse_np(df.iloc[idx_r]['扣非净利润'])
-                            vals.append(v)
+                        vals = [parse_np(df.iloc[_r]['扣非净利润'])
+                                for _r in range(max(0, len(df) - 4), len(df))]
                         if len(vals) >= 3 and vals[0] and vals[-1] and vals[0] > 0 and vals[-1] > 0:
                             n_years = len(vals) - 1
-                            cagr = (vals[-1] / vals[0]) ** (1.0 / n_years) - 1
-                            cagr3_map[code] = round(cagr * 100, 1)
-                        # v2.14: 穿越周期校验——近4年扣非净利是否全为正(含2023存储下行期)
+                            _cagr = round(((vals[-1] / vals[0]) ** (1.0 / n_years) - 1) * 100, 1)
                         if len(vals) >= 4:
-                            hist_loss_free_map[code] = all(
-                                v is not None and v > 0 for v in vals[-4:])
-                    except:
+                            _lf = all(v is not None and v > 0 for v in vals[-4:])
+                    except Exception:
                         pass
-                # v3.0 B2: ROE/资产负债率/每股经营现金流(OCFG YoY) 扩容解析
-                #   —— ROE 原仅 iFinD 前20只有, 扩池后全池可得
-                _ex = ths_extra_map.setdefault(code, {})
-                _roe = _num_or_none(latest.get('净资产收益率'))
+                # ⚠️ 2026-10-27 P0：ROE 的量纲必须在**读取处**标注，不能留给下游猜。
+                #   同花顺摘要原始串形如 `"24.47%"`，_num_or_none 会把 `%` 剥掉只剩 24.47，
+                #   量纲信息随之丢失 —— 下游看到 24.47 无法区分「24.47%」和「2447%」，
+                #   也无法与 iFinD 的小数口径（0.4384）共存。故此处显式记录 roe_unit：
+                #   原始串含 '%' → "pct"（百分数）；否则若值 <=2 → "frac"（按小数理解）。
+                #   两者都不确定时写 None，由 _roe_to_decimal 返回 None（不计分，绝不错判）。
+                _roe_raw = latest.get('净资产收益率')
+                _roe = _num_or_none(_roe_raw)
                 if _roe is not None:
                     _ex['roe'] = _roe
+                    if '%' in str(_roe_raw):
+                        _ex['roe_unit'] = 'pct'
+                    elif _roe <= 2.0:
+                        _ex['roe_unit'] = 'frac'
+                    else:
+                        _ex['roe_unit'] = None
                 _dr = _num_or_none(latest.get('资产负债率'))
                 if _dr is not None:
                     _ex['debt_ratio'] = _dr
@@ -4073,36 +4975,69 @@ def main():
                         _ocf_prev = _num_or_none(df.iloc[-2].get('每股经营现金流'))
                         if _ocf_prev and _ocf_prev > 0:
                             _ex['ocfg'] = round((_ocf_now / _ocf_prev - 1) * 100, 1)
-        except:
+        except Exception:
             pass
-        try:
-            df2 = None
-            for _try in range(2):   # v3.5.1: THS预测偶发限流/瞬断，重试1次（影响 pe_ladder 与 implied_h2 完整度）
+        return code, _g, _cagr, _lf, _ex
+
+    def _ths_fc_one(s):
+        """拉+解析同花顺预测年报净利润。返回 (code, {year: mean})。"""
+        code, sym = s["code"], s["code"][2:]
+        df2 = None
+        for _try in range(2):   # 偶发限流/瞬断，重试 1 次（影响 pe_ladder 与 implied_h2）
+            try:
+                df2 = ak.stock_profit_forecast_ths(symbol=sym, indicator='预测年报净利润')
+                if df2 is not None and len(df2) > 0:
+                    break
+            except Exception:
+                df2 = None
+                time.sleep(1.0)
+        if df2 is None or len(df2) == 0:
+            return code, None
+        multi_year = {}
+        for _, row in df2.iterrows():
+            try:
+                yr = int(row['年度'])
+            except Exception:
+                continue
+            if yr in (2026, 2027, 2028):
                 try:
-                    df2 = ak.stock_profit_forecast_ths(symbol=sym, indicator='预测年报净利润')
-                    if df2 is not None and len(df2) > 0:
-                        break
+                    multi_year[yr] = float(row['均值'])
                 except Exception:
-                    df2 = None
-                    time.sleep(1.0)
-            if df2 is not None and len(df2) > 0:
-                multi_year = {}
-                for _, row in df2.iterrows():
-                    yr = int(row['年度'])
-                    if yr in (2026, 2027, 2028):
-                        try:
-                            multi_year[yr] = float(row['均值'])
-                        except:
-                            pass
-                if multi_year:
-                    fwd_pe_map[code] = multi_year
-        except:
-            pass
-        if (i + 1) % 50 == 0:
-            print(f"   [{i+1}/{len(stocks)}] 增速={len(growth_map)} FwdPE预测={len(fwd_pe_map)} CAGR3={len(cagr3_map)} ROE等={len(ths_extra_map)}")
-        if (i + 1) % 10 == 0:
-            time.sleep(0.3)
-    
+                    pass
+        return code, (multi_year or None)
+
+    _n_a, _n_f = [0], [0]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=_ths_w) as _ex:
+        _fa = {_ex.submit(_ths_abstract_one, s): s for s in stocks}
+        for _f in concurrent.futures.as_completed(_fa):
+            _c, _g, _cagr, _lf, _ex_ = _f.result()
+            if _g is not None:
+                growth_map[_c] = _g
+            if _cagr is not None:
+                cagr3_map[_c] = _cagr
+            if _lf is not None:
+                hist_loss_free_map[_c] = _lf
+            if _ex_:
+                ths_extra_map[_c] = _ex_
+            _n_a[0] += 1
+            if _n_a[0] % 200 == 0 or _n_a[0] == len(stocks):
+                print(f"   THS摘要 [{_n_a[0]}/{len(stocks)}] 增速={len(growth_map)} "
+                      f"CAGR3={len(cagr3_map)} ROE等={len(ths_extra_map)}  {time.time()-_t_ths:.0f}s")
+
+    _t_fc = time.time()
+    with concurrent.futures.ThreadPoolExecutor(max_workers=_ths_w) as _ex:
+        _ff = {_ex.submit(_ths_fc_one, s): s for s in stocks}
+        for _f in concurrent.futures.as_completed(_ff):
+            _c, _my = _f.result()
+            if _my:
+                fwd_pe_map[_c] = _my
+            _n_f[0] += 1
+            if _n_f[0] % 200 == 0 or _n_f[0] == len(stocks):
+                print(f"   THS预测 [{_n_f[0]}/{len(stocks)}] FwdPE预测={len(fwd_pe_map)}  "
+                      f"{time.time()-_t_fc:.0f}s")
+    print(f"   ✅ Step4.5 完成: 增速={len(growth_map)} FwdPE预测={len(fwd_pe_map)} "
+          f"CAGR3={len(cagr3_map)} ROE等={len(ths_extra_map)}  合计 {time.time()-_t_ths:.0f}s")
+
     # 用腾讯行情获取市值+PE-TTM（合并为一次请求）
     print(f"   获取市值+PE-TTM数据...")
     mktcap_map = {}
@@ -4167,6 +5102,7 @@ def main():
     #    最后报告期均为 2025）。现改为东财按报告期「各股最新已披露报告期」累计同比
     #   （官方口径 (cur−prev)/|prev|，见 fetch_em_growth_cached 注释）；
     #    同花顺年报数据降级为兜底（growth_src 留档，不静默混用）。
+    _T("Step4.5 THS摘要")
     print(f"\n📊 Step 4.7: growth口径修复(东财按报告期) + Q3预测 ({len(stocks)}只)")
     import concurrent.futures as _cf
     em_growth_map = {}
@@ -4215,6 +5151,7 @@ def main():
 
 
     # --- Step 4.8: 题材动量预计算（基于已抓取的日K线，不依赖外部板块接口） ---
+    _T("Step4.7 growth")
     print(f"\n🔥 Step 4.8: 题材动量预计算 (成分股真实近5/10/20日收益)")
     mom_map = {}
     for s in stocks:
@@ -4269,16 +5206,19 @@ def main():
     for _e in _dex: print("     ", _e)
 
     # --- Step 4.8: 全市场公告覆盖 (近7日, akshare) ---
+    _T("Step4.8 题材动量")
     print(f"\n📢 Step 4.8: 全市场公告覆盖 (近7日)")
     ann_map = fetch_announcements_map(days=7)
     print(f"   公告覆盖 {len(ann_map)} 只标的")
 
     # --- Step 4.8b: 近7日研报覆盖 (akshare 个股研报, v2.17 新增信号源) ---
+    _T("Step4.8 公告")
     print(f"\n📑 Step 4.8b: 近7日研报覆盖 (akshare)")
     _codes6 = [s["code"][2:] for s in stocks if len(s.get("code", "")) >= 6]
     report_map = fetch_research_reports_map(days=7, codes=_codes6)
 
     # --- Step 5: Score all ---
+    _T("Step4.8b 研报")
     print(f"\n🎯 Step 5: 四维评分(题材30%+基本面30%(含行业前景)+消息20%+技术面20%)")
     # 成交额排名百分位(TOP200全市场口径): 最高成交额=1.0
     _tns = [st.get("turnover", 0) or 0 for st in stocks]
@@ -4337,7 +5277,16 @@ def main():
                 growth_src = 'known_fallback'
         ladder_input = pe_ladder.get(code)
         _ths_ex = ths_extra_map.get(code, {})
-        roe_input = fparsed.get("roe") or _ths_ex.get("roe")   # v3.0 B2: ROE 兜底扩容至全池
+        # ⚠️ 2026-10-27 P0：量纲随值一起传，不让下游猜。
+        #   优先 iFinD（fparsed，parse_fin_text 只收 0.01~2 → 小数口径），
+        #   回退 ths（百分数口径，roe_unit 在读取处已标注）。
+        #   实测 ths 缓存 2069/2071 的原始串都带 '%' → roe_unit='pct' 100% 覆盖。
+        if fparsed.get("roe") is not None:
+            roe_input = fparsed.get("roe")
+            roe_unit_input = "frac"        # parse_fin_text 的 `0.01 < v < 2` 只可能是小数
+        else:
+            roe_input = _ths_ex.get("roe")
+            roe_unit_input = _ths_ex.get("roe_unit")
         gm_input = fparsed.get("gross_margin")
         sub_theme_label = get_sub_theme_label(name)
         # v3.5: cagr3(三年扣非CAGR) 作为存续期锚传入, 用于低基数失真校验与周期股 durable 收紧
@@ -4348,7 +5297,7 @@ def main():
             roe=roe_input, gross_margin=gm_input, sub_theme_label=sub_theme_label,
             hist_loss_free=hist_loss_free_map.get(code, False),
             fwd_np=fwd_pe_map.get(code), sw_l2=sw_l2, cagr3=cagr3_input,
-            q3_info=q3_map.get(code))
+            q3_info=q3_map.get(code), roe_unit=roe_unit_input)
         
         # Tech (传入CAGR3用于成长加分, 传入周线用于双线多头判断)
         wkl = wklines.get(code)
@@ -4384,8 +5333,32 @@ def main():
         _amt_ratio_v = td.get("amount_ratio") if isinstance(td, dict) else None
         _mom60_v = _mom_tmp.get(60) if _mom_tmp else None
         s_oversold60 = score_oversold60(_mom60_v)
-        s_bias60 = score_bias60(price, _ma60_v)
-        s_rsi_rev = score_rsi_rev(_rsi14_v)
+        # ══ round121（2026-11-03）：反转两维改池内分位连续口径 ══
+        #   优先用池内 rank 分位（0–5，分辨率 全池名次）；池不可算时退回绝对阈值兜底。
+        #   ⚠️ 深跌股若止跌确认门未过 → 罚 0.5 分，**不给满分**。
+        #      这条直接修掉生益科技型反例（RSI 19.5 跌停 + 空头排列 + 零企稳 → 双满分）。
+        #   ⚠️⚠️ 触发范围**只允许 RSI<30**，不得加 bias≤−15（round121f 实证）：
+        #      「有确认 − 无确认」在 RSI<30 内 = +1.321pp（t_NW=3.75，n=5064/11670），
+        #      在 RSI<30 & bias≤−15 交集内 = +1.811pp（t_NW=3.77），**两个都为正**；
+        #      但 bias≤−15 **单独** = −0.217pp（t=−0.54）、**并集** RSI<30|bias≤−15
+        #      = −0.216pp（t=−0.59）——加进 bias 会把正向信号稀释成 0。
+        #      实测量级：全池深跌 788 只中 431 只（54.7%）是「仅 bias≤−15」触发，
+        #      并集会让罚分覆盖 482 只/25.1%，其中 89% 落在**无证据支持**的区间。
+        #      故：`or` → 只用 RSI。宁少罚，不罚错。
+        #      另注：t_sub 仅 1.55、子样本 8 天 → 只做罚分、**不做加分**（保守）。
+        _rev_conf = _rev_gate.get(code)
+        _is_deep = (_rsi14_v is not None and _rsi14_v < 30)
+        _rev_penalty = (0.5 if (_is_deep and _rev_conf is False) else 0.0)
+        s_bias60 = _bias_rank5.get(code)
+        if s_bias60 is None:
+            s_bias60 = score_bias60(price, _ma60_v)
+        elif _rev_penalty:
+            s_bias60 = max(1.0, s_bias60 - _rev_penalty)
+        s_rsi_rev = _rsi_rank5.get(code)
+        if s_rsi_rev is None:
+            s_rsi_rev = score_rsi_rev(_rsi14_v)
+        elif _rev_penalty:
+            s_rsi_rev = max(1.0, s_rsi_rev - _rev_penalty)
         s_vol_pulse = score_vol_pulse(_amt_ratio_v)
         s_overbought = score_overbought(_rsi14_v)
 
@@ -4398,15 +5371,129 @@ def main():
             if isinstance(td, dict):
                 td = dict(td)
                 td["industry_prospect"] = f"行业前景{'加分' if industry_bonus > 0 else '减分'}{industry_bonus:+.1f}({label})"
-        # v3.0-10dim: 十维中间总分（step2 无板块动量维度，按 (1−w_sector) 归一化
-        #   保持 0-20 量纲；最终分由 apply_sector_momentum.py 按十权重重算）。
-        #   权重来自 factor_weights.json（十维优先；旧五维自动映射；缺失回退十维先验）。
-        _w9 = (fs * W_FUND + ns * W_NEWS
-               + s_oversold60 * W_OVERSOLD60 + s_bias60 * W_BIAS60 + s_rsi_rev * W_RSI_REV
-               + s_vol_pulse * W_VOL_PULSE + s_overbought * W_OVERBOUGHT
-               + s_theme_int * W_THEME_INT + s_attn * W_ATTENTION)
-        _scale = 1.0 / max(0.5, 1.0 - W_SECTOR_W)
-        total = round(_w9 * _scale * 20, 2)  # v3.3 问题2: 量纲升级 每维满分10/总分满分100 (×20 替代 ×4)
+        # v4.1（2026-10-25）新增两维：
+        #   s_theme_neg = 10 − score_theme —— 把全场唯一过 Bonferroni 的负 alpha 反号利用。
+        #     实证：score_theme h20 IC=-0.1207 / NW t=-3.59（n=58，过 3.08 门槛），
+        #     原始方向五分位严格递减 Q1 −5.82% → Q5 −9.84%（Q5−Q1 = −4.02pct）。
+        #     ⚠️ 反号后 Q5−Q1 仅 +2.98pct 且非严格单调（Q3/Q4 交叉）→ 反号≠强度镜像。
+        #   s_size = 池内流通市值分位（越小越高分）—— SIZE 退出筛选、改为评分加分。
+        #     必须用当日池内分位而非固定阈值：分层抽样后池内市值分布逐日变化。
+        s_theme_neg = max(0.0, min(10.0, 10.0 - float(ths)))
+        s_size = _mv_rank.get(code)
+        # v4.4：质量/成长两维（fund 拆分）+ 技术面反号。
+        #   s_tech_neg = 10 − score_tech：score_tech 与反转块相关 −0.69~−0.72，
+        #   正权混合=内部对冲（round20 实测 h20 从 +0.173 掉到 +0.133 且不过关）。
+        s_quality = _quality_rank.get(code)
+        s_growth = _growth_rank.get(code)
+        # v4.8（round24 落地）：低波20 —— 承接 growth 归零后腾出的 0.13 权重。
+        #   单维 h5 IC +0.1189/t0=3.28；与现有 6 维 |r|≤0.24、与 mom20 −0.186 /
+        #   mom5 +0.038 → 不是动量/规模代理，是真独立低波因子。
+        #   ⚠️ 池内 rank 分位（0-10），不足 21 根 K 线时为 None 并从分母剔除。
+        s_lowvol20 = _lowvol_rank.get(code)
+        # v4.9（round26/27 落地）：EP 估值维 + 行业内中性化市值维。
+        #   s_ep       = 扣非净利润TTM/总市值池内分位（飞书 EP 因子，fund 让出 0.075 各半）
+        #   s_size_growth / s_dominant = v4.13 市值双维度（小盘成长溢价 / 龙头壁垒溢价）
+        #   ⚠️ 两者缺维均为 None → 从分母剔除（禁 or 0）
+        _c6 = _norm_code6(code)
+        s_ep = _ep_rank.get(_c6)
+        # ---- round105 P1-5（2026-10-31）：增速恶化票 ep 封顶防估值陷阱 ----
+        #   G_q<0 或 QoQ<−20% 或 本季亏损 → ep≤6.0。案例：巨人 fwd_pe 8.4→ep 9.85 吃满估值分
+        #   而 Q3 单季环比 −30%（低 PE 变脸票霸榜）。口径 = _GFB_MAP（方式B单一来源，
+        #   禁在此重算 G_q/QoQ）。封顶只在本处生效一次（enhance 层不再动 ep）。
+        #   round106：负基数票 G_q/QoQ 均无定义（None）→ 仅靠前两条会漏掉双亏票，
+        #   补「q_profit<0 本季亏损」触发堵洞。
+        _cap5 = False
+        if isinstance(s_ep, (int, float)):
+            _mb5 = _GFB_MAP.get(code) or {}
+            _gq5, _qq5 = _mb5.get("g_q"), _mb5.get("qoq")
+            _qp5 = _mb5.get("q_profit")
+            if ((isinstance(_gq5, (int, float)) and _gq5 < 0)
+                    or (isinstance(_qq5, (int, float)) and _qq5 < -0.20)
+                    or (isinstance(_qp5, (int, float)) and _qp5 < 0)):
+                if s_ep > 6.0:
+                    s_ep = 6.0
+                    _cap5 = True
+                    _EP_CAP_LOG.append(f"{name}({code})")
+        s_size_growth = _sg_rank.get(_c6)
+        s_dominant = _dom_rank.get(_c6)
+        s_tech_neg = max(0.0, min(10.0, 10.0 - float(ts_adj)))
+        # 缺失市值/质量/成长时不参与（权重按可用维度归一），不臆造中位分
+        # ⚠️ 2026-10-26 P0：_parts 改为 (维度键, 值, 权重) 三元组。
+        #   原因：各维量程不统一（12 维 0-5 制 / 4 维 0-10 制），原实现直接加权 →
+        #   ① 理论天花板仅 67.5（S≥85 / A≥65 永不可达）；
+        #   ② 名义权重被静默扭曲（tech_neg 15%→实占 22.2%，反转块 35%→实占 26%）。
+        #   修复：汇总前按 DIM_MAX 归一化到 0-10，再按名义权重加权，
+        #   这样「权重=名义权重」「满分=100」两个承诺才同时成立。
+        #   量程表唯一来源 factor_weights.json 的 dim_max（禁此处硬编码）。
+        _parts = [("score_oversold60", s_oversold60, W_OVERSOLD60),
+                  ("score_bias60", s_bias60, W_BIAS60),
+                  ("score_rsi_rev", s_rsi_rev, W_RSI_REV),
+                  ("score_vol_pulse", s_vol_pulse, W_VOL_PULSE),
+                  ("score_overbought", s_overbought, W_OVERBOUGHT),
+                  ("score_theme_intrinsic", s_theme_int, W_THEME_INT),
+                  ("score_attention", s_attn, W_ATTENTION)]
+        # ⚠️ 2026-10-27 P0：fund 改为条件加入 —— score_fund 在「无有效估值」时返回 None
+        #   （详见 score_fund 兜底注释），必须从分母剔除，禁用 min(None, DMAX) 会 TypeError。
+        #   与下方 ep / size_ind 同构处理。
+        if fs is not None:
+            _parts.append(("score_fund", fs, W_FUND))
+        if W_TECH_NEG > 0:
+            _parts.append(("score_tech_neg", s_tech_neg, W_TECH_NEG))
+        if s_size is not None:
+            _parts.append(("score_size", s_size, W_SIZE))
+        if s_quality is not None:
+            _parts.append(("score_quality", s_quality, W_QUALITY))
+        if s_growth is not None:
+            _parts.append(("score_growth", s_growth, W_GROWTH))
+        # v4.8：低波20（W_LOWVOL20=0.13）。growth 归零后 W_GROWTH=0，
+        #   s_growth 仍会进 _parts 但权重 0 → 不影响 total，仅保留字段供展示/审计。
+        if s_lowvol20 is not None:
+            _parts.append(("score_lowvol20", s_lowvol20, W_LOWVOL20))
+        # v4.9：EP 估值维（W_EP=0.12）。v4.13-size2d：市值拆双维 ——
+        #   score_size_growth（小盘成长溢价，W=0.08）与 score_dominant（龙头壁垒溢价，W=0.06）。
+        #   ⚠️ score_size 权重已归零 → s_size 仍进 _parts 但 w=0，不影响 total，仅留档对照。
+        if s_ep is not None:
+            _parts.append(("score_ep", s_ep, W_EP))
+        if s_size_growth is not None:
+            _parts.append(("score_size_growth", s_size_growth, W_SIZE_GROWTH))
+        if s_dominant is not None:
+            _parts.append(("score_dominant", s_dominant, W_DOMINANT))
+        # ⚠️ 2026-10-27 P0-4：量尺统一（详见 scale_calc.py 模块头）。
+        #   修复前：total = Σ(min(v,DMAX)/DMAX×10×w) / max(0.5, Σ「该股可用维」的 w) × 10
+        #     → 分母随「这只股票缺了几维」变化 = 同页面不同股票用不同尺子。
+        #     实测 1895 只：Σ可用权重 0.75 的 4 只被放大 1.333x、
+        #     0.85 的 191 只被放大 1.176x → **数据缺失反而占便宜**，最高虚高 16.33 分。
+        #   修复后：分母恒定 Σ全部生效权重（=1.0），缺维按中性分 DMAX/2 填充分子。
+        #   为什么不用「缺维=0 分」：实测 A_zero 复合 IC h5 从 +0.1520 掉到 +0.0926
+        #     （配对 t −5.76）、h20 +0.1879→+0.1071（t −8.94）→ 把「没数据」当「最差」
+        #     是凭空扣分制造噪声。B_neutral 配对 t −0.53/+1.06 → IC 零损失。
+        #   为什么 DMAX/2 无偏：当日池内中位数 vs DMAX/2 —— quality/lowvol20/ep/
+        #     size_ind 全部 5.000 vs 5.00（偏差 0），fund 2.200 vs 2.50（量程 6%）。
+        #   ⚠️ 与 P0-2 语义不冲突：P0-2 反对「用增速伪造估值分」（拿 A 维证据冒充 B 维），
+        #     本处填的是**声明为缺失的中性值**，并逐维记入 _neutral_filled 供页面披露。
+        #   ⚠️ 口径变更后 total 与本模块上线前不可比（同 v4.4 标度 / v4.7 量程变更）。
+        # 把「缺维」也放进 _parts（value=None），由 scale_calc 统一填中性分并上报。
+        #   ⚠️ 只列权重>0 的 8 个生效维；权重 0 的维不参与也不上报（它们本就不计分）。
+        _parts_all = [
+            ("score_fund", fs, W_FUND),
+            ("score_quality", s_quality, W_QUALITY),
+            ("score_tech_neg", s_tech_neg, W_TECH_NEG),
+            ("score_bias60", s_bias60, W_BIAS60),
+            ("score_rsi_rev", s_rsi_rev, W_RSI_REV),
+            ("score_lowvol20", s_lowvol20, W_LOWVOL20),
+            ("score_ep", s_ep, W_EP),
+            ("score_size_growth", s_size_growth, W_SIZE_GROWTH),
+            ("score_dominant", s_dominant, W_DOMINANT),
+        ]
+        _neutral_filled = []
+        total, _missing = scale_calc.composite_total(
+            _parts_all, DIM_MAX,
+            weights={k: v for k, v in FW.items() if v > 0},
+            missing_out=_neutral_filled)
+        # step2 阶段无板块动量维度；最终分由 apply_sector_momentum.py 按同一量尺重算。
+        # v4.4 标度修复（P0）：×20 → ×10。×20 是五维时代遗产（每维 0-5 量纲），
+        #   十维以后每维 0-10，加权平均 ×10 才是百分制。
+        #   上述乘法现由 scale_calc.composite_total 内部完成（勿在外层再乘）。
 
         if total >= 85: rating, advice = "S", "优先买入，可重仓"
         elif total >= 65: rating, advice = "A", "逢低加仓，重点关注"
@@ -4421,9 +5508,18 @@ def main():
             "sector_src": _src,
             "price": price, "pct_chg": pct, "pe": pe,
             "turnover": turnover,
-            "score_news": round(ns, 2), "score_tech": round(ts_adj, 2), "score_fund": round(fs, 2),
+            # ⚠️ 2026-10-27 P0：fs 可能为 None（无有效估值 → 本维不计分），round(None) 会 TypeError。
+            "score_news": round(ns, 2), "score_tech": round(ts_adj, 2),
+            "score_fund": (round(fs, 2) if fs is not None else None),
             "score_theme": round(ths, 2), "total": total, "rating": rating,
             "advice": advice,
+            # v4.10（P0-4）：量尺统一后逐只上报「哪些维按中性分填充」。
+            #   None 值维不再从分母剔除，而是以 DMAX/2 参与并在此留痕 →
+            #   页面可标「中性填充(非实测)」，避免让读者误当实测值。
+            "neutral_filled": list(_neutral_filled),
+            "neutral_filled_note": scale_calc.missing_note(
+                _neutral_filled, DIM_MAX, _DIM_LABEL_CN),
+            "composite_scale": "uniform_v1",
             "tech": td, "fund_reasons": fr, "theme_reasons": thr,
             "news_reasons": nr,
             "news_items": news_items,
@@ -4439,6 +5535,25 @@ def main():
             "score_overbought": round(s_overbought, 2),
             "score_theme_intrinsic": round(s_theme_int, 2),
             "score_attention": round(s_attn, 2),
+            # v4.1 新增两维（供 factor_eval 逐日评估与页面结构摘要消费）
+            "score_theme_neg": round(s_theme_neg, 2),
+            "score_size": (round(s_size, 2) if s_size is not None else None),
+            # v4.4 fund 拆分 + 技术面反号（round21/22 实证；权重见 factor_weights.json）
+            "score_quality": (round(s_quality, 2) if s_quality is not None else None),
+            "score_growth": (round(s_growth, 2) if s_growth is not None else None),
+            "score_tech_neg": round(s_tech_neg, 2),
+            # v4.8：低波20（过去20日日收益标准差，池内分位取负方向）。
+            #   None = K线不足 21 根 → 该维缺失，复合分自动从分母剔除（禁 or 0）
+            "score_lowvol20": (round(s_lowvol20, 2) if s_lowvol20 is not None else None),
+            "lowvol20_raw": (round(_lv_raw.get(code), 6) if _lv_raw.get(code) is not None else None),
+            # v4.9：EP 估值维 + 行业内中性化市值维（权重见 factor_weights.json）
+            #   ⚠️ score_size 权重已归零但字段保留（供页面/审计对照「全市场口径 vs 行业内口径」）
+            "score_ep": (round(s_ep, 2) if s_ep is not None else None),
+            "ep_capped": _cap5,   # round105 P1-5：增速恶化 ep 封顶留痕（True=9.85→6 类）
+            # v4.13-size2d：市值双维度（互斥；龙头进 dominant，其余进 size_growth）。
+            #   score_size 保留字段（全市场口径，供对照，见本 dict 上方）；score_size_ind 已退役，不再写盘。
+            "score_size_growth": (round(s_size_growth, 2) if s_size_growth is not None else None),
+            "score_dominant": (round(s_dominant, 2) if s_dominant is not None else None),
             "score_sustain": round(sustain_info["score"], 2),
             "sustain_note": sustain_info["note"],
             "is_cyclic": sustain_info["is_cyclic"],
@@ -4464,6 +5579,9 @@ def main():
             "q3_note": sustain_info.get("q3_note"),
             # v3.0 B2: 同花顺摘要扩容字段(全池可得, 供报告层/护栏/后续因子用)
             "roe": _ths_ex.get("roe"),
+            # ⚠️ 2026-10-27 P0：roe 的量纲必须一起落库，否则报告层不知道
+            #   「10.58」该显示成 10.58% 还是 1058%。ths 路径恒为 'pct'。
+            "roe_unit": _ths_ex.get("roe_unit"),
             "debt_ratio": _ths_ex.get("debt_ratio"),
             "ocfg": _ths_ex.get("ocfg"),
             "week_chg": week_chg,
@@ -4477,6 +5595,8 @@ def main():
             "liquid_ok": _elig_map.get(code, {}).get("liquid_ok", True),
             "suspended": _elig_map.get(code, {}).get("suspended", False),
             "is_new": _elig_map.get(code, {}).get("is_new", False),
+            # v4.11（2026-10-26）：追高标记必须落盘，否则组合层的二次拦截看不到它
+            "chase_hi": bool(_elig_map.get(code, {}).get("chase_hi", False)),
         })
 
         print(f"   {i+1:2d}. {name:6s} {em}{rating} {total:4.1f}  "
@@ -4486,14 +5606,21 @@ def main():
     results.sort(key=lambda x: (-x["total"], -(x["turnover"] or 0)))
     
     # Data completeness check
-    missing_fund = [r for r in results if r["score_fund"] == 0]
+    # ⚠️ 2026-10-27 P0：score_fund 语义拆成两种，不可混用：
+    #   None = 缺估值数据、本维不计分（新增）；0 = 有估值但极差（原有）。
+    #   原实现 `== 0` 会把两者混为一谈，且 None 不参与 == 比较时为 False →
+    #   修复后若不改，None 会被静默归入「不缺」而漏报，故拆成两个统计量。
+    missing_fund = [r for r in results if r["score_fund"] is None]
+    zero_fund = [r for r in results if r["score_fund"] == 0]
     missing_fwd = [r for r in results if r.get("fwd_pe") is None]
     missing_growth = [r for r in results if r.get("growth") is None]
     missing_news = [r for r in results if r["score_news"] <= 1 and r["code"] not in KNOWN_CATALYSTS]
-    if missing_fund or missing_fwd or missing_growth or missing_news:
+    if missing_fund or zero_fund or missing_fwd or missing_growth or missing_news:
         print(f"\n⚠️ 数据完整性检查:")
         if missing_fund:
-            print(f"   基本面=0: {', '.join(r['name'] for r in missing_fund[:10])}")
+            print(f"   基本面=缺估值(不计分): {len(missing_fund)}只 | {', '.join(r['name'] for r in missing_fund[:10])}")
+        if zero_fund:
+            print(f"   基本面=0(有估值但极差): {len(zero_fund)}只 | {', '.join(r['name'] for r in zero_fund[:10])}")
         if missing_fwd:
             print(f"   缺FwdPE: {', '.join(r['name'] for r in missing_fwd[:10])}")
         if missing_growth:
@@ -4504,6 +5631,7 @@ def main():
         print(f"\n✅ 数据完整性检查: 全部通过")
     
     # --- Step 4.9: 大盘赚钱效应 (全市场广度, 评估入场时机) ---
+    _T("Step5 逐股评分")
     print(f"\n🌊 Step 4.9: 大盘赚钱效应 (全市场广度)")
     breadth = fetch_market_breadth()
     money_effect = compute_money_effect(breadth)
@@ -4546,9 +5674,33 @@ def main():
 
     out_data = {
         "date": raw.get("date", ""),
-        "model": f"stock-scorer {SCORER_VER} (10-dim + AI + sector-momentum[evidence])",
+        # ⚠️ 2026-10-26：原写死 "(15-dim ...)"，v4.8/v4.9 换维后必然过期。
+        #   改为按 factor_weights.json 实时算生效维数（权重>0 的维），
+        #   与页面「生效 N 维」文案同源，禁再手填维数。
+        "model": (f"stock-scorer {SCORER_VER} "
+                  f"({sum(1 for _k, _v in _W_PRIOR_10D.items() if _v > 0)}-dim"
+                  f" + AI + sector-momentum[evidence], "
+                  f"prior-pending (全市场回测先验, 池内 IC 积累中))"),
         "pool_size": raw.get("pool_size") or len(stocks),
-        "weights": "题材30%(内禀0.30+板块动量0.35+成交额排名0.15+情绪确认0.20) 消息20% 技术面20%(结构60%[均线趋势35%/MACD动能25%/量能资金25%/RSI入场时机15%]+动量40%,RSI为Wilder平滑口径) 基本面30%(含行业前景)",
+        # v4.1（P1-2）：把选池口径**原样透传**到 scored。
+        #   原先 fetch 写进 top500_all_a.json 的 pool_rules 在 step2 被丢弃，
+        #   导致下游只能靠「池内市值中位 <60亿」去猜母体归属（v4.1 分层抽样后
+        #   该中位实测 85.9 亿，猜法必然误判）。显式透传后，母体归因可审计。
+        "pool_rules": raw.get("pool_rules") or {},
+        "all_count": raw.get("all_count"),
+        "dropped_eligibility": raw.get("dropped_eligibility"),
+        # ⚠️ 2026-10-26 P0：此处原为 v2.7 的**描述性字符串**
+        #   （"题材30%(内禀0.30+板块动量0.35+...) 消息20% ..."）。
+        #   但 enhance_scores.py L35 与 apply_sector_momentum.py L60 都按
+        #   `(json.load(f) or {}).get("weights")` 期望拿到 **dict**。
+        #   拿到字符串时：enhance 的 `all(k in w for k in _W_PRIOR_10D)` 对字符串
+        #   做子串匹配 → 恒 False → 静默回退内置 _W_PRIOR_10D（旧口径）；
+        #   apply 则直接 raise 后 except 吞掉 → 同样回退兜底先验。
+        #   两者都不报错，只在口径上与 factor_weights.json 脱钩。
+        #   修法：直接写 dict（与 apply 写回的结构完全一致），描述文案另立键。
+        "weights": dict(_W_PRIOR_10D),
+        "weights_note": ("step2 阶段口径：score_sector 未并入（由 apply_sector_momentum.py "
+                         "按全权重重算），此处为 factor_weights.json 的产线权重快照"),
         "results": results,
         "stats": {
             "rating_dist": {r: rc.get(r, 0) for r in "SABCD"},
@@ -4564,6 +5716,11 @@ def main():
         "market_review": build_market_review(money_effect, None, results),
     }
     
+    # round105 P1-5 收尾汇总（禁静默：ep 封顶必须可见）
+    if _EP_CAP_LOG:
+        print(f"\n📉 P1-5 增速恶化 ep 封顶（≤6.0）: {len(_EP_CAP_LOG)} 只 | "
+              + " / ".join(_EP_CAP_LOG[:15]) + (" ..." if len(_EP_CAP_LOG) > 15 else ""))
+
     with open(out, "w") as f:
         json.dump(out_data, f, ensure_ascii=False, indent=2)
     

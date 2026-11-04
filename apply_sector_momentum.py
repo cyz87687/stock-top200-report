@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
-"""将「板块60日动量 / 板块10日动量」并入评分模型 (stock-scorer v3.0-10dim)
+"""将「板块60日动量 / 板块10日动量」并入评分模型 (stock-scorer)
 
-v3.0-10dim（2026-10-13，依据《因子排名与10维评分模型设计_2026-10-13》）：
-十维总分（权重来自 factor_weights.json，缺失/非法回退十维先验）：
-  基本面0.18 | 消息0.18 | 板块动量0.10 | 超跌60 0.12 | 乖离低位0.10 |
-  RSI反转0.06 | 量能反向0.10 | 超买反向0.06 | 题材内禀0.05 | 关注度0.05  (合计1.0)
-  total = Σ(score_i × w_i) × 4
+⚠️ 权重不再写在本文件 —— 唯一来源是 factor_weights.json（当前 v4.2-lag-robust）：
+    fund 0.32 | news 0.16 | theme_neg 0.12 | size 0.12 | sector 0.10 |
+    反转块 4×0.045 | overbought/theme_intrinsic/attention 0
+   合计 1.0。文件缺失或非法时回退下列 _W_PRIOR_10D 硬编码先验。
+   本段此前写成 v3.0 的「基本面0.18 | 消息0.18 | …」静态清单，早已与代码脱钩，
+   会误导维护者以为是权威口径 —— 改为指向单一来源，避免再次失同步。
+
+total = Σ(score_i × w_i) / Σ(w_i | 该股可用) × 20   ← 百分制
+  注意：分母按「该股实际可用维度」归一，缺维（如无 circ_mv 时的 score_size）
+  从分母剔除，不按 0 计入 —— 按 0 会被误读为「市值最大」，等于凭空扣分。
+
 技术面/题材旧维度已拆解：均线/MACD/动量退出评分（三重负证据，仅 tech detail 展示）；
 题材拆为内禀/关注度两维，板块动量子项归并 score_sector。
 
@@ -29,18 +35,15 @@ import glob
 import shutil
 import argparse
 
+# v4.10（2026-10-27 P0-4）：复合分量尺唯一实现来源（分母恒定 + 缺维中性填充）
+import scale_calc
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 SECTOR_DIR = os.path.join(HERE, 'sector')
 MAP_PATH = os.path.join(SECTOR_DIR, 'sw_map.json')
 
 # v3.6-fund-led: 基本面主导先验（与 factor_weights.json weights 同源，回退时必须一致）
-_W_PRIOR_10D = {
-    "score_fund": 0.34, "score_news": 0.22, "score_sector": 0.10,
-    "score_oversold60": 0.055, "score_bias60": 0.055, "score_rsi_rev": 0.055,
-    "score_vol_pulse": 0.055, "score_overbought": 0.02,
-    "score_theme_intrinsic": 0.08, "score_attention": 0.02,
-}
-# 旧五维 → 十维映射（兼容历史 scored json 重跑）
+_W_PRIOR_10D = {"score_fund": 0.200000, "score_news": 0.000000, "score_theme_neg": 0.000000, "score_size": 0.000000, "score_sector": 0.000000, "score_quality": 0.100000, "score_growth": 0.100000, "score_tech_neg": 0.100000, "score_oversold60": 0.000000, "score_bias60": 0.050000, "score_rsi_rev": 0.050000, "score_vol_pulse": 0.000000, "score_overbought": 0.000000, "score_theme_intrinsic": 0.000000, "score_attention": 0.000000, "score_lowvol20": 0.000000, "score_ep": 0.100000, "score_size_ind": 0.000000, "score_size_growth": 0.200000, "score_dominant": 0.100000}  # v4.14-evidence-aligned：quality 0.212→0.12（实证 h20 IC −0.147 负），fund 0.12→0.242（消融 t=+4.41 唯一>4），# tech_neg 0.06→0.03（σ 贡献仅 2.1% 近乎常数）；Σ=1.0
 _W_MAP_FROM_5D = {
     "score_fund": [("score_fund", 1.0)],
     "score_news": [("score_news", 1.0)],
@@ -78,7 +81,46 @@ def _load_factor_weights():
 
 _FW, _FW_META = _load_factor_weights()
 SCORER_VER = _FW_META.get("version", "v3.0-10dim") if _FW_META else "v3.0-10dim"
-print(f"⚖️ 十维权重（{SCORER_VER}）: " + " ".join(f"{k.replace('score_', '')}={v}" for k, v in _FW.items()))
+
+
+def _load_dim_max():
+    """读 factor_weights.json 的 dim_max（各维满分量程）；失败回退内置默认。
+
+    ⚠️ 2026-10-26 P0：量程不统一（12 维 0-5 制 / 4 维 0-10 制）导致
+    ① 天花板仅 67.5 分 → S≥85/A≥65 永不可达（490 只评级只有 B/C/D）；
+    ② 名义权重被扭曲（tech_neg 15%→22.2%，反转块 35%→26%，fund 30%→22.2%）。
+    汇总前必须按量程归一化到 0-10。回退默认值须与 json 的 dim_max 一致。
+    """
+    _DEFAULT = {
+        "score_fund": 5.0, "score_news": 5.0, "score_theme_neg": 10.0,
+        "score_size": 10.0, "score_sector": 5.0, "score_quality": 10.0,
+        "score_growth": 10.0, "score_tech_neg": 10.0, "score_oversold60": 5.0,
+        "score_bias60": 5.0, "score_rsi_rev": 5.0, "score_vol_pulse": 5.0,
+        "score_overbought": 5.0, "score_theme_intrinsic": 5.0, "score_attention": 5.0,
+        # v4.8/v4.9 池内分位族（量程 0-10）
+        "score_lowvol20": 10.0, "score_ep": 10.0, "score_size_ind": 10.0,
+        "score_size_growth": 10.0, "score_dominant": 10.0,
+    }
+    try:
+        path = os.path.join(HERE, "factor_weights.json")
+        with open(path, encoding="utf-8") as f:
+            dm = (json.load(f) or {}).get("dim_max") or {}
+        out = dict(_DEFAULT)
+        for k in _DEFAULT:
+            v = dm.get(k)
+            if isinstance(v, (int, float)) and v > 0:
+                out[k] = float(v)
+        return out
+    except Exception:
+        return dict(_DEFAULT)
+
+
+_DIM_MAX = _load_dim_max()
+# ⚠️ 2026-10-26：原写「十维权重」并把 18 个键**全列**（含 10 个权重 0 的维），
+#   读者会以为模型仍在用 18 维。改为只列权重>0 的生效维 + 明示维数。
+_eff_fw = {k: v for k, v in (_FW or {}).items() if isinstance(v, (int, float)) and v > 0}
+print(f"⚖️ 生效 {len(_eff_fw)} 维权重（{SCORER_VER}）: "
+      + " ".join(f"{k.replace('score_', '')}={v}" for k, v in _eff_fw.items()))
 
 # 分档: (排名下界, 排名上界, 分值)
 BANKS_MOM_60 = [(1, 1, 5.0), (2, 3, 4.2), (4, 5, 3.5), (6, 10, 2.8), (11, 20, 2.0), (21, 40, 1.3), (41, 70, 0.7), (71, 10 ** 6, 0.3)]
@@ -178,22 +220,69 @@ def main():
             # v3.0-10dim: 十维总分（新字段缺失的历史 scored json 按旧五维公式回退）
             _has_10d = any('score_oversold60' in r for r in results)
             if _has_10d:
-                total = round((float(r.get('score_fund') or 0) * _FW["score_fund"]
-                               + float(r.get('score_news') or 0) * _FW["score_news"]
-                               + float(r.get('score_oversold60') or 0) * _FW["score_oversold60"]
-                               + float(r.get('score_bias60') or 0) * _FW["score_bias60"]
-                               + float(r.get('score_rsi_rev') or 0) * _FW["score_rsi_rev"]
-                               + float(r.get('score_vol_pulse') or 0) * _FW["score_vol_pulse"]
-                               + float(r.get('score_overbought') or 0) * _FW["score_overbought"]
-                               + float(r.get('score_theme_intrinsic') or 0) * _FW["score_theme_intrinsic"]
-                               + float(r.get('score_attention') or 0) * _FW["score_attention"]
-                               + score_sector * _FW["score_sector"]) * 20, 2)  # v3.3 问题2: ×20 (每维满分10/总分满分100)
+                # v4.2（P0 修复）：**缺失维必须从分母剔除，绝不能 `or 0` 按 0 计入**。
+                #   原实现写成 `float(r.get('score_theme_neg') or 0)`，
+                #   于是任何缺该字段的行（所有 10-24 之前的历史 scored、以及个别
+                #   上游没算出来的行）都会被当成「theme_neg = 0 分」参与加权，
+                #   相当于凭空扣掉 0.12 权重：实测同一条记录 enhance 算 90.08、
+                #   apply 算 77.80，差 12.28 分 —— apply 在最后一步覆盖 total，
+                #   等于把正确分数改错，且 diff 静默不报错。
+                #   与 step2 / enhance 的「逐行按可用维度归一」口径必须完全一致。
+                # v4.4（round17 同类陷阱修复）：原实现是**硬编码元组列表**，
+                #   factor_weights.json 新增维度（v4.1 的 theme_neg/size、v4.4 的
+                #   quality/growth/tech_neg）不会自动进入 total → 权重静默不落地。
+                #   改为与 enhance_scores._calc_total_10d 完全同口径的通用循环：
+                #   遍历权重表全部键，缺维从分母剔除（isinstance 判断，禁 or 0）。
+                # v2026-10-26（P0 量程修复）：汇总前按 dim_max 归一化到 0-10。
+                #   量程不统一使天花板仅 67.5（S≥85/A≥65 永不可达）且名义权重
+                #   被扭曲（tech_neg 15%→22.2%，反转块 35%→26%）。量程表唯一来源
+                #   factor_weights.json 的 dim_max。
+                # v2026-10-27（P0-4 量尺统一）：分母恒定为 Σ全部生效权重，
+                #   缺维按中性分 DMAX/2 填充（详见 scale_calc.py 模块头）。
+                #   修复前分母 = 该股可用维权重之和 → 缺维越多分数被抬得越高
+                #   （实测放大 1.00~1.33 倍，最高虚高 16.33 分）。
+                #   ⚠️ 本步包含 score_sector（板块动量），其权重也计入统一分母。
+                _parts = []
+                for _k, _wt in _FW.items():
+                    if _wt <= 0:
+                        continue
+                    if _k == "score_sector":
+                        continue          # 板块动量本步才有，下面单独加
+                    _parts.append((_k, r.get(_k), _wt))
+                # 板块动量本步才有，恒可用（同样按量程归一）
+                _parts.append(("score_sector", score_sector, _FW["score_sector"]))
+                _miss_s = []
+                total, _ms = scale_calc.composite_total(
+                    _parts, _DIM_MAX,
+                    weights={k: v for k, v in _FW.items() if v > 0},
+                    missing_out=_miss_s)
+                # 逐只留痕「哪些维是中性填充」，供页面披露（禁让读者误当实测值）
+                r["neutral_filled"] = list(_ms)
+                r["composite_scale"] = "uniform_v1"
             else:
-                total = round((float(r.get('score_news') or 0) * _FW["score_news"]
-                               + float(r.get('score_tech') or 0) * (_FW["score_rsi_rev"] + _FW["score_vol_pulse"] + _FW["score_overbought"])
-                               + float(r.get('score_fund') or 0) * _FW["score_fund"]
-                               + float(r.get('score_theme') or 0) * (_FW["score_theme_intrinsic"] + _FW["score_attention"])
-                               + score_sector * _FW["score_sector"]) * 20, 2)
+                # 旧五维回退路径（历史 scored 无 score_oversold60 字段）。
+                # ⚠️ 2026-10-26 P0：原实现用原值加权再 ×10，同样受量程不统一影响
+                #   （score_news/score_tech/score_fund/score_theme/score_sector 全是
+                #   0-5 制）→ 天花板仅 50。现改为按各自量程归一化到 0-10。
+                # ⚠️ 2026-10-27 P0-4：同样统一量尺 —— 分母 = 映射后「全部」权重和，
+                #   缺维按中性分填充。此刻度与十维分支不可比（维度集不同），
+                #   但内部一致：同批旧文件之间不再因缺维多少而尺子不同。
+                # 旧五维把 score_tech 拆给三个反转子因子、score_theme 拆给内禀+关注度，
+                #   这里按映射后的合并权重汇总，故 parts 直接给合并权重。
+                _p5 = [
+                    ("score_news", r.get('score_news'), _FW["score_news"]),
+                    ("score_sector", score_sector, _FW["score_sector"]),
+                    ("score_rsi_rev", r.get('score_tech'),
+                     _FW["score_rsi_rev"] + _FW["score_vol_pulse"] + _FW["score_overbought"]),
+                    ("score_theme_intrinsic", r.get('score_theme'),
+                     _FW["score_theme_intrinsic"] + _FW["score_attention"]),
+                    # ⚠️ fund 可能为 None（step2 兜底改造后），走中性填充而非 `or 0`
+                    ("score_fund", r.get('score_fund'), _FW["score_fund"]),
+                ]
+                _miss5 = []
+                total, _m5 = scale_calc.composite_total(
+                    _p5, _DIM_MAX, missing_out=_miss5)
+                r["neutral_filled"] = list(_m5)
             r['total'] = total
             if total >= 85:
                 rating, advice = "S", "优先买入，可重仓"
@@ -220,7 +309,10 @@ def main():
     _ver_suffix = ", IC-driven weights" if _adopted == "ic_driven" else (
         ", prior-pending (全市场回测先验, 池内 IC 积累中)"
         if _adopted.startswith("prior") or _meta.get("version", "").startswith("v3.0") else "")
-    data['model'] = f"stock-scorer {SCORER_VER} (10-dim + AI + sector-momentum[{args.mode}]{_ver_suffix})"
+    # ⚠️ 2026-10-26：原为硬编码 "(10-dim ...)" —— v4.8 起生效维已变（7 维→8 维），
+    #   写死的维数会静默过期并在页面标题旁展示错信息。改为按权重配置实时计算。
+    _n_eff = sum(1 for _k, _v in (_FW or {}).items() if isinstance(_v, (int, float)) and _v > 0)
+    data['model'] = f"stock-scorer {SCORER_VER} ({_n_eff}-dim + AI + sector-momentum[{args.mode}]{_ver_suffix})"
     data['sector_momentum'] = {'date': mom_date, 'mode': args.mode,
                                'mom_long_days': mom.get('mom_long_days', 60),
                                'mom_short_days': mom.get('mom_short_days', 10),

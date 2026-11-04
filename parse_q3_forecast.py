@@ -37,28 +37,31 @@ _NUM_RE = re.compile(r"([+-]?\d+(?:\.\d+)?)\s*%?")
 
 
 def parse_pct(v):
-    """解析同比单元格 → (value|None, kind)
+    """解析同比单元格 → (value|None, kind, lo|None, hi|None)
 
     kind ∈ point(点值) / range(区间取中值) / turnaround(扭亏文字) / suspect(区间颠倒) / none(空)
-    无法识别的内容返回 (None, 'none')，原值由调用方留档。
+    无法识别的内容返回 (None, 'none', None, None)，原值由调用方留档。
+    ⚠️ 2026-10-31 起额外返回区间端点 lo/hi（升序），供 earnings_surprise 的预测带
+      判定使用（区间预测直接用真实端点，不再退化为中值±band）；point 时 lo=hi=v。
     """
     if v is None:
-        return None, "none"
+        return None, "none", None, None
     if isinstance(v, float) and pd.isna(v):
-        return None, "none"
+        return None, "none", None, None
     s = str(v).strip()
     if not s or s.lower() == "nan":
-        return None, "none"
+        return None, "none", None, None
     if any(w in s for w in TURNAROUND_WORDS):
-        return None, "turnaround"
+        return None, "turnaround", None, None
     nums = [float(x) for x in _NUM_RE.findall(s)]
     if not nums:
-        return None, "none"
+        return None, "none", None, None
     if len(nums) >= 2:
-        lo, hi = nums[0], nums[1]
-        mid = round((lo + hi) / 2.0, 2)
-        return mid, ("suspect" if lo > hi else "range")
-    return nums[0], "point"
+        x1, x2 = nums[0], nums[1]
+        lo, hi = (x1, x2) if x1 <= x2 else (x2, x1)
+        mid = round((x1 + x2) / 2.0, 2)
+        return mid, ("suspect" if x1 > x2 else "range"), lo, hi
+    return nums[0], "point", nums[0], nums[0]
 
 
 def _clean(v):
@@ -81,13 +84,13 @@ def parse_excel(path):
         name = _clean(r.iloc[1])
         if not name:
             continue
-        a_yoy, a_kind = parse_pct(r.iloc[6])
-        b_yoy, b_kind = parse_pct(r.iloc[12])
+        a_yoy, a_kind, a_lo, a_hi = parse_pct(r.iloc[6])
+        b_yoy, b_kind, b_lo, b_hi = parse_pct(r.iloc[12])
         b_np_raw = _clean(r.iloc[11])
         rec = {
             "sector_raw": _clean(r.iloc[0]),
-            "a_yoy": a_yoy, "a_kind": a_kind,
-            "b_yoy": b_yoy, "b_kind": b_kind,
+            "a_yoy": a_yoy, "a_kind": a_kind, "a_lo": a_lo, "a_hi": a_hi,
+            "b_yoy": b_yoy, "b_kind": b_kind, "b_lo": b_lo, "b_hi": b_hi,
             "a_rev": _clean(r.iloc[2]), "b_rev": _clean(r.iloc[8]),
             "a_np": _clean(r.iloc[5]), "b_np": b_np_raw,
             # B机构净利润部分标 (扣非)，口径留档不静默统一

@@ -1,0 +1,26 @@
+fetch_top200_sina	0	1		2026-11-04 16:49:30	
+check_data_fresh	0	1		2026-11-04 16:49:30	
+step2_stockscorer	0	1		2026-11-04 16:59:29	
+append_klines_latest	0	1		2026-11-04 17:07:15	
+refresh_kline_meta	0	1		2026-11-04 17:07:16	
+verify_qfq_anchor	0	1		2026-11-04 17:07:24	
+archive_fund_universe	0	1		2026-11-04 17:07:37	
+archive_fwd_snapshot	0	1		2026-11-04 17:07:37	
+generate_ai_assessment	0	1		2026-11-04 17:10:17	
+enhance_scores	0	1		2026-11-04 17:10:34	
+sector_momentum_daily	0	1		2026-11-04 17:13:29	
+apply_sector_momentum	0	1		2026-11-04 17:13:29	
+pick_portfolio	0	1		2026-11-04 17:13:29	
+portfolio_risk	0	1		2026-11-04 17:13:30	
+track_recommendations	0	1		2026-11-04 17:14:58	
+portfolio_metrics	0	1		2026-11-04 17:14:59	
+panel_audit	0	1		2026-11-04 17:14:59	
+factor_eval	0	1		2026-11-04 17:34:40	
+selfcheck_pipeline	0	1		2026-11-04 17:34:41	
+fetch_focus_list	0	1		2026-11-04 17:34:43	
+fetch_bench	0	1		2026-11-04 17:34:45	
+regime_model	2	0		2026-11-04 17:34:46	日期门禁拦截（指数缓存落后于数据日期）→ 报告显示管道告警占位
+gen_report_top200	0	1		2026-11-04 17:35:25	
+orphan_scan	0	1		2026-11-04 17:35:29	
+long_panel_ic	0	1		2026-11-04 17:37:29	新鲜度 0d < 7d，按设计跳过重建（非漏跑）
+regime_model	0	1		2026-11-04 17:37:32	补跑通过：指数基准已用新浪备源更新至11-04，日期门禁 lag=0

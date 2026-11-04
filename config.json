@@ -1,93 +1,144 @@
 {
-  "pool_size": 500,
-  "watch_range": [
-    500,
-    1500
+ "pool_size": 0,
+ "pool_size_note": "v4.11（老大 2026-10-26 指令「不再有500只的限制，筛选完之后初筛池每只股票都要拉数据跑一遍评分」）：**0 = 不限规模**，apply_pool_rules 跳过分层抽样与一切截断，初筛池（实测 1898 只）全量进 step2 完整评分。⚠️ 0 的语义必须由 fetch_top200_sina.POOL_UNLIMITED 统一解释——原实现 `if user.get('pool_size')` 会把 0 当假值静默回退缺省 500，限流开关形同虚设。⚠️ 反向改回有限值（如 500）即恢复分层抽样，两处行为差异只由这一个数字控制，不需要改代码。",
+ "watch_range": [
+  500,
+  1500
+ ],
+ "route_pool_map": {
+  "reversal": 500,
+  "momentum": 200
+ },
+ "momentum_route_weight": 0.5,
+ "liquidity_filter": {
+  "enabled": true,
+  "min_avg_amount_20d": 50000000,
+  "min_avg_turnover_rate": 0.01
+ },
+ "industry_limits": {
+  "_comment_max_single_stock": "单票敞口上限。scope=assets(默认) 表示占总资产，min_holdings=ceil(w_total/0.08)，2成仓时仅需3只；scope=equity 表示占股票仓位，恒需13只，但实测 momentum 路线候选只覆盖4个申万一级行业、被 per_parent=2 封顶8只，该口径下结构性不可行。两种口径的数值都会输出，不一致时在 shortfall 里标 divergent，不静默。",
+  "max_single_stock": 0.08,
+  "max_single_stock_scope": "assets",
+  "max_l2_sector": 0.25,
+  "max_l1_parent": 0.35,
+  "max_l1_deviation_pp": 8
+ },
+ "eligibility_filter": {
+  "exclude_st": true,
+  "exclude_delisting": true,
+  "min_listing_days": 60,
+  "exclude_suspended": true
+ },
+ "pool_rules": {
+  "enabled": true,
+  "universe": "all_a",
+  "sort_key": "mv",
+  "size_quantile": 0.0,
+  "min_amount": 100000000,
+  "min_mktcap": 2500000000,
+  "price_floor": 2.0,
+  "drop_mom_top_pct": 20,
+  "rolling_window": 0,
+  "exclude_bj": false,
+  "tech_l1": [
+   "电子",
+   "计算机",
+   "通信",
+   "电力设备",
+   "国防军工",
+   "机械设备"
   ],
-  "route_pool_map": {
-    "reversal": 500,
-    "momentum": 200
-  },
-  "momentum_route_weight": 0.5,
-  "liquidity_filter": {
-    "enabled": true,
-    "min_avg_amount_20d": 50000000,
-    "min_avg_turnover_rate": 0.01
-  },
-  "industry_limits": {
-    "max_single_stock": 0.08,
-    "max_l2_sector": 0.25,
-    "max_l1_parent": 0.35,
-    "max_l1_deviation_pp": 8
-  },
-  "eligibility_filter": {
-    "exclude_st": true,
-    "exclude_delisting": true,
-    "min_listing_days": 60,
-    "exclude_suspended": true
-  },
-  "pool_rules": {
-    "enabled": true,
-    "universe": "all_a",
-    "sort_key": "mv",
-    "size_quantile": 0.18,
-    "min_amount": 100000000,
-    "min_mktcap": 2500000000,
-    "price_floor": 2.0,
-    "drop_mom_top_pct": 20,
-    "rolling_window": 0,
-    "exclude_bj": false,
-    "tech_l1": [
-      "电子",
-      "计算机",
-      "通信",
-      "电力设备",
-      "国防军工",
-      "机械设备"
-    ],
-    "note": "v3.8 选池口径（老大 2026-10-25 指令：剔除低价因子，改用 final_ranking.csv 因子体系；全A成分股、剥成交额<1亿、剥总市值<50亿）。v3.7『绝对价格最便宜18%』方向错误，实证：Spearman(价格,ln流通市值)=0.166(几乎无关)；『价格最低500』市值中位44.0亿≈全A中位48.1亿，选出萃华退/*ST卓然/*ST清越/元道退——便宜的是『即将退市的壳』；『市值最小500』市值中位9.2亿、价格中位15.05元才是真小微盘；两组重合仅26/500=5.2%。→ 绝对价格是SIZE的极差代理且把面值退市风险误当alpha。改按 SIZE(流通市值)排序。依据 final_ranking.csv 47因子中唯一显著超额者=SIZE：exc_t=+2.28(全表唯一|t|>2多头超额)/LS_IR=1.95(最高)/score=0.993(最高)，方向越小越好；估值族普遍弱(EP exc_t=+0.10/BP -0.54/CFP -0.25/EVEBIT -0.32)，故『便宜』在估值维度亦不成立。回测 backtest_pool_factor.py(58截面,无前视,vs宇宙中位)：旧口径绝对价格18%=+4.60pct/胜率87.9%；SIZE市值最小9%=+8.63pct/胜率100%/配对t=+7.60显著优于旧口径；SIZE18%=+7.61pct/胜率100%/t=+6.45；三段稳定性 +8.77/+6.15/+9.18三段全正；自拼多因子=+2.81pct/t=-3.61显著劣化→弱因子堆叠稀释强因子，不做合成。",
-    "constraint_note": "两条流动性硬约束：① min_amount=1.0亿（当日成交额，老大定）② min_mktcap=25亿（**总市值** mktcap，非流通市值 nmc——含大量限售股的央企两者差异极大，如工商银行总市值29653亿 vs 流通22432亿）。市值下限经扫描定值（backtest_size_floor_detail.py，统一口径=子集中位−同一floor内宇宙中位，剥离小市值beta）：下限0亿→+7.54pct/恶化0%；10亿→+7.54/0%；15亿→+7.48/16%；20亿→+7.55/48%；**25亿→+7.43/55%(选定)**；30亿→+7.10/67%；40亿→+6.80/81%；50亿→+5.43/88%；80亿→+3.91/90%；150亿→+0.93(三段有负,接近失效)。判据三条件(a超额≥基线95% / b三段全正 / c恶化截面≤60%)仅≤25亿全过→25亿为『不影响收益率』的最大下限。",
-    "decay_note": "衰减机制（回答老大『为何+8.63降到+5.43』）：(1)口径先纠正——+8.63pct是『无下限+最小9%+基准为全宇宙中位』，+5.43pct是『50亿下限+最小18%+基准为同floor宇宙中位』，两者含beta不同不可直接相减；统一口径下无下限最小18%=+7.54pct，真实落差仅2.11pct。(2)物理原因——无下限时178只选中股有40.5%落在30-50亿(该段平均+8.59%/+7.91%)、25.9%在50-60亿(+5.99%)、19.1%在60-80亿(仅+0.83%)；抬高下限=把选股区间强行推入alpha已衰减段，同时候选从993压到887只，双重削弱。(3)选定25亿的理由：该下限下选中市值中位49.5亿(仅比无下限46.5亿高3亿)，超额+7.43pct几乎无损。",
-    "caveat": "仍未做：财务因子(OCFG/ROE/NAG/TAG/EP/DEBT)历史快照未落盘，故本次只把 SIZE(纯历史价格可得)上线；成长族(NAG LS_IR=1.22/TAG 1.40/NPG 1.77)理论上更强，但需先为全A重算财务分并积累截面。估值字段(pe/pb)自v3.8起每日落盘，累计30截面后可检验『价格分位vs估值分位』真伪。⚠️外推边界（重要）：回测宇宙1012只=历史曾入成交额榜并集，总市值中位220.2亿/最小12.2亿、p10=54.8亿（严重偏大盘），而全A中位仅55.9亿/p25=31.8亿。同一市值下限切掉的比例差异巨大——50亿：全A切掉44.8% vs 本宇宙仅7.9%；25亿：全A切掉15.6% vs 本宇宙仅0.4%。故『≤25亿不影响』对全A是**偏乐观**估计，全A实盘须按真实候选覆盖复核。另：成交额无法历史重建（价格store未存volume），故『成交额≥1亿』这条只能用今日快照实证(全A 5576→3265只)，无法回测，属已知能力边界。"
-  },
-  "dual_pool_compare": false,
-  "regime_tag": "下跌市验证（截面区间 2026-06-26~2026-10-23）",
-  "regime_note": "v3.6 口径切换：主口径由 ten-dim 均摊改为 fund-led(基本面34%/消息22%)。切换依据为 79 截面可交易口径回测 + 67 组权重邻域扫描；配对检验 h1 t=0.13/h5 t=1.52 不显著，改善幅度在噪声范围内，切换主因为共线性治理而非超额提升。渲染层已改为用 factor_ic.json 有效截面区间动态覆盖本静态值。",
-  "regime_review_trigger": "累计 ≥20 个上涨市交易日（上证 20 日均线向上且中位涨幅>0）后重跑 backtest_universe.py 并复核扩池结论",
-  "fetch": {
-    "pages": 15,
-    "page_size": 100,
-    "total_n": 1500,
-    "pages_all_a": 58,
-    "note": "pages 用于 amount 母体(15页=1500只)；pages_all_a 用于全A母体(58页≈5576只，接口 num 上限100)。v3.7 默认走全A。"
-  },
-  "coverage_guard": {
-    "min_pool_coverage": 0.96,
-    "meltdown_coverage": 0.9
-  },
-  "workflow": {
-    "timeout_minutes": 300,
-    "step_warn_ratio": 1.5
-  },
-  "monitoring": {
-    "stale_data_alert": {
-      "enabled": true,
-      "max_stale_trading_days": 1,
-      "note": "指数日线最新交易日落后北京当日>1个交易日即判定停更；本地兜底链路(run_daily_local.sh)为可靠主路径，Actions 海外 runner 慢易超时"
-    },
-    "ic_alert": {
-      "enabled": true,
-      "recommendation_ic_nw_t_hi": -2.0,
-      "recommendation_win_rate_lo": 40,
-      "composite_ic_nw_t_lo": 2.0,
-      "note": "预测力安全门阈值(与 factor_eval._risk_gate 同源)：推荐组合 T+1 NW t≤-2 或 胜率<40% → high_risk(不机械跟单)；综合分 NW t<2 → 无显著正预测力"
-    },
-    "pool_excess_alert": {
-      "enabled": true,
-      "median_excess_pct_lo": -1.0,
-      "neg_ratio_pct_hi": 75,
-      "hop_days": 20,
-      "note": "选股池负超额体检(与 factor_eval._eval_pool_excess 同源)：池内 vs 全池中位涨跌差 < -1.0pct 且跑输入场日占比 ≥75% → 判定『池子选错了』，进入 high_risk。该问题无法靠调权重解决，需改造入选规则（成交额排序会系统性选中高换手关注度脉冲，脉冲退潮后回吐）"
-    }
+  "note": "v4.1 选池口径（老大 2026-10-25 裁决：『全A流通市值最小18%应该是因子加分项，并不是筛选条件。min_mktcap=25亿(总市值)、成交额≥1亿是筛选条件』）。【硬约束=筛选】① 全场价格≥2元(避面值退市) ② 当日成交额≥1亿 ③ 总市值≥25亿。【软信号=评分】流通市值(SIZE)退出筛选、进入 step2 评分层做小市值加分。—— 为什么必须这样改（v4.0 的两个 P0 实证）：(1) 旧实现 n_take=min(len, max(POOL, int(len*size_quantile))) 中 max(POOL,·) 在候选<2778只时恒取500 → 参数静默失效：今日候选2520→int(2520*0.18)=453→max(500,453)=500，实际覆盖 19.84%；若某日候选1000只则取500=50%，口径随候选数漂移、不可复现。(2) 按市值截断进池后，池内流通市值 log-SD 仅 0.276（4.1~39.9亿，中位31.1亿），而硬约束全集 log-SD 达 1.112（4.1~22954亿）。池内已无市值跨度 → SIZE 若只做评分项在池内毫无区分度，『小市值加分』名存实亡；反之若继续截断，SIZE 就仍是筛选而非加分。两者不可能同时成立，故改为【分层抽样】：按流通市值分 5 档等量抽 500 只，既保住市值跨度（log-SD→约1.10，使评分层 SIZE 有真实区分度），又满足 step2 时限。【回测外推边界（P0，勿忽略）】原 backtest_pool_factor.py 的 +7.61pct/+8.63pct 是在1012只『曾进过成交额榜』的并集宇宙内算的，该宇宙流通市值中位 187.7 亿（偏大盘热门股），其内『最小18%』市值中位仍是 44 亿；而线上池中位 31.1 亿、上限 39.9 亿，对应全A约 42.6% 分位 —— 与回测宇宙的『18%』不是同一批股票，绝对幅度不可外推。且该回测 58 个日频截面在 HOP=20 下非重叠样本仅 3 个（06-26/07-24/08-21），原引用 t=+6.45 系把 58 个重叠观测当独立样本；复算 OLS t=+16.06 / NW t=+7.35 均不可信。→ 纪律：不得对外宣称『换母体带来 +7.6pct 超额』，只能表述为『方向性依据』。【历史沿革】v3.8 选池口径（老大 2026-10-25 指令：剔除低价因子，改用 final_ranking.csv 因子体系；全A成分股、剥成交额<1亿、剥总市值<50亿）。",
+  "constraint_note": "【筛选条件（硬约束，老大定）】① min_amount=1.0亿（当日成交额）② min_mktcap=25亿（**总市值** mktcap，非流通市值 nmc——含大量限售股的央企两者差异极大，如工商银行总市值29653亿 vs 流通22432亿）③ price_floor=2.0元（避面值退市）。三者是**筛选**：不满足即不进池。市值下限经扫描定值（backtest_size_floor_detail.py，统一口径=子集中位−同一floor内宇宙中位，剥离小市值beta）：下限0亿→+7.54pct/恶化0%；10亿→+7.54/0%；15亿→+7.48/16%；20亿→+7.55/48%；**25亿→+7.43/55%(选定)**；30亿→+7.10/67%；40亿→+6.80/81%；50亿→+5.43/88%；80亿→+3.91/90%；150亿→+0.93(三段有负,接近失效)。判据三条件(a超额≥基线95% / b三段全正 / c恶化截面≤60%)仅≤25亿全过→25亿为『不影响收益率』的最大下限。⚠️ 注意：本条曾与 note 的『剥总市值<50亿』自相矛盾（v4.0 文档缺陷），实际生效值是 25亿，v4.1 已统一，两处不再打架。",
+  "decay_note": "衰减机制（回答老大『为何+8.63降到+5.43』）：(1)口径先纠正——+8.63pct是『无下限+最小9%+基准为全宇宙中位』，+5.43pct是『50亿下限+最小18%+基准为同floor宇宙中位』，两者含beta不同不可直接相减；统一口径下无下限最小18%=+7.54pct，真实落差仅2.11pct。(2)物理原因——无下限时178只选中股有40.5%落在30-50亿(该段平均+8.59%/+7.91%)、25.9%在50-60亿(+5.99%)、19.1%在60-80亿(仅+0.83%)；抬高下限=把选股区间强行推入alpha已衰减段，同时候选从993压到887只，双重削弱。(3)选定25亿的理由：该下限下选中市值中位49.5亿(仅比无下限46.5亿高3亿)，超额+7.43pct几乎无损。",
+  "caveat": "【未做但必须知道的（v4.1 更新）】(1) 财务因子(OCFG/ROE/NAG/TAG/EP/DEBT)历史快照仍未落盘，成长族(NAG LS_IR=1.22/TAG 1.40/NPG 1.77)理论上更强但无法检验；估值字段(pe/pb)自v3.8起每日落盘，累计30截面后方可检验。(2) SIZE 作为评分项需在 step2 内实现并按池内分位打分；因池内市值分布随分层抽样改变，该分位须逐日重算，不可用固定阈值。(3) drop_mom_top_pct=20（剔除当日涨幅前20%）**从未回测**——全项目仅 fetch 自身3处引用，剔除632只=候选20.1%，纯先验且不可审计。v4.1 已补回测，结论见 mom_filter_backtest.json。(4) 新池市值下移后流动性容量显著收缩：500只成交额中位仅1.61亿、P90 3.37亿、44.2%低于1.5亿。按单只不超过当日成交额5%计，单只可买上限中位约805万，10只组合合计约8100万——亿级以上资金无法按T+1开盘价无冲击建仓，回测的成交假设失效。(5) 分段体检(pool_excess_by_regime)在 v4.0 及以前**结构上不可能有输出**：T+20要求最新58个可用截面，而带 circ_mv 的截面(10-13起)全部因T+20未成熟被剔除，剩下的6~9月旧截面无市值字段→恒返回『样本不足』。v4.1 改为直接用 scored 自带 circ_mv 判定母体。【v3.8 原 caveat】仍未做：财务因子(OCFG/ROE/NAG/TAG/EP/DEBT)历史快照未落盘，故本次只把 SIZE(纯历史价格可得)上线；成长族(NAG LS_IR=1.22/TAG 1.40/NPG 1.77)理论上更强，但需先为全A重算财务分并积累截面。估值字段(pe/pb)自v3.8起每日落盘，累计30截面后可检验『价格分位vs估值分位』真伪。⚠️外推边界（重要）：回测宇宙1012只=历史曾入成交额榜并集，总市值中位220.2亿/最小12.2亿、p10=54.8亿（严重偏大盘），而全A中位仅55.9亿/p25=31.8亿。同一市值下限切掉的比例差异巨大——50亿：全A切掉44.8% vs 本宇宙仅7.9%；25亿：全A切掉15.6% vs 本宇宙仅0.4%。故『≤25亿不影响』对全A是**偏乐观**估计，全A实盘须按真实候选覆盖复核。另：成交额无法历史重建（价格store未存volume），故『成交额≥1亿』这条只能用今日快照实证(全A 5576→3265只)，无法回测，属已知能力边界。",
+  "version": "v4.1-screening-then-scoring",
+  "sample_strata": 5,
+  "size_as_factor": true,
+  "prescreen": {
+   "enabled": true,
+   "min_amount": 100000000.0,
+   "min_total_mv": 2500000000.0,
+   "min_turnover20": 1.5,
+   "turnover_days": 20,
+   "sw_require": "strict",
+   "exclude_st": true,
+   "exclude_new": true,
+   "new_months": 3,
+   "exclude_suspended": true,
+   "price_floor": 2.0,
+   "kl_datalen": 70,
+   "workers": 8,
+   "note": "初筛（老大 2026-10-26 指令「每天第一步选股思路，先初筛一遍降低公司数量，形成初筛池后再去跑分」）。五条硬约束：① 当日成交额≥1亿 ② 总市值≥25亿 ③ 近20日换手率均值≥1.5% ④ 必须具备完整申万二级行业标签 ⑤ 剔除 ST/新股(上市<3个月)/停牌。另保留价格地板2元（面值退市规避，非选股逻辑）。实现见 prescreen.py（单一实现来源）。⚠️ 与 pool_rules 的 min_amount/min_mktcap/price_floor 重复：prescreen 为一阶筛选、apply_pool_rules 为二阶抽样，两者串联时二阶的相同条件实际是空转（一阶已滤净），不产生双重剔除错误，但改阈值必须两处同步否则计数不可对账。",
+   "sw_require_note": "④ 的取值：strict=缺申万二级即剔除（申万不覆盖北交所 → 北交所整体出局，与老大 2026-10-25『不剔北交所』指令冲突，需裁决）；tag_only=只打标签不剔除（北交所保留但无行业标签，行业内 Z-score 时进不了任何组）；off=不做标签校验。默认 strict，因老大本次明确要求『必须具备完整申万二级行业标签』。",
+   "turnover20_note": "③ 的计算口径：mean(最近20日成交量)/流通股本，其中流通股本=当日快照 circ_mv/price（反向推导，因接口不直接给股本）。⚠️ 实测（今日池内 148 只分层抽样）：换手率与市值强负相关——市值档1(12.9~46.4亿)中位5.05%通过率100%、档5(281~1406亿)中位1.06%通过率仅43%。故 1.5% 这条会**按市值从高到低系统性切尾**，直接压缩分层抽样辛苦保留的市值跨度（log-SD 1.093），使 SIZE 维区分度下降。这是结构性冲突，非 bug。"
   }
+ },
+ "dual_pool_compare": false,
+ "regime_tag": "下跌市验证（截面区间 2026-06-26~2026-10-23）",
+ "regime_note": "v4.2 口径（2026-10-25 round13 lag 敏感性审计后）。核心事实：对全部 12 因子 × 3 周期做 NW lag 扫描（lag∈{0,1,2,3,4,6,8,12,19}）后发现——**全 lag 都稳健过 Bonferroni 3.08 的组合只有 1 个：score_fund h=5（t 3.48~5.21）**；11 个组合的「显著与否」随 lag 翻转。据此：fund 0.32（唯一稳健）/ news 0.16 / theme_neg 0.12（方向可靠但显著性不稳）/ size 0.12 / sector 0.10 / 反转块 4×0.045。⚠️ 纪律：任何「某因子显著」的表述必须同时标注 NW lag；隐去 lag 等于选择性报告。渲染层已改为用 factor_ic.json 有效截面区间动态覆盖本静态值。",
+ "regime_review_trigger": "累计 ≥20 个上涨市交易日（上证 20 日均线向上且中位涨幅>0）后重跑 backtest_universe.py 并复核扩池结论",
+ "fetch": {
+  "pages": 15,
+  "page_size": 100,
+  "total_n": 1500,
+  "pages_all_a": 58,
+  "note": "pages 用于 amount 母体(15页=1500只)；pages_all_a 用于全A母体(58页≈5576只，接口 num 上限100)。v3.7 默认走全A。",
+  "async_fetch": {
+   "enabled": true,
+   "concurrency": 12,
+   "qps": 20.0,
+   "progress_every": 100,
+   "note": "异步抓取参数（老大 2026-10-26 指令：替换 sleep 死等为 asyncio+Semaphore+令牌桶+指数退避+501黑名单）。实测标定（120只样本全200）：QPS6/并发10→490只77.8s；QPS12→37.0s；QPS20/并发12→20.6s（选此为默认）；QPS40/并发16→8.4s；QPS80/并发20→2.2s 仍未触发501。老大原建议 QPS=6 偏保守，实测可安全提 3.3 倍。若某日出现 501/429 说明对方限流收紧，调回 6。"
+  }
+ },
+ "coverage_guard": {
+  "min_pool_coverage": 0.96,
+  "meltdown_coverage": 0.9
+ },
+ "workflow": {
+  "timeout_minutes": 300,
+  "step_warn_ratio": 1.5
+ },
+ "monitoring": {
+  "stale_data_alert": {
+   "enabled": true,
+   "max_stale_trading_days": 1,
+   "note": "指数日线最新交易日落后北京当日>1个交易日即判定停更；本地兜底链路(run_daily_local.sh)为可靠主路径，Actions 海外 runner 慢易超时"
+  },
+  "ic_alert": {
+   "enabled": true,
+   "recommendation_ic_nw_t_hi": -2.0,
+   "recommendation_win_rate_lo": 40,
+   "composite_ic_nw_t_lo": 2.0,
+   "note": "预测力安全门阈值(与 factor_eval._risk_gate 同源)：推荐组合 T+1 NW t≤-2 或 胜率<40% → high_risk(不机械跟单)；综合分 NW t<2 → 无显著正预测力"
+  },
+  "pool_excess_alert": {
+   "enabled": true,
+   "median_excess_pct_lo": -1.0,
+   "neg_ratio_pct_hi": 75,
+   "hop_days": 20,
+   "note": "选股池负超额体检(与 factor_eval._eval_pool_excess 同源)：池内 vs 全池中位涨跌差 < -1.0pct 且跑输入场日占比 ≥75% → 判定『池子选错了』，进入 high_risk。该问题无法靠调权重解决，需改造入选规则（成交额排序会系统性选中高换手关注度脉冲，脉冲退潮后回吐）"
+  }
+ },
+ "model_evidence": {
+  "nw_lag_sensitivity": {
+   "source": "audit_round13.py（全因子 × 3 周期 × 9 档 lag 扫描）",
+   "n_robust_bonferroni_combos": 1,
+   "n_flipping_combos": 11,
+   "only_robust": "score_fund h=5（t 范围 3.48~5.21）",
+   "discipline": "t 值必须与 lag 一并披露；lag=h-1 只是约定，不是唯一正确选择",
+   "note": "n≈58 时 lag=19 意味着每个自协方差仅用 39 个观测估计，方差估计本身极不稳定"
+  }
+ },
+ "schedule": {
+  "enabled": true,
+  "pool_rerun_weekday": 4,
+  "quote_daily": true,
+  "pool_weekly": true,
+  "note": "降采样调度（老大 2026-10-26 指令③：股票池仅每周五收盘后运行一次完整评分，每日仅跑行情数据）。",
+  "detail": "完整评分链路（prescreen→step2 全维→enhance→apply→gen_report）仅周五 15:30 后跑一次；其余交易日只更新行情（fetch 快照 + 现价/涨跌幅/成交额/流通市值），复用上一期财报因子与技术因子缓存，不出新评分页（页面沿用最近一期并在页头标注『评分为YYYY-MM-DD期，行情为今日』）。理由：财务因子只在财报披露日变化、技术因子在 1~3 日尺度上黏性 0.903（round25 实测），每日重算 8 维的边际信息量远小于其成本；而持有周期推荐 T+10（round25 IC 峰值在 h40），非日内策略，日频换分本身不产生 alpha。",
+  "quote_only_scope": "行情层更新：全A快照（成交额/总市值/流通市值/PE/PB/涨跌幅）+ 池内现价 + 板块动量。不重算：quality/growth/ep/size_ind/lowvol20/bias60/rsi_rev/tech_neg 全部因子分，直接读最近一期 scored 的同名分数字段。",
+  "override": "SCORER_FORCE_FULL=1 环境变量可强制当日跑完整链路（用于财报季突然披露、或老大临时需要新评分时）。"
+ }
 }

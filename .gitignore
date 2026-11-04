@@ -18,6 +18,11 @@ ai_review_today.json
 review_research_*.template.json
 # v3.4 每日 AI 焦点池：Agent 联网检索填写模板不入库（草稿）；focus_pool_<date>.json 入库留档。
 focus_pool_*.search.json
+# v4.10（2026-10-27 T1-3）：池内 PE 分位跨日记录 —— 必须入库留档。
+#   它记录每日 p10/p50/p90 与池规模，是判断「估值中枢是否漂移」的唯一跨日凭证；
+#   若随 *.json 一起忽略，这份历史一旦本地丢失就再也无法重建（无法用当日快照反推）。
+#   注：按项目惯例，匹配到白名单后仍需 git add -f 才能入库。
+!pool_pe_history.json
 # 早期手动上传工具（已被 workflow git push + Pages 自动部署取代）
 upload826.py
 *_run_*.log
@@ -31,3 +36,37 @@ step2_*.log
 .piptmp/
 data/universe_klines.json
 data/universe_klines_failed.json
+
+# ── 2026-11-04 推送前补齐（此前缺失，实测未跟踪大文件达 388MB）────────────────
+# 1) 二进制行情/矩阵缓存：单文件 7~82MB，全量 388MB，远超仓库合理体积，
+#    且全部可由 fetch_klines_2020.py / recompute 重建 → 绝不入库。
+*.npz
+*.pkl
+data/fin_cache_em/
+# 2) 本地留证快照（.snap_* 是改脚本前的备份，属操作痕迹不是交付物）
+#    ⚠️ 实测存在三种命名，只写一种会大量漏网（残留 93MB）：
+#       ① 带点前缀  .snap_check_data_fresh.py.20261104_152007
+#       ② 不带点前缀 snap_round108_before / snap_r109b_before
+#       ③ **后缀形式** top200_scored_2026-11-03.json.snap_round121_before  ←最容易漏
+.snap_*
+snap_*
+*.snap_before*
+*.snap_*
+snap_round*_before
+snap_r109*_before
+# 3) 归档/临时目录
+archive/
+node_modules/
+# 4) 运行时产物（日志、管道状态、面板中间件）
+refresh_log_local.txt
+pipeline_status_*.json
+panel_round*.json
+data/panel_*.json
+data/klines_long.json
+data/klines_long_meta.json
+*.log
+
+# blat 测试残留（4字节 ASCII，非交付物）
+zmxlky3r
+z8h61j_5
+ywd73zn8

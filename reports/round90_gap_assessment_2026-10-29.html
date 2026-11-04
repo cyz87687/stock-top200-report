@@ -1,0 +1,383 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第八轮：目标差距评估与实操路线图 2026-10-29</title></head><body style="margin:0;background:#0b1220;">
+<div style="max-width:1260px;margin:0 auto;padding:18px 20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0b1220;color:#cbd5e1;">
+
+<!-- ════════ 头部 ════════ -->
+<div style="border-bottom:2px solid #22c55e;padding-bottom:10px;margin-bottom:16px;">
+  <div style="font-size:21px;font-weight:800;color:#e2e8f0;">🧭 第八轮：距离最终目标的差距评估与实操路线图</div>
+  <div style="font-size:12px;color:#94a3b8;margin-top:6px;">
+    数据日期 <b style="color:#38bdf8;">2026-10-29</b> ·
+    评估基准 <b>v4.15-constraint-cap（9 维，Σ=1.000000）</b> ·
+    证据链 <b>round77~89（本轮 13 个脚本，全部实跑）</b>
+  </div>
+  <div style="font-size:11px;color:#64748b;margin-top:8px;line-height:1.85;">
+    📌 <b>本轮定位</b>：第七轮诊断出「三目标 0 项达成」并给出三条根因（R1 防御型、R2 regime 不可事前利用、R3 池前视）。
+    本轮回答老大更具体的问题：<b>还差哪些关键环节？优先级如何？风险在哪？如何可落地、可检验地改进？</b><br>
+    <b style="color:#86efac;">核心转折</b>：引入 <b>α（对池等权回归的截距）</b> 作为剥离市场暴露后的真实选股能力度量后，
+    此前被 β 失配污染的结论被推翻 —— <b style="color:#fda4af;">模型确有真实 alpha（段C α=+85%~99%，t&gt;2.7，优于 200 随机组合 p99）</b>。
+  </div>
+</div>
+
+<!-- ════════ 执行摘要 ════════ -->
+<div style="padding:16px 18px;background:linear-gradient(135deg,rgba(34,197,94,0.10),rgba(17,28,46,0.7));border:1px solid #22c55e;border-radius:10px;margin-bottom:16px;">
+  <div style="font-size:15px;font-weight:800;color:#86efac;margin-bottom:10px;">📌 执行摘要：三个坏消息、一个好消息、三个动作</div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <div style="flex:1 1 280px;padding:11px 13px;background:#0f172a;border-left:3px solid #ef4444;border-radius:6px;">
+      <div style="font-size:12px;font-weight:800;color:#fca5a5;margin-bottom:5px;">❌ 坏消息 1：目标②③ 互斥</div>
+      <div style="font-size:10.5px;color:#cbd5e1;line-height:1.85;">
+        超额最大回撤是<b>波动率的函数</b>，与均值无关（蒙特卡洛标定）。
+        要「MDD≤10% 且 IR≥0.5」，需 σ_超额≤10%，此时超额年化须 ≥5%。
+        当前 σ_超额=25.3% → <b>要么接受超额年化≈0.6%，要么接受回撤 &gt;10%</b>。
+      </div>
+    </div>
+    <div style="flex:1 1 280px;padding:11px 13px;background:#0f172a;border-left:3px solid #f59e0b;border-radius:6px;">
+      <div style="font-size:12px;font-weight:800;color:#fbbf24;margin-bottom:5px;">⚠️ 坏消息 2：换周期无效</div>
+      <div style="font-size:10.5px;color:#cbd5e1;line-height:1.85;">
+        r(IC,市场) 在 h5 = <b>−0.664</b>、h20 = <b>−0.671</b> → regime 依赖与 horizon 无关，
+        <b>缩短持有期不解决问题</b>。R2 结论再次确认。
+      </div>
+    </div>
+    <div style="flex:1 1 280px;padding:11px 13px;background:#0f172a;border-left:3px solid #ef4444;border-radius:6px;">
+      <div style="font-size:12px;font-weight:800;color:#fca5a5;margin-bottom:5px;">❌ 坏消息 3：证据基础薄弱</div>
+      <div style="font-size:10.5px;color:#cbd5e1;line-height:1.85;">
+        全程仅 <b>23 个调仓期 / 7 段C 截面</b>。段C 超额年化 <b>+181%</b> 这种数字
+        说明是<b>单段极值</b>而非可复制能力。任何上线决定都必须先扩样本。
+      </div>
+    </div>
+    <div style="flex:1 1 280px;padding:11px 13px;background:#0f172a;border-left:3px solid #22c55e;border-radius:6px;">
+      <div style="font-size:12px;font-weight:800;color:#86efac;margin-bottom:5px;">✅ 好消息：alpha 真实存在</div>
+      <div style="font-size:10.5px;color:#cbd5e1;line-height:1.85;">
+        剥离 β 后：段C <b>α=+85.16%（t+2.75）</b>，优于 200 个严格匹配随机组合 <b>p99.5</b>；
+        全样本 α=+19.02%（p91.5）。<b>不是随机</b>。
+        且 <code>size_growth</code> 单维 α=<b>+52.85%（t+4.29）</b> 通过全部三条判据。
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px;padding:11px 13px;background:rgba(56,189,248,0.08);border-left:3px solid #38bdf8;border-radius:6px;font-size:11px;color:#cbd5e1;line-height:1.95;">
+    <b style="color:#7dd3fc;">三个动作（按优先级）</b>：<br>
+    <b>①【最高】</b> <b style="color:#fda4af;">修掉池的前视</b> —— 用「当日真实可交易池」重建回测池。
+    这是当前<b>唯一能解锁全部后续判断</b>的前置条件（详见第二节 G1）。<br>
+    <b>②【高】</b> 采纳 <b>size_growth 倾斜</b>（v4.16 候选），但<b>先扩样本复算</b>。<br>
+    <b>③【中】</b> 把目标③从「超额回撤」重新定义为「<b>相对池等权的 beta 偏离度</b>」，
+    否则永远与目标②打架（详见第二节 G3）。
+  </div>
+</div>
+
+<!-- ════════ 一、双视角评估 ════════ -->
+<div style="padding:14px 16px;background:#111c2e;border:0.5px solid #1e293b;border-radius:10px;margin-bottom:16px;">
+  <div style="font-size:14px;font-weight:800;color:#e2e8f0;margin-bottom:10px;">一、量化研究员视角 vs 专业投资者视角：同一个模型，两套价值判断</div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <div style="flex:1 1 320px;padding:12px 14px;background:#0f172a;border-radius:8px;border:1px solid #1e293b;">
+      <div style="font-size:12.5px;font-weight:800;color:#38bdf8;margin-bottom:8px;">🔬 量化研究员视角</div>
+      <div style="font-size:10.5px;color:#cbd5e1;line-height:1.95;">
+        <b style="color:#86efac;">资产</b>：9 维里 <code>size_growth</code> 单维 α=+52.85%（t+4.29），
+        消融显示剔 <code>ep</code> 后 α <b style="color:#22c55e;">+18.10pp</b>、剔 <code>rsi_rev</code> +9.17pp、
+        剔 <code>tech_neg</code> +5.75pp —— 三个维在<b>扣拖累</b>。<br>
+        <b style="color:#fca5a5;">负债</b>：<br>
+        · 23 个调仓期，段C 仅 7 期 → <b>任何 t 值都是脆弱的</b><br>
+        · 9 维 PC1 占 28.9%、有效维数 6.01/9 → <b>正交性差，容量受限</b><br>
+        · 池有前视偏误（差 40.8pp）→ <b>基准不干净</b><br>
+        · 17+ 个配置的多重检验 → 门槛 p94.1 = +21.05% α<br>
+        <b style="color:#fbbf24;">结论</b>：有信号，但<b>证据等级只到「值得投入下一轮」</b>，不到「可上线」。
+      </div>
+    </div>
+    <div style="flex:1 1 320px;padding:12px 14px;background:#0f172a;border-radius:8px;border:1px solid #1e293b;">
+      <div style="font-size:12.5px;font-weight:800;color:#f59e0b;margin-bottom:8px;">💼 专业投资者视角</div>
+      <div style="font-size:10.5px;color:#cbd5e1;line-height:1.95;">
+        <b style="color:#86efac;">资产</b>：模型是<b>自带择时属性的选股器</b>——
+        β=0.32（随机组合 β=1.003）意味着<b>它自动在跌市收缩、在涨市放大防守</b>。
+        这不需要额外择时模块。<br>
+        <b style="color:#fca5a5;">负债</b>：<br>
+        · <b>涨市负贡献</b>：涨市期 α=<b>−16.67%</b> → 单一 regime 下会持续跑输<br>
+        · <b>不可归因的基准</b>：对任何公开指数的超额都含 40.8pp 池偏误 → <b>无法对外归因</b><br>
+        · <b>容量受限</b>：Top20~50，2% 流通市值约束下难以扩容<br>
+        · <b>换手摩擦</b>：H=10 换手 60.7%，成本拖累 2.07%/年<br>
+        <b style="color:#fbbf24;">结论</b>：<b>这是一个「跌市/震荡市择时+选股」工具，
+        不是「全天候超额收益产品」。</b>产品化必须按这个定位设计。
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px;padding:10px 12px;background:rgba(34,197,94,0.07);border-left:3px solid #22c55e;border-radius:5px;font-size:10.5px;color:#cbd5e1;line-height:1.9;">
+    <b style="color:#86efac;">两个视角的交集（唯一可执行结论）</b>：
+    研究员说「信号真实但样本不够」，投资者说「定位必须写清楚」。两者<b>不矛盾</b>——
+    合起来就是：<b>可以做，但必须先扩样本、并且按「跌市工具」定位上线</b>。
+  </div>
+</div>
+
+<!-- ════════ 二、关键环节缺口 ════════ -->
+<div style="padding:14px 16px;background:#111c2e;border:0.5px solid #f43f5e;border-radius:10px;margin-bottom:16px;">
+  <div style="font-size:14px;font-weight:800;color:#fda4af;margin-bottom:10px;">二、距离最终目标还差的关键环节（按优先级排序）</div>
+  <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
+    <tr style="color:#64748b;border-bottom:1px solid #1e293b;">
+      <th style="padding:5px 7px;text-align:center;width:5%;">优先级</th>
+      <th style="padding:5px 7px;text-align:left;width:16%;">缺口</th>
+      <th style="padding:5px 7px;text-align:left;width:26%;">当前状态（实测）</th>
+      <th style="padding:5px 7px;text-align:left;width:24%;">不补的后果</th>
+      <th style="padding:5px 7px;text-align:left;width:29%;">优先级理由</th>
+    </tr>
+    <tr style="border-bottom:1px solid #16223a;background:rgba(239,68,68,0.06);">
+      <td style="padding:5px 7px;text-align:center;color:#ef4444;font-weight:800;">P0<br><span style="font-size:9px;font-weight:400;">G1</span></td>
+      <td style="padding:5px 7px;color:#e2e8f0;font-weight:700;">回测池的前视偏误</td>
+      <td style="padding:5px 7px;">池由「2026-10-27 成交额≥1亿+市值≥25亿」回溯筛出。全池等权同期 <b>+29.34%</b> vs HS300 <b>−11.46%</b>，差 <b>40.8pp</b></td>
+      <td style="padding:5px 7px;">所有对指数基准的超额<b>不可归因</b>；任何权重结论都建立在污染的基准上；<b>优化方向可能整体错向</b></td>
+      <td style="padding:5px 7px;"><b>唯一的前置条件</b>。不修，后面全部白做；修了，可能推翻也可能坐实全部结论</td>
+    </tr>
+    <tr style="border-bottom:1px solid #16223a;background:rgba(245,158,11,0.06);">
+      <td style="padding:5px 7px;text-align:center;color:#f59e0b;font-weight:800;">P0<br><span style="font-size:9px;font-weight:400;">G2</span></td>
+      <td style="padding:5px 7px;color:#e2e8f0;font-weight:700;">样本长度不足</td>
+      <td style="padding:5px 7px;">回测仅 <b>23 个调仓期</b>（H=10）；IC 面板 219 截面但只有 66 个 h20 有效；<b>样本区间仅 11 个月</b>，含一段普涨 + 一段普跌</td>
+      <td style="padding:5px 7px;">段C 超额年化 <b>+181%</b> 这种数字是<b>单段极值</b>，不可复制；t 值全部脆弱；<b>任何上线决定都可能踩空</b></td>
+      <td style="padding:5px 7px;">与 G1 并列 P0。需要<b>≥3 年 / ≥250 个调仓期</b>才能对超额的持续性有话说</td>
+    </tr>
+    <tr style="border-bottom:1px solid #16223a;">
+      <td style="padding:5px 7px;text-align:center;color:#fbbf24;font-weight:800;">P1<br><span style="font-size:9px;font-weight:400;">G3</span></td>
+      <td style="padding:5px 7px;color:#e2e8f0;font-weight:700;">目标③的定义</td>
+      <td style="padding:5px 7px;">「超额最大回撤」= 对池等权的回撤。蒙特卡洛证明 MDD 是 <b>σ 的函数</b>：σ=25%→MDD≈−20%，σ=10%→MDD≈−8%</td>
+      <td style="padding:5px 7px;">目标②③<b>数学互斥</b>：要 IR≥0.5 且 MDD≤10%，必须 σ_超额≤10%，此时超额年化只剩 ≈5%</td>
+      <td style="padding:5px 7px;">这是<b>定义问题不是能力问题</b>。建议改用「<b>β 偏离度</b>」或「<b>相对池的胜率</b>」作目标③</td>
+    </tr>
+    <tr style="border-bottom:1px solid #16223a;">
+      <td style="padding:5px 7px;text-align:center;color:#fbbf24;font-weight:800;">P1<br><span style="font-size:9px;font-weight:400;">G4</span></td>
+      <td style="padding:5px 7px;color:#e2e8f0;font-weight:700;">维度的正交性</td>
+      <td style="padding:5px 7px;">9 维 PC1 占 <b>28.9%</b>，有效维数 <b>6.01/9</b>；技术三簇 ρ=+0.85/+0.75/+0.66；本轮又发现 <code>ep</code>/<code>rsi_rev</code>/<code>tech_neg</code> 三维在扣 α</td>
+      <td style="padding:5px 7px;">ICIR 上限被锁死；且三个「负贡献」维占用 <b>0.225 名义权重</b>，相当于 22.5% 的资金在拖累</td>
+      <td style="padding:5px 7px;">可与 G1/G2 并行做<b>纯计算</b>，不依赖扩样本</td>
+    </tr>
+    <tr style="border-bottom:1px solid #16223a;">
+      <td style="padding:5px 7px;text-align:center;color:#fbbf24;font-weight:800;">P1<br><span style="font-size:9px;font-weight:400;">G5</span></td>
+      <td style="padding:5px 7px;color:#e2e8f0;font-weight:700;">容量与执行约束</td>
+      <td style="padding:5px 7px;">Top20~50 最优；换手 60.7%（H=10）；成本拖累 2.07%/年；<b>未测涨跌停/停牌/流动性冲击</b></td>
+      <td style="padding:5px 7px;">实盘超额会被系统性高估；扩容到 Top100 时 IR <b>转负</b>（−0.14）</td>
+      <td style="padding:5px 7px;">P2 级，但做起来便宜</td>
+    </tr>
+    <tr>
+      <td style="padding:5px 7px;text-align:center;color:#64748b;font-weight:800;">P2<br><span style="font-size:9px;font-weight:400;">G6</span></td>
+      <td style="padding:5px 7px;color:#e2e8f0;font-weight:700;">regime 事前可利用性</td>
+      <td style="padding:5px 7px;">已**证否**（round73）：修复前视后所有日线信号段C IC 价差 &lt;0.05；h5 的 r=−0.664 与 h20 同样强</td>
+      <td style="padding:5px 7px;">—（此项已闭环，不再投入）</td>
+      <td style="padding:5px 7px;"><b>建议关闭</b>。继续找「看涨跌切权重」是浪费算力</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ════════ 三、改进建议 ════════ -->
+<div style="padding:14px 16px;background:#111c2e;border:0.5px solid #22c55e;border-radius:10px;margin-bottom:16px;">
+  <div style="font-size:14px;font-weight:800;color:#86efac;margin-bottom:10px;">三、可落地、可检验的实操改进建议（每条含优化方向 / 预期效果 / 验证方式）</div>
+
+  <!-- 建议 1 -->
+  <div style="padding:12px 14px;background:#0f172a;border-left:3px solid #ef4444;border-radius:6px;margin-bottom:10px;">
+    <div style="font-size:12.5px;font-weight:800;color:#fca5a5;margin-bottom:6px;">建议 1 ｜【P0】用「当日真实可交易池」重建回测池，消灭前视偏误</div>
+    <div style="font-size:10.5px;color:#cbd5e1;line-height:1.95;">
+      <b style="color:#e2e8f0;">优化方向</b>：不再用「2026-10-27 的成交额/市值」回溯筛池，而是<b>对每个历史截面 t，用 t 日当时的量价数据重算池</b>
+      （成交额≥1亿、市值≥25亿、价格≥2），得到「当时真正能买的集合」。<br>
+      <b style="color:#e2e8f0;">预期效果</b>：① 对指数基准的超额从 +49% 回落到真实水平；② POOL_EW 的基准年化从 +17.48%（H=10）大幅回落；
+      ③ 组合与池的 β 从 0.32 收敛到 <b>≈1.0</b>（当前 β 偏离主要来自「池是幸存者集合、组合是另一批股票」的口径差）；
+      ④ <b style="color:#fbbf24;">很可能同时推翻「size_growth 的 α」和「段C 的 +181%」两个结论</b>。<br>
+      <b style="color:#e2e8f0;">验证方式</b>：重建后重跑 round79~89 全链路，判据 = ① POOL_EW 基准年化与沪深300 的差 &lt;10pp；
+      ② 组合 β ∈ [0.85, 1.15]；③ α 的 t 值与随机分位仍显著。<b>若 α 崩塌 → 全部 alpha 结论作废（诚实结论）</b>；
+      若 α 保持 → 结论被强力确认。<br>
+      <b style="color:#fca5a5;">工作量</b>：中等（需逐截面拉量价历史）。<b>这是唯一能同时证伪和证实全部结论的动作。</b>
+    </div>
+  </div>
+
+  <!-- 建议 2 -->
+  <div style="padding:12px 14px;background:#0f172a;border-left:3px solid #22c55e;border-radius:6px;margin-bottom:10px;">
+    <div style="font-size:12.5px;font-weight:800;color:#86efac;margin-bottom:6px;">建议 2 ｜【P1】采纳 size_growth 倾斜，但按「约束内」方案上线，不改治理规则</div>
+    <div style="font-size:10.5px;color:#cbd5e1;line-height:1.95;">
+      <b style="color:#e2e8f0;">优化方向</b>：本轮实证给出四个候选（round88），①②③全过、仅卡在「单维上限 0.20」。
+      <b style="color:#fbbf24;">帕累托前沿显示：把单维上限从 0.20 放宽到 0.60，段C α 从 +96.39% 只升到 +99.11%</b> ——
+      <b>放宽约束的边际收益极小，而违反治理规则的风险大</b>。因此建议走<b>约束内</b>路线：<br>
+      <code style="color:#e2e8f0;">fund 0.1888 / size_growth 0.1583 / dominant 0.1583 / tech_neg 0.1565 /
+      lowvol20 0.1494 / bias60 0.1061 / ep 0.0827 / rsi_rev 0 / quality 0</code>
+      <span style="color:#64748b;">（段C α=+96.39%、t=+3.44、超额MDD=−1.25%，Σ=1.000000，<b>完全满足 v4.15 约束</b>）</span><br>
+      <b style="color:#e2e8f0;">预期效果</b>：相对基线 v4.15 —— 段C α <b>+84.37% → +96.39%</b>（t +2.74→+3.44）；
+      超额 MDD <b>−4.48% → −1.25%</b>（<b>改善 3.2pp</b>）；全样本 α +19.02%→+38.32%（+19.3pp）。
+      三个最大变化：<b style="color:#22c55e;">quality 归零</b>、<b style="color:#22c55e;">rsi_rev 归零</b>、
+      <b style="color:#22c55e;">ep 从 0.120 降到 0.0827</b>。<br>
+      <b style="color:#e2e8f0;">验证方式</b>：① 先过建议 1 的池重建；② 跨 ≥3 年样本复算段C α 与 t；
+      ③ <b>关键验证</b>——把 <code>size_growth</code> 换成<b>随机维度</b>做安慰剂测试，
+      若随机维度也能得到同样 α → 说明是池口径伪影而非维度能力；
+      ④ 检查 quality 归零的副作用：quality 在 round84 的 α 是<b>正贡献</b>（剔后 α 降 5.65pp），归零需额外论证。<br>
+      <b style="color:#fca5a5;">风险</b>：本轮已验证 <code>size_growth</code> <b>不是价格代理</b>（ρ(收盘价)=+0.106，Top20 重合 0/20），
+      但它<b>可能仍是「小盘成长股 beta」的另一种表达</b>（round85 只排除了「纯市值最小」这一种）。
+    </div>
+  </div>
+
+  <!-- 建议 3 -->
+  <div style="padding:12px 14px;background:#0f172a;border-left:3px solid #38bdf8;border-radius:6px;margin-bottom:10px;">
+    <div style="font-size:12.5px;font-weight:800;color:#7dd3fc;margin-bottom:6px;">建议 3 ｜【P1】重新定义目标③：用「β 偏离度」替代「超额最大回撤」</div>
+    <div style="font-size:10.5px;color:#cbd5e1;line-height:1.95;">
+      <b style="color:#e2e8f0;">优化方向</b>：当前目标③与②数学互斥（MDD=σ 的函数）。改用<b>不依赖波动的回撤代理</b>：
+      <b>① β 偏离度</b>：|β_组合 − β_池| ≤ 0.15（当前 0.32 vs 1.00 → 偏离 0.68，严重超标）；
+      <b>② 相对池的胜率</b>：跑赢池等权的期数占比 ≥ 55%（当前全样本约 50%）；
+      <b>③ 最大连续跑输期数</b> ≤ 3（当前段B 连续跑输）。<br>
+      <b style="color:#e2e8f0;">预期效果</b>：把「不可兼得」变成「可同时优化」——
+      β 偏离度是<b>可直接控制的设计变量</b>（通过选股范围），而 MDD 只是它的被动结果。
+      建议 2 的约束内方案恰好 β=0.671，比基线 0.458 更接近 1，<b>同时改善了超额MDD</b>，说明两条路不冲突。<br>
+      <b style="color:#e2e8f0;">验证方式</b>：用 round83 的分解框架，对每个候选同时报 β、超额MDD、胜率、最大连亏期数，
+      看是否出现帕累托改进点。<b>若存在「β 更接近 1 且 α 不降」的点 → 目标②③同时达成</b>。
+    </div>
+  </div>
+
+  <!-- 建议 4 -->
+  <div style="padding:12px 14px;background:#0f172a;border-left:3px solid #a78bfa;border-radius:6px;margin-bottom:10px;">
+    <div style="font-size:12.5px;font-weight:800;color:#c4b5fd;margin-bottom:6px;">建议 4 ｜【P1】对 ep / rsi_rev / tech_neg 三维做「保留 or 归零」的二选一裁决</div>
+    <div style="font-size:10.5px;color:#cbd5e1;line-height:1.95;">
+      <b style="color:#e2e8f0;">优化方向</b>：round84 的消融给出明确信号 ——
+      剔除 <code>ep</code> 后 α <b style="color:#22c55e;">+18.10pp</b>、剔 <code>rsi_rev</code> +9.17pp、剔 <code>tech_neg</code> +5.75pp；
+      而单维看 <code>ep</code> 的 β=<b>−0.206</b>、<code>lowvol20</code> 的 β=<b>−0.225</b>（都是负 beta = 牛市型资产）。
+      建议做<b>严格的 A/B</b>：8 个子集（保留/剔除三维的 2³ 组合）× 3 段切分，用段A 选、段C 裁决。<br>
+      <b style="color:#e2e8f0;">预期效果</b>：若三维确实归零，v4.15 的 0.225 名义权重可释放给 size_growth/fund，
+      在不违反约束的前提下再提升 α。<br>
+      <b style="color:#e2e8f0;">验证方式</b>：<b>必须用 round83 的 α 框架（不是 IR）</b>，并做 200 随机组合的
+      α 多重检验校正（门槛 p94.1 = <b>+21.05%</b>）。<b>只认段C 的 α 与 t，不认全样本 IR</b>。
+    </div>
+  </div>
+
+  <!-- 建议 5 -->
+  <div style="padding:12px 14px;background:#0f172a;border-left:3px solid #f59e0b;border-radius:6px;margin-bottom:10px;">
+    <div style="font-size:12.5px;font-weight:800;color:#fbbf24;margin-bottom:6px;">建议 5 ｜【P2】把模型的产品定位写死为「跌市/震荡市工具」，并做执行约束压力测试</div>
+    <div style="font-size:10.5px;color:#cbd5e1;line-height:1.95;">
+      <b style="color:#e2e8f0;">优化方向</b>：① 页面与报告明示「涨市期 α 为负（−16.67%），本模型在普涨市系统性跑输」；
+      ② 补齐涨跌停/停牌/流动性冲击的执行约束；③ 测算扩容曲线（Top20→50→80→100 的 IR 单调衰减至负）。<br>
+      <b style="color:#e2e8f0;">预期效果</b>：避免在最不该用的环境里用；给组合方明确的「何时启用」条件。<br>
+      <b style="color:#e2e8f0;">验证方式</b>：加执行约束后重跑，检验 IR 衰减幅度；实测 TopN 扩容的 IR 拐点。
+    </div>
+  </div>
+</div>
+
+<!-- ════════ 四、风险清单 ════════ -->
+<div style="padding:14px 16px;background:#111c2e;border:0.5px solid #ef4444;border-radius:10px;margin-bottom:16px;">
+  <div style="font-size:14px;font-weight:800;color:#fca5a5;margin-bottom:10px;">四、主要风险（按「一旦发生则结论作废」的程度排序）</div>
+  <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
+    <tr style="color:#64748b;border-bottom:1px solid #1e293b;">
+      <th style="padding:5px 7px;text-align:center;width:6%;">等级</th>
+      <th style="padding:5px 7px;text-align:left;width:22%;">风险</th>
+      <th style="padding:5px 7px;text-align:left;width:38%;">机理</th>
+      <th style="padding:5px 7px;text-align:left;width:34%;">对冲/缓解</th>
+    </tr>
+    <tr style="border-bottom:1px solid #16223a;">
+      <td style="padding:5px 7px;text-align:center;color:#ef4444;font-weight:800;">致命</td>
+      <td style="padding:5px 7px;color:#e2e8f0;">α 是池口径伪影</td>
+      <td style="padding:5px 7px;">size_growth 的 α 可能来自「池是幸存者集合」而非维度能力。建议 1 一旦落地可能全盘推翻</td>
+      <td style="padding:5px 7px;"><b>先做建议 1 再决定权重</b>；不要在池重建前上线任何新权重</td>
+    </tr>
+    <tr style="border-bottom:1px solid #16223a;">
+      <td style="padding:5px 7px;text-align:center;color:#ef4444;font-weight:800;">致命</td>
+      <td style="padding:5px 7px;color:#e2e8f0;">多重检验未完全校正</td>
+      <td style="padding:5px 7px;">本轮共评估 <b>17+ 个配置</b>（9 单维 + 8 消融）+ 4 候选 + 6 帕累托点。
+      随机组合 α 的 p94.1 = <b>+21.05%</b>；<code>size_growth</code> 的 +52.85% 虽远超门槛，但若真实有效配置数远多于 17，门槛会更高</td>
+      <td style="padding:5px 7px;">扩样本后重做；用 <b>White Reality Check / SPA</b> 类方法做 bootstrap 校正</td>
+    </tr>
+    <tr style="border-bottom:1px solid #16223a;">
+      <td style="padding:5px 7px;text-align:center;color:#f59e0b;font-weight:800;">高</td>
+      <td style="padding:5px 7px;color:#e2e8f0;">段C 单段依赖</td>
+      <td style="padding:5px 7px;">段C α=+85~99% 全部来自 2026-07~10 的普跌小盘市。段A α 仅 p59（不显著）</td>
+      <td style="padding:5px 7px;">扩样本至含 2015/2018/2023 等多轮牛熊；<b>按 regime 分层报告</b>而非全样本汇总</td>
+    </tr>
+    <tr style="border-bottom:1px solid #16223a;">
+      <td style="padding:5px 7px;text-align:center;color:#f59e0b;font-weight:800;">高</td>
+      <td style="padding:5px 7px;color:#e2e8f0;">regime 依赖无法对冲</td>
+      <td style="padding:5px 7px;">r=−0.67 且**不可事前预测**（round73 已证否）。涨市期 α=−16.67% 无法规避</td>
+      <td style="padding:5px 7px;">只能靠<b>仓位管理</b>（涨市降仓），而这需要外部择时——<b>这正是本模型不能自给的</b></td>
+    </tr>
+    <tr style="border-bottom:1px solid #16223a;">
+      <td style="padding:5px 7px;text-align:center;color:#fbbf24;font-weight:800;">中</td>
+      <td style="padding:5px 7px;color:#e2e8f0;">quality 归零的副作用</td>
+      <td style="padding:5px 7px;">round84 显示 quality 是<b>正贡献</b>（剔后 α 降 5.65pp），但建议 2 的解把它归零 → 两者矛盾，需复核</td>
+      <td style="padding:5px 7px;">做 quality 单独的 A/B（保留 vs 归零），不要在多维联合解里隐式决定</td>
+    </tr>
+    <tr style="border-bottom:1px solid #16223a;">
+      <td style="padding:5px 7px;text-align:center;color:#fbbf24;font-weight:800;">中</td>
+      <td style="padding:5px 7px;color:#e2e8f0;">A/B 市值维的股本近似</td>
+      <td style="padding:5px 7px;"><code>circ_mv = 股本中位数 × 收盘</code>，跨期单一常数、无拆股调整。
+      而 <code>size_growth</code> 正是基于它 → <b>本轮最重要的发现直接建立在一个近似上</b></td>
+      <td style="padding:5px 7px;">用真实流通市值重算 size_growth，复核 α。round87 已排除「价格代理」，但未排除「股本常数误差」</td>
+    </tr>
+    <tr>
+      <td style="padding:5px 7px;text-align:center;color:#64748b;font-weight:800;">低</td>
+      <td style="padding:5px 7px;color:#e2e8f0;">执行摩擦低估</td>
+      <td style="padding:5px 7px;">未建模涨跌停、停牌、大额冲击；换手 60.7% 时的实际成本可能远高于 2.07%/年</td>
+      <td style="padding:5px 7px;">加执行约束重跑；实盘先小资金验证</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ════════ 五、优先级排序 ════════ -->
+<div style="padding:14px 16px;background:#111c2e;border:0.5px solid #1e293b;border-radius:10px;margin-bottom:16px;">
+  <div style="font-size:14px;font-weight:800;color:#e2e8f0;margin-bottom:10px;">五、执行顺序（按「依赖关系 + 成本/收益比」排）</div>
+  <div style="font-size:11px;color:#cbd5e1;line-height:2.1;">
+    <div style="padding:9px 12px;background:rgba(239,68,68,0.08);border-left:3px solid #ef4444;border-radius:5px;margin-bottom:7px;">
+      <b style="color:#fca5a5;">第 1 步（阻塞全部后续，约 1~2 天算力）</b>：
+      <b>池重建</b> —— 逐截面按当日量价重算可交易池 → 重跑 round79~89 → 看 α 是否存活。
+      <b>这是 go/no-go 关口</b>：α 崩塌则本轮全部 alpha 结论作废，回到「防御型择时工具」定位；
+      α 存活则建议 2 立即进入实盘前流程。
+    </div>
+    <div style="padding:9px 12px;background:rgba(245,158,11,0.08);border-left:3px solid #f59e0b;border-radius:5px;margin-bottom:7px;">
+      <b style="color:#fbbf24;">第 2 步（与第 1 步并行，纯计算，无依赖）</b>：
+      <b>三维 A/B + 安慰剂测试</b>（建议 4 + 建议 2 的③）——
+      用随机维度替换 size_growth 做安慰剂，若随机维度也得到高 α → 判定为池伪影。
+      <b>这是第 1 步之外的第二道独立保险。</b>
+    </div>
+    <div style="padding:9px 12px;background:rgba(56,189,248,0.08);border-left:3px solid #38bdf8;border-radius:5px;margin-bottom:7px;">
+      <b style="color:#7dd3fc;">第 3 步（低成本，立即可做）</b>：
+      <b>目标③重定义 + 报告口径统一</b>（建议 3、建议 5）——
+      改用 β 偏离度/胜率作风控指标；页面明示「涨市系统性跑输」。
+      <b>这一步不依赖任何新算力，但立刻让三个目标变得可同时优化。</b>
+    </div>
+    <div style="padding:9px 12px;background:rgba(34,197,94,0.08);border-left:3px solid #22c55e;border-radius:5px;margin-bottom:7px;">
+      <b style="color:#86efac;">第 4 步（扩样本，耗时最长）</b>：
+      <b>历史拉取至 ≥3 年</b>（含 2015/2018/2023 等多轮牛熊）→ 重跑全链路 → 分 regime 报告。
+      <b>这是上线前的最终闸门</b>，但可以和 1~3 步并行推进。
+    </div>
+    <div style="padding:9px 12px;background:rgba(148,163,184,0.08);border-left:3px solid #64748b;border-radius:5px;">
+      <b style="color:#94a3b8;">明确不做</b>：继续寻找「看市场涨跌切权重」的信号（round73 已证否）、
+      继续做全样本 ICIR 最大化（round70 已证样本外反噬）、继续扩 TopN（IR 在 Top80 后转负）。
+    </div>
+  </div>
+</div>
+
+<!-- ════════ 六、证据链 ════════ -->
+<div style="padding:14px 16px;background:#0f172a;border:0.5px solid #1e293b;border-radius:10px;margin-bottom:16px;">
+  <div style="font-size:13px;font-weight:800;color:#94a3b8;margin-bottom:8px;">六、本轮证据链（全部可复算，脚本 + JSON 一一对应）</div>
+  <table style="width:100%;border-collapse:collapse;font-size:10px;">
+    <tr style="color:#64748b;border-bottom:1px solid #1e293b;"><th style="padding:3px 7px;text-align:left;width:32%;">脚本</th><th style="padding:3px 7px;text-align:left;">回答的问题</th></tr>
+    <tr style="border-bottom:1px solid #16223a;"><td style="padding:3px 7px;"><code>audit_round77_feasibility.py</code></td><td style="padding:3px 7px;">目标②③ 的<b>数学可行域</b>（MDD=σ 的函数，蒙特卡洛标定）；换周期 h5 vs h20</td></tr>
+    <tr style="border-bottom:1px solid #16223a;"><td style="padding:3px 7px;"><code>audit_round78_exposure.py</code></td><td style="padding:3px 7px;">超额波动的来源分解：β 失配 58.5% vs 特质残差 41.5%</td></tr>
+    <tr style="border-bottom:1px solid #16223a;"><td style="padding:3px 7px;"><code>audit_round79_pool_robust.py</code></td><td style="padding:3px 7px;">同口径基准对照（B0/B1/B3）—— <b>发现 B3 数量不匹配，已作废并由 round80 取代</b></td></tr>
+    <tr style="border-bottom:1px solid #16223a;background:rgba(34,197,94,0.06);"><td style="padding:3px 7px;"><b style="color:#86efac;">audit_round80_matched_random.py</b></td><td style="padding:3px 7px;"><b>严格匹配的 200 次随机对照</b>：真实 IR 分位 66%；随机组合 β=1.003 vs 真实 0.321</td></tr>
+    <tr style="border-bottom:1px solid #16223a;"><td style="padding:3px 7px;"><code>audit_round81_leverage.py</code></td><td style="padding:3px 7px;">β 敞口调整：发现 top10 相对 top20 两目标同时改善（但 round82 证伪其样本外延续性）</td></tr>
+    <tr style="border-bottom:1px solid #16223a;"><td style="padding:3px 7px;"><code>audit_round82_walkforward.py</code></td><td style="padding:3px 7px;">集中度发现的样本外验证：段A 选 TopN → 段C 只测一次</td></tr>
+    <tr style="border-bottom:1px solid #16223a;background:rgba(34,197,94,0.06);"><td style="padding:3px 7px;"><b style="color:#86efac;">audit_round83_decomposed_alpha.py</b></td><td style="padding:3px 7px;"><b>本轮方法论突破</b>：α（回归截距）分解 —— 段C α=+85.16%(t+2.75) 超随机 p99.5</td></tr>
+    <tr style="border-bottom:1px solid #16223a;"><td style="padding:3px 7px;"><code>audit_round84_alpha_attribution.py</code></td><td style="padding:3px 7px;">α 的来源归因：9 维消融 + 9 维单用 + 加权/持仓/频率路径 + 市场方向分组</td></tr>
+    <tr style="border-bottom:1px solid #16223a;"><td style="padding:3px 7px;"><code>audit_round85_size_only.py</code></td><td style="padding:3px 7px;">size_growth 三条判据验证（段C 显著 / p100 / 优于市值最小基准）</td></tr>
+    <tr style="border-bottom:1px solid #16223a;"><td style="padding:3px 7px;"><code>audit_round86_size_artifact.py</code></td><td style="padding:3px 7px;">伪影排查：Top20 从不含 0 分（238/238）→ 无并列退化</td></tr>
+    <tr style="border-bottom:1px solid #16223a;"><td style="padding:3px 7px;"><code>audit_round87_size_provenance.py</code></td><td style="padding:3px 7px;">溯源：ρ(收盘价)=+0.106、Top20 重合 0/20 → <b>不是价格代理</b></td></tr>
+    <tr style="border-bottom:1px solid #16223a;"><td style="padding:3px 7px;"><code>audit_round88_v416_candidate.py</code></td><td style="padding:3px 7px;">v4.16 候选 4 方案验收：①②③全过、仅卡约束；<b>修正了多重检验门槛方向 bug</b></td></tr>
+    <tr style="border-bottom:1px solid #16223a;background:rgba(34,197,94,0.06);"><td style="padding:3px 7px;"><b style="color:#86efac;">audit_round89_constrained.py</b></td><td style="padding:3px 7px;"><b>约束内 α 最优化 + 帕累托前沿</b>：约束内解段C α=+96.39%(t+3.44) MDD=−1.25%</td></tr>
+  </table>
+  <div style="margin-top:10px;padding:9px 12px;background:rgba(239,68,68,0.08);border-left:3px solid #ef4444;border-radius:5px;font-size:10px;color:#cbd5e1;line-height:1.9;">
+    <b style="color:#fca5a5;">本轮自我否证记录（3 处，均已修正并留痕）</b>：<br>
+    ① <b>round79 的 B3 基准数量不匹配</b>（抽 60 只 vs 组合 20 只）→ 结论不可用，由 round80 严格匹配版取代；<br>
+    ② <b>round85 的多重检验门槛方向写反</b>（<code>1-1/17</code> 误取负方向分位，门槛虚低为 −28.43%，正确为 p94.1 = <b>+21.05%</b>）→ 已修正并重判；<br>
+    ③ <b>round81 的 β 中性化方向错误</b>（β&lt;1 时未加杠杆，实际 β=0.32 需加杠杆至 β=1）→ 已修正；<br>
+    ④ <b>round88 的随机对照每次重建打分导致 exit 137</b>（内存）→ 改为缓存候选池复用。
+  </div>
+</div>
+
+<!-- ════════ 七、边界 ════════ -->
+<div style="padding:12px 14px;background:rgba(100,116,139,0.08);border-left:3px solid #64748b;border-radius:6px;font-size:10px;color:#94a3b8;line-height:1.9;">
+  <b style="color:#cbd5e1;">⚠️ 全部边界（必须与数字一起引用）</b><br>
+  <b>①</b> 回测仅 <b>23 个调仓期</b>（H=10），段C 仅 7 期。所有 t 值与分位数的统计功效<b>极低</b>，只作方向判断，不作精确估计。<br>
+  <b>②</b> <code>size_growth</code> 基于 <code>circ_mv = 股本中位数 × 收盘</code>，<b>跨期常数股本、无拆股调整</b>；round87 已排除「价格代理」，但<b>未排除股本常数误差</b>。<br>
+  <b>③</b> α 的定义依赖「池等权」基准，而池本身有前视偏误 → <b>α 是「相对有偏池的 alpha」，不等于绝对 alpha</b>。这正是建议 1 的存在理由。<br>
+  <b>④</b> 本轮共评估 17+ 个配置，多重检验门槛 p94.1 = +21.05% α；未做 White Reality Check / SPA bootstrap。<br>
+  <b>⑤</b> 样本区间 2025-11 ~ 2026-10（11 个月），含一段普涨 + 一段普跌，<b>跨更长周期未验证</b>。<br>
+  <b>⑥</b> 未建模涨跌停、停牌、流动性冲击；成本按 L1 换手/2 逐期扣 0.12%。<br>
+  <b>⑦</b> 本轮<b>未修改线上权重</b>，HEAD 保持 <code>4d76e26</code>，零 commit/push，未使用 <code>push_via_api.py</code>。<b>建议 2 的权重方案仅为待验证候选，不是已上线配置。</b>
+</div>
+
+<div style="margin-top:14px;padding-top:10px;border-top:1px solid #1e293b;font-size:10px;color:#475569;text-align:center;">
+  第八轮评估报告 · 2026-10-29 · 全部数字来自 round77~89 实跑 JSON · 无条件接受任何一项的反驳性复算
+</div>
+
+</div></body></html>

@@ -1,92 +1,534 @@
 {
- "version": "v3.6-fund-led",
- "fitted_at": "2026-10-24 14:40:00",
- "target_horizon": 1,
- "method": "v3.6 基本面主导口径：以全样本(85截面)可验证维度为主(fund 34% / news 22%)，反转块整体压缩至 22% 并按块内等权消除 0.742~0.889 共线性虚增；超买/关注度两个小样本(<9截面)维度降至地板 2% 仅作微调，避免噪声维度主导排序。切换依据：79 个历史截面 + t+1 开盘价的可交易口径回测，67 组权重邻域扫描(±0.04)下 h1 t=2.57~2.83、h5 t=3.54~4.03 全域稳定，非单点过拟合。",
- "weights": {
-  "score_fund": 0.34,
-  "score_news": 0.22,
-  "score_sector": 0.1,
-  "score_oversold60": 0.055,
-  "score_bias60": 0.055,
-  "score_rsi_rev": 0.055,
-  "score_vol_pulse": 0.055,
-  "score_overbought": 0.02,
-  "score_theme_intrinsic": 0.08,
-  "score_attention": 0.02
- },
- "prior_weights": {
-  "score_fund": 0.34,
-  "score_news": 0.22,
-  "score_oversold60": 0.055,
-  "score_bias60": 0.055,
-  "score_rsi_rev": 0.055,
-  "score_vol_pulse": 0.055,
-  "score_overbought": 0.02,
-  "score_theme_intrinsic": 0.08,
-  "score_attention": 0.02,
-  "score_sector": 0.1
- },
- "adopted": "prior",
- "regime_switch": {
-  "from": "v3.1-10dim-ic (十维均摊)",
-  "to": "v3.6-fund-led (基本面主导)",
-  "switched_at": "2026-10-24",
-  "rationale": "十维口径下 5 个反转维度合计 34% 权重但两两相关 0.742~0.889，等于把同一信号重复计权；基本面 score_fund 是全样本唯一通过 Bonferroni 校正的维度(h5 IC=+0.0762, NW t=3.48)",
-  "evidence": {
-   "sample": "79 个历史截面 2026-06-26~2026-10-23",
-   "basis": "t+1 开盘买入 / t+h 开盘卖出，扣 20bp 往返成本",
-   "h1_t_old": 2.48, "h1_t_new": 2.75,
-   "h5_t_old": 3.38, "h5_t_new": 3.85,
-   "h20_ic_old": 0.0512, "h20_ic_new": 0.0645,
-   "paired_t_h1": 0.13, "paired_t_h5": 1.52,
-   "caveat": "配对检验 h1 t=0.13 / h5 t=1.52 未达显著，改善幅度在噪声范围内；切换主因是「可解释性与共线性治理」而非统计显著的超额提升，须持续用 live IC 验证"
-  }
- },
- "walkforward": {
-  "n_oos_dates": 0,
-  "oos_ic_prior": null,
-  "oos_ic_new": null,
-  "oos_t_new": null,
-  "lambda": null,
-  "note": "十维池内截面 8 < MIN_TRAIN(30)，样本外观测不足 → 维持先验权重（每日重估登记，满 30 后自动启用走步验证）"
- },
- "full_period_composite_ic": {
-  "prior": {
-   "1": {"n": 7, "ic_mean": -0.0214, "nw_t": -0.34, "win_rate": 57.1},
-   "5": {"n": 3, "ic_mean": -0.0112, "nw_t": -0.35, "win_rate": 66.7},
-   "20": {"n": 0, "ic_mean": null, "nw_t": null, "win_rate": null}
+  "version": "v4.17-cycle-rules",
+  "fitted_at": "2026-11-02 20:25:00",
+  "target_horizon": 20,
+  "method": "v4.17-cycle-rules：2026-11-02 round108「指令D 落地」——老大三条指令全采纳。①P0/P1 修订：C1 growth 纳入「业绩动量」大类（cap .30，补 round105 治理缺口）；C2 加 accel 与 P1g 去重互斥，采纳 P1g（D3 路A，growth 合成分改纯 rank_Gq，QoQ 一阶导不再重复计量）；C3 防呆改数据驱动（规则1/2 取代拍脑袋阈值）；C4 panel 待补 score_growth。②周期标签：新建 sector/cycle_industry.json 单一来源（20 个申万二级，含光伏），正面清单 gate，成长/消费/医药天然豁免。③两条规则（仅强周期生效）：规则1 盈利持续性=毛利率水平抬升>3pp 扣成长分 10%（原方案「毛利率波动 std>行业p60」实测 lift 0.945<1 方向反了，已换口径）；规则2 二阶导可持续性=按期去均值 ΔG_q≥周期组 p80 扣 15%；叠加上限 25%。权重变动：growth .05→.10（业绩动量通道加倍，否则规则扣分只传导 −0.12 分形同虚设）、rsi_rev .10→.05（反转簇让出）；Σ=1.0 不变。门禁：G1~G4 沿用 v4.16.1 结论、G5 仍未过（1/6 折），panel_round66 无 score_growth 列 → growth 维仍是门禁盲区，权重为产品裁决非 IC 背书。灰度性质存续——禁止表述为『经验证的 alpha』。",
+  "weights": {
+    "score_bias60": 0.05,
+    "score_rsi_rev": 0.05,
+    "score_tech_neg": 0.1,
+    "score_lowvol20": 0.0,
+    "score_quality": 0.1,
+    "score_size_growth": 0.2,
+    "score_dominant": 0.1,
+    "score_size_ind": 0.0,
+    "score_ep": 0.1,
+    "score_fund": 0.2,
+    "score_news": 0.0,
+    "score_theme_neg": 0.0,
+    "score_size": 0.0,
+    "score_sector": 0.0,
+    "score_growth": 0.1,
+    "score_oversold60": 0.0,
+    "score_vol_pulse": 0.0,
+    "score_overbought": 0.0,
+    "score_theme_intrinsic": 0.0,
+    "score_attention": 0.0
   },
-  "lam_best": {
-   "1": {"n": 7, "ic_mean": -0.0214, "nw_t": -0.34, "win_rate": 57.1},
-   "5": {"n": 3, "ic_mean": -0.0112, "nw_t": -0.35, "win_rate": 66.7},
-   "20": {"n": 0, "ic_mean": null, "nw_t": null, "win_rate": null}
+  "prior_weights": {
+    "score_bias60": 0.05,
+    "score_rsi_rev": 0.05,
+    "score_tech_neg": 0.1,
+    "score_lowvol20": 0.0,
+    "score_quality": 0.1,
+    "score_size_growth": 0.2,
+    "score_dominant": 0.1,
+    "score_size_ind": 0.0,
+    "score_ep": 0.1,
+    "score_fund": 0.2,
+    "score_news": 0.0,
+    "score_theme_neg": 0.0,
+    "score_size": 0.0,
+    "score_sector": 0.0,
+    "score_growth": 0.1,
+    "score_oversold60": 0.0,
+    "score_vol_pulse": 0.0,
+    "score_overbought": 0.0,
+    "score_theme_intrinsic": 0.0,
+    "score_attention": 0.0
+  },
+  "dim_max": {
+    "score_fund": 5.0,
+    "score_news": 5.0,
+    "score_theme_neg": 10.0,
+    "score_size": 10.0,
+    "score_sector": 5.0,
+    "score_quality": 10.0,
+    "score_growth": 10.0,
+    "score_tech_neg": 10.0,
+    "score_oversold60": 5.0,
+    "score_bias60": 5.0,
+    "score_rsi_rev": 5.0,
+    "score_vol_pulse": 5.0,
+    "score_overbought": 5.0,
+    "score_theme_intrinsic": 5.0,
+    "score_attention": 5.0,
+    "score_lowvol20": 10.0,
+    "score_ep": 10.0,
+    "score_size_ind": 10.0,
+    "score_size_growth": 10.0,
+    "score_dominant": 10.0
+  },
+  "dim_max_note": "⚠️ P0（2026-10-26）：各维量程不统一 —— 12 维为 0-5 制（score_fund/news/theme/oversold60/bias60/rsi_rev/vol_pulse/overbought/theme_intrinsic/attention/sector + score_tech），仅 size/quality/growth/tech_neg 为 0-10 制。原 total 公式按「每维满分 10」直接加权，导致：① 理论天花板上限仅 67.5（S≥85/A≥65 永不可达，490 只评级只有 B/C/D）；② 名义权重被静默扭曲 —— tech_neg 15% 实占 22.2%（+7.2pp），bias60+rsi_rev 名义 35% 实占 26%（-9pp），fund 30% 实占 22.2%（-7.8pp）。修复=汇总前按 dim_max 归一化到 0-10 再加权，达标后 total 满量程 100。此处为单一来源，四处实现（step2 / enhance / apply / factor_eval）必须同步读取，禁各自硬编码。",
+  "adopted": "prior",
+  "regime_switch": {
+    "from": "v4.8-lowvol-forward-audit (fund .15 + 质量 .12 + 低波 .13；成长归零)",
+    "to": "v4.9-ep-sizeind (fund .075 + EP .075；size 归零 → SIZE_IND_NEUT .10)",
+    "switched_at": "2026-10-26 12:00",
+    "rationale": "老大 2026-10-26 指令：参考飞书《完整的量化选股评分模型》改造现模型，要求『先看现有指标能否复用、尽量复用、一致预期类可复用现有数据』。round26 按飞书口径在本池 78 截面复测 8 因子 → 8 个全部零新增数据源可算；但飞书 5 大类框架整体远弱于现行（同卡口样本 h5 +0.0551 vs v4.8 +0.1437，仅现行 38%），且飞书框架无反转块独立位置（本项目反转块贡献 ΔIC h5 +0.0724 / h20 +0.1038）→ **不照搬框架，只做两处单维替换**。round27c 用各自正确卡口裁决：① EP 全量替换 fund 在 h20 变差（−0.0033，仅 2/3 档改善）→ 改**各半 .075/.075**（3/3 档改善）；② SIZE_IND_NEUT 替换 size（3/3 档改善），依据 round27b Q2b 决定性对照：全市场 LN市值取负 h5 −0.0638(t−2.71)；行业内 Z 取负 h5 −0.0148、h20 **+0.0883(t3.03)** → 飞书『行业内中性化』主张在本池成立。其余五维（quality .12 / lowvol20 .13 / tech_neg .15 / bias60 .175 / rsi_rev .175）一律不动，Σ=1.0 无缩放。",
+    "evidence": {
+      "sample": "78 截面 2026-06-26~2026-10-23；构造期 66 截面（≤09-30）/ 样本外 12 截面（≥10-08，h20 不可验）",
+      "round18": {
+        "theme_industry_neutral_h20_ic": -0.0328,
+        "theme_raw_h20_ic": -0.1076,
+        "decay_pct": 70,
+        "news_industry_neutral_h1_t_range": [
+          3.08,
+          3.68
+        ],
+        "verdict": "theme=行业代理；news 有真实短线信号但仅 h1"
+      },
+      "round19": {
+        "external_csv": "47 因子 × 222 截面 × 11 个月，selected=TRUE 仅 9 个且无消息/情绪/舆情因子",
+        "pool_mom1m": "h1/h5/h20 全 lag 过（IC -0.090/-0.168/-0.250）→ 中期反转最强佐证",
+        "collinearity": "所有量价候选与现有反转块 |rho| 0.58~0.89 → 无新维度可加"
+      },
+      "round20": {
+        "reversal_backfill_incident": "score_oversold60/bias60/rsi_rev/vol_pulse/attention 2026-10-13 才入库，此前 74 截面全 0",
+        "backfilled_bias60": {
+          "h1_t": [
+            3.52,
+            3.24,
+            3.12
+          ],
+          "h5_t": [
+            6.31,
+            3.7,
+            3.25
+          ],
+          "h5_ic": 0.1648
+        },
+        "backfilled_rsi_rev": {
+          "h20_t": [
+            9.19,
+            5.58,
+            4.97
+          ],
+          "h20_ic": 0.2064
+        },
+        "consistency_check": "与已入库 9 截面一致性 98.8~99.8%"
+      },
+      "round21": {
+        "quality_family_ic": {
+          "h1": -0.0116,
+          "h5": -0.0088,
+          "h20": 0.014,
+          "robust": false
+        },
+        "growth_family_ic": {
+          "h1": -0.0064,
+          "h5": -0.0218,
+          "h20": -0.0429,
+          "h20_t_lag0": -2.89
+        },
+        "corr_quality_vs_fund": -0.72,
+        "n1_boss_specified_ic": {
+          "h1": 0.0374,
+          "h5": 0.0635,
+          "h20": 0.0759,
+          "robust": false
+        },
+        "n5_adopted_ic": {
+          "h1": 0.0932,
+          "h5": 0.1543,
+          "h20": 0.188,
+          "robust": true
+        },
+        "growth_neg_variant": "h20 仅 L0 过（t 2.94）→ 按纪律排除反号主张（留痕 audit_round22 Part B）"
+      },
+      "round22": {
+        "is_period_all_lag_pass": {
+          "A现行": false,
+          "E": true,
+          "N4": true,
+          "N5": true
+        },
+        "oos_note": "样本外 h1 n=11 / h5 n=7 / h20 n=0，所有方案 IC ≈ 0 或负且 |t|<0.55 → 无统计功效，既不能支持也不能否决任何方案；落地依据=构造期全 lag 过 + 三独立来源互证 + 样本外无显著恶化",
+        "fund_sensitivity": "0.25/0.30/0.35/0.40 共同样本全 lag 过，h20 IC 单调 +0.2007/+0.1928/+0.1796/+0.1649 → fund 非关键自由度，取 0.30"
+      },
+      "v47_boss_directive": {
+        "directive": "fund .15 / quality .12 / growth .13",
+        "delta": "fund −.15 / quality +.07 / growth +.08；其余四维不变",
+        "sum_check": "0.15+0.12+0.13+0.15+0.175+0.175+0.10 = 1.00",
+        "corr_fund_quality_production": -0.82,
+        "status": "先验调整（老大指定），非统计拟合 —— 页面与日报仍须标注「权重是先验，未经优化验证」"
+      },
+      "round24": {
+        "⚠️口径更正": "round24d 的复合结论（K0/K1/K2/K3/K2+LV）用的是**逐截面 rank_pct 再把各维排名加权**，而生产线 step2 的真实公式是**量程归一化**（sum(min(v,DIM_MAX)/DIM_MAX*10*w)/max(0.5,sum(w))*10）。两套口径在分布偏斜时不等价，故 round24d 的绝对 IC 数值**不能直接作为上线依据**。round24f 用生产线公式在同一 78 截面上重做阶梯，结论方向一致但数值更高，特此更正。",
+        "growth_historical_subs_ic_h5": {
+          "npg": -0.0384,
+          "cagr3": -0.0071,
+          "revg": -0.0292,
+          "qoq": -0.0129,
+          "accel": -0.014
+        },
+        "growth_forward_subs_ic_h5": {
+          "g1": -0.0171,
+          "g2": -0.0182,
+          "acc": 0.0033,
+          "fwd_pe_neg": 0.0927
+        },
+        "outlier_governance_h5_ic": {
+          "raw": -0.0218,
+          "winsor_1_99": -0.0216,
+          "sign_log1p": -0.0148,
+          "winsor_log": -0.015,
+          "sub_rank": -0.0247
+        },
+        "fwd_pe_vs_fund_corr": 0.538,
+        "fwd_pe_resid_ic_h5": 0.0581,
+        "lowvol20_ic": {
+          "h1": {
+            "ic": 0.0513,
+            "t0": 1.53
+          },
+          "h5": {
+            "ic": 0.1189,
+            "t0": 3.28,
+            "robust": false
+          },
+          "h20": {
+            "ic": 0.0826,
+            "t0": 1.88,
+            "robust": false
+          }
+        },
+        "lowvol20_corr_dims": {
+          "fund": 0.241,
+          "tech_neg": 0.123,
+          "quality": -0.187,
+          "growth": -0.036,
+          "bias60": 0.114,
+          "rsi_rev": 0.078
+        },
+        "production_formula_ladder_round24f": {
+          "P0 v4.7基线 成长.13+size.10|h5": {
+            "ic": 0.1153,
+            "t_by_lag": {
+              "0": 4.54,
+              "3": 2.6,
+              "6": 2.21
+            },
+            "robust_bonf": false,
+            "sub_first": 0.1374,
+            "sub_second": 0.0937
+          },
+          "P0 v4.7基线 成长.13+size.10|h20": {
+            "ic": 0.1704,
+            "t_by_lag": {
+              "0": 6.54,
+              "3": 3.58,
+              "6": 2.9
+            },
+            "robust_bonf": false,
+            "sub_first": 0.2158,
+            "sub_second": 0.1249
+          },
+          "P1 v4.8拟上线 低波.13+size.10|h5": {
+            "ic": 0.1776,
+            "t_by_lag": {
+              "0": 9.95,
+              "3": 6.1,
+              "6": 5.65
+            },
+            "robust_bonf": true,
+            "sub_first": 0.2189,
+            "sub_second": 0.1375
+          },
+          "P1 v4.8拟上线 低波.13+size.10|h20": {
+            "ic": 0.2484,
+            "t_by_lag": {
+              "0": 13.02,
+              "3": 7.15,
+              "6": 5.69
+            },
+            "robust_bonf": true,
+            "sub_first": 0.3587,
+            "sub_second": 0.1381
+          },
+          "P2 低波.13+size0|h5": {
+            "ic": 0.2004,
+            "t_by_lag": {
+              "0": 12.97,
+              "3": 8.29,
+              "6": 8.08
+            },
+            "robust_bonf": true,
+            "sub_first": 0.2492,
+            "sub_second": 0.1529
+          },
+          "P2 低波.13+size0|h20": {
+            "ic": 0.254,
+            "t_by_lag": {
+              "0": 12.11,
+              "3": 6.5,
+              "6": 5.13
+            },
+            "robust_bonf": true,
+            "sub_first": 0.385,
+            "sub_second": 0.123
+          },
+          "P3 成长.13+低波.13+size.10(各维×0.87)|h5": {
+            "ic": 0.1635,
+            "t_by_lag": {
+              "0": 9.36,
+              "3": 5.81,
+              "6": 5.5
+            },
+            "robust_bonf": true,
+            "sub_first": 0.1987,
+            "sub_second": 0.1292
+          },
+          "P3 成长.13+低波.13+size.10(各维×0.87)|h20": {
+            "ic": 0.217,
+            "t_by_lag": {
+              "0": 12.17,
+              "3": 6.75,
+              "6": 5.4
+            },
+            "robust_bonf": true,
+            "sub_first": 0.3116,
+            "sub_second": 0.1225
+          },
+          "P4 成长.05+低波.08+size.10|h5": {
+            "ic": 0.1577,
+            "t_by_lag": {
+              "0": 7.55,
+              "3": 4.46,
+              "6": 3.96
+            },
+            "robust_bonf": true,
+            "sub_first": 0.1926,
+            "sub_second": 0.1238
+          },
+          "P4 成长.05+低波.08+size.10|h20": {
+            "ic": 0.2258,
+            "t_by_lag": {
+              "0": 11.25,
+              "3": 6.25,
+              "6": 5.04
+            },
+            "robust_bonf": true,
+            "sub_first": 0.3126,
+            "sub_second": 0.139
+          },
+          "P5 低波.23+size0|h5": {
+            "ic": 0.1995,
+            "t_by_lag": {
+              "0": 13.8,
+              "3": 8.93,
+              "6": 8.76
+            },
+            "robust_bonf": true,
+            "sub_first": 0.2403,
+            "sub_second": 0.1599
+          },
+          "P5 低波.23+size0|h20": {
+            "ic": 0.2361,
+            "t_by_lag": {
+              "0": 10.29,
+              "3": 5.47,
+              "6": 4.31
+            },
+            "robust_bonf": true,
+            "sub_first": 0.3668,
+            "sub_second": 0.1055
+          }
+        },
+        "production_formula_note": "production scale-normalize: sum(min(v,DMAX)/DMAX*10*w)/max(0.5,sum(w))*10",
+        "verdict_vs_baseline": {
+          "h5": {
+            "d_ic": 0.0623,
+            "p1_better": true,
+            "p1_sub_both_pos": true,
+            "p1_robust": true
+          },
+          "h20": {
+            "d_ic": 0.078,
+            "p1_better": true,
+            "p1_sub_both_pos": true,
+            "p1_robust": true
+          }
+        },
+        "size_lowvol20_redundancy": {
+          "n": 78,
+          "mean": -0.5009,
+          "sd": 0.1303,
+          "neg30_share": 0.9872,
+          "min": -0.7072,
+          "max": -0.2905
+        },
+        "size_reconstructed_coverage": {
+          "mean": 0.9327,
+          "min": 0.8497,
+          "max": 1.0,
+          "n_dates": 78
+        },
+        "size_single_dim_ic": {
+          "h5": {
+            "n": 73,
+            "ic": -0.0634,
+            "t_by_lag": {
+              "0": -2.7,
+              "3": -1.52,
+              "6": -1.26
+            },
+            "robust_bonf": false
+          },
+          "h20": {
+            "n": 58,
+            "ic": 0.0415,
+            "t_by_lag": {
+              "0": 1.37,
+              "3": 0.73,
+              "6": 0.59
+            },
+            "robust_bonf": false
+          },
+          "⚠️说明": "size 用 circ_mv/price 反推股本后逐截面重建（覆盖 93.3%，原直采仅 8.26%）。h5 IC 为负 → 本池内「市值越小越涨」的先验方向不成立。该维与 lowvol20 跨 78 截面平均秩相关 −0.501（98.7% 截面 < −0.3），两者方向互斥（低波股=大市值股），合成后互相抵消。⚠️ size 权重 0.10 是老大 2026-10-25 指定，本轮**未改动**，仅如实记录拖累事实。"
+        },
+        "size_drag_evidence": {
+          "h5_含size": 0.1776,
+          "h5_去size": 0.2004,
+          "h20_含size": 0.2484,
+          "h20_去size": 0.254,
+          "结论": "含 size 的复合 IC 在 h5/h20 均低于去 size，与 size 单维负 IC 一致 → size 维在本池是负贡献"
+        }
+      },
+      "round26_27_feishu": {
+        "sample": "78 截面 2026-06-26~2026-10-23，本池 193/490 两档规模",
+        "reuse_check": "8 因子全部可复用（OCFG 99.7% / ROE 99.9% / EP 89.5% / EVEBIT 86.5% / NAG 99.1% / REV1M 99.0% / SIZE_IND_NEUT 71.3% / SUE 98.7%），零新增数据源",
+        "ic_vs_external_csv": "8 个因子方向全部与外部 47 因子 CSV 同号（唯一过 Bonferroni 的只有 REV1M h5 t0=5.94）",
+        "veto_1_no_reversal_slot": "飞书 5 大类无反转块独立位置；本项目 bias60+rsi_rev 合计 35%、贡献 ΔIC h5 +0.0724 / h20 +0.1038",
+        "veto_2_composite_much_weaker": "飞书简化公式 h5 +0.0759 / 5大类分 +0.0551 / v4.8 +0.1437（同卡口）→ 飞书仅现行 53%/43%",
+        "veto_3_ablation": "去掉质量类 IC 从 +0.0551 升到 +0.0796（Δ+0.0245）；去掉一致预期 +0.0685（Δ+0.0134）；正贡献只有估值(Δ−0.0090)、量价(Δ−0.0205)",
+        "adopted_1_ep_half": "EP+fund 各半 .075/.075 → h5 +0.0093 / h10 +0.0080 / h20 +0.0073（3/3 档改善）；EP 全量替换 h5 +0.0049 / h10 +0.0010 / h20 −0.0033（2/3 档）",
+        "adopted_2_size_ind": "SIZE_IND_NEUT 替换 size .10 → h5 +0.0043 / h10 +0.0029 / h20 +0.0040（3/3 档）",
+        "rejected_double": "双替换（统一双卡口）−0.0119/−0.0250/−0.0225（0/3）→ 卡口不是随机子集，系统性排掉 EP 最有效样本，故改用各自卡口",
+        "coverage_note": "score_ep 86.3% / score_size_ind 86.5%（2026-10-23 实测）；两者缺维均从分母剔除"
+      }
+    },
+    "caveat": "⚠️ 五条必须同时披露的边界（v4.7 沿用并更新）：(1) 选择性偏差：本次权重由老大直接指定，属**先验设定**，不是从数据扫出来的最优解 —— 页面与日报禁暗示「权重已被数据优化」。(2) 审计-生产口径差：审计 rev2 口径为 bias60+rsi_rev 等权平均 ×0.35，生产为两维各 0.175 独立加权（ρ=0.88 近似等效但未在生产数据直接复测）。(3) score_size 池内证据为反向（round19 C3：circ_mv 原始值 IC +0.2108 大市值跑赢），0.10 权重按老大意图保留但标注无本池证据。(4) 质量/成长族自身无稳健 alpha（round21），本次大幅上调（5%→12% / 5%→13%）是**结构性表达诉求**（让三族等权），不是「已验证有效」；相应地，评分对 fund 单一维的依赖度下降，但对 fund 拆分口径（fund_split.py 的 16 子因子 PIT 回填）的质量更敏感 —— 该实现是质量/成长两维的唯一来源，改它必须重跑 round21/22。(5) 反转块 35% 内部 ρ≈0.88 的共线冗余本次未处理，有效维数仍显著低于标称 7 维，由页面「模型结构体检」区块当日现算披露。 (6) v4.8 新增两条边界：① lowvol20 全 lag 未过 Bonferroni、分子期前半 t=1.45 近乎为零，属方向性证据而非稳健证据，0.13 权重是先验不是拟合结果；② 成长维归零**不等于「成长无用」**，而是「在本池 78 截面内，历史增速与前瞻增速都测不出 alpha，且极值与前瞻化都无法救活」——若未来池子风格切换（如转向成长占优），须重跑 round24 系列再议。③ fwd_pe 有 alpha 但被 score_fund 吸收（corr 0.538 + fund 内部已用 fwd_pe/PEG），故不单列维度；若未来把 fwd_pe 从 fund 拆出，须重跑 round24b 的残差检验（当前残差 h5 IC +0.0581 未过）。"
+  },
+  "walkforward": {
+    "n_oos_dates": 0,
+    "note": "round22 样本外仅 12 截面（h1 n=11/h5 n=7/h20 n=0）且所有方案一致为负 → 无统计功效，未作为走步验证；待 11 月中旬积累 30+ 样本外截面后重跑 audit_round22 分层判据。"
+  },
+  "full_period_composite_ic": {
+    "prior": {
+      "1": {
+        "n": 66,
+        "ic_mean": 0.0932,
+        "nw_t": [
+          3.96,
+          3.96,
+          4.09
+        ]
+      },
+      "5": {
+        "n": 66,
+        "ic_mean": 0.1543,
+        "nw_t": [
+          7.61,
+          4.59,
+          4.15
+        ]
+      },
+      "20": {
+        "n": 58,
+        "ic_mean": 0.188,
+        "nw_t": [
+          9.7,
+          5.37,
+          4.35
+        ]
+      }
+    },
+    "oos": {
+      "1": {
+        "n": 11,
+        "ic_mean": -0.0087,
+        "nw_t": [
+          -0.2,
+          -0.17,
+          -0.18
+        ]
+      },
+      "5": {
+        "n": 7,
+        "ic_mean": -0.0282,
+        "nw_t": [
+          -0.5,
+          -0.36,
+          -0.43
+        ]
+      },
+      "20": {
+        "n": 0,
+        "ic_mean": null,
+        "nw_t": null
+      }
+    },
+    "note": "IS=构造期（≤2026-09-30，66 截面）；OOS=样本外（≥2026-10-08）。口径：round22 N5 形态 + rev2 审计口径；生产 rev 为两维独立加权（ρ=0.89 近似等效）。"
+  },
+  "factor_ic_target_h": {},
+  "lambda_scan": [],
+  "notes": [
+    "【v4.17-cycle-rules】2026-11-02 round108 指令D 落地：growth .05→.10 / rsi_rev .10→.05；新增「业绩动量」大类（cap .30）；growth 合成分 P1g 去重（纯 rank_Gq）；新增周期标签单一来源 sector/cycle_industry.json（20 个申万二级，含光伏）；新增规则1（毛利率抬升>3pp 扣 10%）+规则2（去均值 ΔG_q≥p80 扣 15%，上限 25%），仅强周期股生效。⚠️ 规则1 原方案「毛利率波动 std>行业p60」实测 lift 0.945 方向反了已换口径；⚠️ 相同阈值下周期/非周期次期回落幅度几乎相同 → 门控合法性来自 autocorr 结构差异（去均值后周期 −0.55 vs 非周期 −0.02），禁宣称『只有周期股会回落』。",
+    "【v4.16.1-gray-growth】v4.16.1-gray-growth：2026-10-31 round105 P0-2「业绩动量进总分」。score_growth 0→0.05（方式B·单季扣非 G_q/QoQ 合成分，产品裁决=业绩变脸响应通道；round105 实锤旧 total 对业绩变脸零响应），score_tech_neg 0.15→0.10（近乎常数注记维让渡）。门禁裁决=FAIL（G1=True/G2=True/G3=True/G4=True/G5=False）。⚠️ 面板 panel_round66 无 score_growth 列——门禁对该维是盲区，其判定仅覆盖 tech_neg 变化后的 8 维归一复合；growth .05 非 IC 证据背书。灰度性质同 v4.16（G5 样本量缺口未闭合，P0 池前视重建仍开放）——禁止表述为『经验证的 alpha』。v4.15 约束沿用：单因子≤0.20/5 大类各≤0.30/Σ=1。",
+    "【v4.16-gray-icir】v4.16-gray-icir：2026-10-31 老大指令「按方案改造，重新计算评分」。依据 R103 §5.4/§6 裁决路径——audit_round104 细网格约束内重解（step=0.05、quality≤0.10 邻域含 0、重建池域 pit_pool median 260 只）+ round92 RSI/乖离有效性核查（rsi_rev 近窗 IC 为负、bias60 弱而不显著）选取 quality 邻域稳定解。门禁裁决=FAIL（G1=True/G2=True/G3=True/G4=True/G5=False）。v4.15 约束沿用：单因子≤0.20 / 5 大类各≤0.30 / Σ=1。⚠️ 灰度状态：G5 样本量缺口未闭合（仅 219 截面），P0（池前视重建严格重算 α）仍开放——禁止表述为『经验证的 alpha』。",
+    "【v4.15-constraint-cap】v4.15-constraint-cap：老大 2026-10-29 指令「单因子≤0.20 + 5大类各≤0.30」。原 fund 0.242 / lowvol20 0.208 双双破单因子上限，基本面大类 0.362 破大类上限；round59 逐维检验「高稳定」豁免条款（h5&h20 同时满足 分段符号一致+lag不翻转+|NW t|≥3.9）→ **无一维通过**，故无豁免可用。方案A 经 round60 三周期四道验收全通过、round61 九维约束合规、round62/63 排序(ρ=0.9935)与结构(PC1 28.9%/有效维数 6.01)均不劣化。⚠️ 候选筛选与验证同在 238 截面上，属探索性，唯一最终裁决仍是前向 walk-forward。",
+    "【v4.15 约束】单因子上限 0.20 / 5 大类各 ≤0.30 / 单因子下限 0；豁免条款（高稳定性）实测无一维通过。变更依据：audit_round59（约束校验+豁免检验）、round60（三周期四道验收）、round61（九维映射+结构）、round62（排序影响+权重敏感度）、round63（真实9维终选验证）。",
+    "复合总分由各维按权重线性合成后与未来收益求 Rank IC（与生产 total 口径一致）",
+    "⚠️ score_tech_neg = 10 - score_tech（0-10 制反号）：score_tech 与反转块相关 -0.69~-0.72，正权混合=内部对冲（round20 Part D 对照：h20 从 +0.1875 掉到 +0.1328 且不过关）",
+    "⚠️ score_quality / score_growth 由 fund_split.py 从 data/fin_cache_em/ PIT 回填（16 子因子：质量三组等权、成长 60/40），池内 rank 分位 ×10；与 audit_round21/22 同一实现来源，单方面修改必须重跑 round21 验证",
+    "⚠️ score_size 按池内流通市值分位打分（越小越高分）；⚠️ round19 C3：池内 circ_mv 原始值 IC +0.2108（大市值跑赢），与本维度方向相反，0.10 权重标注无本池证据",
+    "v4.4 归零维度（news/theme_neg/sector/oversold60/vol_pulse/overbought/theme_intrinsic/attention）：字段保留计算与展示，权重 0 —— 非「验证无效」而是「证据不足或被更强维度替代」",
+    "先验权重与生产同源（prior_weights），拟合失败时回退该先验；五处代码内硬编码 _W_PRIOR_10D/PRIOR_W10 必须同步（step2/enhance/apply_sector_momentum/factor_eval + 本文件），漏一处即静默回退旧口径",
+    "v4.8（2026-10-26）：score_growth 归零（保留字段与展示，标「不计分·参考」）、新增 score_lowvol20 = 过去20日收益率标准差取负（池内 rank 分位 ×10，与 size/quality/growth 同口径）。⚠️ lowvol20 属「池内截面分位」族，DIM_MAX=10；它需要至少 21 个交易日收盘价，次新股/停牌导致不足 21 日时该维缺失并从分母剔除（禁 or 0）。⚠️ 六处权重来源必须同步：factor_weights.json / factor_eval.PRIOR_W10 / step2._W_PRIOR_10D / apply_sector_momentum._W_PRIOR_10D / enhance_scores._W_PRIOR_10D / step2._DIM_MAX_DEFAULT + factor_weights.dim_max。",
+    "2026-10-26 v4.8：成长维（0.13）归零，lowvol20（0.13）顶上，Σ=1.0 不变。落地依据 round24f（生产线口径，非 round24d 的 rank_pct 口径）：复合 h5 IC +0.1153→+0.1776，lag 0/3/6 全过 Bonferroni 3.08，h20 +0.1704→+0.2484。⚠️ 已知未处理项：size 维（0.10）单维 h5 IC −0.0634(t0=−2.70)，且与 lowvol20 秩相关 −0.501 互相抵消，去 size 后复合 h5 可再升到 +0.2004；但 size 权重为老大 2026-10-25 指定，本轮未擅改，仅记录待裁。",
+    "v4.9（2026-10-26）：新增 score_ep（扣非净利润TTM/总市值，fund 让出 0.075）与 score_size_ind（申万一级行业内 LN流通市值 winsorize+Z 取负，替换 score_size 的 0.10）。⚠️ 实现唯一来源 ep_size_ind.py（step2 与审计共用），改它必须重跑 audit_round27c.py。⚠️ 八处权重来源必须同步：factor_weights.json / factor_eval.PRIOR_W10 / factor_eval.OPT_DIMS+ALL_W_DIMS / step2._W_PRIOR_10D / step2._DIM_MAX_DEFAULT / enhance_scores._W_PRIOR_10D / apply_sector_momentum._W_PRIOR_10D + _load_dim_max._DEFAULT / gen_report 渲染层。",
+    "⚠️ v4.9 已知边界：(1) 两处替换的 ΔIC 量级小（h5 +0.0093/+0.0043），属边际改善而非质变，页面禁宣称『显著提升』；(2) score_ep 与 score_fund 相关不可忽略（fund 内部本就用 fwd_pe/PEG），各半是共线性折中而非两次独立 alpha；(3) score_size_ind 短负长正（h5 −0.0148 / h20 +0.0883），持有周期 T+10 处于两者之间，实际增量弱于 h20 数；(4) size 归零不等于『小市值无效』，而是『全市场口径无效、行业内口径有效』—— 两者是不同因子。",
+    "v4.13-size2d（2026-10-28）：方案3 市值双因子拆分 —— 单一 score_size_ind(0.10) 拆成 score_size_growth(小盘成长溢价, 0.08) + score_dominant(龙头壁垒溢价, 0.06)，市值合计 0.14（原 0.10→0.14），差额 0.04 由 score_quality(0.252→0.212) 回吐，Σ=1.0 不变。⚠️ 拆分裁决：原文 mc_pct>0.3 门槛在真实分布下仅覆盖 4.1%（77只）形同虚设，老大改判为「业务份额(营收+利润TTM申万二级行业内占比)合成 rank 前30% = 行业龙头进 B，其余进 A」，两维 Spearman≈0.33 真正互补、天然互斥。⚠️ 七处权重来源必须同步：factor_weights.json / factor_eval.PRIOR_W10 + ALL_W_DIMS / step2._W_PRIOR_10D + step2._DIM_MAX_DEFAULT / enhance_scores._W_PRIOR_10D + _load_dim_max / apply_sector_momentum._W_PRIOR_10D / gen_report 渲染层（_DIM_DEFS + _DIM_W）。"
+  ],
+  "weight_constraints": {
+    "dim_cap": 0.2,
+    "group_cap": 0.3,
+    "dim_floor": 0.0,
+    "groups": {
+      "基本面": [
+        "score_fund",
+        "score_quality"
+      ],
+      "估值": [
+        "score_ep"
+      ],
+      "低波": [
+        "score_lowvol20"
+      ],
+      "技术反转": [
+        "score_bias60",
+        "score_rsi_rev",
+        "score_tech_neg"
+      ],
+      "市值": [
+        "score_size_growth",
+        "score_dominant"
+      ],
+      "业绩动量": [
+        "score_growth"
+      ]
+    },
+    "enforcement": "verify_weights_round36.py 必须逐项校验，FAIL 则不出图"
   }
- },
- "factor_ic_target_h": {
-  "score_fund": -0.0216,
-  "score_news": -0.0129,
-  "score_oversold60": -0.0252,
-  "score_bias60": 0.0132,
-  "score_rsi_rev": -0.0098,
-  "score_vol_pulse": -0.0019,
-  "score_overbought": -0.0287,
-  "score_theme_intrinsic": -0.0457,
-  "score_attention": -0.0302
- },
- "lambda_scan": [
-  {"lambda": 0.0, "n_oos": 0, "oos_ic_mean": null, "oos_t": null, "oos_win_rate": null},
-  {"lambda": 0.2, "n_oos": 0, "oos_ic_mean": null, "oos_t": null, "oos_win_rate": null},
-  {"lambda": 0.4, "n_oos": 0, "oos_ic_mean": null, "oos_t": null, "oos_win_rate": null},
-  {"lambda": 0.6, "n_oos": 0, "oos_ic_mean": null, "oos_t": null, "oos_win_rate": null},
-  {"lambda": 0.8, "n_oos": 0, "oos_ic_mean": null, "oos_t": null, "oos_win_rate": null},
-  {"lambda": 1.0, "n_oos": 0, "oos_ic_mean": null, "oos_t": null, "oos_win_rate": null}
- ],
- "notes": [
-  "复合总分由 10 维分量按权重线性合成后与未来收益求 Rank IC（与生产 total 口径一致）",
-  "v3.6 起 score_sector 固定 0.10 不变；score_overbought/score_attention 降至 0.02 地板（有效截面仅 9 个，信噪比不足）",
-  "反转块(oversold60/bias60/rsi_rev/vol_pulse)按块内等权 0.055 分配，替代原先 0.06~0.12 的不等权以避免共线性维度被重复奖励",
-  "训练窗因子 IC 仅使用基准快照 T+1 收益完整落在训练窗内的观测，避免边界泄漏",
-  "先验权重与生产同源（factor_weights.json prior_weights），拟合失败时回退该先验"
- ]
 }

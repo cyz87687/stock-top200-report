@@ -1,0 +1,280 @@
+{
+ "n_snapshots": 78,
+ "formula": "production scale-normalize: sum(min(v,DMAX)/DMAX*10*w)/max(0.5,sum(w))*10",
+ "cases": {
+  "h5|P0 v4.7基线 成长.13+size.10": {
+   "n": 73,
+   "ic": 0.1153,
+   "t_by_lag": {
+    "0": 4.54,
+    "3": 2.6,
+    "6": 2.21
+   },
+   "robust_bonf": false,
+   "sub_first": 0.1374,
+   "sub_second": 0.0937,
+   "sub_both_pos": true
+  },
+  "h5|P1 v4.8拟上线 低波.13+size.10": {
+   "n": 73,
+   "ic": 0.1776,
+   "t_by_lag": {
+    "0": 9.95,
+    "3": 6.1,
+    "6": 5.65
+   },
+   "robust_bonf": true,
+   "sub_first": 0.2189,
+   "sub_second": 0.1375,
+   "sub_both_pos": true
+  },
+  "h5|P2 低波.13+size0": {
+   "n": 73,
+   "ic": 0.2004,
+   "t_by_lag": {
+    "0": 12.97,
+    "3": 8.29,
+    "6": 8.08
+   },
+   "robust_bonf": true,
+   "sub_first": 0.2492,
+   "sub_second": 0.1529,
+   "sub_both_pos": true
+  },
+  "h5|P3 成长.13+低波.13+size.10(各维×0.87)": {
+   "n": 73,
+   "ic": 0.1635,
+   "t_by_lag": {
+    "0": 9.36,
+    "3": 5.81,
+    "6": 5.5
+   },
+   "robust_bonf": true,
+   "sub_first": 0.1987,
+   "sub_second": 0.1292,
+   "sub_both_pos": true
+  },
+  "h5|P4 成长.05+低波.08+size.10": {
+   "n": 73,
+   "ic": 0.1577,
+   "t_by_lag": {
+    "0": 7.55,
+    "3": 4.46,
+    "6": 3.96
+   },
+   "robust_bonf": true,
+   "sub_first": 0.1926,
+   "sub_second": 0.1238,
+   "sub_both_pos": true
+  },
+  "h5|P5 低波.23+size0": {
+   "n": 73,
+   "ic": 0.1995,
+   "t_by_lag": {
+    "0": 13.8,
+    "3": 8.93,
+    "6": 8.76
+   },
+   "robust_bonf": true,
+   "sub_first": 0.2403,
+   "sub_second": 0.1599,
+   "sub_both_pos": true
+  },
+  "h5|Q 仅低波.13": {
+   "n": 73,
+   "ic": 0.1189,
+   "t_by_lag": {
+    "0": 3.28,
+    "3": 1.87,
+    "6": 1.56
+   },
+   "robust_bonf": false,
+   "sub_first": 0.096,
+   "sub_second": 0.1412,
+   "sub_both_pos": true
+  },
+  "h5|Q 仅成长.13(等权占位)": {
+   "n": 73,
+   "ic": -0.0218,
+   "t_by_lag": {
+    "0": -1.73,
+    "3": -1.06,
+    "6": -0.91
+   },
+   "robust_bonf": false,
+   "sub_first": -0.0412,
+   "sub_second": -0.0029,
+   "sub_both_pos": false
+  },
+  "h5|Q 仅size.10(等权占位)": {
+   "n": 73,
+   "ic": -0.0634,
+   "t_by_lag": {
+    "0": -2.7,
+    "3": -1.52,
+    "6": -1.26
+   },
+   "robust_bonf": false,
+   "sub_first": -0.0375,
+   "sub_second": -0.0886,
+   "sub_both_pos": false
+  },
+  "h5|Q 仅fund": {
+   "n": 73,
+   "ic": 0.0762,
+   "t_by_lag": {
+    "0": 5.21,
+    "3": 3.49,
+    "6": 3.68
+   },
+   "robust_bonf": true,
+   "sub_first": 0.1046,
+   "sub_second": 0.0485,
+   "sub_both_pos": true
+  },
+  "h20|P0 v4.7基线 成长.13+size.10": {
+   "n": 58,
+   "ic": 0.1704,
+   "t_by_lag": {
+    "0": 6.54,
+    "3": 3.58,
+    "6": 2.9
+   },
+   "robust_bonf": false,
+   "sub_first": 0.2158,
+   "sub_second": 0.1249,
+   "sub_both_pos": true
+  },
+  "h20|P1 v4.8拟上线 低波.13+size.10": {
+   "n": 58,
+   "ic": 0.2484,
+   "t_by_lag": {
+    "0": 13.02,
+    "3": 7.15,
+    "6": 5.69
+   },
+   "robust_bonf": true,
+   "sub_first": 0.3587,
+   "sub_second": 0.1381,
+   "sub_both_pos": true
+  },
+  "h20|P2 低波.13+size0": {
+   "n": 58,
+   "ic": 0.254,
+   "t_by_lag": {
+    "0": 12.11,
+    "3": 6.5,
+    "6": 5.13
+   },
+   "robust_bonf": true,
+   "sub_first": 0.385,
+   "sub_second": 0.123,
+   "sub_both_pos": true
+  },
+  "h20|P3 成长.13+低波.13+size.10(各维×0.87)": {
+   "n": 58,
+   "ic": 0.217,
+   "t_by_lag": {
+    "0": 12.17,
+    "3": 6.75,
+    "6": 5.4
+   },
+   "robust_bonf": true,
+   "sub_first": 0.3116,
+   "sub_second": 0.1225,
+   "sub_both_pos": true
+  },
+  "h20|P4 成长.05+低波.08+size.10": {
+   "n": 58,
+   "ic": 0.2258,
+   "t_by_lag": {
+    "0": 11.25,
+    "3": 6.25,
+    "6": 5.04
+   },
+   "robust_bonf": true,
+   "sub_first": 0.3126,
+   "sub_second": 0.139,
+   "sub_both_pos": true
+  },
+  "h20|P5 低波.23+size0": {
+   "n": 58,
+   "ic": 0.2361,
+   "t_by_lag": {
+    "0": 10.29,
+    "3": 5.47,
+    "6": 4.31
+   },
+   "robust_bonf": true,
+   "sub_first": 0.3668,
+   "sub_second": 0.1055,
+   "sub_both_pos": true
+  },
+  "h20|Q 仅低波.13": {
+   "n": 58,
+   "ic": 0.0826,
+   "t_by_lag": {
+    "0": 1.88,
+    "3": 1.02,
+    "6": 0.83
+   },
+   "robust_bonf": false,
+   "sub_first": 0.1403,
+   "sub_second": 0.0249,
+   "sub_both_pos": true
+  },
+  "h20|Q 仅成长.13(等权占位)": {
+   "n": 58,
+   "ic": -0.0429,
+   "t_by_lag": {
+    "0": -2.89,
+    "3": -1.57,
+    "6": -1.25
+   },
+   "robust_bonf": false,
+   "sub_first": -0.0717,
+   "sub_second": -0.014,
+   "sub_both_pos": false
+  },
+  "h20|Q 仅size.10(等权占位)": {
+   "n": 58,
+   "ic": 0.0415,
+   "t_by_lag": {
+    "0": 1.37,
+    "3": 0.73,
+    "6": 0.59
+   },
+   "robust_bonf": false,
+   "sub_first": 0.0501,
+   "sub_second": 0.033,
+   "sub_both_pos": true
+  },
+  "h20|Q 仅fund": {
+   "n": 58,
+   "ic": 0.0914,
+   "t_by_lag": {
+    "0": 5.08,
+    "3": 2.8,
+    "6": 2.29
+   },
+   "robust_bonf": false,
+   "sub_first": 0.1806,
+   "sub_second": 0.0021,
+   "sub_both_pos": true
+  }
+ },
+ "verdict": {
+  "h5": {
+   "d_ic": 0.0623,
+   "p1_better": true,
+   "p1_sub_both_pos": true,
+   "p1_robust": true
+  },
+  "h20": {
+   "d_ic": 0.078,
+   "p1_better": true,
+   "p1_sub_both_pos": true,
+   "p1_robust": true
+  }
+ }
+}

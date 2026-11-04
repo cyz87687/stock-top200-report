@@ -59,7 +59,10 @@ def load_pool_config():
         try:
             with open(CONFIG_PATH, encoding="utf-8") as f:
                 user = json.load(f)
-            if user.get("pool_size"):
+            # v4.11（老大 2026-10-26「不再有500只的限制」）：pool_size=0 表示**不限制**，
+            #   初筛池全量进 step2 评分。原实现 `if user.get("pool_size")` 会把 0 当假值
+            #   → 静默回退到缺省 500，限流开关形同虚设（与 v4.0 的 size_quantile 静默失效同类坑）。
+            if user.get("pool_size") is not None:
                 cfg["pool_size"] = int(user["pool_size"])
             for _sec in ("fetch", "eligibility_filter", "liquidity_filter", "pool_rules"):
                 if isinstance(user.get(_sec), dict):
@@ -95,6 +98,17 @@ def eligibility_filter(stocks, cfg=None):
 
 _POOL_CFG = load_pool_config()
 POOL = _POOL_CFG["pool_size"]
+# v4.11（老大 2026-10-26）：POOL=0 语义 = **不限规模**（初筛池全量进评分）。
+#   用 _cap() 收口，避免各处 `[:POOL]` 在 0 时静默截成空列表。
+POOL_UNLIMITED = (POOL <= 0)
+
+
+def _cap(n, limit=None):
+    """按池上限收敛数量。limit 缺省取 POOL；POOL<=0（不限）时原样返回 n。"""
+    lim = POOL if limit is None else limit
+    if lim is None or lim <= 0:
+        return n
+    return min(n, lim)
 
 REBUILD_OUT = "pool_rebuild_state.json"
 ROLLING_FETCH_BATCH = 120      # 批量行情单次查询只数（新浪 list 上限约 200，留余量）
@@ -261,6 +275,18 @@ def load_sw_l1():
         return {}
 
 
+def _log_sd(vals):
+    """流通市值的对数标准差 —— 度量「池内 SIZE 还有多少区分度」。
+    v4.1 用它对冲一个隐蔽陷阱：若进池时已按市值截断，池内 SIZE 就退化成
+    常数，评分层再加 SIZE 权重毫无意义（旧实现池内 log-SD 仅 0.276）。"""
+    import math
+    xs = [math.log(float(v)) for v in vals if float(v or 0) > 0]
+    if len(xs) < 2:
+        return 0.0
+    m = sum(xs) / len(xs)
+    return (sum((x - m) ** 2 for x in xs) / (len(xs) - 1)) ** 0.5
+
+
 def apply_pool_rules(pool_norm, cfg=None):
     """v3.8 全A 母体规则选池：**SIZE 小市值**为主，剔除低价口径。
 
@@ -327,9 +353,17 @@ def apply_pool_rules(pool_norm, cfg=None):
     cfg = cfg or (_POOL_CFG.get("pool_rules") or {})
     stats = {"enabled": bool(cfg.get("enabled", True)),
              "universe": cfg.get("universe", "all_a"),
+             # v4.1（P1-2）：母体版本必须落盘。下游「新旧母体分段体检」原先靠
+             #   池内流通市值中位 <60亿 去**猜**母体归属，而 v4.1 分层抽样后
+             #   池内市值中位实测 85.9 亿（跨度 4.1~9694 亿）——一旦新母体上线，
+             #   猜法必然把它误判成旧母体，「分段体检」将再次静默失效。
+             #   改为显式版本号传递，归因不再依赖阈值猜测。
+             "version": cfg.get("version", "unknown"),
+             "size_as_factor": bool(cfg.get("size_as_factor", False)),
              "in": len(pool_norm), "out": len(pool_norm),
              "sort_key": cfg.get("sort_key", "mv"),
              "size_quantile": cfg.get("size_quantile", 0.18),
+             "sample_strata": cfg.get("sample_strata", 5),
              "min_amount": cfg.get("min_amount", 1.0e8),
              "min_mktcap": cfg.get("min_mktcap", 25e8),
              "price_floor": cfg.get("price_floor", 2.0),
@@ -337,7 +371,7 @@ def apply_pool_rules(pool_norm, cfg=None):
              "dropped_price_floor": 0, "dropped_high_mom": 0,
              "dropped_illiquid": 0, "dropped_small_mktcap": 0, "dropped_no_mv": 0}
     if not stats["enabled"]:
-        return pool_norm[:POOL], stats
+        return pool_norm[:_cap(len(pool_norm))], stats
 
     floor = float(stats["price_floor"] or 0)
     min_amt = float(stats["min_amount"] or 0)
@@ -381,33 +415,99 @@ def apply_pool_rules(pool_norm, cfg=None):
         kept.append(s)
 
     # 追高过滤：当日涨幅前 N% 剔除（快照无 K 线，当日涨幅作一阶代理）
+    # v4.11（老大 2026-10-26「初筛池每只股票都要拉数据跑一遍评分」）：
+    #   **改为「标记不剔除」**——把 dropped_high_mom 从实际删除降级为 chase_hi 标记。
+    #   原因：老大要求全量评分，而追高过滤（配对 t+2.66）本质是**选组合**时的约束，
+    #   不是「该不该被评分」的理由。在入池层删掉 = 这 380 只永远看不到自己的分数，
+    #   页面也无法回答「它到底几分、只是太高了不能买」。
+    #   ⚠️ 但这不等于放开追高：标记会随 pool_rules.chase_hi_pct 落盘，组合层
+    #   （pick_portfolio / pick_multifactor）必须读它做二次拦截，否则等于废除该规则。
     mom_pct = float(stats["drop_mom_top_pct"] or 0)
+    stats["chase_mark_only"] = True
     if mom_pct > 0 and kept:
         vals = sorted([float(s.get("pct_chg") or 0) for s in kept])
         thr = vals[min(len(vals) - 1, int(len(vals) * (1 - mom_pct / 100.0)))]
-        before = len(kept)
-        kept = [s for s in kept if float(s.get("pct_chg") or 0) < thr]
-        stats["dropped_high_mom"] = before - len(kept)
+        _n_chase = 0
+        for s in kept:
+            _hi = float(s.get("pct_chg") or 0) >= thr
+            s["chase_hi"] = _hi
+            if _hi:
+                _n_chase += 1
+        stats["dropped_high_mom"] = 0          # 实际未剔除
+        stats["marked_high_mom"] = _n_chase    # 标记数（组合层据此拦截）
+        stats["chase_thr_pct"] = round(thr, 2)
     stats["after_mom_filter"] = len(kept)
 
-    # —— 排序键：SIZE（流通市值升序，越小越好）或旧口径 price ——
+    # —— 进池方式：v4.1「分层抽样」 ——
+    # ⚠️ 2026-10-25 P0 改造（老大裁决）：SIZE 从此**不再是筛选条件**，而是评分加分项。
+    #   旧实现 `n_take = min(len, max(POOL, int(len*q)))` 有两个致命问题：
+    #     ① size_quantile 静默失效——max(POOL,·) 在候选<2778 只时恒取 POOL，
+    #        今日候选 2520→int(2520*0.18)=453 → max(500,453)=500，实际取 19.84%；
+    #        某日候选 1000 只则取 500=50%，参数随候选数漂移，不可复现。
+    #     ② 把市值大的全剔掉后，池内市值 log-SD 仅 0.276（4.1~39.9 亿），
+    #        SIZE 若改评分项在池内**毫无区分度**（全集 log-SD 1.112）——自相矛盾。
+    #   分层抽样：按流通市值分 n_strata 档等量抽样，保留完整市值跨度（log-SD→1.10），
+    #   使「小市值优先」能在评分层真实发挥作用，同时池子规模可控（step2 时限约束）。
     key_name = "circ_mv" if stats["sort_key"] == "mv" else "price"
     by_key = sorted(kept, key=lambda s: float(s.get(key_name) or 0))
-    q = float(stats["size_quantile"] if stats["sort_key"] == "mv"
-              else cfg.get("price_quantile", 0.18) or 0.18)
-    n_take = min(len(by_key), max(POOL, int(len(by_key) * q)))
-    chosen = by_key[:n_take]
-    # 若不足 pool_size（极端情况），用成交额补齐
-    if len(chosen) < POOL:
-        cs = {s["code"] for s in chosen}
-        rest = [s for s in kept if s["code"] not in cs]
-        rest.sort(key=lambda s: -float(s.get("amount") or 0))
-        chosen = chosen + rest[:POOL - len(chosen)]
-    chosen = chosen[:POOL]
+    n_strata = int(cfg.get("sample_strata", 5) or 0)
+    # v4.11（老大 2026-10-26「不再有500只的限制，筛选完之后初筛池每只股票都要拉数据跑一遍评分」）：
+    #   POOL<=0 = 不限规模 → **跳过一切截断与抽样**，初筛池全量进池。
+    #   分层抽样的唯一存在理由是「池子规模可控（step2 时限约束）」，一旦规模不再受限，
+    #   抽样就变成纯粹的**信息损失**（丢掉 74% 的合格标的），且会让「全量评分」名存实亡。
+    #   此时保留 by_key 的市值升序（下游按成交额重排 rank），仅记录 sampling="unlimited"。
+    if POOL_UNLIMITED:
+        chosen = by_key
+        stats["sampling"] = "unlimited"
+        stats["sample_strata"] = 0
+        stats["pool_unlimited"] = True
+    elif n_strata > 1 and len(by_key) > POOL:
+        chosen, _seen = [], set()
+        per = max(1, POOL // n_strata)
+        N = len(by_key)
+        for k in range(n_strata):
+            lo, hi = N * k // n_strata, N * (k + 1) // n_strata
+            blk = by_key[lo:hi]
+            if not blk:
+                continue
+            take = blk if len(blk) <= per else [blk[int(i * len(blk) / per)]
+                                                for i in range(per)]
+            for s in take:
+                c = s.get("code")
+                if c and c not in _seen:
+                    _seen.add(c)
+                    chosen.append(s)
+        # 若分层后不足 POOL，按成交额补齐（只在极端候选稀少时触发）
+        if len(chosen) < POOL:
+            rest = [s for s in kept if s.get("code") not in _seen]
+            rest.sort(key=lambda s: -float(s.get("amount") or 0))
+            chosen += rest[:POOL - len(chosen)]
+        stats["sampling"] = "stratified"
+        stats["sample_strata"] = n_strata
+    else:
+        # 候选不足 POOL：全取（不截断，保留全部符合条件的标的）
+        chosen = by_key[:_cap(len(by_key))]
+        stats["sampling"] = "all" if len(by_key) <= POOL else "size_cut"
+        stats["sample_strata"] = 0
+    chosen = chosen[:_cap(len(chosen))]
     chosen.sort(key=lambda s: -float(s.get("amount") or 0))
     for i, s in enumerate(chosen, 1):
         s["rank"] = i
     stats["out"] = len(chosen)
+    # 落盘「实际覆盖的全A市值分位」，杜绝"配 18% 实取 40%"这类口径漂移不可审计
+    try:
+        _all_mv = sorted(float(x.get("circ_mv") or 0) for x in pool_norm
+                         if float(x.get("circ_mv") or 0) > 0)
+        _sel_mv = sorted(float(s.get("circ_mv") or 0) for s in chosen
+                         if float(s.get("circ_mv") or 0) > 0)
+        if _all_mv and _sel_mv:
+            _thr = _sel_mv[-1]
+            _pct = 100.0 * sum(1 for v in _all_mv if v <= _thr) / len(_all_mv)
+            stats["mv_coverage_pct"] = round(_pct, 1)
+            stats["mv_upper_yi"] = round(_thr / 1e8, 1)
+            stats["mv_log_sd"] = round(_log_sd(_sel_mv), 3)
+    except Exception:
+        pass
     if stats["sort_key"] == "mv":
         mvs = sorted([float(s.get("circ_mv") or 0) for s in chosen])
         prices = sorted([float(s.get("price") or 0) for s in chosen])
@@ -601,8 +701,9 @@ def main():
     pages = int(fc.get("pages_all_a", 56)) if all_a else int(fc.get("pages", 15))
     page_size = 100                              # 接口硬上限：num>100 仍只返回 100
     mode = "全A母体(v3.7 换母体)" if all_a else f"成交额 TOP{POOL}"
+    _pool_desc = "不限(初筛池全量)" if POOL_UNLIMITED else f"{POOL} 只"
     print("=" * 60)
-    print(f"  新浪接口获取{mode} → 规则选池 {POOL} 只")
+    print(f"  新浪接口获取{mode} → 规则选池 {_pool_desc}")
     print("=" * 60)
     all_stocks = []
     for page in range(1, pages + 1):
@@ -637,7 +738,35 @@ def main():
         # 滚动召回仅在「成交额榜母体」模式下有意义（全A 母体已覆盖全域）
         if not all_a:
             _cand_norm, _n_recall = rolling_universe(_norm_all, _pool_state, window=roll_win)
+
+    # ===== v4.10 初筛（老大 2026-10-26「每天第一步先初筛」）=====
+    # 位置必须在 apply_pool_rules(分层抽样) **之前**：
+    #   初筛目的是「降低公司数量形成初筛池」，抽样是在初筛池内保市值跨度。
+    #   顺序颠倒 = 先抽样再筛选，等于抽了 500 只又砍掉一半，池子规模失控。
+    _pre_stats = None
+    _pre_cfg = pr_cfg.get("prescreen") or {}
+    if os.environ.get("SCORER_SKIP_PRESCREEN", "") in ("1", "true", "yes"):
+        print("   ⏭  初筛已跳过（SCORER_SKIP_PRESCREEN=1）")
+        _pre_cfg = {}
+    if _pre_cfg.get("enabled"):
+        try:
+            import prescreen as _ps
+            _today0 = datetime.now().strftime("%Y-%m-%d")
+            _kept, _pre_stats = _ps.run(_cand_norm, _today0, _pre_cfg)
+            print()
+            for _ln in _ps.summary_lines(_pre_stats):
+                print(_ln)
+            if _kept:
+                _cand_norm = _kept
+            else:
+                print("   🚨 初筛池为空！保留母体继续（否则流水线中断）。请检查 config.prescreen 阈值。")
+                _pre_stats["fallback_to_universe"] = True
+        except Exception as _e:
+            print(f"   ⚠️ 初筛失败（保留全A母体继续）: {_e}")
+
     main_pool_norm, _pool_stats = apply_pool_rules(_cand_norm, pr_cfg)
+    if _pre_stats:
+        _pool_stats["prescreen"] = _pre_stats
     if _pool_stats["enabled"]:
         _sk = "SIZE小市值" if _pool_stats["sort_key"] == "mv" else "绝对价格"
         print(f"\n🧺 规则选池(v3.8): 母体 {_pool_stats['in']} 只  排序键 {_sk}")
@@ -653,7 +782,7 @@ def main():
                   f" / 科技占比 {_pool_stats.get('tech_ratio', 'NA')}%）")
         else:
             print(f"   价格分位截断 → 选出 {_pool_stats['out']} 只")
-    main_pool = all_stocks[:POOL]          # 保留成交额榜供下游校验/对比
+    main_pool = all_stocks[:_cap(len(all_stocks))]   # 保留成交额榜供下游校验/对比
     print(f"\n✅ 共获取 {len(all_stocks)} 只（母体；规则选池后 {len(main_pool_norm)} 只）")
 
     # ===== 数据质量校验（针对主力池）=====
@@ -662,7 +791,7 @@ def main():
     if not ok:
         print(f"⚠️ 新浪数据校验失败: {reason}")
         print("🔄 尝试东财备源...")
-        out, fb = fallback_eastmoney(POOL)
+        out, fb = fallback_eastmoney(_cap(10 ** 6))
         if out:
             ok2, reason2 = validate_data([{"symbol": s["code"], "code": s["code"],
                                            "trade": s["price"], "amount": s["amount"]} for s in out])
@@ -690,12 +819,24 @@ def main():
         "low_turnover": sum(1 for s in main_norm if not s.get("turnover_ok", True)),
     }
 
+    # v4.10（2026-10-26 老大指令「第一步加入选股步骤」）：全A母体必须落盘。
+    #   ⚠️ 原实现只存 main_pool 500 只 → 初筛（prescreen.py）无从下手，
+    #      因为它要在「全A 5377 只」上做筛选而不是在已抽样的 500 只上做。
+    #      不落盘就只能退回 main_pool 演示，初筛形同虚设。
+    #   体积代价：5377 只 × 约 250 字节 ≈ 1.3MB，可接受。
+    #   只保留初筛需要的字段（快照 8 项），丢弃冗余以控体积。
+    _UNIV_KEYS = ("code", "name", "price", "pct_chg", "amount", "turnover_ratio",
+                  "circ_mv", "total_mv", "pe", "pb", "suspended", "is_new", "rank")
+    all_universe = [{k: s.get(k) for k in _UNIV_KEYS if k in s} for s in _norm_all]
+
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump({
             "top50": main_norm[:50],
             "top100": main_norm[:100],
             "top500": main_norm,
             "main_pool": main_norm,
+            "all_universe": all_universe,
+            "universe_count": len(all_universe),
             "pool_size": len(main_norm),
             "all_count": len(all_stocks),
             "dropped_eligibility": len(dropped),

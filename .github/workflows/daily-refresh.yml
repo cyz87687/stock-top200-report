@@ -219,21 +219,121 @@ jobs:
               echo "[$(date -u '+%H:%M:%S')] ⚠️ Factor IC evaluation failed, report will omit IC section" >> $LOG
             fi
 
+            # Step 3.955: 多因子组合专项审计（v4.3，老大 2026-10-25 三项要求）
+            #   必须在 factor_eval.py 之后：round15/round16 要读 factor_history.json（本步刚刷新）。
+            #   必须在 gen_report_top200.py 之前：报告层「⏱ 持仓周期」区块读 audit_round15.json。
+            #   必须在 pick_multifactor.py 之前：round15/16 不依赖 mf_pick，只依赖历史截面。
+            #   失败不阻断主链（审计是研究层，不是决策产物），但会记 ⚠️。
+            echo "[$(date -u '+%H:%M:%S')] Running audit_round15/16 (holding period + zone filter A/B) ..." >> $LOG
+            if timeout 600 python3 audit_round15.py >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Holding-period backtest updated" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ audit_round15 failed/timeout, report holds stale holding-period block" >> $LOG
+            fi
+            if timeout 600 python3 audit_round16.py >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Zone-filter A/B comparison updated" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ audit_round16 failed/timeout, daily report may show stale table" >> $LOG
+            fi
+
+            # Step 3.957: 权重落地穿透审计（v4.3，round17）—— 回答「日报的权重/因子到底有没有应用到生产」
+            #   老大 2026-10-25 提问「目前看只应用了部分」，穿透后确认三类断点：
+            #     ① 权重维度没进 factor_eval.FACTORS → 日报从未单独评估（round17 发现 theme_neg/size 共 0.24）
+            #     ② 权重维度没进 scored 数据 → total 静默少算（step2 代码已支持，但数据是旧版生成的）
+            #     ③ 选池规则数据与配置不一致 → 页面用上一版口径出图
+            #   三者都不报错、只让结果静默退化，故必须每日显式体检。
+            # ⚠️ 必须在 factor_eval.py 之后：要读最新 factor_ic.json 的实际截面数。
+            # ⚠️ 必须在 gen_report_top200.py 之前：报告层「⚠️ 权重未完全落地」披露条读 audit_round17.json。
+            # ⚠️ 必须在 gen_factor_daily.py 之前：因子日报 6.5 节读同一份产物。
+            #   失败不阻断主链，但会记 ⚠️；缺产物时报告层自动隐藏披露条（不留硬编码兜底）。
+            echo "[$(date -u '+%H:%M:%S')] Running audit_round17 (weight/factor traceability) ..." >> $LOG
+            if timeout 300 python3 audit_round17.py >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Weight traceability audit updated" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ audit_round17 failed, report hides the weight-coverage disclosure" >> $LOG
+            fi
+
+            # Step 3.958: 消息面/题材因子诊断审计（round18）—— 回答「区分度不足、得分趋同、只有科技股高分」
+            #   诊断三类成因：① 打分机制（硬编码先验仅 4 取值 / AI 主题均值混合压平组内差 / 32% 零值率）
+            #     ② 数据源偏差（iFinD 限流 + KNOWN_CATALYSTS 手工表 199 条科技集中）③ 行业失衡
+            #   实证：行业内中性化后 score_theme h20 IC 从 -0.1076 塌到 -0.0328（70% 是行业代理）；
+            #     score_news h1 反而全 lag 过 Bonferroni（+3.08~+3.68）→ 消息面可修复、题材须改造。
+            # ⚠️ 必须在 factor_eval.py 之后：读 factor_history.json 全部截面与价格库。
+            #   失败不阻断主链，但会记 ⚠️。
+            echo "[$(date -u '+%H:%M:%S')] Running audit_round18 (news/theme factor diagnosis) ..." >> $LOG
+            if timeout 600 python3 audit_round18.py >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ News/theme diagnosis updated" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ audit_round18 failed, news/theme diagnosis holds stale data" >> $LOG
+            fi
+
+            # Step 3.959: 替代因子选型实证（round19）——以外部近半年因子排名 CSV 为选型依据，
+            #   池内复测量价类候选 + 财务类候选的复测障碍诊断 + score_size 口径复测。
+            #   CSV 放在 /Users/yzreal/Downloads/（本地一次性输入，非每日产物）；
+            #   文件缺失时 Part A 自动跳过，量价复测不受影响 → 失败不阻断主链。
+            # ⚠️ 必须在 factor_eval.py 之后：读 factor_history.json 全部截面与价格库。
+            echo "[$(date -u '+%H:%M:%S')] Running audit_round19 (replacement factor selection) ..." >> $LOG
+            if timeout 600 python3 audit_round19.py >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Replacement factor selection updated" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ audit_round19 failed, replacement selection holds stale data" >> $LOG
+            fi
+
+            # Step 3.960: 五维架构重构可行性评估（round20）——维度冗余度 PCA + 各维 IC
+            #   复算 + 反转块回填重测（修复 10-13 才入库的事故）+ 5 维族结构合并损益对比。
+            # ⚠️ 必须在 factor_eval.py 之后：读 factor_history.json 全部截面与价格库。
+            echo "[$(date -u '+%H:%M:%S')] Running audit_round20 (5-dim architecture feasibility) ..." >> $LOG
+            if timeout 600 python3 audit_round20.py >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ 5-dim architecture feasibility updated" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ audit_round20 failed, architecture evaluation holds stale data" >> $LOG
+            fi
+
+            # Step 3.961: fund 拆分「质量因子25%+成长因子20%」可行性实证（老大 2026-10-25）
+            #   16 子因子（ROE/ROIC/ROA/OCF-NI/收现比/应计/OCFG/盈利波动/毛利波动/负债率/商誉
+            #   + 扣非增速/CAGR3/营收增速/单季环比/增速差分）从 EM 财务摘要缓存 point-in-time 回填，
+            #   子因子 IC + 族得分 IC + 行业内中性化 + 相关性 + 7 个权重变体合并损益。
+            # ⚠️ 必须在 factor_eval.py 之后：读 factor_history.json 全部截面与价格库。
+            echo "[$(date -u '+%H:%M:%S')] Running audit_round21 (quality/growth split feasibility) ..." >> $LOG
+            if timeout 900 python3 audit_round21.py >> $LOG 2>&1; then
+              echo "[$(date -u '+%H:%M:%S')] ✅ Quality/growth split feasibility updated" >> $LOG
+            else
+              echo "[$(date -u '+%H:%M:%S')] ⚠️ audit_round21 failed, quality/growth split holds stale data" >> $LOG
+            fi
+
             # Step 3.965: 多因子精选组合（≤10 只）+ 回测 → sector/mf_pick_<date>.json + mf_backtest.json
             # 【v3.9 新增】解决「候选组合 20 只无法执行」问题；权重由 factor_ic.json 证据反推，非手填。
+            # 【v4.3 新增】只选当日现价落在买入区间内的个股（老大第 2 项要求）。
+            #   买区由 gen_report_top200.build_trade_plan 同源推导（AST 抽取复用，不重写），
+            #   因此页面展示的买区与选股判据必然一致。
             # ⚠️ 必须在 factor_eval.py 之后: 要读最新 factor_ic.json 的池内 IC 来推导权重。
             # ⚠️ 必须在 track_recommendations.py 之后: 报告层「动量路线低 IC 悖论」区块
             #    读 recommendation_track.json 的真实跟踪数据。
             # ⚠️ 必须在 gen_report_top200.py 之前: 报告层渲染「🧮 多因子精选组合」区块。
             echo "[$(date -u '+%H:%M:%S')] Running pick_multifactor.py + gen_mf_backtest.py ..." >> $LOG
             if python3 pick_multifactor.py "$SCORED_JSON" --top 10 >> $LOG 2>&1; then
-              echo "[$(date -u '+%H:%M:%S')] ✅ Multifactor portfolio generated" >> $LOG
+              echo "[$(date -u '+%H:%M:%S')] ✅ Multifactor portfolio generated (in-zone only)" >> $LOG
               _MFOUT=$(ls -1 sector/mf_pick_*.json 2>/dev/null | sort | tail -1)
               if [ -n "$_MFOUT" ]; then cp "$_MFOUT" sector/mf_latest.json; fi
               if timeout 300 python3 gen_mf_backtest.py >> $LOG 2>&1; then
                 echo "[$(date -u '+%H:%M:%S')] ✅ Multifactor backtest regenerated" >> $LOG
               else
                 echo "[$(date -u '+%H:%M:%S')] ⚠️ Multifactor backtest failed/timeout, report may show stale table" >> $LOG
+              fi
+              # Step 3.965b: 组合产出后立刻核查「现价 vs 买入区间」（v4.3）
+              #   选股层已做这道闸，这里做**独立复核**：万一 build_trade_plan 抽失败或
+              #   数据异常导致过滤没生效，能在此发现而不是等老大在页面上发现。
+              #   round14 默认自动探测最新 mf_pick_<date>.json，不写死日期。
+              echo "[$(date -u '+%H:%M:%S')] Running audit_round14/14b (in-zone verification) ..." >> $LOG
+              if timeout 300 python3 audit_round14.py >> $LOG 2>&1; then
+                echo "[$(date -u '+%H:%M:%S')] ✅ In-zone verification done" >> $LOG
+              else
+                echo "[$(date -u '+%H:%M:%S')] ⚠️ audit_round14 failed, check mf_pick in-zone manually" >> $LOG
+              fi
+              if timeout 300 python3 audit_round14b.py >> $LOG 2>&1; then
+                echo "[$(date -u '+%H:%M:%S')] ✅ Candidate pool zone distribution done" >> $LOG
+              else
+                echo "[$(date -u '+%H:%M:%S')] ⚠️ audit_round14b failed (non-blocking)" >> $LOG
               fi
             else
               echo "[$(date -u '+%H:%M:%S')] ⚠️ Multifactor pick failed, report falls back to mf_latest.json" >> $LOG
@@ -336,6 +436,10 @@ jobs:
           prune_keep "reports/factor_[0-9]*.md" 30
           #   日报的本地 HTML 预览不入库（老大要求「Markdown 存档，不上线」）
           rm -f reports/factor_[0-9]*.html 2>/dev/null || true
+          # 3.7) v4.3 多因子审计产物（保留最近 2 份，供跨日对比）
+          #   audit_round15/16 是持仓周期与买区过滤的每日实证底稿，
+          #   报告层与因子日报都读它们 → 必须入库，否则线上页面拿不到数据。
+          prune_keep "audit_round*.json" 2
           # 4) 清理备份/临时文件
           rm -f *.bak *.bak_* *.prebak 2>/dev/null || true
           echo "--- 保留后清单 ---"
@@ -365,6 +469,13 @@ jobs:
           git add sector_momentum_daily.py apply_sector_momentum.py pick_portfolio.py gen_portfolio_report.py fetch_sw_map.py selfcheck_pipeline.py
           # v3.9 新增脚本
           git add pick_multifactor.py gen_mf_backtest.py backtest_multifactor.py 2>/dev/null || true
+          # v4.3 新增脚本：多因子买区过滤 / 持仓周期回测（老大 2026-10-25 三项要求）
+          # round18：消息面/题材因子诊断（区分度、行业失衡、替代因子实证）
+          git add audit_round14.py audit_round14b.py audit_round15.py audit_round16.py \
+                audit_round17.py audit_round18.py audit_round19.py audit_round20.py audit_round21.py selfcheck_pipeline.py 2>/dev/null || true
+          # v4.3 审计产物（*.json 被 gitignore，必须 -f）：报告层与因子日报的数据源
+          git add -f audit_round14.json audit_round14b.json audit_round15.json audit_round16.json \
+                audit_round17.json audit_round18.json audit_round19.json audit_round20.json audit_round21.json 2>/dev/null || true
           # 记录 prune 产生的删除(仅限已跟踪的历史报告/评分/组合文件)
           git add -u top200_report_2026-*.html 2>/dev/null || true
           git add -Au -- top200_scored_*.json sector/portfolio_*.json sector/sector_momentum_*.json 2>/dev/null || true

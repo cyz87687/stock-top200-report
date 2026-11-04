@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+"""round31：投研视角 T0 两问的 IC 前置验证（tech_neg 权重失真 / bias60×rsi_rev 共线）。
+
+## 为什么必须先验证再落地
+
+诊断已确认两个「页面看不出、但实质影响决策」的问题：
+
+  ① score_tech_neg 名义 15%、有效仅 5.3%（std=0.902，极差仅占量程 33.9%）
+     根因：s_tech_neg = 10 − ts_adj，而 ts_adj ∈ [0,5] → 该维值域恒为 [5,10]，
+     只用了量程上半段。DMAX=10 的分母没用满 → 权重被静默稀释。
+  ② bias60 × rsi_rev 秩相关 +0.854，合计 35% 权重实为 1 个因子
+     → 标称 8 维，有效独立维数仅 3.04。
+
+但「诊断出失真」≠「改了就更好」。本脚本用**生产线同构量尺**（scale_calc，
+分母恒定 Σ全部生效权重 + 缺维填 DMAX/2）在 85 个截面上对比各修法，
+判定标准沿用项目纪律（不放宽）：
+  · NW t 在 lag 0/3/6 **全部** ≥ 3.08（Bonferroni）
+  · 分子期前半/后半必须同号
+  · 与现状必须做**逐截面配对 t**（不是比两个点估计的均值）
+  · ⚠️ 本轮同时比较 10 个方案 = 多重检验（项目累计已 300+ 次），
+     任何单点「过」都不足以上线；必须 ΔIC>0 且配对 t 同向。
+
+## 方案
+
+T0-A（tech_neg）
+  A0 现状        tech_neg .15
+  A1 降半        tech_neg .075，让给 lowvol20（.13→.205）
+  A2 归零        tech_neg 0，全让给 lowvol20（.28）
+  A3 重标定      tech_neg 改池内 rank 分位 0-10（权重仍 .15）← 唯一「不改先验只改刻度」
+  A4 线性拉伸    tech_neg 把 [5,10] 线性映到 [0,10]（等价于 DMAX 改 5 后乘 2）
+
+T0-B（共线）
+  B0 现状        bias60 .175 / rsi_rev .175
+  B1 合并均值    新维 rev_m=(bias60+rsi_rev)/2 占 .35
+  B2 正交化      rsi_rev 对 bias60 逐截面 OLS 取残差 → rank10，权重仍 .175 各半
+  B3 只留 bias60 .35
+  B4 只留 rsi_rev .35
+
+## 口径声明（血泪：round24d 栽在这里）
+
+量尺**必须**是生产线公式 sum(min(v,DMAX)/DMAX*10*w)/Σ全部生效权重*10，
+且缺维填 NEUTRAL_FILL_RATIO*10（=5.0）。**不得**用「逐截面 rank_pct 再加权」，
+那样绝对数值不可作上线依据。
+"""
+import json
+import math
+import os
+import sys
+from collections import defaultdict
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import factor_eval as fe
+import audit_round21 as r21
+import audit_round24b as rb
+import audit_round26 as r26
+import scale_calc
+
+T_BONF = 3.08
+HOPS = [5, 10, 20]
+LAGS = [0, 3, 6]
+
+# round125: dim_max 改为**单一来源**（原为硬编码副本）。
+#   铁律：量程只能来自 factor_weights.json → dim_cfg.load_dim_max。
+from dim_cfg import load_dim_max
+DIM_MAX = load_dim_max(['score_fund', 'score_quality', 'score_tech_neg', 'score_bias60', 'score_rsi_rev', 'score_lowvol20', 'score_ep', 'score_size_ind', 'score_size', 'score_fund', 'score_quality', 'score_tech_neg', 'score_bias60', 'score_rsi_rev', 'score_lowvol20', 'score_ep', 'score_size_ind', 'score_tech', 'score_fund', 'score_fund', 'score_tech_neg', 'score_bias60', 'score_rsi_rev', 'score_bias60', 'score_quality', 'score_lowvol20', 'score_ep', 'score_size_ind', 'score_bias60', 'score_rsi_rev', 'score_bias60', 'score_rsi_rev', 'score_bias60', 'score_rsi_rev', 'score_fund', 'score_quality', 'score_tech_neg', 'score_bias60', 'score_rsi_rev', 'score_lowvol20', 'score_ep', 'score_size_ind', 'score_fund', 'score_quality', 'score_tech_neg', 'score_lowvol20', 'score_ep', 'score_size_ind', 'score_fund', 'score_quality', 'score_tech_neg', 'score_lowvol20', 'score_ep', 'score_size_ind', 'score_bias60', 'score_fund', 'score_quality', 'score_tech_neg', 'score_lowvol20', 'score_ep', 'score_size_ind', 'score_rsi_rev', 'score_tech_neg', 'score_tech_neg', 'score_rsi_rev'], strict=True)

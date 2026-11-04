@@ -1,0 +1,256 @@
+<!DOCTYPE html><html lang='zh-CN'><head><meta charset='utf-8'>
+<title>因子日报 2026-10-23</title>
+<style>body{background:#0b1220;color:#cbd5e1;font:14px/1.85 -apple-system,'PingFang SC',sans-serif;max-width:1080px;margin:0 auto;padding:32px 20px;}h1{color:#f8fafc;font-size:24px;border-bottom:2px solid #1e293b;padding-bottom:10px;}h2{color:#7dd3fc;font-size:18px;margin-top:32px;border-left:3px solid #38bdf8;padding-left:10px;}h3{color:#a3e635;font-size:15px;margin-top:22px;}table{border-collapse:collapse;width:100%;margin:12px 0;font-size:12.5px;}th{background:#1e293b;color:#94a3b8;padding:7px 9px;text-align:left;font-weight:600;}td{border-top:1px solid #1e293b;padding:6px 9px;}tr:hover td{background:#111c2e;}code{background:#1e293b;color:#7dd3fc;padding:1px 5px;border-radius:3px;font-size:12px;}blockquote{border-left:3px solid #f59e0b;background:rgba(245,158,11,.07);margin:12px 0;padding:8px 14px;color:#fcd34d;}sub{color:#64748b;font-size:10px;}hr{border:0;border-top:1px solid #1e293b;margin:28px 0;}strong{color:#f8fafc;}</style></head><body>
+<h1>因子日报 · 2026-10-23</h1>
+<blockquote>生成时间：2026-10-25 12:27:27　·　数据快照：<code>factor_ic.json</code>（内部 date=2026-10-23）</blockquote>
+<p><strong>本报告用途</strong>：为因子权重优化提供每日证据底稿。<strong>主页面只展示结论</strong>，所有计算过程、证伪检验、样本边界披露集中在此存档。</p>
+<h2>0. 样本与口径</h2>
+<table>
+<tr><th>项目</th><th>数值</th></tr>
+<tr><td>有效截面数</td><td>78</td></tr>
+<tr><td>原始截面数</td><td>85</td></tr>
+<tr><td>陈旧快照剔除</td><td>7 个（2026-09-25、2026-10-01、2026-10-02、2026-10-05、2026-10-06、2026-10-07、2026-09-10）</td></tr>
+<tr><td>快照区间</td><td>2026-06-26 ~ 2026-10-23</td></tr>
+<tr><td>统计方法</td><td>Rank IC（Spearman 秩相关，修正口径）</td></tr>
+<tr><td>周期</td><td>1/5/20 日</td></tr>
+<tr><td>t 值口径</td><td>普通 t = mean/(std/√n)；NW t = Newey-West HAC(Bartlett, lag=h-1)，重叠窗口下以 NW t 为准</td></tr>
+<tr><td>最小样本</td><td>20</td></tr>
+<tr><td>多重校正</td><td>30 次检验（5因子×3周期），校正阈值</td><td>NW t</td><td>≥3.08；宽松阈值</td><td>t</td><td>≥2.0</td></tr>
+</table>
+<h2>1. 因子 IC 矩阵</h2>
+<blockquote>IC = 因子分与未来收益的秩相关。NW t 为 Newey-West HAC 校正 t 值（自相关稳健）。</blockquote>
+<blockquote><strong>判读门槛</strong>：30 次检验下 Bonferroni 门槛 |NW t| ≥ 3.08；未过门槛一律视为「未证实」。</blockquote>
+<table>
+<tr><th>因子</th><th>标签</th><th>T+1 IC</th><th>T+1 NW t</th><th>T+1 胜率</th><th>T+5 IC</th><th>T+5 NW t</th><th>T+5 胜率</th><th>T+20 IC</th><th>T+20 NW t</th><th>T+20 胜率</th><th>结论</th></tr>
+<tr><td><code>total</code></td><td>综合总分</td><td>+0.0217</td><td>+1.48</td><td>59.7%</td><td>+0.0278</td><td>+1.14</td><td>58.9%</td><td>+0.0200</td><td>+0.41</td><td>55.2%</td><td>方向为正·不显著</td></tr>
+<tr><td><code>score_fund</code></td><td>基本面</td><td>+0.0431</td><td>+2.96</td><td>59.7%</td><td>+0.0762</td><td>+3.48</td><td>71.2%</td><td>+0.0914</td><td>+1.72</td><td>72.4%</td><td>显著有效</td></tr>
+<tr><td><code>score_news</code></td><td>消息面</td><td>+0.0441</td><td>+2.73</td><td>59.7%</td><td>+0.0387</td><td>+1.56</td><td>63.0%</td><td>+0.0180</td><td>+0.68</td><td>60.3%</td><td>弱有效</td></tr>
+<tr><td><code>score_oversold60</code></td><td>超跌60反转</td><td>+0.0158</td><td>+0.24</td><td>62.5%</td><td>+0.0638</td><td>+0.98</td><td>50.0%</td><td>未查到</td><td>未查到</td><td>未查到</td><td>样本积累中</td></tr>
+<tr><td><code>score_bias60</code></td><td>乖离低位</td><td>+0.0382</td><td>+0.66</td><td>75.0%</td><td>+0.1226</td><td>+2.22</td><td>75.0%</td><td>未查到</td><td>未查到</td><td>未查到</td><td>正向·小样本(待确认)</td></tr>
+<tr><td><code>score_rsi_rev</code></td><td>RSI反转</td><td>+0.0090</td><td>+0.15</td><td>62.5%</td><td>+0.1056</td><td>+1.91</td><td>75.0%</td><td>未查到</td><td>未查到</td><td>未查到</td><td>样本积累中</td></tr>
+<tr><td><code>score_vol_pulse</code></td><td>量能反向</td><td>+0.0060</td><td>+0.12</td><td>50.0%</td><td>+0.0979</td><td>+2.91</td><td>75.0%</td><td>未查到</td><td>未查到</td><td>未查到</td><td>正向·小样本(待确认)</td></tr>
+<tr><td><code>score_overbought</code></td><td>超买反向</td><td>-0.0095</td><td>-0.23</td><td>50.0%</td><td>+0.0223</td><td>+0.79</td><td>75.0%</td><td>未查到</td><td>未查到</td><td>未查到</td><td>样本积累中</td></tr>
+<tr><td><code>score_theme_intrinsic</code></td><td>题材内禀</td><td>-0.0209</td><td>-0.44</td><td>37.5%</td><td>-0.0499</td><td>-1.99</td><td>25.0%</td><td>未查到</td><td>未查到</td><td>未查到</td><td>样本积累中</td></tr>
+<tr><td><code>score_attention</code></td><td>关注度相对</td><td>-0.0226</td><td>-1.22</td><td>37.5%</td><td>-0.0813</td><td>-3.89</td><td>0.0%</td><td>未查到</td><td>未查到</td><td>未查到</td><td>⚠️显著跑输·小样本</td></tr>
+<tr><td><code>score_sector</code></td><td>板块动量</td><td>+0.0094</td><td>+0.29</td><td>55.6%</td><td>-0.0350</td><td>-1.20</td><td>28.6%</td><td>未查到</td><td>未查到</td><td>未查到</td><td>样本积累中</td></tr>
+<tr><td><code>score_theme</code></td><td>题材热度（已拆解·对照）</td><td>-0.0383</td><td>-1.89</td><td>39.0%</td><td>-0.0711</td><td>-1.75</td><td>35.6%</td><td>-0.1076</td><td>-2.70</td><td>24.1%</td><td>负向（可作反向指标）</td></tr>
+<tr><td><code>score_tech</code></td><td>技术面（已拆解·对照）</td><td>-0.0362</td><td>-2.07</td><td>36.4%</td><td>-0.0575</td><td>-1.78</td><td>32.9%</td><td>-0.0333</td><td>-1.29</td><td>34.5%</td><td>负向（可作反向指标）</td></tr>
+</table>
+<h3>1.1 因子逐条实证（含子区间稳定性）</h3>
+<p><strong><code>total</code></strong>（综合总分）：IC=+0.022，NW t=1.48（T+1）</p>
+<div style='margin:3px 0 3px 14px;'>· 子区间稳定性：前半段 IC 均值 +0.0375、后半段 +0.0184、符号稳定率 58.9%、是否发生机制切换：否</div>
+<div style='margin:3px 0 3px 14px;'>· Bonferroni 校正：未通过</div>
+<p><strong><code>score_fund</code></strong>（基本面）：IC=+0.076，NW t=3.48（校正后显著）（T+5）</p>
+<div style='margin:3px 0 3px 14px;'>· 子区间稳定性：前半段 IC 均值 +0.1046、后半段 +0.0485、符号稳定率 71.2%、是否发生机制切换：否</div>
+<div style='margin:3px 0 3px 14px;'>· Bonferroni 校正：通过</div>
+<p><strong><code>score_news</code></strong>（消息面）：IC=+0.044，NW t=2.73（宽松显著·未过多重校正）（T+1）</p>
+<div style='margin:3px 0 3px 14px;'>· 子区间稳定性：前半段 IC 均值 +0.0546、后半段 +0.0233、符号稳定率 63.0%、是否发生机制切换：否</div>
+<div style='margin:3px 0 3px 14px;'>· Bonferroni 校正：未通过</div>
+<p><strong><code>score_oversold60</code></strong>（超跌60反转）：各周期样本均 &lt;20（最大 8）</p>
+<div style='margin:3px 0 3px 14px;'>· Bonferroni 校正：未通过</div>
+<p><strong><code>score_bias60</code></strong>（乖离低位）：IC=+0.123，NW t=2.22，胜率=75.0%，n=4&lt;20；方向为正待更多样本确认（T+5·小样本）</p>
+<div style='margin:3px 0 3px 14px;'>· Bonferroni 校正：未通过</div>
+<p><strong><code>score_rsi_rev</code></strong>（RSI反转）：n=4&lt;20（T+5·小样本）</p>
+<div style='margin:3px 0 3px 14px;'>· Bonferroni 校正：未通过</div>
+<p><strong><code>score_vol_pulse</code></strong>（量能反向）：IC=+0.098，NW t=2.91，胜率=75.0%，n=4&lt;20；方向为正待更多样本确认（T+5·小样本）</p>
+<div style='margin:3px 0 3px 14px;'>· Bonferroni 校正：未通过</div>
+<p><strong><code>score_overbought</code></strong>（超买反向）：各周期样本均 &lt;20（最大 8）</p>
+<div style='margin:3px 0 3px 14px;'>· Bonferroni 校正：未通过</div>
+<p><strong><code>score_theme_intrinsic</code></strong>（题材内禀）：n=4&lt;20（T+5·小样本）</p>
+<div style='margin:3px 0 3px 14px;'>· Bonferroni 校正：未通过</div>
+<p><strong><code>score_attention</code></strong>（关注度相对）：IC=-0.081，NW t=-3.89，胜率=0.0%，n=4&lt;20；方向性负alpha警示（样本未达标，待确认）（T+5·小样本）</p>
+<div style='margin:3px 0 3px 14px;'>· Bonferroni 校正：通过</div>
+<p><strong><code>score_sector</code></strong>（板块动量）：n=14&lt;20（T+5·小样本）</p>
+<div style='margin:3px 0 3px 14px;'>· 子区间稳定性：前半段 IC 均值 -0.0412、后半段 -0.0288、符号稳定率 71.4%、是否发生机制切换：否</div>
+<div style='margin:3px 0 3px 14px;'>· Bonferroni 校正：未通过</div>
+<p><strong><code>score_theme</code></strong>（题材热度（已拆解·对照））：IC=-0.108，NW t=-2.7（T+20）</p>
+<div style='margin:3px 0 3px 14px;'>· 子区间稳定性：前半段 IC 均值 -0.0810、后半段 -0.0615、符号稳定率 64.4%、是否发生机制切换：否</div>
+<div style='margin:3px 0 3px 14px;'>· Bonferroni 校正：未通过</div>
+<p><strong><code>score_tech</code></strong>（技术面（已拆解·对照））：IC=-0.036，NW t=-2.07（T+1）</p>
+<div style='margin:3px 0 3px 14px;'>· 子区间稳定性：前半段 IC 均值 -0.0433、后半段 -0.0714、符号稳定率 67.1%、是否发生机制切换：否</div>
+<div style='margin:3px 0 3px 14px;'>· Bonferroni 校正：未通过</div>
+<h2>2. 可交易口径（前视修正 + 交易成本）</h2>
+<h3>2.1 全因子等权复合（可交易）</h3>
+<div style='margin:3px 0 3px 14px;'>· 口径：t+1 开盘买入 / 持有 h 日后开盘卖出（可执行口径）</div>
+<div style='margin:3px 0 3px 14px;'>· 往返成本：20.0 bp</div>
+<table>
+<tr><th>周期</th><th>样本</th><th>IC 均值</th><th>NW t</th><th>胜率</th><th>结论</th></tr>
+<tr><td>T+1</td><td>76</td><td>+0.0132</td><td>+0.82</td><td>50.0%</td><td>无预测力</td></tr>
+<tr><td>T+5</td><td>72</td><td>+0.0177</td><td>+0.71</td><td>59.7%</td><td>无预测力</td></tr>
+<tr><td>T+20</td><td>57</td><td>+0.0091</td><td>+0.19</td><td>47.4%</td><td>无预测力</td></tr>
+</table>
+<p><strong>小结</strong>：样本积累中　各周期样本均 &lt;20（最大 76）</p>
+<blockquote>前视修正：日评分于 t 日收盘后生成，原 IC 用 t 日收盘价买入不可成交；本口径改为 t+1 开盘买入。gross=未扣成本，net=扣 20bp 往返成本。</blockquote>
+<h3>2.2 基本面单维（可交易）</h3>
+<div style='margin:3px 0 3px 14px;'>· 口径：仅按 score_fund（基本面）排序，t+1 开盘买入头组 / 持有 h 日后开盘卖出</div>
+<div style='margin:3px 0 3px 14px;'>· 往返成本：20.0 bp</div>
+<table>
+<tr><th>周期</th><th>样本</th><th>IC 均值</th><th>NW t</th><th>胜率</th><th>结论</th></tr>
+<tr><td>T+1</td><td>76</td><td>+0.0362</td><td>+2.38</td><td>63.2%</td><td>—</td></tr>
+<tr><td>T+5</td><td>72</td><td>+0.0700</td><td>+3.08</td><td>69.4%</td><td>—</td></tr>
+<tr><td>T+20</td><td>57</td><td>+0.0839</td><td>+1.56</td><td>71.9%</td><td>—</td></tr>
+</table>
+<p><strong>小结</strong>：显著有效　IC=+0.070，NW t=3.08（校正后显著）（T+5）</p>
+<blockquote>单维口径：剥离消息面/反转块/先验维度的影响，回答「只买基本面头组能否赚钱」。</blockquote>
+<p><strong>月度漂移</strong>：</p>
+<table>
+<tr><th>月份</th><th>IC 均值</th><th>样本</th></tr>
+<tr><td>2026-06</td><td>未查到</td><td>3</td></tr>
+<tr><td>2026-07</td><td>未查到</td><td>23</td></tr>
+<tr><td>2026-08</td><td>未查到</td><td>20</td></tr>
+<tr><td>2026-09</td><td>未查到</td><td>20</td></tr>
+<tr><td>2026-10</td><td>未查到</td><td>6</td></tr>
+</table>
+<h3>2.3 现行权重复合（可交易）</h3>
+<div style='margin:3px 0 3px 14px;'>· 口径：按 factor_weights.json 当前权重、逐行可用维度归一后重算的复合分</div>
+<div style='margin:3px 0 3px 14px;'>· 往返成本：20.0 bp</div>
+<div style='margin:3px 0 3px 14px;'>· 使用权重：score_fund=37.8%、score_news=24.4%、score_oversold60=6.1%、score_bias60=6.1%、score_rsi_rev=6.1%、score_vol_pulse=6.1%、score_overbought=2.2%、score_theme_intrinsic=8.9%、score_attention=2.2%</div>
+<table>
+<tr><th>周期</th><th>样本</th><th>IC 均值</th><th>NW t</th><th>胜率</th><th>结论</th></tr>
+<tr><td>T+1</td><td>76</td><td>+0.0405</td><td>+2.63</td><td>61.8%</td><td>—</td></tr>
+<tr><td>T+5</td><td>72</td><td>+0.0629</td><td>+3.26</td><td>69.4%</td><td>—</td></tr>
+<tr><td>T+20</td><td>57</td><td>+0.0695</td><td>+1.33</td><td>70.2%</td><td>—</td></tr>
+</table>
+<p><strong>小结</strong>：显著有效　IC=+0.063，NW t=3.26（校正后显著）（T+5）</p>
+<blockquote>与 tradable_ic 的区别：tradable_ic 用的是快照内 total 字段，该字段跨越 4→5→10 维三次口径变更，属分段混合口径；本项用当前权重在同一批截面上重算，口径统一，可直接与 tradable_fund_ic 对比。</blockquote>
+<h2>3. 选股池本身的超额（P0 根因）</h2>
+<blockquote>这是全系统最严重的问题：<strong>持仓池本身系统性跑输全市场</strong>。</blockquote>
+<blockquote>任何因子加权都只是在这个负 alpha 集合内部做相对排序，调权重无法解决。</blockquote>
+<table>
+<tr><th>指标</th><th>数值</th></tr>
+<tr><td>入场日数</td><td>58</td></tr>
+<tr><td>持有期</td><td>20 日</td></tr>
+<tr><td>池内中位超额</td><td>-5.08%</td></tr>
+<tr><td>池内均值超额</td><td>-8.04%</td></tr>
+<tr><td>跑输入场日占比</td><td>96.6%</td></tr>
+<tr><td>判定</td><td>负超额·稳定</td></tr>
+</table>
+<h3>3.1 按池规模分组</h3>
+<div style='margin:3px 0 3px 14px;'>· 分组规则：按每快照池内流通市值中位 &lt;60亿 归为「SIZE 新母体」，否则归为「成交额旧母体」；缺 circ_mv 字段的旧截面按日期分界回填，不丢弃</div>
+<div style='margin:3px 0 3px 14px;'>· 未归类日数：58</div>
+<table>
+<tr><th>分组</th><th>中位超额</th><th>结论</th></tr>
+<tr><td>legacy</td><td>-5.08%</td><td>负超额·稳定</td></tr>
+<tr><td>size_pool</td><td>未查到</td><td>样本不足</td></tr>
+</table>
+<p><strong>结论</strong>：SIZE 新母体尚无已成熟的 20 日窗口样本 → <strong>无法判定换母体是否有效</strong>。页面其余因子 IC 全部来自成交额旧母体，不可外推到新母体。</p>
+<h2>4. 真实推荐组合的 IC（非回测）</h2>
+<table>
+<tr><th>周期</th><th>样本</th><th>IC 均值</th><th>NW t</th><th>胜率</th><th>结论</th></tr>
+<tr><td>T+1</td><td>11</td><td>-0.1069</td><td>-2.17</td><td>27.3%</td><td>⚠️显著跑输·小样本</td></tr>
+<tr><td>T+5</td><td>7</td><td>-0.1072</td><td>-1.09</td><td>57.1%</td><td>样本积累中</td></tr>
+<tr><td>T+20</td><td>0</td><td>未查到</td><td>未查到</td><td>未查到</td><td>样本积累中</td></tr>
+</table>
+<p><strong>小结</strong>：⚠️显著跑输·小样本　IC=-0.107，NW t=-2.17，胜率=27.3%，n=11&lt;20；方向性负alpha警示（样本未达标，待确认）（T+1·小样本）</p>
+<h2>5. 共线性体检</h2>
+<div style='margin:3px 0 3px 14px;'>· 阈值：|corr| ≥ 0.7</div>
+<div style='margin:3px 0 3px 14px;'>· 高共线对数：3</div>
+<table>
+<tr><th>因子对</th><th>相关系数</th></tr>
+<tr><td>score_bias60</td><td>score_rsi_rev</td><td>+0.889</td></tr>
+<tr><td>score_oversold60</td><td>score_bias60</td><td>+0.834</td></tr>
+<tr><td>score_oversold60</td><td>score_rsi_rev</td><td>+0.742</td></tr>
+</table>
+<blockquote>存在 3 对高共线因子（|corr|≥0.7），多重计权会虚增该主题综合权重、并使 IC 驱动权重不稳定；建议正交化/分组降权（top: score_bias60|score_rsi_rev=0.889, score_oversold60|score_bias60=0.834, score_oversold60|score_rsi_rev=0.742）</blockquote>
+<h2>6. 现行权重与证据覆盖</h2>
+<table>
+<tr><th>维度</th><th>权重</th><th>证据强度</th></tr>
+<tr><td><code>score_fund</code></td><td>34.0%</td><td>满样本（78 截面）</td></tr>
+<tr><td><code>score_news</code></td><td>22.0%</td><td>满样本（78 截面）</td></tr>
+<tr><td><code>score_sector</code></td><td>10.0%</td><td>满样本（78 截面）</td></tr>
+<tr><td><code>score_theme_intrinsic</code></td><td>8.0%</td><td>弱先验（少数截面）</td></tr>
+<tr><td><code>score_oversold60</code></td><td>5.5%</td><td>弱先验（少数截面）</td></tr>
+<tr><td><code>score_bias60</code></td><td>5.5%</td><td>弱先验（少数截面）</td></tr>
+<tr><td><code>score_rsi_rev</code></td><td>5.5%</td><td>弱先验（少数截面）</td></tr>
+<tr><td><code>score_vol_pulse</code></td><td>5.5%</td><td>弱先验（少数截面）</td></tr>
+<tr><td><code>score_overbought</code></td><td>2.0%</td><td>弱先验（少数截面）</td></tr>
+<tr><td><code>score_attention</code></td><td>2.0%</td><td>弱先验（少数截面）</td></tr>
+</table>
+<div style='margin:3px 0 3px 14px;'>· 满样本支撑权重合计：<strong>66.0%</strong></div>
+<div style='margin:3px 0 3px 14px;'>· 弱先验权重合计：<strong>34.0%</strong> ← 这部分无统计证据支撑，属先验设定</div>
+<blockquote>⚠️ 纪律：<strong>页面不得暗示「权重已优化」</strong>。弱先验部分必须明确标注为先验，待满 30 个池内截面后方可运行 <code>--optimize-weights</code> 重估。</blockquote>
+<h2>7. 多因子构造回测：加权是否真的加分</h2>
+<div style='margin:3px 0 3px 14px;'>· 口径：T+1 开盘买入、扣 20bp 往返、相对池内等权基准；TOP10</div>
+<p><strong>构造定义</strong>：</p>
+<div style='margin:3px 0 3px 14px;'>· <strong>A</strong>：fund 单维 TOP10</div>
+<div style='margin:3px 0 3px 14px;'>· <strong>B</strong>：fund+news 按 0.76/0.20 加权</div>
+<div style='margin:3px 0 3px 14px;'>· <strong>C</strong>：B + 剔除 theme 前20%</div>
+<div style='margin:3px 0 3px 14px;'>· <strong>D</strong>：C + 剔除 attention 前20%（= pick_multifactor 可回测近似）</div>
+<table>
+<tr><th>周期</th><th>A 单因子</th><th>B +消息面</th><th>C +剔题材</th><th>D +剔关注度</th><th>最大配对 \</th><th>t\</th><th></th></tr>
+<tr><td>T+1</td><td>+0.24%&lt;br&gt;&lt;sub&gt;t=+1.33 · 胜率 57.1%&lt;/sub&gt;</td><td>+0.19%&lt;br&gt;&lt;sub&gt;t=+1.16 · 胜率 53.2%&lt;/sub&gt;</td><td>+0.16%&lt;br&gt;&lt;sub&gt;t=+0.93 · 胜率 54.5%&lt;/sub&gt;</td><td>+0.21%&lt;br&gt;&lt;sub&gt;t=+1.16 · 胜率 57.1%&lt;/sub&gt;</td><td>0.61</td></tr>
+<tr><td>T+5</td><td>+0.61%&lt;br&gt;&lt;sub&gt;t=+1.40 · 胜率 58.9%&lt;/sub&gt;</td><td>+0.91%&lt;br&gt;&lt;sub&gt;t=+2.01 · 胜率 52.1%&lt;/sub&gt;</td><td>+0.53%&lt;br&gt;&lt;sub&gt;t=+1.25 · 胜率 53.4%&lt;/sub&gt;</td><td>+0.50%&lt;br&gt;&lt;sub&gt;t=+1.19 · 胜率 52.1%&lt;/sub&gt;</td><td>1.41</td></tr>
+<tr><td>T+20</td><td>+2.09%&lt;br&gt;&lt;sub&gt;t=+1.81 · 胜率 46.6%&lt;/sub&gt;</td><td>+2.46%&lt;br&gt;&lt;sub&gt;t=+2.68 · 胜率 53.4%&lt;/sub&gt;</td><td>+2.04%&lt;br&gt;&lt;sub&gt;t=+2.52 · 胜率 58.6%&lt;/sub&gt;</td><td>+2.04%&lt;br&gt;&lt;sub&gt;t=+2.52 · 胜率 58.6%&lt;/sub&gt;</td><td>1.09</td></tr>
+</table>
+<p><strong>诚实结论</strong>：四组构造（fund 单维 / +news / +剔theme / +剔attention）在 T+1、T+5、T+20 三个周期上的全部配对检验均不显著（|t| 最大 1.41）。<strong>多因子加权与 fund 单维在本池内统计等价</strong>——加 news、加排除规则既不显著加分，也不显著减分。选择多因子版本的理由不是「收益更高」，而是① 降低对单一维度的依赖（分散模型风险）；② 排除规则有独立的行为学依据（不追高、不追热度）；③ 输出更少标的（10 只 vs 原 20 只），可执行性更强。</p>
+<p><strong>T+1 配对检验</strong>：</p>
+<table>
+<tr><th>对比</th><th>差值</th><th>t</th><th>样本</th><th>显著</th></tr>
+<tr><td>B−A（加 news）</td><td>-0.05%</td><td>-0.37</td><td>77</td><td>否</td></tr>
+<tr><td>D−A（多因子全量）</td><td>-0.03%</td><td>-0.19</td><td>77</td><td>否</td></tr>
+<tr><td>C−B（再剔 theme）</td><td>-0.03%</td><td>-0.30</td><td>77</td><td>否</td></tr>
+<tr><td>D−C（再剔 attention）</td><td>+0.05%</td><td>+0.61</td><td>77</td><td>否</td></tr>
+</table>
+<p><strong>T+5 配对检验</strong>：</p>
+<table>
+<tr><th>对比</th><th>差值</th><th>t</th><th>样本</th><th>显著</th></tr>
+<tr><td>B−A（加 news）</td><td>+0.30%</td><td>+1.11</td><td>73</td><td>否</td></tr>
+<tr><td>D−A（多因子全量）</td><td>-0.11%</td><td>-0.29</td><td>73</td><td>否</td></tr>
+<tr><td>C−B（再剔 theme）</td><td>-0.39%</td><td>-1.41</td><td>73</td><td>否</td></tr>
+<tr><td>D−C（再剔 attention）</td><td>-0.03%</td><td>-1.03</td><td>73</td><td>否</td></tr>
+</table>
+<p><strong>T+20 配对检验</strong>：</p>
+<table>
+<tr><th>对比</th><th>差值</th><th>t</th><th>样本</th><th>显著</th></tr>
+<tr><td>B−A（加 news）</td><td>+0.37%</td><td>+0.70</td><td>58</td><td>否</td></tr>
+<tr><td>D−A（多因子全量）</td><td>-0.05%</td><td>-0.08</td><td>58</td><td>否</td></tr>
+<tr><td>C−B（再剔 theme）</td><td>-0.42%</td><td>-1.09</td><td>58</td><td>否</td></tr>
+<tr><td>D−C（再剔 attention）</td><td>+0.00%</td><td>+0.00</td><td>58</td><td>否</td></tr>
+</table>
+<h2>8. 三条不能省掉的边界</h2>
+<div style='margin:3px 0 3px 14px;'>1. <strong>反转块仅 8 个截面</strong> —— 属弱先验而非已验证因子，权重已折半。样本量不足时任何「有效」判定都不成立。</div>
+<div style='margin:3px 0 3px 14px;'>2. <strong>板块动量未作为选股轴</strong> —— <code>score_sector</code> 池内 IC 全周期不显著（T+1 t=0.29、T+5 t=-1.20），原「按板块动量切路线」的做法缺乏证据支撑。</div>
+<div style='margin:3px 0 3px 14px;'>3. <strong>池内头组净收益历史上为负</strong>（池内基准在跌），组合只表达「相对排序」，<strong>不等于买入能赚钱</strong>。</div>
+<blockquote>补充：多因子加权与 fund 单维在本池内<strong>统计等价</strong>（全部配对检验 |t| 最大 1.41）。选多因子的理由不是「收益更高」，而是降低单一维度依赖、排除规则有独立行为学依据、标的更少可执行性更强。</blockquote>
+<h2>9. 为什么动量路线 IC 和胜率都低，却仍在选动量路线的个股</h2>
+<p>这个问题问到了模型的结构性矛盾，答案有四层：</p>
+<p><strong>① 字段同名字不同物：动量路线选的是「板块动量」，不是「个股动量」。</strong></p>
+<p><code>pick_portfolio.py</code> 的 momentum 路线筛选条件写在申万二级板块的 60 日/10 日涨幅排名上，个股层面只按综合评分 <code>total</code> 降序取前 10，个股动量从未参与筛选。</p>
+<p><strong>② 系统自己的个股动量开关是关的。</strong></p>
+<p>多数标的 <code>momentum_mode = off</code>（三重负证据触发关闭），个股动量分完全不进总分。模型一边判定动量无效并关掉它，一边在组合层用板块动量选股 —— 两处口径互相拆台，属设计缺陷而非巧合。</p>
+<p><strong>③ IC 低是统计事实，但 IC 衡量的是「排序能力」不是「选股能力」。</strong></p>
+<p>个股动量因子 IC 为负（MOM1M ic_daily=-0.052），说明在本池内涨得多的后续跌得多（均值回复）。而动量路线选出的板块，其成分股往往已经跌下来了 ——「动量路线」实际选出的是「强势板块里的弱势股」，恰好落在反转因子的有效区。</p>
+<p><strong>④ 但真实跟踪数据说明：它确实在亏钱，只是没亏那么多。</strong></p>
+<p>见下节真实推荐记录。</p>
+<h2>10. 真实推荐跟踪（非回测）</h2>
+<div style='margin:3px 0 3px 14px;'>· 记录条数：1493</div>
+<table>
+<tr><th>路线</th><th>周期</th><th>样本</th><th>超额均值</th><th>超额中位</th><th>胜率</th><th>绝对收益均值</th></tr>
+<tr><td>📈 动量路线</td><td>T+1</td><td>54</td><td>-1.53%</td><td>-1.08%</td><td>37.0%</td><td>-1.93%</td></tr>
+<tr><td>📈 动量路线</td><td>T+5</td><td>26</td><td>-3.39%</td><td>-1.99%</td><td>34.6%</td><td>-5.85%</td></tr>
+<tr><td>🔄 反转路线</td><td>T+1</td><td>31</td><td>-0.61%</td><td>-0.34%</td><td>45.2%</td><td>-1.15%</td></tr>
+<tr><td>🔄 反转路线</td><td>T+5</td><td>15</td><td>-4.32%</td><td>-4.44%</td><td>33.3%</td><td>-7.08%</td></tr>
+<tr><td>🤖 AI 主观线</td><td>T+1</td><td>42</td><td>+0.17%</td><td>+0.02%</td><td>50.0%</td><td>-0.31%</td></tr>
+<tr><td>🤖 AI 主观线</td><td>T+5</td><td>28</td><td>-6.07%</td><td>-7.15%</td><td>28.6%</td><td>-8.88%</td></tr>
+</table>
+<h2>11. 风险闸门</h2>
+<div style='margin:3px 0 3px 14px;'>· 等级：<strong>high_risk</strong></div>
+<p><strong>已触发的风险项</strong>：</p>
+<div style='margin:3px 0 3px 14px;'>· 推荐组合 T+1 IC=-0.107（NW t=-2.17）显著为负 → 历史推荐跑输基准池</div>
+<div style='margin:3px 0 3px 14px;'>· 推荐组合 T+1 胜率仅 27.3%（&lt;40%）</div>
+<div style='margin:3px 0 3px 14px;'>· 综合总分 T+1 IC=+0.022（NW t=1.48）未见显著正预测力</div>
+<div style='margin:3px 0 3px 14px;'>· 可交易口径（T+1 开盘买入扣20bp）IC=+0.013（NW t=0.82）不显著 → 前视修正后无可执行 alpha</div>
+<div style='margin:3px 0 3px 14px;'>· 可交易口径头部组净收益 -0.93%（持有 T+1）为负 → 买前排不赚钱</div>
+<div style='margin:3px 0 3px 14px;'>· 选股池本身系统性负超额：池内中位涨跌较全池低 -5.08pct（持有 20 日，96.6% 的入场日跑输）→ 池子选错了，任何因子加权都只是在负 alpha 集合内做相对排序</div>
+<div style='margin:3px 0 3px 14px;'>· 存在 3 对高共线因子，综合权重虚增风险</div>
+<p><strong>处置建议</strong>：⚠️ 建议观望/不机械跟单：实测推荐跑输，综合分无显著正预测力；仅基本面 score_fund 经 Bonferroni 验证有效（T+5 IC=+0.075）。已切『基本面主导』口径（v3.6-fund-led），但须注意选股池本身的负超额问题——该问题无法靠调权重解决，需改造入选规则。</p>
+<h2>12. 数据口径备注</h2>
+<div style='margin:3px 0 3px 14px;'>· 有效截面 78 个交易日（2026-06-26 ~ 2026-10-23），剔除非交易日陈旧快照 7 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差；价格 store 日常自动增量刷新，--bootstrap-prices 全量重建）</div>
+<div style='margin:3px 0 3px 14px;'>· IC 衡量排序能力而非绝对收益；分层多空为未扣成本毛利口径</div>
+<div style='margin:3px 0 3px 14px;'>· TOP200 为高换手关注度筛选池：动量/关注型因子的负向 IC 更可能反映&#x27;关注度脉冲后的均值回复&#x27;，而非因子构造错误；解读时须结合本池的选择机制</div>
+<div style='margin:3px 0 3px 14px;'>· ⚠️ total 的 IC 使用历史快照中「当时实际产出的 total 字段」，跨越 4→5→10 维三次口径变更，故 total IC 是分段混合口径的加权结果，不代表当前 v3.6 权重的真实预测力；评估当前权重应看 current_weights_composite_ic（按现权重重算）与 tradable_ic。</div>
+<div style='margin:3px 0 3px 14px;'>· v3.6-fund-led 口径自 2026-10-24 生效，需累计 ≥20 个新截面后 current_weights_composite_ic 才具参考意义。</div>
+<div style='margin:3px 0 3px 14px;'>· 历史截面来自 git 提交记录（含早期综合行业归类版本，v2.46 已修复）</div>
+<hr>
+<p>*本报告由 <code>gen_factor_daily.py</code> 自动生成，仅用于因子权重优化的内部证据底稿，不对外发布、不进入 index.html 导航。所有数字均来自 factor_ic.json / mf_backtest.json / recommendation_track.json，未做任何人工填补。*</p>
+</body></html>

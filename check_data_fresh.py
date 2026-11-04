@@ -40,8 +40,8 @@ def bj_today():
     return (datetime.now(timezone.utc) + timedelta(hours=8)).date().isoformat()
 
 
-def index_last_date():
-    """上证指数最近一根日线日期（新浪日线，项目既有可用通道）。"""
+def index_last_date_sina():
+    """新浪日线最新日期。==实测缺陷：新浪日线当日收盘后长时间不更新==。"""
     url = ("https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/"
            "CN_MarketData.getKLineData?symbol=sh000001&scale=240&ma=no&datalen=5")
     req = urllib.request.Request(url, headers={"User-Agent": UA,
@@ -51,6 +51,55 @@ def index_last_date():
     if not data:
         return None
     return str(data[-1].get("day"))[:10]
+
+
+def index_last_date_tx():
+    """腾讯 fqkline 上证指数最新日期（备源）。"""
+    url = ("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
+           "?param=sh000001,day,,,8,qfq")
+    req = urllib.request.Request(url, headers={"User-Agent": UA,
+                                               "Referer": "https://gu.qq.com/"})
+    with urllib.request.urlopen(req, timeout=20) as r:
+        j = json.loads(r.read().decode("utf-8"))
+    d = (j.get("data") or {}).get("sh000001") or {}
+    kl = d.get("qfqday") or d.get("day") or []
+    if not kl:
+        return None
+    return str(kl[-1][0])[:10]
+
+
+def index_last_date():
+    """上证指数最近一根日线日期 —— **多源取最新**。
+
+    ==修复背景（2026-11-04 实测事故）==
+    原实现只用新浪日线。今日新浪日线停在 11-03，而腾讯 fqkline 已有 11-04
+    （上证收 3686.17，与 fetch 拿到的个股收盘价逐位一致）→ 单源判据把
+    「真实存在的当日数据」误判成 stale，整条日链在 Step 1.5 被拦停。
+
+    ==为什么不直接放宽阈值==
+    判据本身是对的（「指数最新日线 < 北京当日 ⇒ 不新鲜」）。错的是把
+    **单一数据源**当成事实基准。故改为多源交叉取 max：
+      · 任一源报当日 → 当日行情确实存在 → 放行
+      · 所有源都落后 → 真假日/真延迟 → 仍然拦停（风控不降级）
+    两源历史日期一致，仅当日更新速度不同，故不存在「取 max 放到假数据」的风险。
+    """
+    import sys as _sys
+    got = {}
+    for nm, fn in (("sina", index_last_date_sina), ("tx", index_last_date_tx)):
+        try:
+            v = fn()
+        except Exception as e:                       # 单源故障不拖垮整体
+            print(f"   ⚠️ 指数源 {nm} 失败: {e}", file=_sys.stderr)
+            continue
+        if v:
+            got[nm] = v
+    if not got:
+        return None
+    newest = max(got.values())
+    detail = " / ".join(f"{k}={v}" for k, v in sorted(got.items()))
+    if len(set(got.values())) > 1:
+        print(f"   ⚠️ 指数源不同步（{detail}）→ 取最新 {newest}")
+    return newest
 
 
 def prev_scored_path():
@@ -128,8 +177,15 @@ def pool_coverage():
              if isinstance(s.get("price"), (int, float)) and s["price"] > 0
              and isinstance(s.get("amount"), (int, float)) and s["amount"] > 0]
     cfg = load_pool_config()
-    return {"valid": len(valid), "expected": cfg["pool_size"],
-            "ratio": len(valid) / max(1, cfg["pool_size"]),
+    # v4.11（2026-10-26）：config.pool_size<=0 = 不限规模，此时「期望池大小」不存在，
+    #   必须用**文件内实际写入的 pool_size**（fetch 写的是 len(main_norm)）作基准。
+    #   ⚠️ 若照旧用 cfg["pool_size"]=0，ratio = valid/1 恒 >1 → 熔断永不触发，
+    #      覆盖率守门在「不限规模」模式下静默失效（与 P0「读文件自查基准必须对齐实际」同类坑）。
+    expected = cfg["pool_size"]
+    if expected <= 0:
+        expected = int(new.get("pool_size") or 0) or len(main)
+    return {"valid": len(valid), "expected": expected,
+            "ratio": len(valid) / max(1, expected),
             "min_coverage": cfg["min_coverage"], "meltdown": cfg["meltdown"]}
 
 

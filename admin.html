@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>模型配置后台 · 维护页</title>
+<style>
+:root{
+  --bg:#0f172a; --panel:#1e293b; --panel2:#273549; --line:#334155;
+  --tx:#e2e8f0; --tx2:#94a3b8; --tx3:#64748b;
+  --acc:#38bdf8; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+  --chip:#0ea5e9;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--tx);
+  font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+header{
+  background:linear-gradient(180deg,#111c31,#0f172a);
+  border-bottom:1px solid var(--line); padding:18px 28px 16px;
+}
+h1{margin:0 0 6px; font-size:20px; letter-spacing:.3px}
+.sub{color:var(--tx2); font-size:12.5px}
+.sub b{color:var(--acc)}
+.badge{
+  display:inline-block; padding:2px 9px; border-radius:11px; font-size:11px;
+  background:rgba(56,189,248,.14); color:var(--acc); margin-left:8px;
+  border:1px solid rgba(56,189,248,.3)
+}
+.badge.warn{background:rgba(245,158,11,.14); color:var(--warn); border-color:rgba(245,158,11,.3)}
+.wrap{padding:18px 28px 60px; max-width:1240px; margin:0 auto}
+.tabs{display:flex; gap:6px; margin:16px 0 18px; flex-wrap:wrap}
+.tab{
+  padding:8px 16px; border-radius:8px; cursor:pointer; user-select:none;
+  background:var(--panel); color:var(--tx2); border:1px solid var(--line);
+  font-size:13px
+}
+.tab.on{background:var(--acc); color:#06283d; border-color:var(--acc); font-weight:600}
+.card{
+  background:var(--panel); border:1px solid var(--line); border-radius:12px;
+  padding:18px 20px; margin-bottom:16px
+}
+.card h2{margin:0 0 4px; font-size:15px}
+.card .desc{color:var(--tx2); font-size:12px; margin-bottom:14px}
+table{width:100%; border-collapse:collapse; font-size:13px}
+th,td{padding:8px 10px; text-align:left; border-bottom:1px solid var(--line)}
+th{color:var(--tx3); font-weight:500; font-size:11.5px; letter-spacing:.4px}
+tr:hover td{background:rgba(56,189,248,.05)}
+input[type=number],input[type=text],select,textarea{
+  background:var(--panel2); border:1px solid var(--line); color:var(--tx);
+  border-radius:6px; padding:6px 9px; font-size:13px; width:100%;
+  font-family:inherit
+}
+input[type=number]{width:92px; text-align:right}
+input:focus,textarea:focus{outline:none; border-color:var(--acc)}
+input.changed{border-color:var(--warn); background:rgba(245,158,11,.10)}
+.dim{color:var(--tx3); font-size:11px}
+.grp{
+  display:inline-block; padding:1px 8px; border-radius:9px; font-size:11px;
+  background:rgba(148,163,184,.14); color:var(--tx2)
+}
+.grp.g0{background:rgba(56,189,248,.16); color:#7dd3fc}
+.grp.g1{background:rgba(34,197,94,.16); color:#86efac}
+.grp.g2{background:rgba(245,158,11,.16); color:#fcd34d}
+.grp.g3{background:rgba(236,72,153,.16); color:#f9a8d4}
+.grp.g4{background:rgba(168,85,247,.16); color:#d8b4fe}
+.grp.g5{background:rgba(20,184,166,.16); color:#5eead4}
+.bar{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  position:sticky; top:0; z-index:20; background:rgba(15,23,42,.96);
+  padding:12px 0; border-bottom:1px solid var(--line); margin-bottom:8px
+}
+.btn{
+  padding:9px 18px; border-radius:8px; cursor:pointer; font-size:13.5px;
+  border:1px solid var(--line); background:var(--panel2); color:var(--tx);
+  font-weight:500
+}
+.btn:hover{border-color:var(--acc)}
+.btn.primary{background:var(--acc); color:#06283d; border-color:var(--acc); font-weight:600}
+.btn.primary:hover{filter:brightness(1.1)}
+.btn.danger{background:rgba(239,68,68,.16); color:#fca5a5; border-color:rgba(239,68,68,.4)}
+.btn:disabled{opacity:.45; cursor:not-allowed}
+.msg{
+  padding:11px 14px; border-radius:8px; font-size:12.5px; margin:10px 0;
+  border-left:3px solid var(--line); background:var(--panel2); display:none;
+  white-space:pre-wrap; word-break:break-all
+}
+.msg.show{display:block}
+.msg.ok{border-color:var(--ok); background:rgba(34,197,94,.10)}
+.msg.bad{border-color:var(--bad); background:rgba(239,68,68,.10)}
+.msg.warn{border-color:var(--warn); background:rgba(245,158,11,.10)}
+.kv{display:grid; grid-template-columns:150px 1fr; gap:6px 14px; font-size:13px}
+.kv .k{color:var(--tx3)}
+.sum-row{
+  display:flex; gap:10px; flex-wrap:wrap; margin:12px 0 4px;
+  padding:12px; background:var(--panel2); border-radius:9px
+}
+.sum{
+  padding:7px 13px; border-radius:8px; font-size:12.5px; cursor:default;
+  border:1px solid var(--line)
+}
+.sum b{font-size:15px; display:block}
+.sum.pass{border-color:rgba(34,197,94,.4); background:rgba(34,197,94,.10)}
+.sum.fail{border-color:rgba(239,68,68,.45); background:rgba(239,68,68,.12)}
+.pill{
+  display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px;
+  background:rgba(34,197,94,.16); color:#86efac
+}
+.pill.no{background:rgba(239,68,68,.16); color:#fca5a5}
+.muted{color:var(--tx3); font-size:12px}
+code{
+  background:var(--panel2); padding:1px 6px; border-radius:4px;
+  font-size:12px; color:#7dd3fc
+}
+pre{
+  background:#0b1220; border:1px solid var(--line); border-radius:8px;
+  padding:12px; overflow:auto; max-height:320px; font-size:11.5px;
+  color:#cbd5e1; line-height:1.55
+}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+@media(max-width:860px){ .grid2{grid-template-columns:1fr} }
+.uline{border-bottom:1px dashed var(--line); padding-bottom:10px; margin-bottom:10px}
+
+/* ── 二次确认弹窗 ─────────────────────────────── */
+.mask{
+  position:fixed; inset:0; background:rgba(2,6,23,.82); z-index:900;
+  display:none; align-items:center; justify-content:center; padding:20px;
+  backdrop-filter:blur(3px)
+}
+.mask.show{display:flex}
+.modal{
+  background:var(--panel); border:1px solid var(--line); border-radius:14px;
+  width:100%; max-width:680px; max-height:88vh; overflow:auto;
+  box-shadow:0 24px 60px rgba(0,0,0,.55)
+}
+.modal-hd{
+  padding:18px 22px 14px; border-bottom:1px solid var(--line);
+  display:flex; align-items:center; gap:10px
+}
+.modal-hd h3{margin:0; font-size:16px}
+.modal-hd .warnicon{font-size:19px}
+.modal-bd{padding:18px 22px}
+.modal-ft{
+  padding:14px 22px 18px; border-top:1px solid var(--line);
+  display:flex; gap:10px; justify-content:flex-end; align-items:center
+}
+.diff-tbl{width:100%; border-collapse:collapse; font-size:12.5px; margin:6px 0 14px}
+.diff-tbl th,.diff-tbl td{padding:6px 9px; border-bottom:1px solid var(--line); text-align:left}
+.diff-tbl th{color:var(--tx3); font-weight:500; font-size:11px}
+.up{color:#f87171}   /* A股习惯：涨红 */
+.down{color:#4ade80}
+.warnbox{
+  padding:11px 13px; border-radius:8px; font-size:12.5px; line-height:1.7;
+  background:rgba(245,158,11,.10); border-left:3px solid var(--warn);
+  color:#fcd34d; margin-bottom:14px
+}
+.confirm-row{
+  display:flex; align-items:center; gap:9px; padding:12px 13px;
+  background:var(--panel2); border-radius:9px; border:1px solid var(--line);
+  margin-bottom:8px; cursor:pointer
+}
+.confirm-row:hover{border-color:var(--acc)}
+.confirm-row input[type=checkbox]{
+  width:17px; height:17px; accent-color:var(--ok); cursor:pointer; flex:none
+}
+.confirm-row .txt{font-size:12.5px; line-height:1.5}
+.fp{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11.5px;
+  background:#0b1220; padding:3px 8px; border-radius:5px; color:#7dd3fc;
+  letter-spacing:.5px
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>模型配置后台
+    <span class="badge">维护页</span>
+    <span class="badge warn">与展示页 index.html 分离</span>
+  </h1>
+  <div class="sub">
+    在这里改权重 / 规则 → 点「<b>生效并重生成 index</b>」→ 展示页才会变。
+    改完不点生效，<b>index.html 保持原样</b>。每次生效都会快照 + 八处同步 +
+    跑 <b>verify_weights_round36.py</b>，未过自动回滚。
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="tabs" id="tabs">
+    <div class="tab on" data-t="w">① 权重配置</div>
+    <div class="tab" data-t="p">② 选池规则</div>
+    <div class="tab" data-t="c">③ 周期规则</div>
+    <div class="tab" data-t="d">④ 维度量程</div>
+    <div class="tab" data-t="a">⑤ 变更历史</div>
+    <div class="tab" data-t="s">⑥ 链路自检</div>
+  </div>
+
+  <!-- ① 权重配置 -->
+  <section id="p-w">
+    <div class="bar">
+      <button class="btn" id="btnReset">还原为已生效值</button>
+      <button class="btn" id="btnValidate">只校验不写盘</button>
+      <button class="btn" id="btnPreview" style="border-color:var(--acc);color:#7dd3fc">👁 预览前十</button>
+      <button class="btn primary" id="btnApply">生效并重生成 index</button>
+      <button class="btn danger" id="btnRollback">回滚到上次快照</button>
+      <span class="muted" id="dirtyFlag"></span>
+    </div>
+
+    <div class="msg" id="msgW"></div>
+
+    <div class="sum-row" id="sumRow"></div>
+
+    <!-- 预览前十（点「👁 预览前十」出现；纯只读，不写盘） -->
+    <div class="card" id="previewCard" style="display:none">
+      <h2>前十预览
+        <span class="pill" id="pvTag">—</span>
+      </h2>
+      <div class="desc" id="pvDesc">
+        用<b>编辑中的权重</b>按生产口径逐股重算，与已生效权重对比名次。
+        <b>本操作不写盘</b>——确认满意后再点「生效并重生成 index」。
+      </div>
+      <div class="sum-row" id="pvSum"></div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:40px">#</th>
+            <th>名称</th>
+            <th style="width:88px">预览分</th>
+            <th style="width:88px">现index分</th>
+            <th style="width:88px">分数差</th>
+            <th style="width:80px">原排名</th>
+            <th style="width:70px">变化</th>
+            <th style="width:120px">行业</th>
+            <th style="width:90px">市值</th>
+            <th style="width:80px">PE</th>
+            <th style="width:80px">评级</th>
+          </tr>
+        </thead>
+        <tbody id="pvBody"></tbody>
+      </table>
+      <div class="muted" style="margin-top:12px" id="pvNote"></div>
+    </div>
+
+    <div class="card">
+      <h2>因子权重（可编辑）</h2>
+      <div class="desc">
+        约束：<b>单因子 ≤ 0.20</b> · <b>大类 ≤ 0.30</b> · <b>Σ = 1.0</b> · 下限 0。
+        生效维（&gt;0）必须全部归入某个大类，否则绕过组约束会被拒。
+        权重改动会同步写进 <code>factor_weights.json</code> 的
+        <code>weights</code> 与 <code>prior_weights</code> 两入口 + 6 个 py 的硬编码。
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:34px">#</th>
+            <th>因子维度</th>
+            <th style="width:110px">权重</th>
+            <th style="width:70px">量程</th>
+            <th style="width:100px">大类</th>
+            <th style="width:150px">大类合计</th>
+            <th>说明</th>
+          </tr>
+        </thead>
+        <tbody id="wBody"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>大类约束（可编辑）</h2>
+      <div class="desc">
+        来自 <code>factor_weights.json → weight_constraints</code>。
+        <b>改这里会立即生效</b>（跑 verify + 重生成 index）—— 约束是出图前的最后一道闸，
+        放宽它等于放宽权重本身。
+      </div>
+
+      <div class="msg" id="msgC"></div>
+
+      <table style="margin-bottom:14px">
+        <thead><tr>
+          <th style="width:190px">约束项</th><th style="width:120px">当前生效</th>
+          <th style="width:130px">改为</th><th>含义</th>
+        </tr></thead>
+        <tbody id="ccBody"></tbody>
+      </table>
+
+      <table>
+        <thead><tr>
+          <th>大类</th><th>成员（点选增删）</th>
+          <th style="width:100px">当前合计</th><th style="width:90px">上限</th>
+          <th style="width:74px">状态</th>
+        </tr></thead>
+        <tbody id="gBody"></tbody>
+      </table>
+
+      <div class="bar" style="position:static;border:0;padding:14px 0 0">
+        <button class="btn" id="btnGpAdd">+ 新增大类</button>
+        <button class="btn" id="btnGpReset">还原为生效值</button>
+        <button class="btn" id="btnGpValidate">只校验不写盘</button>
+        <button class="btn primary" id="btnGpApply">生效约束</button>
+        <span class="muted" id="gDirty"></span>
+      </div>
+
+      <div class="card" style="background:var(--panel2);margin:14px 0 0">
+        <h2 style="font-size:13.5px">维度归属编辑</h2>
+        <div class="desc" style="margin-bottom:10px">
+          为每个维度选择所属大类。<b>已生效维（权重&gt;0）必须全部有归属</b>，
+          否则绕过组约束会被拒。灰显的维度权重为 0，归属仅留档。
+        </div>
+        <div id="dimAssign"></div>
+      </div>
+
+      <pre id="previewG" style="margin-top:14px">（尚未修改）</pre>
+    </div>
+
+    <div class="card">
+      <h2>本次变更预览</h2>
+      <div class="desc">点「生效」前可先看会写到哪几处。未改动的键不显示。</div>
+      <pre id="preview">（尚未修改）</pre>
+    </div>
+  </section>
+
+  <!-- ② 选池规则 -->
+  <section id="p-p" style="display:none">
+    <div class="warnbox" style="margin-bottom:16px">
+      ⚠️ <b>改这里不会改变今日 index.html</b>。选池规则只在<b>次日日链</b>
+      （<code>fetch_top200_sina</code> → <code>step2</code>）重跑时才生效。
+      今日的 <code>top200_scored_*.json</code> 是按旧规则筛完的池子，
+      不能用来预览新规则的效果。下面的「影响估算」只能算<b>谁会被剔掉</b>，
+      算不出<b>谁会新进池</b>（那些股票根本不在数据里）。
+    </div>
+
+    <div class="msg" id="msgP"></div>
+
+    <div class="card">
+      <h2>选池硬约束（筛选层）</h2>
+      <div class="desc">
+        来自 <code>config.json</code>。不满足即不进池，与评分无关。
+        只开放白名单字段 —— <code>workflow</code>/<code>schedule</code>/<code>monitoring</code>
+        等运维字段<b>故意不给改</b>，改坏它们会让日链不跑。
+      </div>
+      <table>
+        <thead><tr>
+          <th style="width:250px">规则</th><th style="width:140px">当前值</th>
+          <th style="width:150px">改为</th><th>含义 / 边界</th>
+        </tr></thead>
+        <tbody id="poolBody"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>候选池规模 &amp; 路线</h2>
+      <table>
+        <thead><tr>
+          <th style="width:250px">规则</th><th style="width:140px">当前值</th>
+          <th style="width:150px">改为</th><th>含义 / 边界</th>
+        </tr></thead>
+        <tbody id="routeBody"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>组合约束</h2>
+      <div class="desc">
+        影响 <code>pick_portfolio.py</code> 的选股与配权。
+        <b>单票上限口径</b>这一项历史上曾是死参数（只定义不读取），现已修成
+        <code>min_holdings=ceil(w_total/max_single_stock)</code>。
+      </div>
+      <table>
+        <thead><tr>
+          <th style="width:250px">规则</th><th style="width:140px">当前值</th>
+          <th style="width:150px">改为</th><th>含义 / 边界</th>
+        </tr></thead>
+        <tbody id="indBody"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>筹码/资格过滤</h2>
+      <table>
+        <thead><tr>
+          <th style="width:250px">规则</th><th style="width:140px">当前值</th>
+          <th style="width:150px">改为</th><th>含义 / 边界</th>
+        </tr></thead>
+        <tbody id="eligBody"></tbody>
+      </table>
+      <div class="bar" style="position:static;border:0;padding:14px 0 0">
+        <button class="btn" id="btnPoolReset">还原为生效值</button>
+        <button class="btn" id="btnPoolEst">估算影响面</button>
+        <button class="btn primary" id="btnPoolApply">写盘（次日生效）</button>
+        <span class="muted" id="poolDirty"></span>
+      </div>
+      <pre id="poolEst" style="margin-top:14px">（点「估算影响面」看谁会被剔掉）</pre>
+    </div>
+  </section>
+
+  <!-- ③ 周期规则 -->
+  <section id="p-c" style="display:none">
+    <div class="msg" id="msgCy"></div>
+
+    <div class="card">
+      <h2>强周期行业清单（四份，语义不同）</h2>
+      <div class="desc">
+        来自 <code>sector/cycle_industry.json</code> —— <b>单一来源</b>。
+        ⚠️ 这四份清单<b>互不替换</b>：前两份是「规则1/2 的 gate 正面清单」，
+        后两份是「step2 的低PE可持续性保护」。历史上 step2 故意多保护 15 个行业。
+      </div>
+      <div id="cycSlots"></div>
+    </div>
+
+    <div class="card">
+      <h2>规则阈值（当前不可在线改）</h2>
+      <div class="desc">
+        规则1/2 的阈值是 <code>growth_factor_b.py</code> 里的<b>代码常量</b>，
+        不在 json 里。放这里只做展示 —— 强行写进 json 只会变成「写了但没人读」的假配置。
+      </div>
+      <table>
+        <thead><tr><th>常量</th><th style="width:110px">值</th><th>含义</th></tr></thead>
+        <tbody id="cycRuleBody"></tbody>
+      </table>
+    </div>
+
+    <div class="bar" style="position:static;border:0;padding:0 0 14px">
+      <button class="btn" id="btnCyReset">还原为生效值</button>
+      <button class="btn" id="btnCyEst">估算命中只数变化</button>
+      <button class="btn primary" id="btnCyApply">生效并重生成 index</button>
+      <span class="muted" id="cyDirty"></span>
+    </div>
+
+    <div class="card" id="cyEstCard" style="display:none">
+      <h2>影响估算</h2>
+      <div id="cyEstBox"></div>
+    </div>
+
+    <div class="card">
+      <h2>历史留档（只读）</h2>
+      <div class="desc">老大 2026-11-02 原话清单与映射注记，逐字保留，<b>不参与判定</b>。</div>
+      <div id="cycArchive"></div>
+    </div>
+  </section>
+
+  <!-- ④ 维度量程 -->
+  <section id="p-d" style="display:none">
+    <div class="card">
+      <h2>维度量程 dim_max（只读）</h2>
+      <div class="desc">
+        <b>单一来源</b>：<code>factor_weights.json → dim_max</code>。
+        归一化公式 <code>min(v, DMAX)/DMAX*10*w</code>，量程错了整维分数会被系统性压扁/拉伸。
+        改量程必须同步 <code>step2._DIM_MAX_DEFAULT</code> / <code>enhance</code> /
+        <code>apply</code> / <code>factor_eval</code> 四处 —— 后台<b>不开放</b>在线改，避免误伤。
+      </div>
+      <table>
+        <thead><tr><th>维度</th><th style="width:110px">dim_max</th><th style="width:90px">当前权重</th><th>说明</th></tr></thead>
+        <tbody id="dBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ⑤ 变更历史 -->
+  <section id="p-a" style="display:none">
+    <div class="card">
+      <h2>变更审计日志</h2>
+      <div class="desc">
+        追加写入 <code>data/admin_audit.jsonl</code>，<b>只增不改</b>。
+        每条含快照目录名，可用「回滚到上次快照」还原。
+      </div>
+      <pre id="auditBox">加载中…</pre>
+    </div>
+  </section>
+
+  <!-- ⑥ 链路自检 -->
+  <section id="p-s" style="display:none">
+    <div class="card">
+      <h2>verify_weights_round36.py 实时输出</h2>
+      <div class="desc">
+        八处权重入口 + dim_max 入口一致性 + v4.15 约束 + 准入裁决（advisory）。
+        这是「出图前的最后一道闸」。
+      </div>
+      <div class="bar" style="position:static;border:0;padding:0 0 12px">
+        <button class="btn primary" id="btnVerify">跑一次校验</button>
+      </div>
+      <pre id="verifyBox">（未运行）</pre>
+    </div>
+    <div class="card">
+      <h2>文件状态</h2>
+      <div class="kv" id="fileKv"></div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ══════ 二次确认弹窗 ══════ -->
+<div class="mask" id="mask">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mdTitle">
+    <div class="modal-hd">
+      <span class="warnicon">⚠️</span>
+      <h3 id="mdTitle">确认生效这批权重改动？</h3>
+    </div>
+    <div class="modal-bd">
+      <div class="warnbox">
+        生效会做这些事：<b>快照当前文件</b> → <b>八处同步改写</b>（2 个 json 入口 + 6 个 py 硬编码）
+        → 跑 <code>verify_weights_round36.py</code> → <b>重生成 index.html</b>。<br>
+        verify 未过会自动回滚，但 <b>index.html 会短暂中断</b>（约 1~2 分钟）。
+      </div>
+
+      <div style="font-size:12.5px;color:var(--tx2);margin-bottom:6px">
+        本次将改动的权重（<b id="mdCount">0</b> 项）：
+      </div>
+      <table class="diff-tbl">
+        <thead>
+          <tr><th>维度</th><th style="width:90px">当前生效</th><th style="width:30px"></th>
+              <th style="width:90px">改后</th><th style="width:90px">增减</th></tr>
+        </thead>
+        <tbody id="mdDiff"></tbody>
+      </table>
+
+      <div style="font-size:12.5px;color:var(--tx2);margin:14px 0 6px">
+        前十影响（若已点过「👁 预览前十」会显示）：
+      </div>
+      <div id="mdTop" class="muted" style="font-size:12.5px">— 尚未预览。建议先点「预览前十」看清影响再决定。</div>
+
+      <div style="font-size:12.5px;color:var(--tx2);margin:16px 0 8px">
+        请逐项勾选（<b>全部勾选后</b>「确认生效」才会点亮）：
+      </div>
+      <label class="confirm-row">
+        <input type="checkbox" id="ck1">
+        <span class="txt">我确认这是<b>有意</b>的权重调整，不是误触。</span>
+      </label>
+      <label class="confirm-row">
+        <input type="checkbox" id="ck2">
+        <span class="txt">我已知悉 <b>index.html 会被重生成</b>，约 1~2 分钟不可用。</span>
+      </label>
+      <label class="confirm-row">
+        <input type="checkbox" id="ck3">
+        <span class="txt">
+          我确认权重指纹为 <span class="fp" id="mdFp">—</span>
+          <span class="muted">（与页面重算一致才放行；后端也会独立校验）</span>
+        </span>
+      </label>
+    </div>
+    <div class="modal-ft">
+      <span class="muted" id="mdHint" style="margin-right:auto;font-size:12px">请先完成上方勾选</span>
+      <button class="btn" id="mdCancel">取消</button>
+      <button class="btn primary" id="mdOk" disabled>确认生效</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+let CFG = null;
+let EDIT = {};      // 用户编辑中的权重
+let BASE = {};      // 已生效权重
+let ORPHAN = new Set();
+let LAST_PREVIEW = null;   // 最近一次预览结果（确认弹窗里复用）
+
+// ── 三块规则配置的「编辑中」状态（与 EDIT 权重状态并列，互不干扰）──
+let C_EDIT = null;     // 编辑中的 weight_constraints
+let C_BASE = null;     // 已生效的 weight_constraints
+let P_EDIT = {};       // 编辑中的选池规则（dotted key → 值）
+let CY_EDIT = {};      // 编辑中的周期清单（dotted key → 数组）
+let POOL_SPEC = null;  // 后端下发的字段白名单（含 min/max/type/semantics）
+let POOL_EDITABLE = {}; // 同上（原样保留，渲染时按 key 查 spec）
+
+// ── 权重指纹：必须与 admin_server.py 的 weights_fingerprint() 完全同算法 ──
+// Python: sorted((k, f"{v:.3f}")) → "|".join("k=v") → sha256 → 前 12 位
+// JS 侧用 SubtleCrypto（异步）。任何一边改了算法，两边就对不上，
+// 那正是想要的效果：指纹对不上 = 确认无效 = 不许生效。
+async function weightsFingerprint(w) {
+  const items = Object.keys(w || {})
+    .map(k => [String(k), Number(w[k] || 0).toFixed(3)])
+    .sort((a, b) => a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0);
+  const raw = items.map(([k, v]) => `${k}=${v}`).join('|');
+  const buf = new TextEncoder().encode(raw);
+  const h = await crypto.subtle.digest('SHA-256', buf);
+  const hex = Array.from(new Uint8Array(h))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+  return hex.slice(0, 12);
+}
+
+// ── tabs ──────────────────────────────────────────────
+$$('#tabs .tab').forEach(t => t.addEventListener('click', () => {
+  $$('#tabs .tab').forEach(x => x.classList.remove('on'));
+  t.classList.add('on');
+  ['w','p','c','d','a','s'].forEach(k => {
+    const el = $('#p-' + k);
+    if (el) el.style.display = (k === t.dataset.t) ? '' : 'none';
+  });
+  if (t.dataset.t === 'a') loadAudit();
+  if (t.dataset.t === 's') loadVerify();
+}));
+
+// ── load config ───────────────────────────────────────
+async function loadConfig() {
+  const r = await fetch('/api/config');
+  CFG = await r.json();
+  BASE = Object.assign({}, CFG.weights);
+  EDIT = Object.assign({}, CFG.weights);
+  C_BASE = JSON.parse(JSON.stringify(CFG.weight_constraints || {}));
+  C_EDIT = JSON.parse(JSON.stringify(C_BASE));
+  POOL_EDITABLE = CFG.pool_editable || {};
+  SW_L2_ALL = ((CFG.sw_names||{}).l2) || [];
+  SW_L1_ALL = ((CFG.sw_names||{}).l1) || [];
+  P_EDIT = {};
+  CY_EDIT = {};
+  renderWeights();
+  renderGroups();
+  renderConstraints();
+  renderPool();
+  renderCycle();
+  renderDim();
+  renderFiles();
+  renderPreview();
+}
+
+// ── ① weights ─────────────────────────────────────────
+function groupOf(key) {
+  const G = (CFG.weight_constraints || {}).groups || {};
+  for (const [g, ms] of Object.entries(G)) if (ms.includes(key)) return g;
+  return null;
+}
+function groupClass(g) {
+  const order = Object.keys((CFG.weight_constraints||{}).groups||{});
+  return 'g' + (order.indexOf(g) >= 0 ? order.indexOf(g) % 6 : 0);
+}
+function renderWeights() {
+  const entries = Object.entries(EDIT).sort((a,b) => {
+    // 生效维在前，按权重降序；再按名字
+    const av = +a[1] > 0 ? 0 : 1, bv = +b[1] > 0 ? 0 : 1;
+    if (av !== bv) return av - bv;
+    if (+b[1] !== +a[1]) return (+b[1]) - (+a[1]);
+    return a[0].localeCompare(b[0]);
+  });
+  const G = (CFG.weight_constraints || {}).groups || {};
+  const rows = entries.map(([k, v], i) => {
+    const g = groupOf(k);
+    const mx = (CFG.dim_max || {})[k];
+    const changed = Math.abs((+v) - (+BASE[k])) > 1e-9;
+    return `<tr>
+      <td class="dim">${i+1}</td>
+      <td><code>${k.replace('score_','')}</code>
+          ${(+v)===0?'<span class="pill no">已归零</span>':''}</td>
+      <td><input type="number" step="0.01" min="0" max="1"
+                 value="${(+v).toFixed(2)}" data-k="${k}"
+                 class="${changed?'changed':''}"></td>
+      <td class="dim">${mx!=null?mx:'—'}</td>
+      <td>${g?`<span class="grp ${groupClass(g)}">${g}</span>`:'<span class="pill no">未分组</span>'}</td>
+      <td class="dim" data-gsum="${g||''}">${g?((G[g]||[]).reduce((s,m)=>s+(+EDIT[m]||0),0).toFixed(2)):'—'}</td>
+      <td class="dim">${k==='score_size_growth'?'龙头( dominant≥7 )不参与该维 → 生产按中性填 5.0':
+                     k==='score_fund'?'基本面主通道，dim_max=5.0（非 10）':
+                     k==='score_tech_neg'?'技术面反号：10 - score_tech':
+                     ''}</td>
+    </tr>`;
+  }).join('');
+  $('#wBody').innerHTML = rows;
+
+  $$('#wBody input').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const k = e.target.dataset.k;
+      let v = parseFloat(e.target.value);
+      if (isNaN(v) || v < 0) v = 0;
+      if (v > 1) v = 1;
+      EDIT[k] = v;
+      // 权重一动，上次的预览就过期了 —— 必须清掉，
+      // 否则确认弹窗会拿旧的前十去「证明」新权重的效果（等于自己骗自己）。
+      LAST_PREVIEW = null;
+      renderWeights();
+      renderGroups();
+      renderPreview();
+    });
+  });
+}
+
+function renderGroups() {
+  const G = (CFG.weight_constraints || {}).groups || {};
+  const cap = +((CFG.weight_constraints||{}).group_cap ?? 0.30);
+  const rows = Object.entries(G).map(([g, ms]) => {
+    const s = ms.reduce((a,m) => a + (+EDIT[m]||0), 0);
+    const pass = s <= cap + 1e-9;
+    return `<tr>
+      <td><span class="grp ${groupClass(g)}">${g}</span></td>
+      <td class="dim">${ms.map(m=>m.replace('score_','')).join(' + ')}</td>
+      <td><b style="color:${pass?'var(--ok)':'var(--bad)'}">${s.toFixed(3)}</b></td>
+      <td class="dim">${cap.toFixed(2)}</td>
+      <td>${pass?'<span class="pill">OK</span>':'<span class="pill no">超限</span>'}</td>
+    </tr>`;
+  }).join('');
+  // 注：gBody 由 renderConstraints() 拥有（可编辑版），此处不再写
+  const _gb = $('#gBody');
+  if (_gb && !($('#ccBody'))) _gb.innerHTML = rows;
+
+  // 顶部汇总
+  const total = Object.values(EDIT).reduce((a,v)=>a+(+v||0),0);
+  const dims = Object.entries(EDIT).filter(([,v])=>+v>0);
+  const over = dims.filter(([k,v])=>+v > +((CFG.weight_constraints||{}).dim_cap ?? .2) + 1e-9);
+  const gOver = Object.entries(G).filter(([g,ms]) =>
+    ms.reduce((a,m)=>a+(+EDIT[m]||0),0) > cap + 1e-9);
+
+  // 未分组的生效维
+  const grouped = new Set(Object.values(G).flat());
+  ORPHAN = new Set(dims.map(([k])=>k).filter(k=>!grouped.has(k)));
+
+  const tOk = Math.abs(total-1) < 1e-6;
+  $('#sumRow').innerHTML = `
+    <div class="sum ${tOk?'pass':'fail'}"><b>${total.toFixed(3)}</b>Σ 权重 ${tOk?'= 1.0 ✅':'≠ 1.0 ❌'}</div>
+    <div class="sum ${over.length?'fail':'pass'}"><b>${dims.length}</b>生效维 ${over.length?'超单因子上限 ❌':'≤ 0.20 ✅'}</div>
+    <div class="sum ${gOver.length?'fail':'pass'}"><b>${Object.keys(G).length}</b>大类 ${gOver.length?'有超限 ❌':'均 ≤ 0.30 ✅'}</div>
+    <div class="sum ${ORPHAN.size?'fail':'pass'}"><b>${ORPHAN.size}</b>未分组生效维 ${ORPHAN.size?'绕过组约束 ❌':'无 ✅'}</div>`;
+
+  const changed = Object.keys(EDIT).filter(k => Math.abs((+EDIT[k])-(+BASE[k]))>1e-9);
+  $('#dirtyFlag').textContent = changed.length
+    ? `已改 ${changed.length} 项（未生效）: ` + changed.map(k=>k.replace('score_','')).join(', ')
+    : '当前无未生效改动';
+}
+
+// ── ①b 大类约束（可编辑）───────────────────────────────
+function cDirty() {
+  return JSON.stringify(C_EDIT) !== JSON.stringify(C_BASE);
+}
+
+function renderConstraints() {
+  const capItems = [
+    ['dim_cap', '单因子上限 dim_cap', '单个维度权重最高能到多少'],
+    ['group_cap', '大类上限 group_cap', '同一大类内所有维度权重合计上限'],
+    ['dim_floor', '单因子下限 dim_floor', '通常 0；设正数等于强制每维至少配这么多'],
+  ];
+  $('#ccBody').innerHTML = capItems.map(([k, name, desc]) => {
+    const cur = C_BASE[k], now = C_EDIT[k];
+    const chg = Math.abs((+now) - (+cur)) > 1e-12;
+    return `<tr>
+      <td><code>${k}</code><div class="dim">${name}</div></td>
+      <td class="dim">${cur != null ? (+cur).toFixed(3) : '—'}</td>
+      <td><input type="number" step="0.01" min="0" max="1"
+                 value="${now != null ? (+now).toFixed(3) : ''}"
+                 data-ck="${k}" class="${chg?'changed':''}"></td>
+      <td class="dim">${desc}</td>
+    </tr>`;
+  }).join('');
+
+  $$('#ccBody input').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const k = e.target.dataset.ck;
+      let v = parseFloat(e.target.value);
+      if (isNaN(v)) v = 0;
+      C_EDIT[k] = v;
+      renderConstraints();
+    });
+  });
+
+  // 大类表（成员可点选增删）
+  const G = C_EDIT.groups || {};
+  const cap = +C_EDIT.group_cap ?? 0.3;
+  const allDims = Object.keys(EDIT);
+  $('#gBody').innerHTML = Object.entries(G).map(([g, ms]) => {
+    const s = ms.reduce((a,m) => a + (+EDIT[m]||0), 0);
+    const pass = s <= cap + 1e-9;
+    const others = allDims.filter(d => !ms.includes(d));
+    return `<tr>
+      <td><span class="grp ${groupClass(g)}">${g}</span>
+          <div class="dim" style="margin-top:4px">
+            <a href="#" data-gdel="${g}" style="color:#fca5a5">删除大类</a>
+          </div></td>
+      <td>
+        <div>${ms.map(m=>`<span class="grp g5" style="margin:2px 4px 2px 0;display:inline-block">
+            ${m.replace('score_','')}
+            <a href="#" data-grem="${g}|${m}" style="color:#fca5a5;text-decoration:none;margin-left:5px">×</a>
+          </span>`).join('') || '<span class="dim">（空）</span>'}</div>
+        ${others.length ? `<select data-gadd="${g}" style="margin-top:6px;width:auto">
+            <option value="">+ 添加维度…</option>
+            ${others.map(d=>`<option value="${d}">${d.replace('score_','')}${(+EDIT[d]||0)>0?'（生效中）':''}</option>`).join('')}
+        </select>` : ''}
+      </td>
+      <td><b style="color:${pass?'var(--ok)':'var(--bad)'}">${s.toFixed(3)}</b></td>
+      <td class="dim">${cap.toFixed(2)}</td>
+      <td>${pass?'<span class="pill">OK</span>':'<span class="pill no">超限</span>'}</td>
+    </tr>`;
+  }).join('');
+
+  $$('#gBody [data-gdel]').forEach(a => a.onclick = e => {
+    e.preventDefault();
+    delete C_EDIT.groups[a.dataset.gdel];
+    renderConstraints();
+  });
+  $$('#gBody [data-grem]').forEach(a => a.onclick = e => {
+    e.preventDefault();
+    const [g, m] = a.dataset.grem.split('|');
+    C_EDIT.groups[g] = (C_EDIT.groups[g] || []).filter(x => x !== m);
+    renderConstraints();
+  });
+  $$('#gBody [data-gadd]').forEach(sel => sel.onchange = e => {
+    const g = sel.dataset.gadd, v = e.target.value;
+    if (!v) return;
+    // 从其它大类里摘掉（同一维度不能属于两个大类）
+    for (const gg of Object.keys(C_EDIT.groups))
+      C_EDIT.groups[gg] = (C_EDIT.groups[gg] || []).filter(x => x !== v);
+    C_EDIT.groups[g] = (C_EDIT.groups[g] || []).concat([v]);
+    renderConstraints();
+  });
+
+  // 维度归属一览
+  $('#dimAssign').innerHTML = allDims.map(d => {
+    const inG = Object.keys(G).find(g => (G[g]||[]).includes(d));
+    const w = +EDIT[d] || 0;
+    return `<span style="display:inline-block;margin:3px 8px 3px 0;
+        ${w>0?'':'opacity:.45'}">
+      <code>${d.replace('score_','')}</code>
+      <span class="dim">${w>0?w.toFixed(2):'0'}</span>
+      ${inG?`<span class="grp ${groupClass(inG)}">${inG}</span>`
+           :'<span class="pill no">未归类</span>'}
+    </span>`;
+  }).join('');
+
+  $('#gDirty').textContent = cDirty() ? '约束已改（未生效）' : '约束无改动';
+  if (!cDirty()) { $('#previewG').textContent = '（尚未修改）'; return; }
+
+  const diff = [];
+  for (const k of ['dim_cap','group_cap','dim_floor'])
+    if (String(C_BASE[k]) !== String(C_EDIT[k]))
+      diff.push(`  ${k}: ${C_BASE[k]} → ${C_EDIT[k]}`);
+  const og = C_BASE.groups || {}, ng = C_EDIT.groups || {};
+  for (const g of new Set([...Object.keys(og), ...Object.keys(ng)])) {
+    const a = (og[g]||[]).slice().sort().join(','),
+          b = (ng[g]||[]).slice().sort().join(',');
+    if (a !== b)
+      diff.push(`  大类「${g}」: [${(og[g]||[]).join('+')||'不存在'}] → [${(ng[g]||[]).join('+')||'删除'}]`);
+  }
+  $('#previewG').textContent =
+    '将写入 factor_weights.json → weight_constraints：\n' + diff.join('\n') +
+    '\n\n生效后会跑 verify_weights_round36.py（按新约束校验现有权重）并重生成 index.html。\n' +
+    '⚠️ 如果把约束改窄到现有权重不合规，verify 会 FAIL 并自动还原。';
+}
+
+function renderPreview() {
+  const changed = Object.entries(EDIT)
+    .filter(([k,v]) => Math.abs((+v)-(+BASE[k]))>1e-9)
+    .map(([k,v]) => `  ${k}: ${BASE[k]} → ${v}`);
+  const G = (CFG.weight_constraints||{}).groups||{};
+  const gsum = Object.entries(G).map(([g,ms]) =>
+    `  ${g}: ${ms.reduce((a,m)=>a+(+EDIT[m]||0),0).toFixed(3)} (≤0.30)`);
+  $('#preview').textContent = changed.length
+    ? "将写入的变更（8 处同步）:\n" + changed.join('\n') +
+      "\n\n大类合计:\n" + gsum.join('\n') +
+      "\n\n同步落点:\n" +
+      "  factor_weights.json  weights\n" +
+      "  factor_weights.json  prior_weights\n" +
+      "  factor_eval.py       PRIOR_W10\n" +
+      "  step2_stockscorer_v2.py  _W_PRIOR_10D\n" +
+      "  apply_sector_momentum.py _W_PRIOR_10D\n" +
+      "  enhance_scores.py    _W_PRIOR_10D\n" +
+      "  gen_report_top200.py _fb\n" +
+      "  gen_report_top200.py _rf_W_ACT\n"
+    : "（尚未修改）";
+}
+
+// ── buttons ───────────────────────────────────────────
+function showMsg(el, text, cls) {
+  el.textContent = text;
+  el.className = 'msg show ' + (cls||'');
+}
+async function validateOnly() {
+  const r = await fetch('/api/validate', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({weights: EDIT})
+  });
+  const d = await r.json();
+  showMsg($('#msgW'),
+    (d.ok ? '✅ 约束校验通过（未写盘）\n' : '❌ 约束校验未通过\n') +
+    (d.info||[]).join('\n') +
+    (d.errors && d.errors.length ? '\n\n' + d.errors.map(e=>'· '+e).join('\n') : ''),
+    d.ok ? 'ok' : 'bad');
+}
+async function applyAll() {
+  const changed = Object.keys(EDIT).filter(k => Math.abs((+EDIT[k])-(+BASE[k]))>1e-9);
+  if (!changed.length) { showMsg($('#msgW'), '没有改动，无需生效。', 'warn'); return; }
+
+  // 打开二次确认弹窗（不再用原生 confirm —— 原生 confirm 无法展示
+  // 权重 diff / 前十影响 / 指纹校验，也容易被「一路回车」误过）
+  await openConfirm(changed);
+}
+
+// ── 二次确认弹窗 ──────────────────────────────────────
+let MODAL_TOKENS = 0;
+
+async function openConfirm(changed) {
+  // 1) 权重 diff 表
+  const rows = changed.map(k => {
+    const a = +BASE[k], b = +EDIT[k];
+    const d = b - a;
+    const cls = d > 0 ? 'up' : 'down';
+    const dtxt = (d > 0 ? '+' : '') + d.toFixed(2);
+    return `<tr>
+      <td><code>${k.replace('score_','')}</code></td>
+      <td class="muted">${a.toFixed(2)}</td>
+      <td class="muted">→</td>
+      <td><b>${b.toFixed(2)}</b></td>
+      <td class="${cls}">${dtxt}</td>
+    </tr>`;
+  }).join('');
+  $('#mdDiff').innerHTML = rows;
+  $('#mdCount').textContent = changed.length;
+
+  // 2) 前十影响
+  if (LAST_PREVIEW && LAST_PREVIEW.ok) {
+    const s = LAST_PREVIEW.summary || {};
+    const ent = (s.n_entered || []);
+    $('#mdTop').innerHTML =
+      `预览已计算：前十均值 <b>${s.top10_mean ?? '—'}</b> 分，` +
+      `榜首 <b>${LAST_PREVIEW.rows[0]?.name || '—'}</b> ${LAST_PREVIEW.rows[0]?.total ?? ''}` +
+      (ent.length ? `<br>新进前十：<b style="color:#fcd34d">${ent.join('、')}</b>` : '<br>前十名单无新进。') +
+      `<br><span class="muted">（预览基于编辑中的权重；生效后 index 即为此口径）</span>`;
+  } else {
+    $('#mdTop').innerHTML =
+      '<span style="color:#fcd34d">⚠️ 尚未预览。建议先点「👁 预览前十」看清影响再决定。</span>';
+  }
+
+  // 3) 指纹（前端算，后端独立再算一遍）
+  const fp = await weightsFingerprint(EDIT);
+  $('#mdFp').textContent = fp;
+  MODAL_TOKENS = fp;
+
+  // 4) 重置勾选
+  ['ck1','ck2','ck3'].forEach(id => { const el = $('#'+id); if (el) el.checked = false; });
+  $('#mdOk').disabled = true;
+  $('#mdHint').textContent = '请先完成上方勾选';
+
+  $('#mask').classList.add('show');
+}
+
+function closeConfirm() {
+  $('#mask').classList.remove('show');
+  MODAL_TOKENS = 0;
+}
+
+function syncConfirmState() {
+  const all = ['ck1','ck2','ck3'].every(id => $('#'+id) && $('#'+id).checked);
+  $('#mdOk').disabled = !all;
+  const n = ['ck1','ck2','ck3'].filter(id => $('#'+id) && $('#'+id).checked).length;
+  $('#mdHint').textContent = all ? '✅ 已确认，可以生效' : `还需勾选 ${3-n} 项`;
+}
+
+['ck1','ck2','ck3'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('change', syncConfirmState);
+});
+$('#mdCancel').onclick = closeConfirm;
+// 点遮罩空白处关闭（点弹窗内部不关）
+$('#mask').addEventListener('click', e => { if (e.target.id === 'mask') closeConfirm(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && $('#mask').classList.contains('show')) closeConfirm();
+});
+
+$('#mdOk').onclick = async () => {
+  if (MODAL_TOKENS === 0) return;
+  const confirmToken = MODAL_TOKENS;
+  // 再算一次，防「弹窗开着时又改了输入框」这种时序漏洞
+  const now = await weightsFingerprint(EDIT);
+  if (now !== confirmToken) {
+    $('#mdHint').textContent = '⚠️ 权重在确认期间被修改，指纹已变，请取消后重新确认';
+    $('#mdOk').disabled = true;
+    ['ck1','ck2','ck3'].forEach(id => { const el=$('#'+id); if(el) el.checked=false; });
+    return;
+  }
+  closeConfirm();
+  await doApply(confirmToken);
+};
+
+async function doApply(confirmToken) {
+  const changed = Object.keys(EDIT).filter(k => Math.abs((+EDIT[k])-(+BASE[k]))>1e-9);
+  showMsg($('#msgW'), '正在生效…（含重生成 index.html，可能需 1~2 分钟）\n请勿关闭页面。', 'warn');
+  $('#btnApply').disabled = true;
+
+  let d = null;
+  try {
+    const r = await fetch('/api/apply', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        weights: EDIT, regenerate: true, confirm: confirmToken,
+        reason: `admin UI: ${changed.map(k=>k.replace('score_','')).join(',')}`
+      })
+    });
+    d = await r.json();
+  } catch (e) {
+    d = { ok:false, stage:'network', error:String(e) };
+  } finally {
+    $('#btnApply').disabled = false;
+  }
+
+  if (d.ok) {
+    showMsg($('#msgW'),
+      '✅ 已生效，index.html 已重生成\n\n' +
+      (d.changes||[]).join('\n') + '\n\n' +
+      (d.regenerate||'') + '\n快照: ' + d.snap,
+      'ok');
+    LAST_PREVIEW = null;
+    await loadConfig();
+  } else {
+    showMsg($('#msgW'),
+      `❌ 生效失败（阶段 ${d.stage||'?'}）` +
+      (d.stage==='sync'||d.stage==='verify' ? '，已回滚' : '') + '\n\n' +
+      (d.error||'') + '\n' +
+      ((d.errors||[]).join('\n')) + '\n' +
+      (d.verify_tail||''),
+      'bad');
+    await loadConfig();
+  }
+}
+async function doRollback() {
+  if (!confirm('回滚到最近一次快照？当前未生效的编辑会一并丢弃。')) return;
+  const r = await fetch('/api/rollback', {method:'POST'});
+  const d = await r.json();
+  showMsg($('#msgW'),
+    d.ok ? `✅ 已回滚（${d.snap}）\n还原: ${(d.restored||[]).join(', ')}\nverify: ${d.verify_ok?'PASS':'FAIL'}\n\n${d.verify_tail||''}`
+        : `❌ ${d.error||'回滚失败'}`,
+    d.ok ? 'ok' : 'bad');
+  await loadConfig();
+}
+// ── 👁 预览前十 ────────────────────────────────────────
+async function doPreview() {
+  const btn = $('#btnPreview');
+  btn.disabled = true;
+  const oldTxt = btn.textContent;
+  btn.textContent = '⏳ 计算中…';
+  try {
+    const r = await fetch('/api/preview', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ weights: EDIT, top_n: 10, verify_caliber: true })
+    });
+    const d = await r.json();
+    if (!d.ok) {
+      LAST_PREVIEW = null;
+      $('#previewCard').style.display = '';
+      let extra = '';
+      if (d.stage === 'caliber' && d.worst) {
+        extra = '\n\n偏差最大的几只（说明口径走偏，需要查代码而非信这份榜单）：\n' +
+          d.worst.map(x => `  ${x.code} ${x.name}: 文件 ${x.file_total} vs 重算 ${x.recomputed} (Δ${x.diff})`).join('\n');
+      }
+      showMsg($('#msgW'), '❌ 预览失败：' + (d.error||'') + extra, 'bad');
+      return;
+    }
+    LAST_PREVIEW = d;
+    renderPreviewTop(d);
+    const cal = d.caliber || {};
+    showMsg($('#msgW'),
+      `✅ 预览完成（未写盘）\n\n` +
+      `口径自证：以已生效权重重算 ${cal.n} 只，与文件 total 最大差 ` +
+      `${cal.max_abs_diff} ${cal.passed ? '✅ 通过' : '❌ 未通过'}\n` +
+      `数据源：${d.source}（${d.data_date}，池 ${d.pool_n} 只）\n` +
+      `前十均值 ${d.summary.top10_mean} 分` +
+      (d.summary.n_entered.length ? `；新进前十：${d.summary.n_entered.join('、')}` : '；前十名单无新进'),
+      'ok');
+  } catch (e) {
+    LAST_PREVIEW = null;
+    showMsg($('#msgW'), '❌ 预览请求失败：' + e, 'bad');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = oldTxt;
+  }
+}
+
+function renderPreviewTop(d) {
+  const card = $('#previewCard');
+  card.style.display = '';
+  const changed = Object.keys(EDIT).filter(k => Math.abs((+EDIT[k])-(+BASE[k]))>1e-9);
+  $('#pvTag').textContent = changed.length ? `编辑中权重（改 ${changed.length} 项）` : '当前生效权重';
+  $('#pvDesc').innerHTML =
+    `按生产口径逐股重算（缺维填中性 DIM_MAX/2、分母恒 Σ生效权重），池 ${d.pool_n} 只。` +
+    `<b>不写盘</b>——满意后再点「生效并重生成 index」。` +
+    (d.caliber && d.caliber.checked
+      ? `<br>口径自证：重算 ${d.caliber.n} 只与文件 total 最大差 <b>${d.caliber.max_abs_diff}</b>` +
+        (d.caliber.passed ? ' ✅' : ' ❌')
+      : '');
+
+  const s = d.summary || {};
+  $('#pvSum').innerHTML = `
+    <div class="sum pass"><b>${s.top10_mean ?? '—'}</b>前十均值</div>
+    <div class="sum pass"><b>${s.top_total ?? '—'}</b>榜首分数</div>
+    <div class="sum ${s.n_new_entries ? 'fail' : 'pass'}"><b>${s.n_new_entries ?? 0}</b>新进前十</div>
+    <div class="sum"><b>${d.data_date}</b>数据日期</div>`;
+
+  $('#pvBody').innerHTML = d.rows.map(r => {
+    const diff = r.total - (r.base_total ?? r.total);
+    const dcls = diff > 0.005 ? 'up' : diff < -0.005 ? 'down' : 'muted';
+    const ch = r.rank_change;
+    const chTxt = ch === null ? '新' : (ch === 0 ? '—' : (ch > 0 ? `↑${ch}` : `↓${-ch}`));
+    const chCls = ch === null ? 'up' : (ch > 0 ? 'up' : ch < 0 ? 'down' : 'muted');
+    const miss = (r.neutral_missing || []).length;
+    return `<tr>
+      <td class="dim">${r.rank}</td>
+      <td><b>${r.name || ''}</b> <span class="muted">${r.code || ''}</span>
+          ${miss ? `<span class="pill no" title="缺失维：${(r.neutral_missing||[]).join(',')}">缺${miss}维</span>` : ''}</td>
+      <td><b style="color:var(--acc)">${r.total.toFixed(2)}</b></td>
+      <td class="muted">${r.base_total != null ? r.base_total.toFixed(2) : '—'}</td>
+      <td class="${dcls}">${diff > 0.005 ? '+' : ''}${Math.abs(diff) < 0.005 ? '—' : diff.toFixed(2)}</td>
+      <td class="muted">${r.prev_rank ?? '—'}</td>
+      <td class="${chCls}">${chTxt}</td>
+      <td class="muted">${(r.sector || '—').slice(0, 8)}${r.sector_src === 'fallback' ? ' ⚠️' : ''}</td>
+      <td class="muted">${r.circ_mv_yi} 亿</td>
+      <td class="muted">${r.pe ?? '—'}</td>
+      <td class="muted">${r.rating ?? '—'}</td>
+    </tr>`;
+  }).join('');
+
+  $('#pvNote').innerHTML =
+    '⚠️ 前三类风险提示：①「缺N维」= 该股在这些维度上是中性分（不是真实优劣）；' +
+    '② 行业标 ⚠️ 表示 sector 走的是 fallback 兜底映射；' +
+    '③ 本榜单只反映权重变化对排序的影响，<b>不构成已验证 alpha</b>（h=20 仍零样本外）。';
+}
+
+$('#btnPreview').onclick = doPreview;
+
+$('#btnReset').onclick = () => { EDIT = Object.assign({}, BASE); renderWeights(); renderGroups(); renderPreview(); showMsg($('#msgW'),'已还原为已生效值。','warn'); };
+$('#btnValidate').onclick = validateOnly;
+$('#btnApply').onclick = applyAll;
+$('#btnRollback').onclick = doRollback;
+
+// ── ①b 大类约束按钮 ──
+$('#btnGpReset').onclick = () => {
+  C_EDIT = JSON.parse(JSON.stringify(C_BASE));
+  renderConstraints();
+  showMsg($('#msgC'), '已还原为生效值。', 'warn');
+};
+$('#btnGpAdd').onclick = () => {
+  let i = 1, name = '新大类';
+  while (C_EDIT.groups[name]) name = '新大类' + (++i);
+  C_EDIT.groups[name] = [];
+  renderConstraints();
+};
+$('#btnGpValidate').onclick = async () => {
+  const r = await fetch('/api/constraints/validate', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({constraints: C_EDIT})
+  });
+  const d = await r.json();
+  showMsg($('#msgC'),
+    (d.ok ? '✅ 约束自洽，且现有权重在其下合规。' : '❌ 未通过：\n') +
+    (d.errors||[]).map(x=>'  · '+x).join('\n') +
+    ((d.info||[]).length ? '\n\n' + d.info.map(x=>'  '+x).join('\n') : ''),
+    d.ok ? 'ok' : 'bad');
+};
+$('#btnGpApply').onclick = async () => {
+  if (!cDirty()) { showMsg($('#msgC'), '约束无改动。', 'warn'); return; }
+  const diff = [];
+  for (const k of ['dim_cap','group_cap','dim_floor'])
+    if (String(C_BASE[k]) !== String(C_EDIT[k]))
+      diff.push(`${k}: ${C_BASE[k]} → ${C_EDIT[k]}`);
+  const og = C_BASE.groups||{}, ng = C_EDIT.groups||{};
+  for (const g of new Set([...Object.keys(og),...Object.keys(ng)])) {
+    const a=(og[g]||[]).join(','), b=(ng[g]||[]).join(',');
+    if (a!==b) diff.push(`大类「${g}」成员变化`);
+  }
+  if (!confirm(
+    '确认生效这批约束改动？\n\n' + diff.map(x=>'  '+x).join('\n') +
+    '\n\n生效会：快照 → 写 factor_weights.json → 跑 verify → 重生成 index.html。\n' +
+    '⚠️ 若现有权重在新约束下不合规，verify 会 FAIL 并自动还原。'
+  )) return;
+  const btn = $('#btnGpApply');
+  btn.disabled = true; btn.textContent = '处理中…';
+  try {
+    const r = await fetch('/api/constraints/apply', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({constraints: C_EDIT, reason:'后台手改大类约束'})
+    });
+    const d = await r.json();
+    if (!d.ok) {
+      showMsg($('#msgC'), '❌ ' + (d.error || (d.errors||[]).join('\n')) +
+        (d.verify_tail ? '\n\n' + d.verify_tail : ''), 'bad');
+      return;
+    }
+    showMsg($('#msgC'),
+      '✅ 约束已生效。\n\n' + (d.info||[]).map(x=>'  '+x).join('\n') +
+      '\n\n' + (d.regenerate||'') + '\n快照：' + (d.snap||''), 'ok');
+    await loadConfig();
+  } finally {
+    btn.disabled = false; btn.textContent = '生效约束';
+  }
+};
+
+// ── ②③ 规则按钮 ──
+$('#btnPoolReset').onclick = () => {
+  P_EDIT = {}; renderPool();
+  showMsg($('#msgP'), '已还原为生效值。', 'warn');
+  $('#poolEst').textContent = '（点「估算影响面」看谁会被剔掉）';
+};
+$('#btnPoolEst').onclick = poolEstimate;
+$('#btnPoolApply').onclick = poolApply;
+
+$('#btnCyReset').onclick = () => {
+  CY_EDIT = {}; renderCycle();
+  showMsg($('#msgCy'), '已还原为生效值。', 'warn');
+  $('#cyEstCard').style.display = 'none';
+};
+$('#btnCyEst').onclick = cyEstimate;
+$('#btnCyApply').onclick = cyApply;
+
+// ── ② pool ────────────────────────────────────────────
+function kv(pairs) {
+  return pairs.map(([k,v]) =>
+    `<div class="k">${k}</div><div>${v==null?'<span class="muted">—</span>':v}</div>`).join('');
+}
+function fmtY(n){ if(n==null)return '—'; if(n>=1e8)return (n/1e8).toFixed(2)+' 亿'; if(n>=1e4)return (n/1e4).toFixed(0)+' 万'; return n; }
+
+// 选池字段分组（每组一个 card 的 tbody）
+const POOL_GROUPS = {
+  poolBody: ['pool_rules.min_amount', 'pool_rules.min_mktcap',
+             'pool_rules.price_floor', 'pool_rules.drop_mom_top_pct',
+             'pool_rules.exclude_bj',
+             'liquidity_filter.enabled',
+             'liquidity_filter.min_avg_amount_20d',
+             'liquidity_filter.min_avg_turnover_rate'],
+  routeBody: ['pool_size', 'route_pool_map.reversal', 'route_pool_map.momentum'],
+  indBody: ['industry_limits.max_single_stock',
+            'industry_limits.max_single_stock_scope',
+            'industry_limits.max_l2_sector',
+            'industry_limits.max_l1_parent',
+            'industry_limits.max_l1_deviation_pp'],
+  eligBody: ['eligibility_filter.exclude_st',
+             'eligibility_filter.exclude_delisting',
+             'eligibility_filter.exclude_suspended',
+             'eligibility_filter.min_listing_days'],
+};
+
+function getPath(obj, dotted) {
+  let cur = obj;
+  for (const s of dotted.split('.')) {
+    if (cur == null || typeof cur !== 'object' || !(s in cur)) return undefined;
+    cur = cur[s];
+  }
+  return cur;
+}
+function pCur(k) { return P_EDIT.hasOwnProperty(k) ? P_EDIT[k] : getPath(CFG.pool, k); }
+function pBase(k) { return getPath(CFG.pool, k); }
+function pFmt(k, v) {
+  if (v == null) return '—';
+  if (typeof v === 'boolean') return v ? '是' : '否';
+  if (k.endsWith('_pp')) return v + ' pp';
+  if (k.includes('min_amount') || k.includes('min_mktcap')) return fmtY(v);
+  if (k.includes('turnover_rate')) return (v * 100).toFixed(2) + '%';
+  if (k.includes('max_single_stock') || k.includes('max_l2') || k.includes('max_l1_parent'))
+    return (v * 100).toFixed(0) + '%';
+  if (k.includes('price_floor')) return v + ' 元';
+  if (k.includes('pct')) return v + '%';
+  return String(v);
+}
+
+function renderPool() {
+  const spec = POOL_EDITABLE || {};
+  for (const [tbody, keys] of Object.entries(POOL_GROUPS)) {
+    const el = $('#' + tbody);
+    if (!el) continue;
+    el.innerHTML = keys.map(k => {
+      const s = spec[k] || {};
+      const cur = pBase(k), now = pCur(k);
+      const chg = JSON.stringify(now) !== JSON.stringify(cur);
+      let input;
+      if (s.type === 'bool') {
+        input = `<select data-pk="${k}" class="${chg?'changed':''}">
+            <option value="true" ${now===true?'selected':''}>启用 / 是</option>
+            <option value="false" ${now===false?'selected':''}>关闭 / 否</option>
+          </select>`;
+      } else if (s.type === 'enum') {
+        input = `<select data-pk="${k}" class="${chg?'changed':''}">
+            ${(s.options||[]).map(o=>`<option value="${o}" ${now===o?'selected':''}>${o}</option>`).join('')}
+          </select>`;
+      } else {
+        const shown = (k.includes('min_amount') || k.includes('min_mktcap'))
+          ? (now == null ? '' : (now / 1e8).toFixed(2))       // 亿元显示
+          : (k.includes('turnover_rate') ? (now == null ? '' : (now * 100).toFixed(2))
+          : now);
+        const step = (k.includes('turnover_rate') || k.includes('max_single_stock')
+                      || k.includes('max_l2') || k.includes('max_l1_parent')) ? '0.01' : 'any';
+        input = `<input type="number" step="${step}" data-pk="${k}"
+                   data-scale="${(k.includes('min_amount')||k.includes('min_mktcap'))?1e8:(k.includes('turnover_rate')?100:1)}"
+                   value="${shown}" class="${chg?'changed':''}">`;
+      }
+      let hint = s.semantics || '';
+      if (s.min != null || s.max != null) {
+        const mn = (k.includes('min_amount')||k.includes('min_mktcap')) && s.min!=null ? fmtY(s.min) : s.min;
+        const mx = (k.includes('min_amount')||k.includes('min_mktcap')) && s.max!=null ? fmtY(s.max) : s.max;
+        hint += `（范围 ${mn} ~ ${mx}${k.includes('min_amount')?' 元为显示单位，实际存元':''}）`;
+      }
+      return `<tr>
+        <td><code>${k}</code></td>
+        <td class="dim">${pFmt(k, cur)}</td>
+        <td>${input}</td>
+        <td class="dim">${hint}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  $$('[data-pk]').forEach(inp => {
+    inp.addEventListener('change', e => {
+      const k = e.target.dataset.pk;
+      const s = spec[k] || {};
+      let v;
+      if (s.type === 'bool') v = (e.target.value === 'true');
+      else if (s.type === 'enum') v = e.target.value;
+      else {
+        const scale = parseFloat(e.target.dataset.scale || '1');
+        const raw = parseFloat(e.target.value);
+        if (isNaN(raw)) { delete P_EDIT[k]; renderPool(); return; }
+        v = s.type === 'int' ? Math.round(raw * scale) : raw * scale;
+      }
+      if (JSON.stringify(v) === JSON.stringify(pBase(k))) delete P_EDIT[k];
+      else P_EDIT[k] = v;
+      renderPool();
+    });
+  });
+
+  const n = Object.keys(P_EDIT).length;
+  $('#poolDirty').textContent = n
+    ? `已改 ${n} 项（未写盘）: ` + Object.keys(P_EDIT).map(k=>k.split('.').pop()).join(', ')
+    : '当前无未写盘改动';
+}
+
+async function poolValidate() {
+  if (!Object.keys(P_EDIT).length) {
+    showMsg($('#msgP'), '没有改动。', 'warn'); return null;
+  }
+  const r = await fetch('/api/pool/validate', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({edits: P_EDIT})
+  });
+  const d = await r.json();
+  showMsg($('#msgP'),
+    (d.ok ? '✅ 校验通过。' : '❌ 校验未通过：\n') +
+    (d.errors||[]).map(x=>'  · '+x).join('\n') +
+    ((d.info||[]).length ? '\n\n' + d.info.map(x=>'  '+x).join('\n') : ''),
+    d.ok ? 'ok' : 'bad');
+  return d;
+}
+
+async function poolEstimate() {
+  $('#poolEst').textContent = '估算中…';
+  const r = await fetch('/api/pool/estimate', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({edits: P_EDIT})
+  });
+  const d = await r.json();
+  if (!d.ok) {
+    $('#poolEst').textContent = '❌ ' + (d.error || (d.errors||[]).join('\n'));
+    return;
+  }
+  const lines = [`池子样本 ${d.pool_n} 只（${d.source} · ${d.data_date}）`, ''];
+  for (const c of d.checks) {
+    const flag = c.changed ? '🔸已改' : '  ';
+    lines.push(`${flag} ${c.rule}`);
+    lines.push(`      阈值 ${pFmt(c.field, c.old)} → ${pFmt(c.field, c.new)}`);
+    lines.push(`      会剔掉 ${c.n_dropped} 只（${c.pct_dropped}%）`);
+    if (c.examples.length)
+      lines.push('      例：' + c.examples.map(e=>`${e.name}(${e.value})`).join(' / '));
+    lines.push('');
+  }
+  lines.push(d.note);
+  $('#poolEst').textContent = lines.join('\n');
+}
+
+async function poolApply() {
+  const v = await poolValidate();
+  if (!v || !v.ok) return;
+  if (!confirm('确认把选池规则写入 config.json？\n\n⚠️ 不会改变今日 index.html，次日日链才生效。')) return;
+  const r = await fetch('/api/pool/apply', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({edits: P_EDIT, reason: '后台手改选池规则'})
+  });
+  const d = await r.json();
+  if (!d.ok) {
+    showMsg($('#msgP'), '❌ ' + (d.error || (d.errors||[]).join('\n')), 'bad');
+    return;
+  }
+  showMsg($('#msgP'),
+    '✅ 已写入 config.json\n\n' + (d.changes||[]).map(x=>'  '+x).join('\n') +
+    '\n\n生效时机：' + (d.effective||'') + '\n快照：' + (d.snap||''), 'ok');
+  P_EDIT = {};
+  await loadConfig();
+  $('#poolEst').textContent = '（已写盘，上面是写盘前的影响估算）';
+}
+
+// ── ③ cycle ───────────────────────────────────────────
+// ⚠️ 这里的 key 必须是 **cycle_industry.json 里的原始字段路径**，
+//   不能用后端 disguised 过的别名（比如把 l2_list 叫 l2）。
+//   round125 CDP 实测踩过：后端只下发 l2/l1 别名时，getPath(cycle,'l2_list')
+//   恒 undefined → 四份清单全渲染成空、估算恒 "163→163"，
+//   而且更危险的是「删掉一项」会把**空数组**写回去。
+const CYC_SLOTS = [
+  ['l2_list', '规则1/2 gate 正面清单', '#7dd3fc'],
+  ['l1_list', '一级兼容清单', '#a3e635'],
+  ['step2_cycle_lists.theme_list', 'step2 主题粗分类', '#fcd34d'],
+  ['step2_cycle_lists.sw_cyclic_list', 'step2 申万二级', '#f9a8d4'],
+];
+// 申万二级/一级全名单（用于「加项」下拉，避免手打错字）
+let SW_L2_ALL = [], SW_L1_ALL = [];
+
+function cyBase(k) {
+  const v = getPath(CFG.cycle, k);
+  return Array.isArray(v) ? v.slice() : [];
+}
+function cyCur(k) {
+  return CY_EDIT.hasOwnProperty(k) ? CY_EDIT[k] : cyBase(k);
+}
+
+function renderCycle() {
+  const meta = CFG.cycle || {};
+  $('#cycSlots').innerHTML = CYC_SLOTS.map(([k, label, color]) => {
+    const items = cyCur(k), base = cyBase(k);
+    const chg = JSON.stringify(items) !== JSON.stringify(base);
+    const pool = (k.includes('l1_list') ? SW_L1_ALL : SW_L2_ALL);
+    const others = pool.filter(x => !items.includes(x));
+    const meta1 = ((meta.cycle_list_meta||{})[k]) || {};
+    return `<div class="uline">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+        <code>${k}</code>
+        <b style="color:${color};font-size:13px">${label}</b>
+        <span class="pill ${chg?'no':''}">${items.length} 项${chg?`（原 ${base.length}）`:''}</span>
+        ${meta1.consumer?`<span class="muted">消费方：${meta1.consumer}</span>`:''}
+      </div>
+      <div style="margin-bottom:8px">
+        ${items.map(x=>`<span class="grp g5" style="margin:3px 5px 3px 0;display:inline-block">
+            ${x}<a href="#" data-cyrem="${k}|${x}"
+                   style="color:#fca5a5;text-decoration:none;margin-left:6px">×</a>
+          </span>`).join('') || '<span class="dim">（空 —— 空清单会让该路判定全部失效）</span>'}
+      </div>
+      ${others.length ? `<select data-cyadd="${k}" style="width:auto;max-width:280px">
+          <option value="">+ 添加行业（共 ${others.length} 个可选）…</option>
+          ${others.map(x=>`<option value="${x}">${x}</option>`).join('')}
+        </select>` : ''}
+      ${meta1.effect?`<div class="dim" style="margin-top:6px">效果：${meta1.effect}</div>`:''}
+    </div>`;
+  }).join('');
+
+  $$('[data-cyrem]').forEach(a => a.onclick = e => {
+    e.preventDefault();
+    const [k, x] = a.dataset.cyrem.split('|');
+    CY_EDIT[k] = cyCur(k).filter(y => y !== x);
+    renderCycle();
+  });
+  $$('[data-cyadd]').forEach(sel => sel.onchange = e => {
+    const k = sel.dataset.cyadd, x = e.target.value;
+    if (!x) return;
+    CY_EDIT[k] = cyCur(k).concat([x]);
+    renderCycle();
+  });
+
+  // 规则阈值（只读，真身在 py 常量里）
+  const RULES = [
+    ['RULE1_GM_RISE_PP', '3.0 pp', '规则1：近4季毛利率均值 − 前4季均值 > 本值 → 触发'],
+    ['RULE1_DED', '10%', '规则1 扣成长合成分比例'],
+    ['RULE2_DED', '15%', '规则2 扣成长合成分比例（round108e 单独 lift 1.59 > 规则1 的 1.38）'],
+    ['RULE_DED_CAP', '25%', '两规则叠加扣减上限（联合 lift 1.82，但不清零）'],
+  ];
+  $('#cycRuleBody').innerHTML = RULES.map(([n, v, d]) => `<tr>
+      <td><code>${n}</code></td><td><b>${v}</b></td><td class="dim">${d}</td></tr>`).join('');
+
+  // 历史留档
+  const bd = meta.boss_declared || [];
+  const map = meta.mapping || {}, notes = meta.mapping_notes || {};
+  const exc = meta.excluded_deliberately || {};
+  $('#cycArchive').innerHTML = `
+    <div style="margin-bottom:12px">
+      <div class="dim" style="margin-bottom:5px">老大原话清单（${bd.length} 项，逐字保留，<b>不参与判定</b>）：</div>
+      ${bd.map(x=>`<span class="grp" style="margin:3px 5px 3px 0;display:inline-block">${x}</span>`).join('')}
+    </div>
+    <div style="margin-bottom:12px">
+      <div class="dim" style="margin-bottom:5px">口语名 → 申万二级映射：</div>
+      ${Object.entries(map).map(([k,v])=>`<div style="font-size:12.5px;margin:3px 0">
+        <code>${k}</code> → ${v.map(x=>`<span class="grp g5">${x}</span>`).join(' ')}
+        ${notes[k]?`<div class="dim" style="margin-left:14px">${notes[k]}</div>`:''}
+      </div>`).join('')}
+    </div>
+    <div>
+      <div class="dim" style="margin-bottom:5px">故意排除（${Object.keys(exc).length} 项）：</div>
+      ${Object.entries(exc).map(([k,v])=>`<div style="font-size:12.5px;margin:3px 0">
+        <code>${k}</code> <span class="dim">${v}</span></div>`).join('')}
+    </div>`;
+
+  const n = Object.keys(CY_EDIT).length;
+  $('#cyDirty').textContent = n
+    ? `已改 ${n} 份清单（未写盘）: ` + Object.keys(CY_EDIT).join(', ')
+    : '当前无未写盘改动';
+}
+
+function cyPayload() {
+  const p = {};
+  for (const [k] of CYC_SLOTS) p[k] = cyCur(k);
+  return p;
+}
+
+async function cyValidate() {
+  const r = await fetch('/api/cycle/validate', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({payload: cyPayload()})
+  });
+  const d = await r.json();
+  showMsg($('#msgCy'),
+    (d.ok ? '✅ 校验通过。' : '❌ 校验未通过：\n') +
+    (d.errors||[]).map(x=>'  · '+x).join('\n') +
+    ((d.info||[]).length ? '\n\n' + d.info.map(x=>'  '+x).join('\n') : ''),
+    d.ok ? 'ok' : 'bad');
+  return d;
+}
+
+async function cyEstimate() {
+  const btn = $('#btnCyEst');
+  btn.disabled = true; btn.textContent = '估算中…';
+  try {
+    const r = await fetch('/api/cycle/estimate', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({payload: cyPayload()})
+    });
+    const d = await r.json();
+    $('#cyEstCard').style.display = '';
+    if (!d.ok) {
+      $('#cyEstBox').innerHTML = `<div class="msg show bad">${d.error||'估算失败'}</div>`;
+      return;
+    }
+    const blk = (name, o, extra) => `
+      <div style="margin-bottom:14px">
+        <div style="font-size:13px;margin-bottom:6px">
+          <b>${name}</b>：命中 <b style="color:var(--acc)">${o.cur}</b>
+          → <b style="color:${o.delta>0?'var(--ok)':o.delta<0?'var(--bad)':'var(--tx2)'}">${o.new}</b>
+          <span class="dim">（Δ${o.delta>0?'+':''}${o.delta} · 新增 ${o.n_added} / 移除 ${o.n_removed}）</span>
+        </div>
+        ${extra}
+        ${o.added.length?`<div class="dim">新增例：${o.added.map(x=>`${x.name}(${x.l2})`).join(' / ')}</div>`:''}
+        ${o.removed.length?`<div class="dim">移除例：${o.removed.map(x=>`${x.name}(${x.l2})`).join(' / ')}</div>`:''}
+      </div>`;
+    $('#cyEstBox').innerHTML =
+      `<div class="muted" style="margin-bottom:12px">样本 ${d.pool_n} 只（${d.source} · ${d.data_date}）</div>` +
+      blk('规则1/2 gate（l2_list）', d.gate,
+          '<div class="dim">命中才扣成长分：规则1 −10% / 规则2 −15%，上限 25%</div>') +
+      blk('step2 低PE保护（theme ∪ sw）', d.step2,
+          '<div class="dim">命中要论证低PE是否盈利高峰陷阱 → 影响 score_sustain</div>') +
+      `<div class="warnbox" style="margin:0">${d.note}</div>`;
+  } finally {
+    btn.disabled = false; btn.textContent = '估算命中只数变化';
+  }
+}
+
+async function cyApply() {
+  const v = await cyValidate();
+  if (!v || !v.ok) return;
+  const chg = Object.keys(CY_EDIT).length;
+  if (!confirm(
+    `确认写入周期规则？\n\n` +
+    (chg ? `将改动 ${chg} 份清单\n` : `清单无改动（仍会重写版本号与时间戳）\n`) +
+    `\n⚠️ 生效后会重跑 gen_report_top200.py 重生成 index.html（约 1~2 分钟不可用）。\n` +
+    `⚠️ 但 index.html 里的成长分仍基于旧数据 —— 真正全链生效需次日日链重跑。`
+  )) return;
+  const btn = $('#btnCyApply');
+  btn.disabled = true; btn.textContent = '处理中…';
+  try {
+    const r = await fetch('/api/cycle/apply', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({payload: cyPayload(), reason: '后台手改周期规则',
+                            regenerate: true})
+    });
+    const d = await r.json();
+    if (!d.ok) {
+      showMsg($('#msgCy'), '❌ ' + (d.error || (d.errors||[]).join('\n')), 'bad');
+      return;
+    }
+    showMsg($('#msgCy'),
+      '✅ 已写入 cycle_industry.json\n\n' +
+      (d.changes||[]).map(x=>'  '+x).join('\n') +
+      '\n\n' + (d.regenerate||'') +
+      (d.warning ? '\n\n' + d.warning : '') +
+      '\n快照：' + (d.snap||''), 'ok');
+    CY_EDIT = {};
+    await loadConfig();
+  } finally {
+    btn.disabled = false; btn.textContent = '生效并重生成 index';
+  }
+}
+
+// ── ④ dim_max ─────────────────────────────────────────
+function renderDim() {
+  const dm = CFG.dim_max || {};
+  const rows = Object.entries(dm).sort((a,b)=>a[0].localeCompare(b[0])).map(([k,v]) => {
+    const w = EDIT[k];
+    return `<tr>
+      <td><code>${k.replace('score_','')}</code></td>
+      <td><b>${v}</b> ${v===5?'<span class="pill no">0-5 制</span>':'<span class="pill">0-10 制</span>'}</td>
+      <td class="dim">${w!=null?(+w).toFixed(2):'—'}</td>
+      <td class="dim">${k==='score_fund'?'⚠️ 量程是 5.0 不是 10.0，写错整维分数会被压半':''}</td>
+    </tr>`;
+  }).join('');
+  $('#dBody').innerHTML = rows;
+}
+
+// ── ⑤ audit ───────────────────────────────────────────
+async function loadAudit() {
+  const r = await fetch('/api/audit');
+  const d = await r.json();
+  $('#auditBox').textContent = d.length
+    ? d.map(x => `[${x.ts}] ${x.action}` +
+        (x.reason?`  原因=${x.reason}`:'') +
+        (x.changes?`\n${x.changes.map(c=>'    '+c).join('\n')}`:'') +
+        (x.restored?`\n    还原: ${x.restored.join(', ')}`:'') +
+        (x.snap?`\n    快照: ${x.snap}`:'') +
+        (x.regenerate?`\n    ${x.regenerate}`:'')
+      ).join('\n\n')
+    : '（暂无变更记录）';
+}
+
+// ── ⑥ verify ──────────────────────────────────────────
+async function loadVerify() {
+  $('#verifyBox').textContent = '运行中…';
+  const r = await fetch('/api/status');
+  const d = await r.json();
+  $('#verifyBox').textContent =
+    `verify_ok = ${d.verify_ok}\nran_at = ${d.ts}\n\n` + (d.verify_tail||'');
+  $('#verifyBox').style.borderColor = d.verify_ok ? 'rgba(34,197,94,.5)' : 'rgba(239,68,68,.5)';
+}
+$('#btnVerify').onclick = loadVerify;
+
+function renderFiles() {
+  const f = CFG.files || {};
+  $('#fileKv').innerHTML = kv([
+    ['index.html（展示页）', f.index_html ? `${f.index_html.path} · ${(f.index_html.bytes/1048576).toFixed(2)} MB · ${f.index_html.mtime}` : '—'],
+    ['最新评分数据', f.scored ? `${f.scored.path} · ${(f.scored.bytes/1048576).toFixed(2)} MB · ${f.scored.mtime}` : '—'],
+    ['factor_weights.json', f.factor_weights ? `${f.factor_weights.bytes} bytes · ${f.factor_weights.mtime}` : '—'],
+    ['模型版本', `${CFG.version}  ·  target_horizon=${CFG.target_horizon}`],
+    ['fitted_at', CFG.fitted_at],
+  ]);
+}
+
+loadConfig().catch(e => {
+  // 直接双击 admin.html 用 file:// 打开时必然到这里 —— 后端没起。
+  // 不显示技术错误，直接给可执行的动作，否则老大只会看到一串 fetch 报错。
+  const box = $('#msgW');
+  box.className = 'msg show bad';
+  box.innerHTML =
+    '❌ <b>没有连上后台服务</b>（当前是静态打开，只能看不能改）<br><br>' +
+    '请在项目目录执行下面任一命令把后台拉起来，然后<b>刷新本页</b>：<br><br>' +
+    '<code>cd /Users/yzreal/WorkBuddy/2026-07-24-18-07-15/stock-top200-report</code><br>' +
+    '<code>./start_admin.sh open</code>　　<span class="muted">（起服务 + 自动开浏览器）</span><br><br>' +
+    '或者只起服务：<br>' +
+    '<code>./start_admin.sh</code>　然后手动访问 <code>http://127.0.0.1:8788/</code><br><br>' +
+    '<span class="muted">原始错误：' + e + '</span>';
+});
+</script>
+</body>
+</html>

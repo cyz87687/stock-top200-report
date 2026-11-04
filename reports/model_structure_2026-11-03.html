@@ -1,0 +1,1068 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>模型结构与方法论证据 2026-11-03</title></head><body style="margin:0;background:#0b1220;">
+<div style="max-width:1180px;margin:0 auto;padding:18px 20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#0b1220;color:#cbd5e1;">
+  <div style="border-bottom:2px solid #38bdf8;padding-bottom:10px;margin-bottom:16px;">
+    <div style="font-size:20px;font-weight:800;color:#e2e8f0;">🔬 模型结构与方法论证据报告</div>
+    <div style="font-size:12px;color:#94a3b8;margin-top:5px;">
+      数据日期 <b style="color:#38bdf8;">2026-11-03</b> ·
+      评分层版本 <b>stock-scorer v4.17-cycle-rules (9-dim + AI + sector-momentum[evidence], prior-pending (全市场回测先验, 池内 IC 积累中))</b> ·
+      生效 9 维 · 池内 1921 只
+    </div>
+    <div style="font-size:11px;color:#64748b;margin-top:6px;line-height:1.8;">
+      📌 <b>本报告用途</b>：主页面（每日决策页）只回答「今天环境怎样 / 买什么 / 池子里还有什么」，
+      所有<b>计算过程、证伪检验、样本边界披露</b>集中在本文件存档。
+      主页首屏只保留一条结论摘要，不内联这些推导过程。
+    </div>
+  </div>
+
+  <div style="padding:14px 16px;background:rgba(34,197,94,0.07);border:1px solid #22c55e;border-radius:10px;margin-bottom:16px;">
+    <div style="font-size:14px;font-weight:800;color:#86efac;margin-bottom:6px;">✅ 数据口径升级说明（取代旧「样本外可靠性警示」）</div>
+    <div style="font-size:11px;color:#e2e8f0;line-height:1.95;">
+      旧版此处曾有一条<b>红色警示</b>：说明「78 混合截面不可作样本外验证、大池仅 9 天无功效、
+      305 只大池会员无法回补」。<b style="color:#86efac;">该警示的前提已被本轮工作消除</b>：<br>
+      · <b>价格历史已向前回补</b>至 <b>2025-07-24</b>（腾讯 <code>need=300</code> 实返 301 根/只，
+      <b>2138 只</b>，<b>304 个真实交易日</b>），使 bias60 所需 61 根预热与 h20 所需 20 日前视<b>不再互斥</b>；<br>
+      · 域<b>不锁定冻结旧池</b>，重建为 <b style="color:#38bdf8;">2029 只真·大池</b>，
+      此前「缺失的 305 只」已全部回补进面板；<br>
+      · 因此本报告第三节的实证表<b>仍标为「历史截面诊断」</b>（口径未变，数字仍是旧混合池），
+      但<b style="color:#86efac;">决策依据已切换为第二节的真·大池裁决</b>。<br>
+      <b style="color:#fca5a5;">请以第二节为决策依据；第四节仅作历史沿革参照。</b>
+    </div>
+  </div>
+
+  <div style="padding:14px 16px;background:#111c2e;border:0.5px solid #1e293b;border-radius:10px;margin-bottom:16px;">
+    <div style="font-size:14px;font-weight:800;color:#e2e8f0;margin-bottom:2px;">⚖️ 一、当前权重配置（与主页同源）</div>
+    <div style="font-size:11px;color:#64748b;margin-bottom:8px;">
+      下面这张条与主页首屏权重条由<b>同一个函数</b>（_build_weight_strip）生成，口径完全一致，
+      此处存档一份便于脱离主页核对。
+    </div>
+    <div class="weight-strip" style="margin-top:14px;padding:12px 14px;border-radius:10px;background:#111c2e;border:0.5px solid #1e293b;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;flex-wrap:wrap;"><span style="font-size:12px;font-weight:800;color:#e2e8f0;">⚖️ 当前评分维度与权重</span><span style="font-size:10px;color:#64748b;">生效 9 维 · 权重合计 100% · 每维先按自身量程归一化到 0-10，再加权 ×10 得百分制总分</span></div><div style="display:flex;gap:7px;flex-wrap:wrap;"><div class="ws-cell" style="flex:1 1 0;min-width:96px;padding:7px 9px;border-radius:6px;background:#0f172a;border-left:3px solid #22c55e;"><div style="font-size:10px;color:#94a3b8;white-space:nowrap;">基本面(估值锚)</div><div class="ws-pct" style="font-size:15px;font-weight:800;color:#22c55e;line-height:1.3;">20.0%</div><div style="font-size:9px;color:#475569;">原始 0-5 · 归一化 0-10</div></div><div class="ws-cell" style="flex:1 1 0;min-width:96px;padding:7px 9px;border-radius:6px;background:#0f172a;border-left:3px solid #3b82f6;"><div style="font-size:10px;color:#94a3b8;white-space:nowrap;">质量(fund拆分)</div><div class="ws-pct" style="font-size:15px;font-weight:800;color:#3b82f6;line-height:1.3;">10.0%</div><div style="font-size:9px;color:#475569;">池内分位 0-10（非绝对分）</div></div><div class="ws-cell" style="flex:1 1 0;min-width:96px;padding:7px 9px;border-radius:6px;background:#0f172a;border-left:3px solid #38bdf8;"><div style="font-size:10px;color:#94a3b8;white-space:nowrap;">成长(fund拆分)</div><div class="ws-pct" style="font-size:15px;font-weight:800;color:#38bdf8;line-height:1.3;">10.0%</div><div style="font-size:9px;color:#475569;">池内分位 0-10（非绝对分）</div></div><div class="ws-cell" style="flex:1 1 0;min-width:96px;padding:7px 9px;border-radius:6px;background:#0f172a;border-left:3px solid #a78bfa;"><div style="font-size:10px;color:#94a3b8;white-space:nowrap;">技术面反号</div><div class="ws-pct" style="font-size:15px;font-weight:800;color:#a78bfa;line-height:1.3;">10.0%</div><div style="font-size:9px;color:#475569;">原始 0-10</div></div><div class="ws-cell" style="flex:1 1 0;min-width:96px;padding:7px 9px;border-radius:6px;background:#0f172a;border-left:3px solid #f59e0b;"><div style="font-size:10px;color:#94a3b8;white-space:nowrap;">乖离低位</div><div class="ws-pct" style="font-size:15px;font-weight:800;color:#f59e0b;line-height:1.3;">5.0%</div><div style="font-size:9px;color:#475569;">原始 0-5 · 归一化 0-10</div></div><div class="ws-cell" style="flex:1 1 0;min-width:96px;padding:7px 9px;border-radius:6px;background:#0f172a;border-left:3px solid #f97316;"><div style="font-size:10px;color:#94a3b8;white-space:nowrap;">RSI反转</div><div class="ws-pct" style="font-size:15px;font-weight:800;color:#f97316;line-height:1.3;">5.0%</div><div style="font-size:9px;color:#475569;">原始 0-5 · 归一化 0-10</div></div><div class="ws-cell" style="flex:1 1 0;min-width:96px;padding:7px 9px;border-radius:6px;background:#0f172a;border-left:3px solid #4ade80;"><div style="font-size:10px;color:#94a3b8;white-space:nowrap;">EP估值</div><div class="ws-pct" style="font-size:15px;font-weight:800;color:#4ade80;line-height:1.3;">10.0%</div><div style="font-size:9px;color:#475569;">池内分位 0-10（非绝对分）</div></div><div class="ws-cell" style="flex:1 1 0;min-width:96px;padding:7px 9px;border-radius:6px;background:#0f172a;border-left:3px solid #eab308;"><div style="font-size:10px;color:#94a3b8;white-space:nowrap;">小盘成长溢价</div><div class="ws-pct" style="font-size:15px;font-weight:800;color:#eab308;line-height:1.3;">20.0%</div><div style="font-size:9px;color:#475569;">市值分×成长门限(＞7→0.8/4-7→0.3/≤4→0)</div></div><div class="ws-cell" style="flex:1 1 0;min-width:96px;padding:7px 9px;border-radius:6px;background:#0f172a;border-left:3px solid #fb923c;"><div style="font-size:10px;color:#94a3b8;white-space:nowrap;">行业龙头壁垒</div><div class="ws-pct" style="font-size:15px;font-weight:800;color:#fb923c;line-height:1.3;">10.0%</div><div style="font-size:9px;color:#475569;">业务份额组内rank·全池(0-10)</div></div></div><div style="margin-top:9px;font-size:10px;color:#94a3b8;line-height:1.7;padding:7px 9px;background:rgba(56,189,248,0.06);border-left:3px solid #38bdf8;border-radius:4px;">📐 <b>两种量纲别混读</b>：<b style="color:#22c55e;">质量 / 成长 / EP / 行业龙头</b> 4 维是<b>池内分位×10</b>（0=本池最差或市值最大/波动最高，5=中位，10=本池最好或市值最小/波动最低），是<b>相对排名</b>不是绝对水平 —— 因此本池<b>必然</b>有 0.0 与 10.0 各一只、中位恒为 5.00，某股「质量 0.04」的含义是「在今日 1921 只里质量排最后几名」，而非「这家公司质量几乎为零」。<br>其余 5 维（估值锚 / 技反 / 乖离 / RSI反 / 小盘成长）才是按阈值算出的<b>绝对分</b>，可跨日比较。跨日只能比 total 与绝对分维，<b style="color:#f59e0b;">分位维跨日不可比</b>（池子换了、排名就换）。</div><div style="margin-top:10px;padding:8px 10px;border-radius:6px;background:rgba(148,163,184,0.06);border-left:3px solid #64748b;"><div style="font-size:11px;font-weight:800;color:#cbd5e1;margin-bottom:5px;">📊 名义权重 ≠ 实际排序贡献（当日现算）</div><table style="width:100%;border-collapse:collapse;font-size:10px;"><thead><tr style="color:#64748b;border-bottom:1px solid #1e293b;"><th style="padding:3px 6px;text-align:left;font-weight:600;">维度</th><th style="padding:3px 6px;text-align:right;font-weight:600;">名义权重</th><th style="padding:3px 6px;text-align:right;font-weight:600;">σ 贡献占比</th><th style="padding:3px 6px;text-align:right;font-weight:600;">偏离</th><th style="padding:3px 6px;text-align:right;font-weight:600;">有效样本</th></tr></thead><tbody><tr><td style="padding:3px 6px;color:#cbd5e1;">小盘成长溢价</td><td style="padding:3px 6px;text-align:right;color:#94a3b8;">20.0%</td><td style="padding:3px 6px;text-align:right;color:#e2e8f0;font-weight:700;">26.8%</td><td style="padding:3px 6px;text-align:right;color:#22c55e;">+6.8pp</td><td style="padding:3px 6px;text-align:right;color:#475569;">1405/1921</td></tr><tr><td style="padding:3px 6px;color:#cbd5e1;">基本面(估值锚)</td><td style="padding:3px 6px;text-align:right;color:#94a3b8;">20.0%</td><td style="padding:3px 6px;text-align:right;color:#e2e8f0;font-weight:700;">17.4%</td><td style="padding:3px 6px;text-align:right;color:#ef4444;">-2.6pp</td><td style="padding:3px 6px;text-align:right;color:#475569;">1673/1921</td></tr><tr><td style="padding:3px 6px;color:#cbd5e1;">质量(fund拆分)</td><td style="padding:3px 6px;text-align:right;color:#94a3b8;">10.0%</td><td style="padding:3px 6px;text-align:right;color:#e2e8f0;font-weight:700;">11.6%</td><td style="padding:3px 6px;text-align:right;color:#64748b;">+1.6pp</td><td style="padding:3px 6px;text-align:right;color:#475569;">1921/1921</td></tr><tr><td style="padding:3px 6px;color:#cbd5e1;">成长(fund拆分)</td><td style="padding:3px 6px;text-align:right;color:#94a3b8;">10.0%</td><td style="padding:3px 6px;text-align:right;color:#e2e8f0;font-weight:700;">11.5%</td><td style="padding:3px 6px;text-align:right;color:#64748b;">+1.5pp</td><td style="padding:3px 6px;text-align:right;color:#475569;">1921/1921</td></tr><tr><td style="padding:3px 6px;color:#cbd5e1;">EP估值</td><td style="padding:3px 6px;text-align:right;color:#94a3b8;">10.0%</td><td style="padding:3px 6px;text-align:right;color:#e2e8f0;font-weight:700;">10.2%</td><td style="padding:3px 6px;text-align:right;color:#64748b;">+0.2pp</td><td style="padding:3px 6px;text-align:right;color:#475569;">1491/1921</td></tr><tr><td style="padding:3px 6px;color:#cbd5e1;">行业龙头壁垒</td><td style="padding:3px 6px;text-align:right;color:#94a3b8;">10.0%</td><td style="padding:3px 6px;text-align:right;color:#e2e8f0;font-weight:700;">8.4%</td><td style="padding:3px 6px;text-align:right;color:#64748b;">-1.6pp</td><td style="padding:3px 6px;text-align:right;color:#475569;">1904/1921</td></tr><tr><td style="padding:3px 6px;color:#cbd5e1;">乖离低位</td><td style="padding:3px 6px;text-align:right;color:#94a3b8;">5.0%</td><td style="padding:3px 6px;text-align:right;color:#e2e8f0;font-weight:700;">5.4%</td><td style="padding:3px 6px;text-align:right;color:#64748b;">+0.4pp</td><td style="padding:3px 6px;text-align:right;color:#475569;">1921/1921</td></tr><tr><td style="padding:3px 6px;color:#cbd5e1;">RSI反转</td><td style="padding:3px 6px;text-align:right;color:#94a3b8;">5.0%</td><td style="padding:3px 6px;text-align:right;color:#e2e8f0;font-weight:700;">5.4%</td><td style="padding:3px 6px;text-align:right;color:#64748b;">+0.4pp</td><td style="padding:3px 6px;text-align:right;color:#475569;">1921/1921</td></tr><tr><td style="padding:3px 6px;color:#cbd5e1;">技术面反号</td><td style="padding:3px 6px;text-align:right;color:#94a3b8;">10.0%</td><td style="padding:3px 6px;text-align:right;color:#e2e8f0;font-weight:700;">3.3%</td><td style="padding:3px 6px;text-align:right;color:#ef4444;">-6.7pp</td><td style="padding:3px 6px;text-align:right;color:#475569;">1921/1921</td></tr></tbody></table><div style="margin-top:5px;font-size:9.5px;color:#64748b;line-height:1.65;">σ 贡献 = 权重 × 该维截面标准差 ÷ 量程，反映该维<b>对最终排序的真实影响力</b>。名义权重只在各维离散度相同时才等于实际贡献 —— 偏离为负（红）说明该维「占了权重但没起作用」，常见原因是覆盖不足或近乎常数。按此口径的有效维数为 <b style="color:#e2e8f0;">6.53 / 9</b>（1/Σp²，越小说明排序越集中在少数维上）。</div></div><div style="margin-top:9px;font-size:10px;color:#64748b;line-height:1.7;"><b style="color:#94a3b8;">未参与评分（权重 0，共 11 维）：</b>消息面、题材反号、小市值(全市场口径)、板块动量、超跌60反转、量能反向、超买反向、题材内禀、关注度相对、score_lowvol20、score_size_ind。这些字段仍在数据库中计算与保留，但<b style="color:#94a3b8;">不计入总分</b> —— 不是「该股这几维很差」，而是模型当前不采信它们。</div><div style="margin-top:9px;padding:8px 10px;border-radius:6px;background:rgba(148,163,184,0.07);border-left:3px solid #64748b;font-size:10px;color:#94a3b8;line-height:1.75;">🔬 <b style="color:#cbd5e1;">模型结构结论（详见独立报告）</b>：<ul style="margin:4px 0 0 16px;padding:0;"><li><b>有效维数 4.91 / 9</b>（按相关矩阵特征值算的信息参与率；PC1 29%、特征值&gt;1 的成分 3 个）——标称 9 维不等于 9 份独立信息</li><li>逐维单维 IC、全 lag 稳健性（Bonferroni 3.08）、换维裁决与复合分对照，见独立报告的实证表</li><li><b style="color:#38bdf8;">真·大池审计（round34）已取代旧混合池</b>：域 <b>2029 只</b>（不锁定冻结池）、<b>238 个截面</b> / 2025-11-03 ~ 2026-10-27、<b>7 个价格维回测窗口 11.53 个月</b>（h20 10.58 个月），<b style="color:#22c55e;">远超 3 个月硬下限</b>；fund 维见下条例外</li><li><b style="color:#f59e0b;">裁决：4 维建议归零</b>（乖离60(反转) / RSI反转 / 技术反号 / EP估值）—— 反转块三维在真·大池中双周期均不过 Bonferroni，且组合消融显示<b>剔除后 h20 复合 IC 反而上升</b>。详见独立报告<b>第二节</b></li><li><b style="color:#fca5a5;">例外：fund 维 h20 窗口仅 2.86 月，未达 3 月</b>（<code>fwd_hist</code> 起点硬边界，穷举验证无解），故 fund 以 h5（3.81 月）为主判据。fund 覆盖率亦仅约 10%（每日 ~190 行且带 TOP200 选样偏差）</li><li>独立报告<b>第六节</b>另有 <b>外部基准对照</b>（飞书全 A 股近半年 47 因子）：揭示 8 维与外部基准的偏离与符号翻转</li></ul><div style="margin-top:4px;color:#64748b;">📄 完整分析（有效维数推导 · 相关矩阵 · 方差贡献 · Top20 敏感性 · 逐维 IC 与稳健性 · 换维裁决 · 双视角评估）已移至 <b style="color:#38bdf8;">reports/model_structure_2026-11-03.html</b>（同目录另有因子日报 <b style="color:#94a3b8;">reports/factor_2026-10-23.md</b>，数据日期 2026-10-23，<b style="color:#f59e0b;">非当日</b>）。</div></div></div>
+  </div>
+
+  
+  <div style="padding:14px 16px;background:linear-gradient(135deg,rgba(56,189,248,0.07),rgba(17,28,46,0.6));border:1px solid #38bdf8;border-radius:10px;margin-bottom:16px;">
+    <div style="font-size:15px;font-weight:800;color:#38bdf8;margin-bottom:6px;">🎯 二、真·大池审计裁决（round34 · 取代旧混合池）</div>
+    <div style="font-size:11px;color:#94a3b8;margin-bottom:10px;line-height:1.9;">
+      依据老大指令：<b>决策须以基于 ≥3 个月回测算出的 IC 为依据</b>。本裁决在
+      <b style="color:#38bdf8;">真·大池 2029 只</b>上重建长面板
+      （<b>不锁定冻结旧池</b>），共 <b>238 个截面</b>，
+      区间 <b>2025-11-03 ~ 2026-10-27</b>。<b>7 个价格维</b>的回测窗口：
+      h5 <b>11.53 个月</b>、h20 <b>10.58 个月</b>，
+      <b style="color:#22c55e;">均远超 3 个月硬下限</b>；
+      <b style="color:#f59e0b;">fund 维例外</b>（h20 仅 2.86 月，见下方边界②）。
+    </div>
+
+    <div style="padding:9px 12px;background:rgba(239,68,68,0.08);border-left:3px solid #ef4444;border-radius:5px;margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:700;color:#fca5a5;margin-bottom:4px;">为什么推翻旧结论：混合池 IC 是选样偏差</div>
+      <div style="font-size:10.5px;color:#cbd5e1;line-height:1.9;">
+        旧 <code>audit_round33</code> 的 78 截面实为<b>混合池</b>（76 个冻结旧池 ~195 只 + 9 个当前大池仅 11 天），
+        89% 是单一窄名单的时间重复。<b>同一维度换到真·大池后 IC 崩塌：</b><br>
+        · 乖离60（反转）h5 IC：混合池 <b style="color:#f59e0b;">+0.1871</b> →
+        真·大池 <b style="color:#22c55e;">+0.0261</b>（<b style="color:#ef4444;">−86%</b>），
+        且分半稳定（前半 +0.0256 / 后半 +0.0266），<b>不是噪声</b>。<br>
+        结论：<b style="color:#fca5a5;">旧反转块的高 IC 来自窄池顺风，扩到真池后 alpha 消失。</b>
+      </div>
+    </div>
+
+    <div style="font-size:12px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">逐维裁决表</div>
+    <table style="width:100%;border-collapse:collapse;font-size:10px;margin-bottom:6px;">
+      <tr style="border-bottom:1px solid #334155;color:#64748b;font-size:9px;">
+        <th style="text-align:left;padding:3px 8px;width:13%;">维度</th>
+        <th style="text-align:right;padding:3px 8px;width:12%;">权重 现→建议</th>
+        <th style="text-align:right;padding:3px 8px;width:14%;">h5 IC</th>
+        <th style="text-align:right;padding:3px 8px;width:14%;">h20 IC</th>
+        <th style="text-align:left;padding:3px 8px;width:13%;">消融(h20)</th>
+        <th style="text-align:center;padding:3px 8px;width:11%;">裁决</th>
+        <th style="text-align:left;padding:3px 8px;">理由</th>
+      </tr>
+      <tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:5px 8px;color:#e2e8f0;font-weight:600;">乖离60(反转)</td><td style="padding:5px 8px;text-align:right;"><span style="color:#64748b;">0.175</span><span style="color:#475569;"> → </span><b style="color:#f59e0b;">0.000</b></td><td style="padding:5px 8px;text-align:right;"><span style="color:#ef4444;font-weight:700;">+0.0261</span><span style="color:#64748b;font-size:8px;"> t+2.13</span></td><td style="padding:5px 8px;text-align:right;"><span style="color:#ef4444;font-weight:700;">+0.0328</span><span style="color:#64748b;font-size:8px;"> t+2.08</span></td><td style="padding:5px 8px;font-size:9px;color:#94a3b8;">不可区分<span style="color:#475569;font-size:8px;"> Δ+0.0107</span></td><td style="padding:5px 8px;text-align:center;color:#ef4444;font-weight:700;">✕ 归零</td><td style="padding:5px 8px;font-size:9px;color:#64748b;line-height:1.5;">双周期均不过 Bonferroni</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:5px 8px;color:#e2e8f0;font-weight:600;">RSI反转</td><td style="padding:5px 8px;text-align:right;"><span style="color:#64748b;">0.175</span><span style="color:#475569;"> → </span><b style="color:#f59e0b;">0.000</b></td><td style="padding:5px 8px;text-align:right;"><span style="color:#ef4444;font-weight:700;">+0.0215</span><span style="color:#64748b;font-size:8px;"> t+1.78</span></td><td style="padding:5px 8px;text-align:right;"><span style="color:#ef4444;font-weight:700;">+0.0294</span><span style="color:#64748b;font-size:8px;"> t+1.93</span></td><td style="padding:5px 8px;font-size:9px;color:#94a3b8;">拖累<span style="color:#475569;font-size:8px;"> Δ+0.0074</span></td><td style="padding:5px 8px;text-align:center;color:#ef4444;font-weight:700;">✕ 归零</td><td style="padding:5px 8px;font-size:9px;color:#64748b;line-height:1.5;">双周期均不过 Bonferroni</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:5px 8px;color:#e2e8f0;font-weight:600;">技术反号</td><td style="padding:5px 8px;text-align:right;"><span style="color:#64748b;">0.150</span><span style="color:#475569;"> → </span><b style="color:#f59e0b;">0.000</b></td><td style="padding:5px 8px;text-align:right;"><span style="color:#ef4444;font-weight:700;">+0.0312</span><span style="color:#64748b;font-size:8px;"> t+2.80</span></td><td style="padding:5px 8px;text-align:right;"><span style="color:#ef4444;font-weight:700;">+0.0239</span><span style="color:#64748b;font-size:8px;"> t+1.60</span></td><td style="padding:5px 8px;font-size:9px;color:#94a3b8;">拖累<span style="color:#475569;font-size:8px;"> Δ+0.0034</span></td><td style="padding:5px 8px;text-align:center;color:#ef4444;font-weight:700;">✕ 归零</td><td style="padding:5px 8px;font-size:9px;color:#64748b;line-height:1.5;">双周期均不过 Bonferroni</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:5px 8px;color:#e2e8f0;font-weight:600;">低波20</td><td style="padding:5px 8px;text-align:right;"><span style="color:#64748b;">0.130</span><span style="color:#475569;"> → </span><b style="color:#22c55e;">0.130</b></td><td style="padding:5px 8px;text-align:right;"><span style="color:#ef4444;font-weight:700;">+0.0554</span><span style="color:#64748b;font-size:8px;"> t+3.23</span><span style="color:#22c55e;font-weight:700;">★</span></td><td style="padding:5px 8px;text-align:right;"><span style="color:#ef4444;font-weight:700;">+0.0579</span><span style="color:#64748b;font-size:8px;"> t+3.26</span><span style="color:#22c55e;font-weight:700;">★</span></td><td style="padding:5px 8px;font-size:9px;color:#94a3b8;">不可区分<span style="color:#475569;font-size:8px;"> Δ-0.0113</span></td><td style="padding:5px 8px;text-align:center;color:#22c55e;font-weight:700;">● 保留</td><td style="padding:5px 8px;font-size:9px;color:#64748b;line-height:1.5;">双周期过 Bonferroni 且方向符合先验</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:5px 8px;color:#e2e8f0;font-weight:600;">质量</td><td style="padding:5px 8px;text-align:right;"><span style="color:#64748b;">0.120</span><span style="color:#475569;"> → </span><b style="color:#f59e0b;">0.060</b></td><td style="padding:5px 8px;text-align:right;"><span style="color:#ef4444;font-weight:700;">+0.0118</span><span style="color:#64748b;font-size:8px;"> t+1.73</span></td><td style="padding:5px 8px;text-align:right;"><span style="color:#ef4444;font-weight:700;">+0.0361</span><span style="color:#64748b;font-size:8px;"> t+5.10</span><span style="color:#22c55e;font-weight:700;">★</span></td><td style="padding:5px 8px;font-size:9px;color:#94a3b8;">不可替代<span style="color:#475569;font-size:8px;"> Δ-0.0100</span></td><td style="padding:5px 8px;text-align:center;color:#f59e0b;font-weight:700;">◑ 降权一半</td><td style="padding:5px 8px;font-size:9px;color:#64748b;line-height:1.5;">仅单周期过 Bonferroni</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:5px 8px;color:#e2e8f0;font-weight:600;">行业内市值</td><td style="padding:5px 8px;text-align:right;"><span style="color:#64748b;">0.100</span><span style="color:#475569;"> → </span><b style="color:#22c55e;">0.100</b></td><td style="padding:5px 8px;text-align:right;"><span style="color:#ef4444;font-weight:700;">+0.0390</span><span style="color:#64748b;font-size:8px;"> t+5.37</span><span style="color:#22c55e;font-weight:700;">★</span></td><td style="padding:5px 8px;text-align:right;"><span style="color:#ef4444;font-weight:700;">+0.0722</span><span style="color:#64748b;font-size:8px;"> t+7.96</span><span style="color:#22c55e;font-weight:700;">★</span></td><td style="padding:5px 8px;font-size:9px;color:#94a3b8;">不可替代<span style="color:#475569;font-size:8px;"> Δ-0.0155</span></td><td style="padding:5px 8px;text-align:center;color:#22c55e;font-weight:700;">● 保留</td><td style="padding:5px 8px;font-size:9px;color:#64748b;line-height:1.5;">双周期过 Bonferroni 且方向符合先验</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:5px 8px;color:#e2e8f0;font-weight:600;">EP估值</td><td style="padding:5px 8px;text-align:right;"><span style="color:#64748b;">0.075</span><span style="color:#475569;"> → </span><b style="color:#f59e0b;">0.000</b></td><td style="padding:5px 8px;text-align:right;"><span style="color:#ef4444;font-weight:700;">+0.0197</span><span style="color:#64748b;font-size:8px;"> t+2.16</span></td><td style="padding:5px 8px;text-align:right;"><span style="color:#ef4444;font-weight:700;">+0.0233</span><span style="color:#64748b;font-size:8px;"> t+2.51</span></td><td style="padding:5px 8px;font-size:9px;color:#94a3b8;">不可区分<span style="color:#475569;font-size:8px;"> Δ-0.0011</span></td><td style="padding:5px 8px;text-align:center;color:#ef4444;font-weight:700;">✕ 归零</td><td style="padding:5px 8px;font-size:9px;color:#64748b;line-height:1.5;">双周期均不过 Bonferroni</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:5px 8px;color:#e2e8f0;font-weight:600;">fund基本面</td><td style="padding:5px 8px;text-align:right;"><span style="color:#64748b;">0.075</span><span style="color:#475569;"> → </span><b style="color:#22c55e;">0.075</b></td><td style="padding:5px 8px;text-align:right;"><span style="color:#ef4444;font-weight:700;">+0.0558</span><span style="color:#64748b;font-size:8px;"> t+4.18</span><span style="color:#22c55e;font-weight:700;">★</span></td><td style="padding:5px 8px;text-align:right;"><span style="color:#ef4444;font-weight:700;">+0.0959</span><span style="color:#64748b;font-size:8px;"> t+5.43</span><span style="color:#22c55e;font-weight:700;">★</span><span style="color:#f59e0b;font-size:8px;" title="h20 跨度 < 3 月，数据源硬边界，仅供参照">⚠</span></td><td style="padding:5px 8px;font-size:9px;color:#94a3b8;">伪影(幅度过小)<span style="color:#475569;font-size:8px;"> Δ+0.0006</span></td><td style="padding:5px 8px;text-align:center;color:#22c55e;font-weight:700;">● 保留</td><td style="padding:5px 8px;font-size:9px;color:#64748b;line-height:1.5;">双周期过 Bonferroni 且方向符合先验</td></tr>
+    </table>
+    <div style="font-size:9.5px;color:#64748b;margin-bottom:12px;line-height:1.8;">
+      <b style="color:#22c55e;">★</b> = 过 Bonferroni（|NW t| ≥ 3.08，双重检验门槛已按 300+ 次检验取值）；
+      消融列显示<b>剔除该维后复合 IC 的变化</b>，「不可替代」= 剔除后显著下降，
+      「拖累」= 剔除后显著上升，「伪影」= t 大但幅度 &lt; 0.003（配对检验方差趋零发散，非真实效应）。<br>
+      汇总：<b style="color:#22c55e;">保留 3 维</b> · <b style="color:#f59e0b;">降权 1 维</b> ·
+      <b style="color:#ef4444;">建议归零 4 维</b>；
+      建议权重合计 <b>0.365</b>（≠1.0 属正常，缺口需单独裁决再分配）。<br>
+      <b style="color:#fca5a5;">⚠️ 本表「建议归零」只是单维 IC 判据的初判，不是最终落档值</b> ——
+      下方分前后段复核显示该判据不 regime 稳健，实际落档改为<b>降权到 1/4</b>（见「决定性扫描」）。
+    </div>
+
+    <div style="font-size:12px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">组合消融：归零不是单维噪声</div>
+    <table style="width:100%;border-collapse:collapse;font-size:10px;margin-bottom:6px;">
+      <tr style="border-bottom:1px solid #334155;color:#64748b;font-size:9px;">
+        <th style="text-align:left;padding:3px 8px;">方案</th>
+        <th style="text-align:right;padding:3px 8px;width:15%;">h5 复合IC</th>
+        <th style="text-align:right;padding:3px 8px;width:15%;">h20 复合IC</th>
+        <th style="text-align:center;padding:3px 8px;width:16%;">对基准</th>
+      </tr>
+      <tr style="border-bottom:0.5px solid #1e293b;background:rgba(56,189,248,0.06);"><td style="padding:4px 8px;color:#cbd5e1;">现行 8 维</td><td style="padding:4px 8px;text-align:right;color:#ef4444;font-weight:700;">+0.0602</td><td style="padding:4px 8px;text-align:right;color:#ef4444;font-weight:700;">+0.0778</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#64748b;">基准</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">去 bias60</td><td style="padding:4px 8px;text-align:right;color:#ef4444;font-weight:700;">+0.0632</td><td style="padding:4px 8px;text-align:right;color:#22c55e;font-weight:700;">+0.0884</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#22c55e;">↑ 优于基准</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">去 RSI反号</td><td style="padding:4px 8px;text-align:right;color:#ef4444;font-weight:700;">+0.0653</td><td style="padding:4px 8px;text-align:right;color:#22c55e;font-weight:700;">+0.0851</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#22c55e;">↑ 优于基准</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">去 技术反号</td><td style="padding:4px 8px;text-align:right;color:#ef4444;font-weight:700;">+0.0608</td><td style="padding:4px 8px;text-align:right;color:#22c55e;font-weight:700;">+0.0812</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#22c55e;">↑ 优于基准</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">去 EP</td><td style="padding:4px 8px;text-align:right;color:#ef4444;font-weight:700;">+0.0587</td><td style="padding:4px 8px;text-align:right;color:#ef4444;font-weight:700;">+0.0767</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#64748b;">↓ 差于基准</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">去反转块三合一(bias60+RSI+tech_neg)</td><td style="padding:4px 8px;text-align:right;color:#ef4444;font-weight:700;">+0.0624</td><td style="padding:4px 8px;text-align:right;color:#22c55e;font-weight:700;">+0.0933</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#22c55e;">↑ 优于基准</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">只留 4 个建议保留维</td><td style="padding:4px 8px;text-align:right;color:#ef4444;font-weight:700;">+0.0612</td><td style="padding:4px 8px;text-align:right;color:#22c55e;font-weight:700;">+0.0932</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#22c55e;">↑ 优于基准</td></tr>
+    </table>
+    <div style="font-size:10px;color:#94a3b8;line-height:1.9;margin-bottom:12px;">
+      <b style="color:#f59e0b;">初步证据：</b>剔除反转块三合一（乖离60 + RSI + 技术反号，合计权重 0.50）后，
+      h20 复合 IC 由 <b>+0.0778</b> 升至 <b style="color:#22c55e;">+0.0933</b>（<b style="color:#22c55e;">+20%</b>）。<b style="color:#fca5a5;">看似「反转块是拖累」</b>。<br>
+      <b style="color:#f59e0b;">但该结论不 regime 稳健，不能直接归零</b> —— 见下方「分前后段复核」。
+    </div>
+
+    <div style="padding:9px 12px;background:rgba(239,68,68,0.08);border-left:3px solid #ef4444;border-radius:5px;margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:700;color:#fca5a5;margin-bottom:4px;">
+        ⚠️ 分前后段复核：本模型的 alpha 几乎全部来自最后 28% 的样本
+      </div>
+      <div style="font-size:10.5px;color:#cbd5e1;line-height:1.95;">
+        以 fund 数据起点 <code>2026-06-26</code> 为界把面板拆成两段，
+        现行 8 维的 h20 复合 IC：<br>
+        · <b>前段</b>（2025-11-03 ~ 2026-06-25，156 截面，占 71.6%）→
+        <b style="color:#fca5a5;">-0.0021</b>（近乎为零）<br>
+        · <b>后段</b>（2026-06-26 起，62 截面，占 28.4%）→
+        <b style="color:#22c55e;">+0.2786</b>（极强）<br>
+        加权复原 0.7156×(-0.0021) + 0.2844×(+0.2786)
+        = <b>+0.0778</b>，与全样本审计值吻合。<br>
+        <b style="color:#fca5a5;">即「复合分过 Bonferroni」的全部功效来自最后 28% 的样本，
+        前 72% 的时间里这套分数没有区分能力。</b>
+      </div>
+    </div>
+
+    <div style="font-size:12px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">
+      逐维分前后段：不是「哪个维有效」，而是整批因子同时突发有效
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:10px;margin-bottom:6px;">
+      <tr style="border-bottom:1px solid #334155;color:#64748b;font-size:9px;">
+        <th style="text-align:left;padding:3px 8px;">维度</th>
+        <th style="text-align:right;padding:3px 8px;">前段 h20 IC</th>
+        <th style="text-align:right;padding:3px 8px;">后段 h20 IC</th>
+        <th style="text-align:center;padding:3px 8px;width:18%;">判读</th>
+      </tr>
+      <tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">bias60</td><td style="padding:4px 8px;text-align:right;color:#f59e0b;">-0.0223</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.1691</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#f59e0b;">仅后段 ⚠️</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">rsi_rev</td><td style="padding:4px 8px;text-align:right;color:#f59e0b;">-0.0405</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.2040</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#f59e0b;">仅后段 ⚠️</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">tech_neg</td><td style="padding:4px 8px;text-align:right;color:#f59e0b;">-0.0393</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.1826</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#f59e0b;">仅后段 ⚠️</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">lowvol20</td><td style="padding:4px 8px;text-align:right;color:#f59e0b;">-0.0123</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.2309</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#f59e0b;">仅后段 ⚠️</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">quality</td><td style="padding:4px 8px;text-align:right;color:#f59e0b;">+0.0658</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">-0.0389</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#f59e0b;">仅前段 ⚠️</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">size_ind</td><td style="padding:4px 8px;text-align:right;color:#f59e0b;">+0.0065</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.2375</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#f59e0b;">仅后段 ⚠️</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">ep</td><td style="padding:4px 8px;text-align:right;color:#f59e0b;">+0.0079</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.0597</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#f59e0b;">仅后段 ⚠️</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">fund</td><td style="padding:4px 8px;text-align:right;color:#f59e0b;">数据不足</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.0956</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#f59e0b;">数据不足</td></tr>
+    </table>
+    <div style="font-size:9.5px;color:#64748b;margin-bottom:12px;line-height:1.85;">
+      后段 8 维单维 IC 几乎全线 <b>+0.17~+0.24</b>，前段全线 <b>−0.04~+0.008</b>
+      （唯一例外是质量：前段 +0.066、后段 −0.039，方向相反）。
+      <b style="color:#fca5a5;">八个方向各异的因子不可能同时「变有效」</b> ——
+      这是后段整个市场风格对这批因子同时顺风的 <b>regime 特征</b>，不是因子本身被验证。
+    </div>
+
+    <div style="font-size:12px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">
+      🌱 决定性扫描：反转块该降到多少（其余 5 维不变，反转块整体 ×scale 后归一到 Σ=1）
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:10px;margin-bottom:6px;">
+      <tr style="border-bottom:1px solid #334155;color:#64748b;font-size:9px;">
+        <th style="text-align:left;padding:3px 8px;">反转倍数</th>
+        <th style="text-align:right;padding:3px 8px;">反转占比</th>
+        <th style="text-align:right;padding:3px 8px;">全样本 h20</th>
+        <th style="text-align:right;padding:3px 8px;">t</th>
+        <th style="text-align:right;padding:3px 8px;">前段 Δ</th>
+        <th style="text-align:right;padding:3px 8px;">后段 Δ</th>
+        <th style="text-align:center;padding:3px 8px;">判读</th>
+      </tr>
+      <tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">×0.00</td><td style="padding:4px 8px;text-align:right;color:#64748b;">0%</td><td style="padding:4px 8px;text-align:right;color:#ef4444;font-weight:700;">+0.0933</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+7.93</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0352</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">-0.0341</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#ef4444;">后段劣化 ❌</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">×0.10</td><td style="padding:4px 8px;text-align:right;color:#64748b;">9%</td><td style="padding:4px 8px;text-align:right;color:#ef4444;font-weight:700;">+0.0950</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+7.54</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0295</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">-0.0136</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#ef4444;">后段劣化 ❌</td></tr><tr style="border-bottom:0.5px solid #1e293b;background:rgba(34,197,94,0.10);"><td style="padding:4px 8px;color:#cbd5e1;">×0.25 ←已落档</td><td style="padding:4px 8px;text-align:right;color:#64748b;">20%</td><td style="padding:4px 8px;text-align:right;color:#ef4444;font-weight:700;">+0.0949</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+7.01</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0217</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0054</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#22c55e;">两段皆不劣化 ✅</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">×0.40</td><td style="padding:4px 8px;text-align:right;color:#64748b;">29%</td><td style="padding:4px 8px;text-align:right;color:#ef4444;font-weight:700;">+0.0926</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+6.54</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0154</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0135</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#22c55e;">两段皆不劣化 ✅</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">×0.50</td><td style="padding:4px 8px;text-align:right;color:#64748b;">33%</td><td style="padding:4px 8px;text-align:right;color:#ef4444;font-weight:700;">+0.0904</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+6.24</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0119</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0145</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#22c55e;">两段皆不劣化 ✅</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">×0.75</td><td style="padding:4px 8px;text-align:right;color:#64748b;">43%</td><td style="padding:4px 8px;text-align:right;color:#ef4444;font-weight:700;">+0.0839</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+5.58</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0050</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0090</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#22c55e;">两段皆不劣化 ✅</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">×1.00</td><td style="padding:4px 8px;text-align:right;color:#64748b;">50%</td><td style="padding:4px 8px;text-align:right;color:#ef4444;font-weight:700;">+0.0778</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+5.06</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0000</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0000</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#ef4444;">基准(现行)</td></tr>
+    </table>
+    <div style="font-size:10px;color:#94a3b8;line-height:1.9;margin-bottom:12px;">
+      <b>采纳判定三条（在跑数之前写死，避免事后挑数）：</b>
+      ① 全样本 h20 提升 ≥ +0.010；② 前后两段均不劣化（Δ ≥ −0.005）；③ 反转块占比 ≤ 0.25。<br>
+      <b style="color:#22c55e;">唯一通过的是 ×0.25</b>：
+      全样本 h20 <b>+0.0949</b>
+      （较基准 +0.0778 提升 <b style="color:#22c55e;">+0.0171</b>），
+      前段 Δ<b>+0.0217</b>、后段 Δ<b>+0.0054</b>，
+      两段皆不劣化，反转占比 <b>20%</b>。<br>
+      <b style="color:#fca5a5;">为什么不能直接归零</b>：归零（×0.00）全样本虽 +0.0933，
+      但<b>后段 Δ-0.0341</b> ——
+      砍掉了现行最强 regime 的一块。降权到 1/4 是「全样本近最优 + 两段皆不劣化」的唯一交点。
+    </div>
+
+    <div style="font-size:12px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">
+      ✅ 已落档权重（v4.10-rev-quarter，Σ=1.0 保持「满分 100、S 档可达」口径）
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:10px;margin-bottom:6px;">
+      <tr style="border-bottom:1px solid #334155;color:#64748b;font-size:9px;">
+        <th style="text-align:left;padding:3px 8px;">维度</th>
+        <th style="text-align:right;padding:3px 8px;">原</th>
+        <th style="text-align:right;padding:3px 8px;">现</th>
+        <th style="text-align:right;padding:3px 8px;">变化</th>
+      </tr>
+      <tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">size_growth</td><td style="padding:4px 8px;text-align:right;color:#64748b;">—</td><td style="padding:4px 8px;text-align:right;color:#22c55e;font-weight:700;">0.2000</td><td style="padding:4px 8px;text-align:right;color:#38bdf8;">新增</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">fund</td><td style="padding:4px 8px;text-align:right;color:#64748b;">0.0750</td><td style="padding:4px 8px;text-align:right;color:#22c55e;font-weight:700;">0.2000</td><td style="padding:4px 8px;text-align:right;color:#38bdf8;">+0.1250</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">tech_neg</td><td style="padding:4px 8px;text-align:right;color:#64748b;">0.1500</td><td style="padding:4px 8px;text-align:right;color:#22c55e;font-weight:700;">0.1000</td><td style="padding:4px 8px;text-align:right;color:#38bdf8;">-0.0500</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">quality</td><td style="padding:4px 8px;text-align:right;color:#64748b;">0.1200</td><td style="padding:4px 8px;text-align:right;color:#22c55e;font-weight:700;">0.1000</td><td style="padding:4px 8px;text-align:right;color:#38bdf8;">-0.0200</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">dominant</td><td style="padding:4px 8px;text-align:right;color:#64748b;">—</td><td style="padding:4px 8px;text-align:right;color:#22c55e;font-weight:700;">0.1000</td><td style="padding:4px 8px;text-align:right;color:#38bdf8;">新增</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">ep</td><td style="padding:4px 8px;text-align:right;color:#64748b;">0.0750</td><td style="padding:4px 8px;text-align:right;color:#22c55e;font-weight:700;">0.1000</td><td style="padding:4px 8px;text-align:right;color:#38bdf8;">+0.0250</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">growth</td><td style="padding:4px 8px;text-align:right;color:#64748b;">—</td><td style="padding:4px 8px;text-align:right;color:#22c55e;font-weight:700;">0.1000</td><td style="padding:4px 8px;text-align:right;color:#38bdf8;">新增</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">bias60</td><td style="padding:4px 8px;text-align:right;color:#64748b;">0.1750</td><td style="padding:4px 8px;text-align:right;color:#22c55e;font-weight:700;">0.0500</td><td style="padding:4px 8px;text-align:right;color:#38bdf8;">-0.1250</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">rsi_rev</td><td style="padding:4px 8px;text-align:right;color:#64748b;">0.1750</td><td style="padding:4px 8px;text-align:right;color:#22c55e;font-weight:700;">0.0500</td><td style="padding:4px 8px;text-align:right;color:#38bdf8;">-0.1250</td></tr>
+    </table>
+    <div style="font-size:9.5px;color:#64748b;margin-bottom:12px;line-height:1.85;">
+      反转块占比 <b>50% → 20%</b>。
+      <b style="color:#f59e0b;">为什么必须归一到 Σ=1.0</b>：<code>scale_calc</code> 的分母是
+      <code>max(0.5, Σw)</code>，Σ=0.365 时满分上限仅 <b>73.00</b>，
+      S 档（≥85）<b style="color:#fca5a5;">永不可达</b>；只有 Σ=1.0 才保证「满分=100、85 分可达」口径不变。
+    </div>
+
+    <div style="padding:9px 12px;background:rgba(239,68,68,0.08);border-left:3px solid #ef4444;border-radius:5px;margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:700;color:#fca5a5;margin-bottom:4px;">
+        🔍 自我证伪：我上一轮推荐的「4 维等权」是错的
+      </div>
+      <div style="font-size:10.5px;color:#cbd5e1;line-height:1.95;">
+        上一轮曾推荐「C 4 维等权」（全样本 h20 <b>+0.0941</b>、
+        t <b>+16.26</b>，看似最优）。<b>该结论已被推翻。</b><br>
+        根因：审计脚本的入样门槛只要求「行业内市值维有值」，<b>不要求 fund 齐备</b>，
+        而 fund 在面板中仅 62 个截面有数据。
+        4 维里 fund 占 0.25，遇到无 fund 截面时被「缺维同剔」整体拿掉 →
+        <b style="color:#fca5a5;">「4 维等权」在那个截面自动退化成「3 维等权」</b>，
+        所以 +0.0941
+        是<b>两套不同模型的混合平均</b>，不是同一个模型的表现。<br>
+        <b>只用「有 fund」的 62 个截面直接比</b>（唯一可比口径）：
+        C 为 <b style="color:#fca5a5;">+0.2497</b>，
+        比现行 8 维的 <b>+0.2786</b> 低
+        <b style="color:#fca5a5;">-0.0289</b>，
+        <b>是所有候选里最差的一个</b>。故改采降权方案，不采用 4 维等权。
+      </div>
+    </div>
+
+    <div style="font-size:12px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">
+      同质样本公平对比（仅取有 fund 的 62 个截面）
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:10px;margin-bottom:6px;">
+      <tr style="border-bottom:1px solid #334155;color:#64748b;font-size:9px;">
+        <th style="text-align:left;padding:3px 8px;">方案</th>
+        <th style="text-align:right;padding:3px 8px;">h5 IC</th>
+        <th style="text-align:right;padding:3px 8px;">h5 t</th>
+        <th style="text-align:right;padding:3px 8px;">h20 IC</th>
+        <th style="text-align:right;padding:3px 8px;">h20 t</th>
+        <th style="text-align:center;padding:3px 8px;width:20%;">标记</th>
+      </tr>
+      <tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">F 3 维 keep 归一</td><td style="padding:4px 8px;text-align:right;color:#ef4444;">+0.1944</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+5.96</td><td style="padding:4px 8px;text-align:right;font-weight:700;color:#22c55e;">+0.3023</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+10.30</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#475569;"></td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">E 保留质量 0.12</td><td style="padding:4px 8px;text-align:right;color:#ef4444;">+0.1793</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+7.16</td><td style="padding:4px 8px;text-align:right;font-weight:700;color:#22c55e;">+0.2976</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+14.14</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#475569;"></td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">D 按 IC 强度加权</td><td style="padding:4px 8px;text-align:right;color:#ef4444;">+0.1756</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+7.45</td><td style="padding:4px 8px;text-align:right;font-weight:700;color:#22c55e;">+0.2945</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+15.15</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#475569;"></td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">B 按裁决比例摊平</td><td style="padding:4px 8px;text-align:right;color:#ef4444;">+0.1829</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+6.57</td><td style="padding:4px 8px;text-align:right;font-weight:700;color:#22c55e;">+0.2896</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+11.75</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#475569;"></td></tr><tr style="border-bottom:0.5px solid #1e293b;background:rgba(56,189,248,0.06);"><td style="padding:4px 8px;color:#cbd5e1;">A 现行 8 维</td><td style="padding:4px 8px;text-align:right;color:#ef4444;">+0.1933</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+11.61</td><td style="padding:4px 8px;text-align:right;font-weight:700;color:#22c55e;">+0.2786</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+10.58</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#22c55e;">基准</td></tr><tr style="border-bottom:0.5px solid #1e293b;background:rgba(239,68,68,0.10);"><td style="padding:4px 8px;color:#cbd5e1;">C 4 维等权</td><td style="padding:4px 8px;text-align:right;color:#ef4444;">+0.1483</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+8.01</td><td style="padding:4px 8px;text-align:right;font-weight:700;color:#ef4444;">+0.2497</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+16.26</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#ef4444;">最差 ←原推荐被证伪</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">G 排除fund·3维IC权</td><td style="padding:4px 8px;text-align:right;color:#ef4444;">+0.1495</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+7.47</td><td style="padding:4px 8px;text-align:right;font-weight:700;color:#22c55e;">+0.2412</td><td style="padding:4px 8px;text-align:right;color:#64748b;">t+13.87</td><td style="padding:4px 8px;text-align:center;font-size:9px;color:#475569;"></td></tr>
+    </table>
+    <div style="font-size:9.5px;color:#64748b;margin-bottom:12px;line-height:1.85;">
+      ⚠️ 本表<b>仅用于横向比较各方案</b>，不能用来挑权重 ——
+      因为「被 fund 覆盖」本身就是显著的<b>负向</b>预测变量（见下方边界⑥），
+      有 fund 的截面本身带 TOP200 选样偏差。故落档依据用全样本 scale 扫描，不用本表。
+    </div>
+
+    <div style="padding:9px 12px;background:rgba(245,158,11,0.07);border-left:3px solid #f59e0b;border-radius:5px;">
+      <div style="font-size:11px;font-weight:700;color:#fbbf24;margin-bottom:4px;">必须披露的边界（不得省略）</div>
+      <div style="font-size:10px;color:#cbd5e1;line-height:1.95;">
+        ① <b>fund 覆盖率仅约 10%</b>：<code>data/fwd_hist</code> 每日仅 190~194 行（非全池），
+        且这 190 只正是当日 TOP200，<b style="color:#fca5a5;">带选样偏差</b>；
+        fund 的 IC 在 2029 只域中仅由 77（h5）/ 62（h20）个截面贡献。<br>
+        ② <b style="color:#fca5a5;">fund h20 窗口仅 2.86 月，未达 3 月</b>：
+        这是 <code>fwd_hist</code> 起点 2026-06-26 的<b>数据源硬边界</b>
+        （穷举验证：任何起点选择都无法达 3 个月）。故 fund 以 h5（3.81 月）为主判据，
+        h20 仅供参照，<b>不单独据此下重裁决</b>。<br>
+        ③ <b>股本为跨期单一常数</b>（median of circ_mv/price），未做拆股调整，
+        可能影响行业内市值维的早期截面精度。<br>
+        ④ <b>本裁决是池内 IC 证据，非组合回测</b>：已知绝对收益全周期为负
+        （Top50 净值 H5 0.777 / H20 0.955 vs 基准 0.598 / 0.777），
+        模型当前属性是<b>抗跌而非赚钱</b>，换手是最大摩擦。<br>
+        ⑤ <b style="color:#fca5a5;">本裁决是历史回测，不是样本外前视验证</b>：
+        round34 提升的是<b>样本代表性</b>（真·大池 + ≥3 个月长窗口），
+        而非<b>样本外性</b> —— 面板域取自当前可得名单，
+        存在幸存者/成分变更偏差；真正的 walk-forward 前视验证仍未完成。
+        故本节<b>不声称「已优化 / 已验证」</b>，只提供「在更可信样本上，哪些维度站不住」的证据。<br>
+        ⑥ <b style="color:#fca5a5;">「被 fund 覆盖」本身是显著负向变量</b>（同一截面内比较，排除 regime 混淆）：
+        h5 IC <b>-0.1088</b>（NW t -8.30）、
+        h20 IC <b>-0.1792</b>（NW t -16.61），双周期过 Bonferroni。
+        有 fund 的股票后续 h20 均收益比无 fund 的低
+        <b>9.19pp</b>。
+        原因是覆盖名单 = 当日 TOP200，而 TOP200 被高权重的反转因子筛成了「超跌股」。
+        <b>fund 子样本本身带选样偏差，不能用来择优权重。</b><br>
+        ⑦ <b style="color:#fca5a5;">模型 alpha 高度 regime 依赖</b>：
+        前 156 截面 h20 IC -0.0021、后 62 截面 +0.2786。
+        本轮降权只声称「<b>在可得样本上更稳健</b>」，<b>不声称</b>「已通过样本外验证」。<br>
+        ⑧ <b style="color:#fca5a5;">跨版本分数不可比</b>：本轮改权重后 total 与改前不可直接比较
+        （同 v4.4 标度、v4.7 量程、v4.10 量尺变更的历史惯例）。
+        页面今日 S 档 3 只、A 档 366 只，与昨日分布不同<b>主要来自权重变更</b>，不是市场变化。<br>
+        ⑨ <b style="color:#fca5a5;">fund 缺口必须按三层分开理解（round44/45 实证，2026-10-29）</b>：<br>
+        &nbsp;&nbsp;<b>L1 整维未参与</b> —— 158 个截面（66.4%，2025-11-03~2026-06-25）
+        该维对所有股票给同一常数。<b>数学上无害</b>：total = A×其余维加权分 + C（A&gt;0、C 常数），
+        截面内排序严格不变（实测 ρ=0.999999）。仅导致<b>绝对分不可跨期比较</b>（放大倍数 1/0.7580=1.3193）。<br>
+        &nbsp;&nbsp;<b>L2 部分覆盖</b> —— 80 个截面（33.6%）只有部分股票有真实分，
+        其余填中性 5.0。这是<b style="color:#fca5a5;">实质性损害</b>：
+        消除异质后 Top50 重合中位仅 <b>39/50</b>（最低 13/50）。
+        实测若改为「低覆盖整维剔除」，h20 IC 提升 +0.0039（NW t +3.82）。<br>
+        &nbsp;&nbsp;<b>L3 归档断流</b> —— <code>data/fwd_hist</code> 全项目 16 个引用方<b>无一写入</b>。
+        停更段 2026-10-24~10-25 已由 <code>archive_fwd_snapshot.py</code> 补录
+        （10-26 / 10-27 两日已恢复，现共 93 个文件，最新 2026-11-03）；
+        根治由 <code>archive_fund_universe.py</code> 全域归档承担，已接入每日链路。<br>
+        &nbsp;&nbsp;<b style="color:#fca5a5;">关键澄清（round46 追加）</b>：覆盖率跃升的<b>唯一驱动是池扩容</b>，
+        与数据可得性无关。fwd_hist 覆盖 = 当日池规模 ÷ 面板域：
+        195/2029 = 9.5% → 490/2029 = 24.0% → 1895/2029 = <b>93.4%</b>，
+        与池的三次扩容（195→490→1895 只）逐段吻合。故 L1 与 L2 并非两个独立缺陷，
+        而是<b>同一个「池太小」问题在时间轴上的两个投影</b>。<br>
+
+        ⑩ <b style="color:#fca5a5;">严禁用静态 PE 代理回填 fund 历史</b>：三条填充法实测
+        ρ(重建,真实) = 0.5261 / 0.5359 / 0.5343，全部低于 0.70 门槛。
+        瓶颈是前瞻PE 系统性高于静态PE 49.7%，而 <code>score_fund</code> 是<b>阈值型分段函数</b>
+        （&lt;15/<20/<30/<40/<60/<100），线性标定无法修正分段非线性。
+        <b style="color:#fca5a5;">填充不会让结果更准，只会让失真变得不可见</b>——
+        当前「可见的残缺」优于「不可见的失真」。<br>
+
+        ⑪ <b style="color:#86efac;">填充问题的最终结论：不需要填充，池扩容本身已解决</b>（round46/48 实证）<br>
+        &nbsp;&nbsp;2026-11-03 实测池规模：母体 <b>5,377</b> 只、主池 <b>2,710</b> 只；
+        对面板域 2029 只的覆盖分别为 <b>100.0%</b> / <b>92.3%</b>。
+        池内 fund 实际覆盖率 <b>89.6%（2415/2696）</b>，
+        较历史 22.5% 已发生量级变化。<br>
+        &nbsp;&nbsp;仍未覆盖的 281 只<b>全部是 PE≤0 的亏损股</b>，且机构均未给盈利预测（fwd_pe 全缺）。
+        这是<b>业务本质而非数据缺失</b>——亏损股估值无法计算，
+        任何填充都只会制造假信号。故该部分缺口<b>应当保留为缺口</b>。<br>
+        &nbsp;&nbsp;<b style="color:#fca5a5;">给决策的明确答复</b>：「补齐 fund 历史」在数据上不可能完成
+        （B 类入参 fwd_pe / pe_ladder / fwd_np 过期即失，任何数据库都不提供历史快照），
+        但「未来每日 fund 权重真实生效」<b style="color:#86efac;">已经达成</b>。两者不是同一件事。<br>
+
+        ⑫ <b style="color:#fca5a5;">M1 口径的代价被此前高估</b>（round47 实测，80 个触发截面）<br>
+        &nbsp;&nbsp;ρ(M0,M1) 排序相关性中位 <b>0.9916</b>（最差 0.9677），
+        Top50 重合中位 <b>50/50</b>（最差 43/50），
+        total 均值变动中位 -0.290。
+        机理：现状「未覆盖填中性 5.0」本身即常数，M1「整维剔除」也不给区分度，
+        两者对未覆盖股票的排序效果<b>完全相同</b>；校准只发生在被覆盖的子样本上
+        —— 而这正是要修的<b>选择偏差</b>本身。<br>
+        &nbsp;&nbsp;⇒ P0-3 并非「历史 total 推倒重来」，而是「绝大多数股票排序不动」。
+        <b>收益小、代价同样小，属低风险正确性修正。</b><br>
+
+        ⑬ <b style="color:#fca5a5;">权重证据链体检：80.0% 的名义权重缺 IC 证据</b>（round51~58）<br>
+        &nbsp;&nbsp;<b>证据缺口</b>：<code>factor_ic.json</code> 里
+        <b>quality / ep / bias60 / rsi_rev / tech_neg / growth / size_growth / dominant</b> 这几维在 h5 的截面数不足 20（部分为 0），
+        合计名义权重 <b style="color:#fca5a5;">80.0%</b>，
+        在 IC 表里是空白。<b>根因不是数据没有</b>——<code>factor_history.json</code> 的
+        84 个历史截面只存了 fund/bias60/rsi_rev 三个字段，把
+        <b>238 截面的长面板整个绕过了</b>。<br>
+        &nbsp;&nbsp;用长面板补算后：quality h20 IC <b>+0.0357</b>（t=+2.37），
+        仅为弱正、未过 Bonferroni（|t|≥2.87）。
+        ⇒ <b>这些维度目前属「先验配置」而非「实证结论」</b>，页面不再暗示它们经过验证。<br>
+
+        &nbsp;&nbsp;<b>共线虚增</b>：2026-11-03 真实打分文件（2,696 只）实测
+        3 对 |ρ|≥0.5，全部集中在技术块（bias60 / rsi_rev / tech_neg，
+        ρ 在 +0.659 ~ +0.855 之间）。
+        三者名义合计 <b>0.170</b>，按簇合并后有效仅 <b>0.070</b>，
+        <b style="color:#fca5a5;">权重虚增 0.100</b>（名义 1.000 → 有效 0.900）。
+        PC1 解释 28.9%、有效维数 <b>6.01/9</b>。<br>
+        &nbsp;&nbsp;<b style="color:#86efac;">但实测证明这个虚增无害</b>：
+        把技术三簇合并成单权重（C7）后，h20 IC <b>+0.0981</b> vs 现状（C0）
+        <b>+0.0975</b>（t=+3.04），ΔIC +0.0006、
+        配对 t +0.67 <b>不显著</b>。
+        机理：三簇指向同一方向，重复计权只是把同一个信号「加厚」，没有制造虚假分散度。<br>
+
+        &nbsp;&nbsp;<b>regime 依赖</b>：h20 分段（K=4）显示
+        <b style="color:#fca5a5;">8/8 维符号翻转</b>，
+        其中 6 维在最后一段（2026-07-22 之后）同时转正。
+        这不是多个独立 alpha 同时生效，而是<b>同一波行情的共同暴露</b>。
+        已做剥 size 暴露检验：剥掉后各维 IC 基本未塌陷（塌陷 ≤20%），
+        故段4 强势<b>不能归因于小市值单一暴露</b>，属真实共同 regime。<br>
+        &nbsp;&nbsp;<b>给决策的明确答复</b>：该评分
+        <b>在当前 regime（2026-07 后的小盘/反转行情）内有效，跨 regime 稳定性未验证</b>。
+        fund 维自身已在段4 转负，是最近的一次失效记录。
+        对外不可表述为「经充分验证的 alpha」。<br>
+
+        ⑭ <b style="color:#fca5a5;">v4.15 约束化权重落地 + quality 维污染定案</b>（2026-10-29）<br>
+        &nbsp;&nbsp;<b>① 权重约束已强制</b>：老大指令「单因子 ≤0.20 / 5 大类各 ≤0.30 / 单因子下限 0」。
+        改前违反：<b>单因子超限 fund=0.242>0.2；单因子超限 lowvol20=0.208>0.2；大类超限 基本面=0.362>0.3</b>。
+        豁免条款（「除非有明显的证据证明其高稳定」）已逐维实测（需 h5 与 h20 同时满足
+        分段符号一致 + lag 不翻转 + |NW t|≥3.9）→ <b>无一维</b>满足豁免，
+        故 fund 与 lowvol20 均须降到 0.20。
+        改后大类合计：基本面 0.300 / 估值 0.120 / 低波 0.200 / 技术反转 0.180 / 市值 0.200。<br>
+        &nbsp;&nbsp;<b>② 变更幅度</b>：L1 变动 0.1424，
+        与现权重排序 Spearman <b>ρ=0.9935</b>、Top50 重合 <b>47/50</b>、total 均值仅 +0.004，
+        九维结构指标 PC1 28.9% / 有效维数 6.01/9 与改前一致 →
+        <b>排序基本不变，属低风险修正</b>。<br>
+        &nbsp;&nbsp;<b style="color:#fca5a5;">③ quality 维污染（新发现，比 fund 缺口更严重）</b>：
+        截面 <b>2026-10-23(ρ=-0.070)、2026-10-26(ρ=-0.074)</b> 的 score_quality 是<b>坏值</b>。
+        铁证：① 同批股票 ρ(quality, 10-28) ≈ −0.07（应 ≈ +1），
+        而 lowvol20/fund/ep/bias60 均 ρ≥0.82；② 两天的原始输入
+        roe/cagr3/debt_ratio/pb 跨日 <b>ρ=+1.0000 完全一致</b> ⇒ 输入相同、输出不同，
+        坏在「quality/growth 的截面内 rank」环节；③ 判据：内部 ρ(quality, roe) 在坏截面是
+        <b>负</b>（10-23 −0.17 / 10-26 −0.17），正常截面为正（10-27 +0.26 / 10-28 +0.24）。<br>
+        &nbsp;&nbsp;⇒ 已按「只清空受污染字段、不动同截面其他维」处置
+        （factor_eval 剔除 2 个截面的 quality/growth），
+        <b>不重算历史</b>（重算 = 以现在认知回填历史，三季报披露状态已变 → 前视风险）。
+        代价：quality 维 IC 证据归零。此前 round51 报出的 quality h20 +0.0357(t=+2.37)
+        建立在 panel 的 quality 上，而 panel 的 quality 与真实 scored ρ=+0.033
+        → <b style="color:#fca5a5;">该结论作废</b>，quality 目前仍是「不可判维」。<br>
+        &nbsp;&nbsp;<b>④ 多重检验门槛 3.08 → 3.90</b>（老大指令）：项目累计检验已达 304 次，
+        单轮 30 次的 3.08 严重低估假阳性率。已同步 factor_eval 与页面判定逻辑
+        （同一口径两处实现必然漂移，已核对一致）。<b>门槛变严会让部分维度由「显著」转「不显著」，
+        这是正确方向</b>；历史裁决节内的旧数值保留原样（那是当时的事实）。
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:14px 16px;background:#111c2e;border:0.5px solid #1e293b;border-radius:10px;margin-bottom:16px;">
+    <div style="font-size:14px;font-weight:800;color:#e2e8f0;margin-bottom:6px;">🔬 三、模型结构体检（2026-11-03 当日现算）</div>
+    <div style="font-size:11px;color:#64748b;margin-bottom:8px;">
+      全部数字当日现算，不读任何历史审计文件；只输出结论，推导过程在代码注释里。
+    </div>
+    
+        <div style="margin-top:9px;font-size:10px;color:#94a3b8;line-height:1.75;
+                    padding:8px 10px;background:rgba(251,191,36,0.06);
+                    border-left:3px solid #f59e0b;border-radius:4px;">
+            🔬 <b style="color:#fbbf24;">模型结构体检（930 只当日现算，不是历史结论）</b><br>
+            · <b>有效维数 4.91 / 9</b>：
+            虽然标称 9 维，但按相关矩阵特征值算参与率只有
+            <b style="color:#f59e0b;">4.91 维</b>独立信息
+            （PC1 29%、PC2 28%，
+            特征值 &gt;1 的成分仅 3 个）。
+            主因：乖离 ↔ RSI反 r=+0.93；成长 ↔ 小盘成长 r=+0.80 —— <b>高相关维并非独立信号，等于同一维度被计了两次权重</b>。<br>
+            · <b>方差贡献</b>（谁在真正决定排名）：小盘成长 29% · 估值锚 17% · 成长 12% · 质量 12% · EP 9% · 行业龙头 6% · 乖离 5% · RSI反 5% · 技反 3%。
+            <br>
+            · <b>Top20 敏感性</b>（改这一维后，前 20 名还剩几只没变）：质量（去 10/20 · 减半 17/20 · 反号 3/20） · 小盘成长（去 10/20 · 减半 16/20 · 反号 0/20） · 估值锚（去 14/20 · 减半 16/20 · 反号 4/20） · 行业龙头（去 14/20 · 减半 15/20 · 反号 10/20） · 成长（去 15/20 · 减半 18/20 · 反号 14/20） · 乖离（去 15/20 · 减半 18/20 · 反号 13/20） · EP（去 15/20 · 减半 18/20 · 反号 10/20） · RSI反（去 16/20 · 减半 19/20 · 反号 11/20） · 技反（去 18/20 · 减半 20/20 · 反号 16/20）。<br>
+            <b style="color:#fbbf24;">结论</b>：这套评分适合当「当日相对强弱排序」用，
+            <b>不宜当成「按 9 维独立验证过的选股模型」</b>；权重是先验设定，
+            在池内有效样本补足前不具备「已优化」的统计地位。
+            上表中「去 X/20」「反号 X/20」偏低的维度，说明最终名单对该维的取舍
+            <b>高度敏感</b>，而该取舍目前只有先验、没有本池的稳健实证。
+        </div>
+  </div>
+
+  <div style="padding:14px 16px;background:#111c2e;border:0.5px solid #1e293b;border-radius:10px;margin-bottom:16px;">
+    <div style="font-size:14px;font-weight:800;color:#e2e8f0;margin-bottom:6px;">🧪 四、维数实证（历史截面 · 旧混合池口径）</div>
+    <div style="font-size:11px;color:#64748b;margin-bottom:8px;">
+      逐维单维 IC、NW t 扫 lag、Bonferroni 门槛、换维裁决。样本为历史 78 个截面 × 池内成分股，
+      <b style="color:#f59e0b;">与当日截面无关</b>，不可与页面当日分数直接对照。<br>
+      <b style="color:#f59e0b;">⚠️ 本区块保留为历史沿革：其 78 截面 = 76 冻结旧池（~195只）
+      + 9 当前大池（490只，仅 11 天），是混合池口径，已被上方第二节真·大池裁决取代。
+      决策请以第二节为准。</b>
+    </div>
+    
+        <div style="margin-top:9px;font-size:10px;color:#94a3b8;line-height:1.75;
+                    padding:8px 10px;background:rgba(34,197,94,0.06);
+                    border-left:3px solid #22c55e;border-radius:4px;">
+            🧪 <b style="color:#4ade80;">维数实证（round23 单维 IC + round24 换维裁决，78 截面 × 真实前瞻收益，非当日数）</b><br>
+            <div style="margin:6px 0 4px;font-size:9px;color:#64748b;">
+                方法：逐维单独算 IC（rank 相关，未来 h 日收益）；NW t 扫 lag 0/3/6；Bonferroni 门槛 3.08。
+                「过」= 三档 lag 全部 ≥3.08，缺一档即不算稳健。低波20 的单维 IC 来自 round24d 复测。
+                <b style="color:#f59e0b;">「消融 t」是本表最该看的一列</b>：把该维从复合分里去掉后，
+                复合 IC 的变化是否显著（|t|≥3.08 才算）。单维 IC 高只是「单独用有点用」，
+                消融 t 高才是「组合里非它不可」—— 两者可以完全背离。
+            </div>
+            <table style="width:100%;border-collapse:collapse;font-size:9.5px;margin-bottom:7px;">
+                <tr style="border-bottom:0.5px solid #334155;color:#64748b;">
+                    <th style="text-align:left;padding:3px 8px;">维度</th>
+                    <th style="text-align:right;padding:3px 8px;">当前权重</th>
+                    <th style="text-align:right;padding:3px 8px;">h5 IC</th>
+                    <th style="text-align:right;padding:3px 8px;">h5 t0</th>
+                    <th style="text-align:right;padding:3px 8px;">h20 IC</th>
+                    <th style="text-align:right;padding:3px 8px;">截面数 n</th>
+                    <th style="text-align:right;padding:3px 8px;">消融 t<br><span style="font-weight:400;">(h5)</span></th>
+                    <th style="text-align:right;padding:3px 8px;">消融 t<br><span style="font-weight:400;">(h20)</span></th>
+                    <th style="text-align:left;padding:3px 8px;">实证判定</th>
+                </tr>
+                <tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">乖离</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">5.0%</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.1648</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+6.31</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.1971</td><td style="padding:4px 8px;text-align:right;color:#64748b;">63</td><td style="padding:4px 8px;text-align:right;color:#4ade80;font-weight:400;">+1.92</td><td style="padding:4px 8px;text-align:right;color:#4ade80;font-weight:400;">+3.04</td><td style="padding:4px 8px;color:#f59e0b;">单维强（复合靠组合）</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">RSI反转</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">5.0%</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.1288</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+4.62</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.2064</td><td style="padding:4px 8px;text-align:right;color:#64748b;">63</td><td style="padding:4px 8px;text-align:right;color:#4ade80;font-weight:400;">+0.21</td><td style="padding:4px 8px;text-align:right;color:#4ade80;font-weight:700;">+4.01</td><td style="padding:4px 8px;color:#f59e0b;">单维强（复合靠组合）</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">EP估值</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">10.0%</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.1013</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">—</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">—</td><td style="padding:4px 8px;text-align:right;color:#64748b;">73</td><td style="padding:4px 8px;text-align:right;color:#4ade80;font-weight:400;">+2.48</td><td style="padding:4px 8px;text-align:right;color:#4ade80;font-weight:400;">+1.97</td><td style="padding:4px 8px;color:#f59e0b;">单维强（复合靠组合）</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">低波20</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">0.0%</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.1189</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+3.28</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0826</td><td style="padding:4px 8px;text-align:right;color:#64748b;">73</td><td style="padding:4px 8px;text-align:right;color:#4ade80;font-weight:400;">+2.92</td><td style="padding:4px 8px;text-align:right;color:#4ade80;font-weight:400;">+1.58</td><td style="padding:4px 8px;color:#f59e0b;">单维强（复合靠组合）</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">估值锚</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">20.0%</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.0762</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+5.21</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0914</td><td style="padding:4px 8px;text-align:right;color:#64748b;">73</td><td style="padding:4px 8px;text-align:right;color:#4ade80;font-weight:700;">+4.41</td><td style="padding:4px 8px;text-align:right;color:#4ade80;font-weight:700;">+4.32</td><td style="padding:4px 8px;color:#22c55e;">去掉后显著变差</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">技术反号</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">10.0%</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.0575</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+3.34</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0333</td><td style="padding:4px 8px;text-align:right;color:#64748b;">73</td><td style="padding:4px 8px;text-align:right;color:#f87171;font-weight:400;">-2.47</td><td style="padding:4px 8px;text-align:right;color:#f87171;font-weight:700;">-5.28</td><td style="padding:4px 8px;color:#f59e0b;">边际有效</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">行业内市值</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">0.0%</td><td style="padding:4px 8px;text-align:right;color:#ef4444;">-0.0148</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">—</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">—</td><td style="padding:4px 8px;text-align:right;color:#64748b;">73</td><td style="padding:4px 8px;text-align:right;color:#f87171;font-weight:400;">-0.88</td><td style="padding:4px 8px;text-align:right;color:#4ade80;font-weight:400;">+0.54</td><td style="padding:4px 8px;color:#ef4444;">负 IC，已归零</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">质量</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">10.0%</td><td style="padding:4px 8px;text-align:right;color:#ef4444;">-0.0209</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">-0.67</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0140</td><td style="padding:4px 8px;text-align:right;color:#64748b;">73</td><td style="padding:4px 8px;text-align:right;color:#f87171;font-weight:400;">-1.17</td><td style="padding:4px 8px;text-align:right;color:#f87171;font-weight:400;">-1.44</td><td style="padding:4px 8px;color:#ef4444;">负 IC，方向相反</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">小市值</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">0.0%</td><td style="padding:4px 8px;text-align:right;color:#ef4444;">—</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">—</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">—</td><td style="padding:4px 8px;text-align:right;color:#64748b;">—</td><td style="padding:4px 8px;text-align:right;color:#64748b;font-weight:400;">—</td><td style="padding:4px 8px;text-align:right;color:#64748b;font-weight:400;">—</td><td style="padding:4px 8px;color:#ef4444;">无本池历史数据</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">成长</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">10.0%</td><td style="padding:4px 8px;text-align:right;color:#ef4444;">-0.0218</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">-1.73</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">-0.0429</td><td style="padding:4px 8px;text-align:right;color:#64748b;">73</td><td style="padding:4px 8px;text-align:right;color:#64748b;font-weight:400;">—</td><td style="padding:4px 8px;text-align:right;color:#64748b;font-weight:400;">—</td><td style="padding:4px 8px;color:#ef4444;">负 IC，方向相反</td></tr>
+            </table>
+            <div style="margin:2px 0 6px;font-size:9px;color:#64748b;line-height:1.7;">
+                <b style="color:#cbd5e1;">⚠️ 原文表述纠正（2026-10-27）</b>：
+                此前本页曾写「8 维中只有估值锚、乖离单维过 Bonferroni」——
+                <b style="color:#f87171;">这句话不成立，已撤回</b>。按 round23 的
+                <code>q1_dim_ic</code>，过 Bonferroni 的是 <b>fund（n=73）与 bias60（n=63）两维</b>；
+                但本表此前<b>漏列了 v4.9 生效的 EP估值与行业内市值</b>，也没有 n 列，
+                读者无法判断各维 IC 来自不同样本口径。<br>
+                <b style="color:#fbbf24;">fund 权重 7.5% 但 IC 只排第 5、消融 t 却排第 1</b> ——
+                这三件事不矛盾：单维 IC 是「只用这一维选股」的收益，
+                消融 t 是「把它从这 8 维组合里拿掉」的损失。
+                维度之间相关（乖离↔RSI反 r=+0.86）会让单维 IC 与边际贡献脱钩。
+                权重是先验，<b>不是</b>按 IC 大小分配的。
+            </div>
+            <b style="color:#fbbf24;">换维裁决（同一历史样本，按 <u>生产线量程归一化公式</u> 重算，78 截面）</b>
+            <div style="margin:2px 0 4px;font-size:9px;color:#64748b;">
+                ⚠️ 口径说明：此表用 step2 的真实公式（各维先按自身量程归一化到 0-10 再加权 ×10），
+                不是「各维转池内排名再加权」。后者在分布偏斜时与生产线不等价，曾导致早期结论数值虚高/虚低。
+            </div>
+            <table style="width:100%;border-collapse:collapse;font-size:9.5px;margin:4px 0 6px;">
+                <tr style="border-bottom:0.5px solid #334155;color:#64748b;">
+                    <th style="text-align:left;padding:3px 8px;">方案</th>
+                    <th style="text-align:right;padding:3px 8px;">h5 IC</th>
+                    <th style="text-align:right;padding:3px 8px;">h5 t0</th>
+                    <th style="text-align:left;padding:3px 8px;">稳健性</th>
+                </tr>
+                <tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">P1 现行 v4.8（低波0.13 + size0.10）</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.1776</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+9.95</td><td style="padding:4px 8px;color:#22c55e;">✅ 过 Bonferroni</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">P0 v4.7 旧口径（成长0.13 + size0.10）</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.1153</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+4.54</td><td style="padding:4px 8px;color:#f59e0b;">⚠️ 未过</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">去掉 size（低波0.13）</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.2004</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+12.97</td><td style="padding:4px 8px;color:#22c55e;">✅ 过 Bonferroni</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">成长0.13 + 低波0.13 共存</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.1635</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+9.36</td><td style="padding:4px 8px;color:#22c55e;">✅ 过 Bonferroni</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">成长0.05 + 低波0.08</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.1577</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+7.55</td><td style="padding:4px 8px;color:#22c55e;">✅ 过 Bonferroni</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">低波0.23 吃掉 size</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.1995</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+13.80</td><td style="padding:4px 8px;color:#22c55e;">✅ 过 Bonferroni</td></tr>
+            </table>
+            <b style="color:#fbbf24;">⚠️ 怎么读这两张表（别读过头）</b>：<br>
+            · 「无证据」= 在本池 78 个截面里<b>没有可检出的 alpha</b>，不等于「一定是噪声」；
+            样本 78 个、池内 490 只，检验功效有限，<b>负 IC 也不构成「反向更优」的证据</b>。<br>
+            · 成长维已<b>归零</b>（权重 0，字段保留标「不计分·参考」）：历史增速与前瞻一阶导/二阶导
+            （pe_ladder 推导 g1/g2/acc）h5 IC 全负，且<b style="color:#fbbf24;">五种极值治理均未转正</b>
+            （raw −0.0218 → 缩尾 −0.0216 → sign·log1p −0.0148 → 缩尾+对数 −0.0150 → 逐子因子 rank −0.0247），
+            故判定为「本池无 alpha」而非「方向算反」。<br>
+            · 低波20 是换维来源：单维 h5 IC +0.1189(t0=3.28)、与六维 |r| ≤ 0.24、与 mom20 r=−0.19（非动量代理）。<br>
+            · 换上低波后复合分 h5 IC 从 +0.1153 升到 <b style="color:#4ade80;">+0.1776</b>，
+            lag 0/3/6 = +9.95/+6.10/+5.65 <b style="color:#4ade80;">全过 Bonferroni 3.08</b>，
+            分子期前半 +0.2189 / 后半 +0.1375 <b>双正</b> —— 这是本项目首次出现「复合分全 lag 过 Bonferroni 且分子期双正」。<br>
+            · <b style="color:#f59e0b;">已知短板（v4.8 时点披露，v4.9 已处置）</b>：小市值维单维 h5 IC
+            <b style="color:#ef4444;">−0.0634（t0=−2.70）</b>，且与低波20 跨 78 截面平均秩相关
+            <b style="color:#ef4444;">−0.501</b>（98.7% 截面 &lt; −0.3）——两者方向互斥
+            （低波股本就是大市值股），合成后互相抵消；当时实测去掉 size 后复合 h5 可再升到 +0.2004。
+            → <b style="color:#4ade80;">v4.9 已按 round27 方案 C 处置</b>：原始 size 归零、换成
+            <b>行业内中性化市值（SIZE_IND_NEUT）</b>，h5 IC 由 −0.0634 改善到
+            −0.0148 量级，是「保留小市值暴露但不与低波对冲」的那条路径。<br>
+            · 本区块是<b>披露</b>，各维权重仍是先验；样本外复验（目标 30+ 截面）前不再调整。<br>
+            · <b style="color:#fbbf24;">加维候选（round23 已测，口径为当时 v4.7 的 7 维）</b>：
+            已实测 4 个候选（低波20 / 1周动量 / 1月动量 / 距20日高点），其中<b>低波20 单独 h5 IC=+0.1189（t0=+3.28）</b>、加入现有 7 维后 h5 从 +0.1263→+0.1651，且与现有各维最大相关仅 |r|=0.33（唯一真正不冗余的候选）；但<b>全 lag 未过 Bonferroni</b>（t=3.28/1.87/1.56），且前半样本几乎为零（+0.0956/t=1.56）、后半段才有效（+0.1457/t=4.47）—— 只能登记为候选维，<b>不足以支撑上线</b>。其余三个候选与现有维 |r|=0.76~0.89，不带来新信息。<b style="color:#4ade80;">→ 其中 lowvol20 已于 v4.8 上线</b>
+        </div>
+  </div>
+
+  <div style="padding:14px 16px;background:#111c2e;border:0.5px solid #1e293b;border-radius:10px;margin-bottom:16px;">
+    <div style="font-size:14px;font-weight:800;color:#e2e8f0;margin-bottom:6px;">📊 五、双视角评估（研究有效性 / 投资实用性）</div>
+    <div style="font-size:11px;color:#64748b;margin-bottom:8px;">
+      因子系统化分类、逐维具体短板与修改意见、ICIR/分层/换手/衰减/拥挤度/多重检验。
+    </div>
+    
+    <div style="margin-top:9px;padding:11px 13px;border-radius:8px;background:#0b1424;
+                border:0.5px solid #1e3a5f;font-size:10px;color:#94a3b8;line-height:1.75;">
+        <div style="font-size:12px;font-weight:800;color:#e2e8f0;margin-bottom:3px;">
+            🎓 双视角评估：因子分类框架 · 逐维修改意见 · 双维度结论
+        </div>
+        <div style="font-size:9px;color:#64748b;margin-bottom:9px;">
+            全部数字来自 audit_round23 / 24f / 25 / 25b / 25c / 27 / 27b（78 截面 · 2026-03-24~10-23 · 真实前瞻收益），
+            不是当日数，也不是估算值。样本外（第 79 个截面起）尚无数据。
+            逐维表里的<b>权重为当前配置实值</b>，方差贡献与有效维数为当日现算。
+        </div>
+
+        <b style="color:#38bdf8;">一、因子系统化分类框架</b>
+        <div style="font-size:9px;color:#64748b;margin:2px 0 5px;">
+            分类依据是<b>信息来源</b>与<b>定价机制</b>，不是代码实现顺序。只有按机制分类，
+            才能回答「这一类为什么在这个池子里该有效 / 该失效」。
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:9.5px;margin-bottom:10px;">
+            <tr style="border-bottom:0.5px solid #334155;color:#64748b;">
+                <th style="text-align:left;padding:3px 7px;width:13%;">类别</th>
+                <th style="text-align:left;padding:3px 7px;width:19%;">本模型中的维</th>
+                <th style="text-align:left;padding:3px 7px;">底层逻辑</th>
+                <th style="text-align:left;padding:3px 7px;width:22%;">在本池的实证状态</th>
+                <th style="text-align:left;padding:3px 7px;width:17%;">适用场景</th>
+            </tr>
+            <tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#22c55e;font-weight:700;white-space:nowrap;">A 价值/估值锚</td><td style="padding:5px 7px;"><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#22c55e22;color:#22c55e;border:0.5px solid #22c55e55;">估值锚 20.0%</span></td><td style="padding:5px 7px;color:#94a3b8;">用未来盈利折算当前价格贵不贵（fwd_pe / PEG / pe_ladder）。信息来自财报与一致预期。</td><td style="padding:5px 7px;color:#cbd5e1;">池子经初筛（成交额≥1亿/总市值≥25亿/20日换手≥1.5%/申万二级完整）后全量评分，已滤掉小盘冷门股，估值锚提供<b>安全边际</b>而非爆发力。</td><td style="padding:5px 7px;color:#64748b;">震荡市、估值分化大时最有效；单边普涨时会被高估值成长股甩开。</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#38bdf8;font-weight:700;white-space:nowrap;">B 质量/盈利质地</td><td style="padding:5px 7px;"><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#38bdf822;color:#38bdf8;border:0.5px solid #38bdf855;">质量 10.0%</span></td><td style="padding:5px 7px;color:#94a3b8;">ROE/毛利率/现金流等盈利质量。信息来自财报，变化慢。</td><td style="padding:5px 7px;color:#cbd5e1;">与估值锚高度负相关（−0.82），本质是「便宜但质地差」vs「贵但质地好」的镜像。</td><td style="padding:5px 7px;color:#64748b;">长周期（>60 日）有效；本池持仓周期 T+10 附近，故 alpha 弱。</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#f59e0b;font-weight:700;white-space:nowrap;">C 反转/均值回归</td><td style="padding:5px 7px;"><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#f59e0b22;color:#f59e0b;border:0.5px solid #f59e0b55;">乖离 5.0%</span><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#f59e0b22;color:#f59e0b;border:0.5px solid #f59e0b55;">RSI反 5.0%</span><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#f59e0b22;color:#f59e0b;border:0.5px solid #f59e0b55;">低波 ·0%</span></td><td style="padding:5px 7px;color:#94a3b8;">价格偏离均线/RSI 极值/波动率高低 → 赌短期过度反应的回补。信息来自行情，纯技术。</td><td style="padding:5px 7px;color:#cbd5e1;"><b>本项目 alpha 的主来源</b>：bias60+rsi_rev 合计 10%，加上 lowvol 0% 共 10%。</td><td style="padding:5px 7px;color:#64748b;">震荡市、高换手池子里最强；趋势市会连续被打脸（逆势接刀）。</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#a78bfa;font-weight:700;white-space:nowrap;">D 量价结构/趋势</td><td style="padding:5px 7px;"><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#a78bfa22;color:#a78bfa;border:0.5px solid #a78bfa55;">技反 10.0%</span><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#a78bfa22;color:#a78bfa;border:0.5px solid #a78bfa55;">score_vol_pulse ·0%</span><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#a78bfa22;color:#a78bfa;border:0.5px solid #a78bfa55;">score_oversold60 ·0%</span><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#a78bfa22;color:#a78bfa;border:0.5px solid #a78bfa55;">score_momentum ·0%</span></td><td style="padding:5px 7px;color:#94a3b8;">用技术指标综合分或量能变化判趋势强弱。</td><td style="padding:5px 7px;color:#cbd5e1;">本池里 tech_neg 边际有效但方差贡献仅 3.3%（9 维最低）；量能维因无历史 volume 数据不可回测。</td><td style="padding:5px 7px;color:#64748b;">适合中长趋势市；本池 78 截面以震荡为主，故证据弱。</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#ef4444;font-weight:700;white-space:nowrap;">E 规模/流动性</td><td style="padding:5px 7px;"><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#ef444422;color:#ef4444;border:0.5px solid #ef444455;">小市值 ·0%</span><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#ef444422;color:#ef4444;border:0.5px solid #ef444455;">小盘成长 20.0%</span><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#ef444422;color:#ef4444;border:0.5px solid #ef444455;">行业龙头 10.0%</span></td><td style="padding:5px 7px;color:#94a3b8;">流通市值分位（小市值=高分）→ v4.9 改行业内中性化 → <b>v4.13 拆为双维</b>：A 小盘成长溢价（行业内市值×成长门限）+ B 行业龙头壁垒（业务份额组内前30%）。</td><td style="padding:5px 7px;color:#cbd5e1;"><b>原始市值方向相反</b>：单维 h5 IC -0.0634，且与 lowvol 结构互斥（r=-0.50）→ 已归零，改用行业内中性化口径（h5 IC +0.0000，较原始口径改善 +0.0000）。<br>v4.13 进一步拆分：A 维吃成长门限（小盘+高成长），B 维吃业务份额（行业龙头壁垒），两维互斥（Spearman≈0.33），避免单一市值口径两头不讨好。</td><td style="padding:5px 7px;color:#64748b;">小市值溢价在流动性收紧/壳价值消失后失效；本池样本期内大市值跑赢。</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#64748b;font-weight:700;white-space:nowrap;">F 成长/景气度</td><td style="padding:5px 7px;"><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#64748b22;color:#64748b;border:0.5px solid #64748b55;">成长 10.0%</span></td><td style="padding:5px 7px;color:#94a3b8;">方式B（2026-10-31 二次修正 / 2026-11-02 v4.17 周期规则）：G_q=单季扣非同比（一阶导），QoQ=单季环比增速仅作 fund 一阶导、ΔG_q 仅作 fund 二阶导（v4.17 P1g 去重后成长合成分=纯 rank_Gq，避免与 fund 导数重复计量）；行业中性rank、1%/99%缩尾，硬约束（负增长锁0.4/亏损锁0.3/环比连续下滑扣分/连两季降速扣0.15）。<b>v4.17 周期规则（仅强周期20个申万二级生效，成长/消费/医药豁免）</b>：规则1 毛利率水平4季均值抬升＞3pp 判价格驱动 → 扣成长分10%；规则2 按期去均值的ΔG_q≥周期组p80 判加速不可持续 → 扣15%；叠加上限25%。原方案「毛利率波动std＞行业p60」实测 lift 0.945＜1（方向反了）已换口径。</td><td style="padding:5px 7px;color:#cbd5e1;">方式B 已进总分（v4.17 权重 10%，业绩动量大类；v4.16.1 时为 5%）。⚠️ 准入门禁 G1~G4 通过、G5 未过（1/6 折），且 panel_round66 无 score_growth 列 → growth 维仍是门禁盲区，权重为产品裁决非 IC 背书。禁表述为「经验证的 alpha」。</td><td style="padding:5px 7px;color:#64748b;">成长因子需要「增长持续性可验证」的市场环境；强周期股的高增速常由价格驱动、二阶导不可持续，故以规则1/2 事后扣分而非事前剔除。</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#475569;font-weight:700;white-space:nowrap;">G 消息/情绪/题材</td><td style="padding:5px 7px;"><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#47556922;color:#475569;border:0.5px solid #47556955;">score_news ·0%</span><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#47556922;color:#475569;border:0.5px solid #47556955;">score_theme_neg ·0%</span><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#47556922;color:#475569;border:0.5px solid #47556955;">score_sector ·0%</span><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#47556922;color:#475569;border:0.5px solid #47556955;">score_attention ·0%</span><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#47556922;color:#475569;border:0.5px solid #47556955;">score_theme_intrinsic ·0%</span><span style="display:inline-block;margin:1px 3px 1px 0;padding:0 5px;border-radius:3px;font-size:9px;background:#47556922;color:#475569;border:0.5px solid #47556955;">score_overbought ·0%</span></td><td style="padding:5px 7px;color:#94a3b8;">新闻情绪、题材热度、板块动量、关注度。信息来自文本与资金流。</td><td style="padding:5px 7px;color:#cbd5e1;"><b>全部归零</b>：theme 经行业内中性化后 IC 衰减 70%（行业代理，非独立信号）；news 仅 h1 有效；外部 47 因子排名中无一消息类因子入前列。</td><td style="padding:5px 7px;color:#64748b;">适合事件驱动、短持有（T+1~T+3）；本模型推荐 T+10，故不采信。</td></tr>
+        </table>
+
+        <b style="color:#38bdf8;">二、逐维修改意见（问题 → 改进 → 预期效果）</b>
+        <div style="font-size:9px;color:#64748b;margin:2px 0 5px;">
+            每条都给出<b>可执行落点</b>与<b>预期效果</b>；预期效果只写能用现有数据验证的方向，不写无法检验的承诺。
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:9.5px;margin-bottom:10px;">
+            <tr style="border-bottom:0.5px solid #334155;color:#64748b;">
+                <th style="text-align:left;padding:3px 7px;width:11%;">维度</th>
+                <th style="text-align:left;padding:3px 7px;width:30%;">问题（实测证据）</th>
+                <th style="text-align:left;padding:3px 7px;width:29%;">改进方向</th>
+                <th style="text-align:left;padding:3px 7px;">预期效果</th>
+            </tr>
+            <tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#22c55e;font-weight:700;white-space:nowrap;">fund 估值锚<br><span style="font-size:9px;color:#64748b;font-weight:400;">权重 0.2</span></td><td style="padding:5px 7px;color:#cbd5e1;">ICIR +0.61（IC +0.0762，std 0.1257）——t 值高但 ICIR 低，说明<b>靠少数截面撑起均值</b>；且 score_fund 内部已含 fwd_pe+PEG，与成长维重复计价（r=+0.67）。</td><td style="padding:5px 7px;color:#94a3b8;">① 用已入库但未使用的 OCFG（经营现金流增速）替换部分估值权重，降低与 fwd_pe 的共线；② 或拆成「估值分位」+「预期修正」两个子分只留高 ICIR 的一支。</td><td style="padding:5px 7px;color:#4ade80;">ICIR 0.61 → 0.75+；与成长/质量相关下降。零成本（字段已在库）。</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#ef4444;font-weight:700;white-space:nowrap;">质量 quality<br><span style="font-size:9px;color:#64748b;font-weight:400;">权重 0.1</span></td><td style="padding:5px 7px;color:#cbd5e1;"><b>生效维中唯一 IC 为负</b>：h5 IC -0.0088（t0=-0.66），h20 仅 +0.0145。与 fund 相关 −0.818，本质是「便宜但质地差」的镜像，<b>10% 权重等于变相做空高质量</b>。</td><td style="padding:5px 7px;color:#94a3b8;">① 优先：权重从 0.1 降到 0.05 或归零；② 若保留，必须换成<b>质量变化量</b>（ΔROE、毛利率环比）而非水平值，因为本池「高 ROE」已被市场充分定价。</td><td style="padding:5px 7px;color:#4ade80;">去 quality 后 v4.7 基线 h5 IC 从 +0.1137 升到 <b>+0.1477</b>（round23 drop_one）→ 归零是<b>已被本池数据支持</b>的动作。</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#14b8a6;font-weight:700;white-space:nowrap;">低波20 lowvol20<br><span style="font-size:9px;color:#64748b;font-weight:400;">权重 0（已归零）</span></td><td style="padding:5px 7px;color:#cbd5e1;">ICIR 仅 +0.38，IC 标准差 0.3121 （<b>9 维中最高</b>）——虽然均值 +0.1189 且与反转块相互独立（残差 IC 保留 110%），但<b>逐截面极不稳定</b>，且只能整池相对计算、无法跨日比较。</td><td style="padding:5px 7px;color:#94a3b8;">① 加<b>波动率分层中性化</b>：在 5 个波动率桶内各自排名，避免它退化成「买大市值低波股」；② 或改用 60 日波动率降低噪声；③ 补充 20 日<b>下行波动率</b>（只算负收益），它比总波动率更贴近风险。</td><td style="padding:5px 7px;color:#4ade80;">预期 IC 标准差从 0.31 降到 0.22 附近，ICIR 0.38 → 0.55+，同时削弱与 size 的 −0.50 冲突。</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#f59e0b;font-weight:700;white-space:nowrap;">技术反号 tech_neg<br><span style="font-size:9px;color:#64748b;font-weight:400;">权重 0.1</span></td><td style="padding:5px 7px;color:#cbd5e1;">方差贡献仅 3.3%（9 维最低），权重/贡献比 3.04 —— <b>给了 10% 权重但几乎不影响排名</b>，h5 IC +0.0575 边际有效。去 tech_neg 后基线 h5 IC 反而升到 +0.1479（round23 drop_one）。</td><td style="padding:5px 7px;color:#94a3b8;">① 权重从 0.1 降到 0.05，把腾出的权重给反转块；② 或直接归零——它和 bias60/rsi_rev 相关 +0.637/+0.684，信息已被覆盖。</td><td style="padding:5px 7px;color:#4ade80;">权重/贡献比从 3.04 回到 1.0 附近，模型更诚实；IC 预期小幅提升。</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#f97316;font-weight:700;white-space:nowrap;">乖离60 bias60<br><span style="font-size:9px;color:#64748b;font-weight:400;">权重 0.05</span></td><td style="padding:5px 7px;color:#cbd5e1;">单维最强（h5 IC +0.1648，ICIR +0.79），但与 rsi_rev 相关 <b>+0.877</b>——两者合计 10% 权重实际是<b>同一维度被计了两次</b>。</td><td style="padding:5px 7px;color:#94a3b8;">① 保留 bias60 为主、rsi_rev 为辅，把 10% 压到 25% 左右；② 或把两者合成单一「反转复合分」再赋一个权重，让权重与有效维数一致。</td><td style="padding:5px 7px;color:#4ade80;">有效维数从 4.91/9 升到 3.5+；权重语义变清晰。</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#f59e0b;font-weight:700;white-space:nowrap;">RSI反转 rsi_rev<br><span style="font-size:9px;color:#64748b;font-weight:400;">权重 0.05</span></td><td style="padding:5px 7px;color:#cbd5e1;">h20 IC +0.2064 且 ICIR +1.31（IC>0 占比 97.9%）——<b>长周期极稳，但 h5 ICIR 仅 +0.58</b>，长短期表现分裂。</td><td style="padding:5px 7px;color:#94a3b8;">① 与 bias60 合并（见上）；② 单独保留时建议延长推荐持有到 T+20（IC 衰减曲线在 h40 才见顶），而非现在的 T+10。</td><td style="padding:5px 7px;color:#4ade80;">按 IC 衰减实测，h10 IC +0.2243 → h20 +0.2484 → h40 +0.2796，<b>峰值在 h40</b>，延长持有期可直接提高单笔期望。</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#a855f7;font-weight:700;white-space:nowrap;">EP 盈利收益率<br><span style="font-size:9px;color:#64748b;font-weight:400;">权重 0.1</span></td><td style="padding:5px 7px;color:#cbd5e1;">单维 h5 IC +0.0477（t0=+1.65），仅用「有 EPS 的截面」时 IC +0.0986（t0=+2.86）——<b>点估计优于 fund（+0.0746）但不过 Bonferroni</b>（t0 +2.86 &lt; 3.08），且 IC 标准差 0.2942 是 fund（0.1283）的 2.3 倍。覆盖率存在<b>硬天花板</b>：亏损股 EP 数学上无定义，当前池内约 23% 标的缺该维，<b>缺维会被从分母剔除</b>（不是记 0 分），故高位排名在盈利股与亏损股之间不完全可比。</td><td style="padding:5px 7px;color:#94a3b8;">① 保持与 fund 各半的现状（不要再加权重）；② 若要提效，应改成<b>分档</b>：盈利股用 EP，亏损股用 PS 或 EV/EBIT 兜底，而不是留空；③ 或改用 EP 的<b>行业中性分位</b>，压低 IC 标准差。</td><td style="padding:5px 7px;color:#4ade80;">预期 IC 标准差从 0.29 降到 0.20 以内、覆盖率从 77% 提到 95%+，代价是引入第二个估值口径的可比性假设。</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#0ea5e9;font-weight:700;white-space:nowrap;">小盘成长溢价 size_growth<br><span style="font-size:9px;color:#64748b;font-weight:400;">权重 0.2</span></td><td style="padding:5px 7px;color:#cbd5e1;">单维 h5 IC -0.0218（t0=-1.01），行业内中性化后比原始市值（-0.0638）<b>改善 +0.0490</b>，h20 亦由 +0.0417 升至 +0.0883；但 h5 仍<b>微负</b>，说明本池「小市值溢价」在 5 日尺度上不成立。覆盖率 98.1%（行业组内不足 5 只的标的被剔除）。<br><b>v4.13 加了成长门限</b>：final = 行业内市值分 × w_mc（G&gt;7→0.8 / 4&lt;G≤7→0.3 / G≤4→0）——低成长小票不再拿市值溢价，这是对「小市值溢价在本池不成立」的直接回应。</td><td style="padding:5px 7px;color:#94a3b8;">① 成长门限已使该维只在「小盘 + 高成长」子集上生效（实测 744/1859 只 w_mc=0，即 40.1% 的市值溢价归零）；② 下一步应做<b>门限档位扫描</b>（0.8/0.3/0 三档消融），确认 0.3 这一中间档是否真的比直接归零更优。</td><td style="padding:5px 7px;color:#4ade80;">若门限扫描显示 0.3 档无增量，可退到「G&gt;7→0.8 / 其余 0」的更保守设定，把释放的权重给已被实证验证的 fund（消融 t=+4.41）。</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#f97316;font-weight:700;white-space:nowrap;">行业龙头壁垒 dominant<br><span style="font-size:9px;color:#64748b;font-weight:400;">权重 0.1</span></td><td style="padding:5px 7px;color:#cbd5e1;"><b>P0-3（round118）起改为全池打分</b>，覆盖率 26.1% → 99.1%。口径：营收TTM与扣非净利TTM 的<b>申万二级行业内业务份额</b>合成 rank（连续变量），再做市值一致性校验（mc_pct ≥ 0.8×业务份额则不打折）与流动性惩罚。<b>注意语义</b>：全池打分不等于「非龙头也享受龙头溢价」，而是「全池都在份额维度上排序，份额低的自然拿低分」。</td><td style="padding:5px 7px;color:#94a3b8;">① 实测复合 IC 三周期全部上升（h1 +0.0204→+0.0458 / h5 +0.0292→+0.0748 / h20 +0.0679→+0.0779，见 round118f）；单维 h20 反而由 +0.0525 降到 +0.0311 ——<b>复合升与单维降必须分开看</b>，升来自「更多行上该维可参与归一化」，不是「该维在 h20 变强」；② 与 size_growth 相关仅 −0.02~+0.05，不构成内部对冲；③ <b>代价</b>：非龙头同时拿 size_growth(.20)+dominant(.10)=0.30，龙头仅 dominant(.10) → 市值大类单股暴露差 3 倍。</td><td style="padding:5px 7px;color:#4ade80;">本维<b>未过 Bonferroni</b>：h20 的 NW t=1.493、n=66/lag=19，该 (n,lag) 的真实 5% 临界值在 3.6 以上（不能套用 2.0）。故本维权重属<b>结构性表达 + 覆盖率修复</b>，不得表述为「经验证的 alpha」。</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#475569;font-weight:700;white-space:nowrap;">小市值 size<br><span style="font-size:9px;color:#64748b;font-weight:400;">权重 0（已归零）</span></td><td style="padding:5px 7px;color:#cbd5e1;"><b>已于 v4.9 归零</b>：原权重 0.10。归零依据：h5 -0.0634（t0=-2.70），IC>0 占比仅 28.8%；且与 lowvol20 跨 78 截面平均秩相关 <b>-0.501</b>（98.7% 截面 &lt; −0.3）——低波股本就是大市值股，两维方向互斥、合成后互相抵消。</td><td style="padding:5px 7px;color:#94a3b8;">已执行：改用<b>行业内</b>市值分位替代，避免与低波在同一维度上对冲；v4.13 进一步拆为 A 小盘成长溢价 / B 行业龙头壁垒两维。本行保留仅作溯源，<b>不再参与评分</b>。</td><td style="padding:5px 7px;color:#4ade80;">替换后复合分 h5 从 +0.1776 边际改善到 -0.0148 量级；另一条更激进的路径（直接去 size 不给替代）实测可达 +0.2004，未采纳。</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#38bdf8;font-weight:700;white-space:nowrap;">成长 growth<br><span style="font-size:9px;color:#64748b;font-weight:400;">权重 0.1</span></td><td style="padding:5px 7px;color:#cbd5e1;">历史 5 子因子 h5 IC 全负（npg −0.0384 / cagr3 −0.0071 / revg −0.0292 / qoq −0.0129 / accel −0.0140）；前瞻口径（pe_ladder 推导的 g1 一阶导 / g2 / acc 二阶导）同样全负（−0.0171 / −0.0182 / −0.0007）；五种极值治理均未转正 —— 上述均为<b>旧口径</b>结论，已于 2026-10-31 起换为方式B（单季扣非 G_q）。<br>现权重 10%（v4.16.1 时 5% → v4.17 提至 10%，新设「业绩动量」大类 cap 30%）：<b>方式B 尚无本池 IC 实证</b>，且 panel_round66 面板无 score_growth 列 → 门禁对该维是盲区。<br>v4.17 另加周期规则1/2（仅强周期20个申万二级生效）：毛利率抬升＞3pp 判价格驱动扣 10%、去均值 ΔG_q≥p80 判加速不可持续扣 15%，上限 25%。</td><td style="padding:5px 7px;color:#94a3b8;">① 权重提升是<b>产品裁决</b>——理由是原 5% 时规则扣分只让总分降 0.12、排名最大下移 5 位，整套周期校验形同虚设（round108 §六 传导失效实测）；② 下一步必须补 panel_round67（含 score_growth + 毛利率字段）才能解门禁盲区。</td><td style="padding:5px 7px;color:#4ade80;">在补出 IC 证据前，本维权重属<b>结构性表达</b>（承认业绩动量有信息）而非实证结论；页面与对外口径须标注「权重为产品裁决，非 IC 背书」，<b>禁表述为「经验证的 alpha」</b>。</td></tr>
+        </table>
+
+        <b style="color:#38bdf8;">三、双维度评估结论</b>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;margin:5px 0 9px;">
+            <div style="flex:1 1 300px;padding:8px 10px;border-radius:6px;
+                        background:rgba(34,197,94,0.06);border-left:3px solid #22c55e;">
+                <div style="font-size:10px;font-weight:800;color:#4ade80;margin-bottom:3px;">
+                    视角一 · 研究有效性：<span style="color:#4ade80;">成立，但有边界</span>
+                </div>
+                <div style="color:#cbd5e1;">
+                · 复合分 h5 IC <b style="color:#4ade80;">+0.1776</b>、
+                  ICIR <b>+1.16</b>、
+                  IC&gt;0 占比 <b>89.0%</b>；<br>
+                · 分层<b style="color:#4ade80;">严格单调</b>：Q1 -0.0211 →
+                  Q5 +0.0194，层序秩相关 <b>1.0</b>，
+                  多空 +0.0405（t0=+7.01，
+                  正占比 86.3%）——<b>不是极值驱动</b>；<br>
+                · IC 在 h1→h40 单调上升未见衰减，峰值 h40
+                  （+0.2796），<b>半衰期 &gt;60 日</b>；<br>
+                · 低波<b>不是反转块代理</b>：控制反转块后残差 IC 保留 110%；
+                  同权重下把 0.13 全给反转块，h5 从 +0.1776 <b>降到 +0.1330</b>。<br>
+                <b style="color:#f59e0b;">边界</b>：① 累计检验已达
+                  <b>304 次</b>，严格阈值应升至 t≈3.9，
+                  现用 3.08 <b>偏乐观</b>；② 有效维数仅 2.98/7；
+                  ③ 全部结论限于 78 个截面（≈7 个月）单一区制。
+                </div>
+            </div>
+            <div style="flex:1 1 300px;padding:8px 10px;border-radius:6px;
+                        background:rgba(239,68,68,0.06);border-left:3px solid #ef4444;">
+                <div style="font-size:10px;font-weight:800;color:#f87171;margin-bottom:3px;">
+                    视角二 · 投资实用性：<span style="color:#f87171;">相对可用，绝对不行</span>
+                </div>
+                <div style="color:#cbd5e1;">
+                · <b style="color:#ef4444;">绝对收益全周期为负</b>：等权持有 Top50，
+                  H5 净值 0.777、
+                  H10 <b>0.809</b>、H20 0.955，
+                  同期池内等权基准 0.598 /
+                  0.620 / 0.777
+                  —— <b>组合抗跌但不赚钱</b>，因为<b>池子本身负 alpha</b>；<br>
+                · <b>超额为正且随持有期改善</b>：H5 单期超额
+                  +0.0175（胜率 80%）
+                  → H10 +0.0359（100%）
+                  → H20 +0.0596（100%）；<br>
+                · <b style="color:#f59e0b;">换手是最大摩擦</b>：按持有周期折算，年化换手
+                  H5 26x、
+                  H10 15x、H20 9x
+                  —— <b>即使按 H20，年化换手仍 8.5 倍</b>，
+                  双边成本按 0.1% 计，H20 每年吃 <b>1.7%</b>；<br>
+                · 分数黏性 +0.903（区间 +0.67~+0.97）
+                  —— 名单变动不剧烈，但<b>离「低换手」还很远</b>；<br>
+                · Top50 市值分位 5.27 vs 池均值 5.00
+                  —— <b>未显著向大市值倾斜</b>（偏离仅 +0.27），
+                  说明 size 维的负作用被其他维部分抵消；<br>
+                · 横截面分数标准差 10.62（百分制）——区分度可用。<br>
+                <b style="color:#f59e0b;">结论</b>：这套分数<b>适合当「池内相对强弱排序」</b>，
+                  用来决定「先看哪些、后看哪些」；<b>不适合当独立买入信号</b>。
+                </div>
+            </div>
+        </div>
+
+        <b style="color:#38bdf8;">四、优先改进建议（按「改动成本 ÷ 预期收益」排序）</b>
+        <div style="font-size:9px;color:#64748b;margin:2px 0 5px;">
+            排序依据不是「最重要」，而是<b>「现在就能做、做完能用现有数据验证」</b>。
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:9.5px;">
+            <tr style="border-bottom:0.5px solid #334155;color:#64748b;">
+                <th style="text-align:left;padding:3px 7px;width:4%;">#</th>
+                <th style="text-align:left;padding:3px 7px;width:20%;">动作</th>
+                <th style="text-align:left;padding:3px 7px;width:11%;">成本</th>
+                <th style="text-align:left;padding:3px 7px;width:26%;">实测依据</th>
+                <th style="text-align:left;padding:3px 7px;">为什么排这个位置</th>
+            </tr>
+            <tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;">
+                <td style="padding:5px 7px;color:#4ade80;font-weight:800;">1</td>
+                <td style="padding:5px 7px;color:#cbd5e1;font-weight:700;">size 维 0.10 → 0</td>
+                <td style="padding:5px 7px;color:#4ade80;">极低<br><span style="font-size:9px;color:#64748b;">改权重配置</span></td>
+                <td style="padding:5px 7px;color:#94a3b8;">唯一负 IC（h5 -0.0634，t0=-2.70，IC&gt;0 仅 28.8%）；与 lowvol 相关 -0.501；去 size 后复合 h5 +0.1776 → <b style="color:#4ade80;">+0.2004</b>（t0 +9.95→+12.97）</td>
+                <td style="padding:5px 7px;color:#94a3b8;">三项证据同向、零实现成本、且<b>已在生产线口径下验证</b>。唯一阻碍是 0.10 权重属既定决策，需老大裁决。</td>
+            </tr>
+            <tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;">
+                <td style="padding:5px 7px;color:#4ade80;font-weight:800;">2</td>
+                <td style="padding:5px 7px;color:#cbd5e1;font-weight:700;">quality 维 0.12 → 0.05 或 0</td>
+                <td style="padding:5px 7px;color:#4ade80;">极低</td>
+                <td style="padding:5px 7px;color:#94a3b8;">h5 IC −0.0088（t0=−0.66）、h20 仅 +0.0145；与 fund 相关 −0.818；round23 drop_one 去 quality 后基线 h5 +0.1137 → <b>+0.1477</b></td>
+                <td style="padding:5px 7px;color:#94a3b8;">同为负 IC 且证据链完整。与 #1 可同批执行、同批验证。</td>
+            </tr>
+            <tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;">
+                <td style="padding:5px 7px;color:#fbbf24;font-weight:800;">3</td>
+                <td style="padding:5px 7px;color:#cbd5e1;font-weight:700;">bias60 + rsi_rev 合并为单一反转分，35% → 25%</td>
+                <td style="padding:5px 7px;color:#fbbf24;">中<br><span style="font-size:9px;color:#64748b;">改评分逻辑+七处同步</span></td>
+                <td style="padding:5px 7px;color:#94a3b8;">两者相关 <b>+0.877</b>，有效维数仅 2.98/7；合计 35% 权重等于同一维计两次</td>
+                <td style="padding:5px 7px;color:#94a3b8;">改善的是<b>模型诚实度</b>而非 IC——不能指望它提高收益，但能让权重语义站得住。放在 1、2 之后因为要动七处同步。</td>
+            </tr>
+            <tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;">
+                <td style="padding:5px 7px;color:#fbbf24;font-weight:800;">4</td>
+                <td style="padding:5px 7px;color:#cbd5e1;font-weight:700;">引入<b>交易成本</b>与<b>换手约束</b>做组合构建</td>
+                <td style="padding:5px 7px;color:#fbbf24;">中</td>
+                <td style="padding:5px 7px;color:#94a3b8;">H10 年化换手 15x、H20 9x；H20 双边成本年吃 1.7%</td>
+                <td style="padding:5px 7px;color:#94a3b8;"><b>研究有效 ≠ 投资可用</b>的最大缺口就在这里。当前所有 IC 都是<b>零成本口径</b>，扣费后超额会显著缩水。</td>
+            </tr>
+            <tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;">
+                <td style="padding:5px 7px;color:#94a3b8;font-weight:800;">5</td>
+                <td style="padding:5px 7px;color:#cbd5e1;font-weight:700;">把推荐持有周期从 T+10 延到 T+20</td>
+                <td style="padding:5px 7px;color:#4ade80;">低<br><span style="font-size:9px;color:#64748b;">改文案+回测口径</span></td>
+                <td style="padding:5px 7px;color:#94a3b8;">IC 衰减峰值在 h40（+0.2796），h10 +0.2243 仍在上行；H20 单期超额 +0.0596 &gt; H10 +0.0359</td>
+                <td style="padding:5px 7px;color:#94a3b8;">延长期限<b>同时降低换手</b>，一举两得。但 H20 只有 3 个独立区间，样本过少，须等更多数据。</td>
+            </tr>
+            <tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;">
+                <td style="padding:5px 7px;color:#64748b;font-weight:800;">6</td>
+                <td style="padding:5px 7px;color:#cbd5e1;font-weight:700;">样本外复验（第 79 个截面起，目标 30+）</td>
+                <td style="padding:5px 7px;color:#ef4444;">高<br><span style="font-size:9px;color:#64748b;">等时间</span></td>
+                <td style="padding:5px 7px;color:#94a3b8;">累计检验 304 次，严格阈值应 t≈3.9；当前 78 截面单一区制</td>
+                <td style="padding:5px 7px;color:#94a3b8;">这是<b>唯一能真正提升可信度</b>的动作，但无法加速。在此之前应<b>冻结权重</b>，避免继续在同一批数据上搜索。</td>
+            </tr>
+        </table>
+
+        
+        <b style="color:#38bdf8;">五、飞书「五维分层」 vs 本项目「线性多维」—— 谁更优（round29 宽样本定稿）</b>
+        <div style="padding:6px 9px;background:rgba(239,68,68,0.10);border-left:3px solid #ef4444;
+                    border-radius:4px;margin:2px 0 7px;color:#cbd5e1;font-size:9.5px;">
+            <b style="color:#f87171;">⚠️ 本节已整节重做两次：round28 样本错 → round29 首版样本又选窄</b><br>
+            <b>第一错（round28）：</b>用了 78 个截面，
+            其中 <b>69 个（88.5%）
+            是老 500 池截面（每截面仅 ~195 只）</b>，新池截面只有
+            9 个 → 该版结论已作废。<br>
+            <b>第二错（round29 首版，老大追问「为什么只用486只」）：</b>把「490 只新池的
+            <u>单日</u>成分」当固定域 → 只剩 <b>486 只</b>。但同一天池里约 100 只大盘股
+            （平安银行/美的/五粮液/格力/中兴/泸州老窖…）在 10-26 因「近20日换手率 ≥ 1.5%」被初筛掉，
+            <b>用单日池当锚 = 把「今天恰好没过换手率门槛」的股票永久踢出历史回测</b>，这是错的。<br>
+            <b>正确锚 = 历史池成分</b>（所有截面出现过的 1014 只）<b> ∩ 可用数据</b>。<br>
+            <b>漏斗（逐层如实披露）：</b>历史池 1014
+            → ∩价格库 1012 → ∩EM财务 964
+            → ∩申万一级 958 → ∩股本 917
+            <span style="color:#64748b;">（股本原只有 676 只，补 top200_scored 的 circ_mv/price 后到
+            2037 只，域才从 668 上到 917）</span>。<br>
+            <b>本轮样本：</b><b style="color:#4ade80;">917 只</b>
+            （覆盖历史池 90.4%，比首版 486 只补回
+            <b>431 只</b>；round28 老池那 69
+            个截面每截面仅 ~195 只，本轮是它的
+            4.7 倍）；
+            窗口 2026-07-10 ~ 2026-10-16，
+            h5 <b>65</b> 截面 / h20 <b>50</b> 截面。<br>
+            <b style="color:#fbbf24;">扩域的直接后果：飞书三方案 h20 从「显著负」翻成「≈0 / 弱正」，
+            「飞书是反向指标」这条结论已被推翻</b>（详见下方「扩域翻转归因」）。
+        </div>
+
+        <div style="font-size:9px;color:#64748b;margin:2px 0 6px;">
+            <b>先回答一个更根本的问题：这个对比本身是不是伪命题？</b>
+            飞书的综合分是 <code>Σ_c w_c × mean(z ∈ 类c)</code>，展开后恒等于
+            <code>Σ_f (w_c/|c|) × z_f</code> —— <b>分层线性加权与单层线性加权数学上完全等价</b>。
+            实测 n=4000 只次，最大绝对差
+            <b style="color:#4ade80;">0.00e+00</b>。
+            所以「五维 vs 线性」<b>结构本身不产生任何 alpha</b>，它只是设定权重的一种启发式写法；
+            真正决定优劣的是<b>隐含因子权重</b>。
+            <span style="color:#64748b;">（这是全节唯一不随样本变化的结论——因为它<span style="color:#94a3b8;">是数学恒等式，不是实证结论</span>。）</span>
+        </div>
+        <div style="padding:6px 9px;background:rgba(239,68,68,0.08);border-left:3px solid #ef4444;
+                    border-radius:4px;margin-bottom:7px;color:#cbd5e1;font-size:9.5px;">
+            <b style="color:#f87171;">⚠️ 顺带发现：飞书文档内部权重自相矛盾（这不是我算错，是文档两处不一致）</b><br>
+            同一份文档里，「五大类分层」隐含的因子权重 与 「因子权重表」声明的权重
+            <b>完全对不上</b>，但两处各自的合计都归一为 1.000 —— 所以单看任何一处都「看起来对」：
+            <table style="width:62%;border-collapse:collapse;font-size:9px;margin-top:4px;">
+                <tr style="border-bottom:0.5px solid #334155;color:#64748b;">
+                    <th style="text-align:left;padding:2px 7px;">因子</th>
+                    <th style="text-align:right;padding:2px 7px;">分层隐含</th>
+                    <th style="text-align:right;padding:2px 7px;">平铺声明</th>
+                    <th style="text-align:right;padding:2px 7px;">倍数</th>
+                </tr>
+                <tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">OCFG</td><td style="padding:3px 7px;color:#94a3b8;text-align:right;">0.100</td><td style="padding:3px 7px;color:#94a3b8;text-align:right;">0.250</td><td style="padding:3px 7px;text-align:right;font-weight:700;color:#f87171;">0.40x</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">ROE</td><td style="padding:3px 7px;color:#94a3b8;text-align:right;">0.350</td><td style="padding:3px 7px;color:#94a3b8;text-align:right;">0.100</td><td style="padding:3px 7px;text-align:right;font-weight:700;color:#f87171;">3.50x</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">EP</td><td style="padding:3px 7px;color:#94a3b8;text-align:right;">0.100</td><td style="padding:3px 7px;color:#94a3b8;text-align:right;">0.150</td><td style="padding:3px 7px;text-align:right;font-weight:700;color:#94a3b8;">0.67x</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">EVEBIT</td><td style="padding:3px 7px;color:#94a3b8;text-align:right;">0.100</td><td style="padding:3px 7px;color:#94a3b8;text-align:right;">0.050</td><td style="padding:3px 7px;text-align:right;font-weight:700;color:#f87171;">2.00x</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">NAG</td><td style="padding:3px 7px;color:#94a3b8;text-align:right;">0.100</td><td style="padding:3px 7px;color:#94a3b8;text-align:right;">0.200</td><td style="padding:3px 7px;text-align:right;font-weight:700;color:#94a3b8;">0.50x</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">REV1M</td><td style="padding:3px 7px;color:#94a3b8;text-align:right;">0.075</td><td style="padding:3px 7px;color:#94a3b8;text-align:right;">0.100</td><td style="padding:3px 7px;text-align:right;font-weight:700;color:#94a3b8;">0.75x</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">SIZE_IND_NEUT</td><td style="padding:3px 7px;color:#94a3b8;text-align:right;">0.075</td><td style="padding:3px 7px;color:#94a3b8;text-align:right;">0.050</td><td style="padding:3px 7px;text-align:right;font-weight:700;color:#94a3b8;">1.50x</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">SUE</td><td style="padding:3px 7px;color:#94a3b8;text-align:right;">0.100</td><td style="padding:3px 7px;color:#94a3b8;text-align:right;">0.100</td><td style="padding:3px 7px;text-align:right;font-weight:700;color:#94a3b8;">1.00x</td></tr>
+            </table>
+            <b>ROE 实际权重是声明值的 3.5 倍，OCFG 只有声明值的
+            40%</b> —— 按分层跑和按平铺表跑，是两套完全不同的模型。
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:9.5px;margin-bottom:5px;">
+            <tr style="border-bottom:0.5px solid #334155;color:#64748b;">
+                <th style="text-align:left;padding:3px 7px;width:20%;">方案</th>
+                <th style="text-align:right;padding:3px 7px;">h5 IC</th>
+                <th style="text-align:right;padding:3px 7px;">t0</th>
+                <th style="text-align:right;padding:3px 7px;">ICIR</th>
+                <th style="text-align:right;padding:3px 7px;">h20 IC</th>
+                <th style="text-align:right;padding:3px 7px;">t0</th>
+                <th style="text-align:right;padding:3px 7px;">ICIR</th>
+                <th style="text-align:center;padding:3px 7px;width:11%;">Bonferroni<br>h5/h20</th>
+            </tr>
+            <tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#f87171;font-weight:700;white-space:nowrap;">F1 飞书分层5类<br><span style="font-size:8.5px;color:#64748b;font-weight:400;">按文档「五大类」写法：类内等权，再按大类权重加总</span></td><td style="padding:5px 7px;color:#e2e8f0;text-align:right;font-weight:700;">+0.0271</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;">+1.85</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;">+0.23</td><td style="padding:5px 7px;color:#e2e8f0;text-align:right;font-weight:700;">+0.0058</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;font-weight:700;">+0.36</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;">+0.05</td><td style="padding:5px 7px;text-align:center;">❌ / ❌</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#fbbf24;font-weight:700;white-space:nowrap;">F2 飞书平铺8因子<br><span style="font-size:8.5px;color:#64748b;font-weight:400;">按文档「因子权重表」写法：8 因子直接线性加总</span></td><td style="padding:5px 7px;color:#e2e8f0;text-align:right;font-weight:700;">+0.0589</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;">+3.64</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;">+0.45</td><td style="padding:5px 7px;color:#e2e8f0;text-align:right;font-weight:700;">+0.0463</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;font-weight:700;">+2.48</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;">+0.35</td><td style="padding:5px 7px;text-align:center;">✅ / ❌</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#94a3b8;font-weight:700;white-space:nowrap;">F3 隐含权重当平铺<br><span style="font-size:8.5px;color:#64748b;font-weight:400;">把分层的隐含权重拿出来当平铺权重（=F1 的等价展开）</span></td><td style="padding:5px 7px;color:#e2e8f0;text-align:right;font-weight:700;">+0.0256</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;">+1.74</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;">+0.22</td><td style="padding:5px 7px;color:#e2e8f0;text-align:right;font-weight:700;">+0.0033</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;font-weight:700;">+0.20</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;">+0.03</td><td style="padding:5px 7px;text-align:center;">❌ / ❌</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#4ade80;font-weight:700;white-space:nowrap;"><b>现行八维 v4.9</b><br><span style="font-size:8.5px;color:#64748b;font-weight:400;">本项目当前生效模型（ep/fund 各半 + size_ind 替换 size）</span></td><td style="padding:5px 7px;color:#e2e8f0;text-align:right;font-weight:700;">+0.1522</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;">+8.03</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;">+1.00</td><td style="padding:5px 7px;color:#e2e8f0;text-align:right;font-weight:700;">+0.1882</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;font-weight:700;">+7.21</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;">+1.02</td><td style="padding:5px 7px;text-align:center;">✅ / ✅</td></tr><tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;"><td style="padding:5px 7px;color:#38bdf8;font-weight:700;white-space:nowrap;">现行七维 v4.8（对照）<br><span style="font-size:8.5px;color:#64748b;font-weight:400;">换维前的版本，用于确认基线可复现</span></td><td style="padding:5px 7px;color:#e2e8f0;text-align:right;font-weight:700;">+0.1508</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;">+7.70</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;">+0.95</td><td style="padding:5px 7px;color:#e2e8f0;text-align:right;font-weight:700;">+0.1917</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;font-weight:700;">+7.30</td><td style="padding:5px 7px;color:#94a3b8;text-align:right;">+1.03</td><td style="padding:5px 7px;text-align:center;">✅ / ✅</td></tr>
+        </table>
+        <div style="font-size:9px;color:#64748b;margin-bottom:7px;">
+            <b>同一样本、同一公式</b>：917 只固定域，
+            仅取覆盖最低的 SIZE_IND_NEUT（92.3%）有值的子样本做卡口，
+            所有方案都走生产线量程归一化口径 <code>Σ min(v,DMAX)/DMAX×10×w / max(0.5,Σw)×10</code>，
+            飞书侧走 winsorize 0.1% + 截面 Z。<br>
+            <b style="color:#fbbf24;">⚠️ 读表纪律：扩域后飞书三方案 h20 已不再显著为负</b>（首版 486 域时为负是样本伪影，
+            见下「扩域翻转归因」）。本节所有负数标红，请勿只看 ✅/❌ 不看符号。
+        </div>
+
+        <div style="padding:7px 10px;border-radius:6px;background:rgba(251,191,36,0.09);
+                    border-left:3px solid #fbbf24;margin-bottom:7px;color:#cbd5e1;font-size:9.5px;">
+            <b style="color:#fbbf24;">🔍 扩域翻转归因：把域拆成 A=老486 / B=新增431，分别算 IC</b><br>
+            <span style="font-size:9px;color:#94a3b8;">A、B 都 ⊆ 同一 917 域、同一 GATE 卡口、同一前瞻收益，
+            唯一差别是成分 —— 这是唯一能把「样本效应」和「信号效应」拆开的做法。</span>
+            <table style="width:100%;border-collapse:collapse;font-size:9px;margin-top:4px;">
+                <tr style="border-bottom:0.5px solid #334155;color:#64748b;">
+                    <th style="text-align:left;padding:2px 7px;width:26%;">方案</th>
+                    <th style="text-align:center;padding:2px 7px;">hop</th>
+                    <th style="text-align:right;padding:2px 7px;">A 老486 子集</th>
+                    <th style="text-align:right;padding:2px 7px;">B 新增431 子集</th>
+                    <th style="text-align:right;padding:2px 7px;">全样本 917</th>
+                </tr>
+                <tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:2px 7px;color:#cbd5e1;">F1 飞书分层5类</td><td style="padding:2px 7px;text-align:center;color:#64748b;">h5</td><td style="padding:2px 7px;text-align:right;color:#e2e8f0;">+0.0212<span style="color:#64748b;"> (t+1.49)</span></td><td style="padding:2px 7px;text-align:right;color:#e2e8f0;">+0.0366<span style="color:#64748b;"> (t+2.16)</span></td><td style="padding:2px 7px;text-align:right;color:#4ade80;font-weight:700;">+0.0271<span style="color:#64748b;"> (t+1.85)</span></td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:2px 7px;color:#cbd5e1;">F1 飞书分层5类</td><td style="padding:2px 7px;text-align:center;color:#64748b;">h20</td><td style="padding:2px 7px;text-align:right;color:#e2e8f0;">-0.0196<span style="color:#64748b;"> (t-1.18)</span></td><td style="padding:2px 7px;text-align:right;color:#e2e8f0;">+0.0318<span style="color:#64748b;"> (t+2.07)</span></td><td style="padding:2px 7px;text-align:right;color:#4ade80;font-weight:700;">+0.0058<span style="color:#64748b;"> (t+0.36)</span></td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:2px 7px;color:#cbd5e1;">F2 飞书平铺8因子</td><td style="padding:2px 7px;text-align:center;color:#64748b;">h5</td><td style="padding:2px 7px;text-align:right;color:#e2e8f0;">+0.0468<span style="color:#64748b;"> (t+3.02)</span></td><td style="padding:2px 7px;text-align:right;color:#e2e8f0;">+0.0766<span style="color:#64748b;"> (t+4.07)</span></td><td style="padding:2px 7px;text-align:right;color:#4ade80;font-weight:700;">+0.0589<span style="color:#64748b;"> (t+3.64)</span></td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:2px 7px;color:#cbd5e1;">F2 飞书平铺8因子</td><td style="padding:2px 7px;text-align:center;color:#64748b;">h20</td><td style="padding:2px 7px;text-align:right;color:#e2e8f0;">+0.0127<span style="color:#64748b;"> (t+0.66)</span></td><td style="padding:2px 7px;text-align:right;color:#e2e8f0;">+0.0837<span style="color:#64748b;"> (t+4.77)</span></td><td style="padding:2px 7px;text-align:right;color:#4ade80;font-weight:700;">+0.0463<span style="color:#64748b;"> (t+2.48)</span></td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:2px 7px;color:#cbd5e1;"><b>现行八维 v4.9</b></td><td style="padding:2px 7px;text-align:center;color:#64748b;">h5</td><td style="padding:2px 7px;text-align:right;color:#e2e8f0;">+0.1513<span style="color:#64748b;"> (t+7.96)</span></td><td style="padding:2px 7px;text-align:right;color:#e2e8f0;">+0.1472<span style="color:#64748b;"> (t+6.70)</span></td><td style="padding:2px 7px;text-align:right;color:#4ade80;font-weight:700;">+0.1522<span style="color:#64748b;"> (t+8.03)</span></td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:2px 7px;color:#cbd5e1;"><b>现行八维 v4.9</b></td><td style="padding:2px 7px;text-align:center;color:#64748b;">h20</td><td style="padding:2px 7px;text-align:right;color:#e2e8f0;">+0.1928<span style="color:#64748b;"> (t+7.08)</span></td><td style="padding:2px 7px;text-align:right;color:#e2e8f0;">+0.1937<span style="color:#64748b;"> (t+7.40)</span></td><td style="padding:2px 7px;text-align:right;color:#4ade80;font-weight:700;">+0.1882<span style="color:#64748b;"> (t+7.21)</span></td></tr>
+            </table>
+            <b style="margin-top:4px;display:block;color:#4ade80;">关键发现：飞书方案的 IC 对「横截面标准化的池大小」极度敏感 ——
+            现行八维几乎不动（池效应 +0.0007 / +0.0014），飞书三方案 h20 却动了 +0.036 ~ +0.058（<b>40 倍差</b>）。</b>
+            <b style="display:block;margin-top:3px;">根因：飞书综合分是 8 个 Z 值的加权和，Z 在<b>当日全池</b>上标准化；
+            池从 486 扩到 917 后，新增的 431 只（中位市值
+            104 亿 vs 老池 316 亿、&lt;50 亿占比 19.4% vs 4.7%）<b>改变了每个 Z 的分布</b>，
+            于是同一批股票的分数被重排。现行八维是<b>池内 rank 转 0-10</b>，秩变换单调、抗分布变形，所以稳。</b>
+            <b style="display:block;margin-top:3px;color:#f87171;">结论修正：「飞书 h20 是显著反向指标」<u>不成立</u>。
+            486 域上的负号来自：①域太窄（漏 45% 小市值股）；②Z 标准化让飞书分对池成分异常敏感。
+            正确表述是：飞书三方案 h20 IC ≈ 0、不显著（F2 平铺在 h5 上另有 +0.0589 且过 Bonferroni，仍需在更大样本复核）。</b>
+        </div>
+
+        <div style="padding:7px 10px;border-radius:6px;background:rgba(239,68,68,0.07);
+                    border-left:3px solid #ef4444;margin-bottom:7px;color:#cbd5e1;font-size:9.5px;">
+            <b style="color:#f87171;">🔴 两轮纠错后仍然成立的结论（这才是能拿去用的）</b>
+            <table style="width:100%;border-collapse:collapse;font-size:9px;margin-top:4px;">
+                <tr style="border-bottom:0.5px solid #334155;color:#64748b;">
+                    <th style="text-align:left;padding:2px 7px;width:24%;">结论</th>
+                    <th style="text-align:left;padding:2px 7px;width:24%;">两轮纠错前</th>
+                    <th style="text-align:left;padding:2px 7px;width:28%;">现（917 只）</th>
+                    <th style="text-align:left;padding:2px 7px;">影响</th>
+                </tr>
+                <tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;">
+                    <td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">分层 vs 平铺是否等价</td>
+                    <td style="padding:3px 7px;color:#94a3b8;">未验证</td>
+                    <td style="padding:3px 7px;color:#4ade80;font-weight:700;">maxdiff 0.00e+00，完全等价</td>
+                    <td style="padding:3px 7px;color:#94a3b8;"><b>唯一不随样本变的结论</b>（数学恒等式）→「五维 vs 线性」是伪命题</td>
+                </tr>
+                <tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;">
+                    <td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">飞书三方案 h20 IC</td>
+                    <td style="padding:3px 7px;color:#94a3b8;">round28 正 +0.065~+0.083<br>首版486 <b style="color:#f87171;">负 −0.045~−0.060</b></td>
+                    <td style="padding:3px 7px;color:#e2e8f0;font-weight:700;">+0.0058 / +0.0463 / +0.0033（均不显著）</td>
+                    <td style="padding:3px 7px;color:#f87171;font-weight:700;">「反向指标」结论<b>撤回</b>；正解是「≈0，无 alpha」</td>
+                </tr>
+                <tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;">
+                    <td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">现行八维是否仍大幅领先</td>
+                    <td style="padding:3px 7px;color:#94a3b8;">+0.1914 vs −0.0554（差 0.25）</td>
+                    <td style="padding:3px 7px;color:#4ade80;font-weight:700;">+0.1882 vs +0.0058（差 +0.1824）</td>
+                    <td style="padding:3px 7px;color:#94a3b8;">仍领先但差距缩小到原来的 1/6，<b>不宜再引用 0.25 那个量级</b></td>
+                </tr>
+                <tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;">
+                    <td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">C+REV1M 并入增量</td>
+                    <td style="padding:3px 7px;color:#94a3b8;">round28 正 +0.0121/+0.0180<br>首版486 负</td>
+                    <td style="padding:3px 7px;color:#f87171;font-weight:700;">-0.0064 / -0.0145</td>
+                    <td style="padding:3px 7px;color:#cbd5e1;">两轮都是负 → <b>「提高反转块权重」确已撤回</b>，这条站得住</td>
+                </tr>
+                <tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;">
+                    <td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">Q7 强制块内等权</td>
+                    <td style="padding:3px 7px;color:#94a3b8;">round28 负 −0.006/−0.005</td>
+                    <td style="padding:3px 7px;color:#4ade80;font-weight:700;">正 +0.0138 / +0.0407</td>
+                    <td style="padding:3px 7px;color:#cbd5e1;"><b>但这是「缺失值归并层级」效应，不是结构效应</b>（Z3 纯结构也正，见下），不能当作结构有 alpha 的证据</td>
+                </tr>
+                <tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;">
+                    <td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">Q8 h20 v4.9 vs v4.8</td>
+                    <td style="padding:3px 7px;color:#94a3b8;">NW-t −2.85（v4.8 更好）</td>
+                    <td style="padding:3px 7px;color:#e2e8f0;font-weight:700;">NW-t -1.63（v4.8 略好）</td>
+                    <td style="padding:3px 7px;color:#cbd5e1;">两者都不过 3.08 → 只能称「不可区分」，<b>不能推翻 round27c</b></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">现行八维 IC 的稳健性</td>
+                    <td style="padding:3px 7px;color:#94a3b8;">+0.1506 / +0.1914（486域）</td>
+                    <td style="padding:3px 7px;color:#4ade80;font-weight:700;">+0.1522 / +0.1882（917域）</td>
+                    <td style="padding:3px 7px;color:#cbd5e1;">扩域 +89% 后几乎不变（Δ +0.0016 / −0.0032）→ <b>现行模型对样本口径不敏感，这是它最可贵的性质</b></td>
+                </tr>
+            </table>
+            <b style="margin-top:4px;display:block;">教训：①样本域必须用「历史成分并集」，绝不能用单日池当固定域（换手率门槛会静默踢掉大盘股）；
+            ②横截面标准化 vs 池内 rank 是两种尺度，对池大小敏感度差 40 倍，做 A/B 必须先对齐这一层；
+            ③「显著负」这种强结论一定要先做子集归因，否则样本伪影会被写进决策依据。</b>
+        </div>
+
+        <div style="padding:7px 10px;border-radius:6px;background:rgba(34,197,94,0.07);
+                    border-left:3px solid #22c55e;margin-bottom:7px;color:#cbd5e1;font-size:9.5px;">
+            <b style="color:#4ade80;">结论一：现行八维在宽样本上仍明显更优，但「线性比五维好」这个说法本身不成立</b><br>
+            现行八维 h5 <b>+0.1522</b> vs 飞书最优可实现版（F2 平铺）
+            +0.0589，差
+            <b>+0.0933</b>；<br>
+            h20 <b>+0.1882</b> vs +0.0463（t0
+            +2.48，不显著），差
+            <b>+0.1419</b>。<br>
+            <b style="color:#fbbf24;">⚠️ 措辞修正：上一版说「h20 是正负方向差异」已被扩域推翻</b>
+            —— 486 域上飞书 h20 为负，扩到 917 后转正但不显著。
+            正解是「飞书 h20 无 alpha」，而不是「飞书是反向指标」。<br><br>
+            <b>稳健性校验：剔除 fund 维（覆盖仅 25.0%，硬缺口）后：</b>
+            C_noFund h5 <b>+0.1548</b>
+            （t0 +8.24）/
+            h20 <b>+0.1921</b>
+            （t0 +7.51），双 ✅。
+            <b>剔除 fund 后 C 反而略升</b>（+0.1522 → +0.1548，
+            +0.1882 → +0.1921），排序不变
+            → 结论不依赖那 25% 的 fund 子样本；
+            同时暴露<b>fund 维在本样本边际贡献为零甚至微负</b>（待裁决）。<br><br>
+            <b>但把差额拆开看，结构这一项贡献仍然是 0：</b>
+            <table style="width:100%;border-collapse:collapse;font-size:9px;margin-top:3px;">
+                <tr style="border-bottom:0.5px solid #334155;color:#64748b;">
+                    <th style="text-align:left;padding:2px 7px;width:26%;">归因项</th>
+                    <th style="text-align:left;padding:2px 7px;width:14%;">贡献</th>
+                    <th style="text-align:left;padding:2px 7px;">说明</th>
+                </tr>
+                <tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;">
+                    <td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">结构（五维 vs 线性）</td>
+                    <td style="padding:3px 7px;color:#94a3b8;"><b>0</b></td>
+                    <td style="padding:3px 7px;color:#94a3b8;">数学恒等（maxdiff=0.0e+00）。
+                        分块写法的实测差异来自<b>缺失值归并层级</b>，不是结构本身（见结论二）。</td>
+                </tr>
+                <tr style="border-bottom:0.5px solid #1e293b;vertical-align:top;">
+                    <td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">因子集（飞书无反转块）</td>
+                    <td style="padding:3px 7px;color:#f87171;"><b>主因</b></td>
+                    <td style="padding:3px 7px;color:#94a3b8;">飞书 8 因子<b>完全没有反转块</b>（bias60/rsi_rev/lowvol20），
+                        而反转块是本项目 alpha 的主来源（占现行权重
+                        10%）。</td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">权重分配</td>
+                    <td style="padding:3px 7px;color:#fbbf24;">被上项吸收</td>
+                    <td style="padding:3px 7px;color:#94a3b8;">飞书把 35%（分层）/ 25%（平铺）押在 ROE / OCFG 上；
+                        本池实测 ROE 单维与 quality 相关 −0.42、OCFG 与各维相关 |r| ≤ 0.24，
+                        <b>在本池都无 alpha</b>。</td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="padding:7px 10px;border-radius:6px;background:rgba(56,189,248,0.07);
+                    border-left:3px solid #38bdf8;margin-bottom:7px;color:#cbd5e1;font-size:9.5px;">
+            <b style="color:#38bdf8;">结论二：分子期前后半——飞书三方案 h20 后半期强负，不是「衰减」是「本来就没有」</b>
+            <table style="width:100%;border-collapse:collapse;font-size:9px;margin-top:4px;">
+                <tr style="border-bottom:0.5px solid #334155;color:#64748b;">
+                    <th style="text-align:left;padding:2px 7px;width:24%;">方案</th>
+                    <th style="text-align:right;padding:2px 7px;">h5 前半</th>
+                    <th style="text-align:right;padding:2px 7px;">h5 后半</th>
+                    <th style="text-align:right;padding:2px 7px;">h20 前半</th>
+                    <th style="text-align:right;padding:2px 7px;">h20 后半</th>
+                </tr>
+                <tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 7px;color:#f87171;font-weight:700;">F1 飞书分层5类</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;font-weight:400;">+0.0842</td><td style="padding:4px 7px;text-align:right;color:#f87171;font-weight:700;">-0.0282</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;font-weight:400;">+0.0971</td><td style="padding:4px 7px;text-align:right;color:#f87171;font-weight:700;">-0.0854</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 7px;color:#fbbf24;font-weight:700;">F2 飞书平铺8因子</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;font-weight:400;">+0.1189</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;font-weight:400;">+0.0007</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;font-weight:400;">+0.1501</td><td style="padding:4px 7px;text-align:right;color:#f87171;font-weight:700;">-0.0574</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 7px;color:#94a3b8;font-weight:700;">F3 隐含权重当平铺</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;font-weight:400;">+0.0837</td><td style="padding:4px 7px;text-align:right;color:#f87171;font-weight:700;">-0.0308</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;font-weight:400;">+0.0966</td><td style="padding:4px 7px;text-align:right;color:#f87171;font-weight:700;">-0.0900</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 7px;color:#4ade80;font-weight:700;">现行八维 v4.9</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;font-weight:400;">+0.2505</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;font-weight:400;">+0.0569</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;font-weight:400;">+0.3430</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;font-weight:400;">+0.0334</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 7px;color:#38bdf8;font-weight:700;">现行七维 v4.8</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;font-weight:400;">+0.2471</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;font-weight:400;">+0.0574</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;font-weight:400;">+0.3455</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;font-weight:400;">+0.0378</td></tr>
+            </table>
+            <b style="display:block;margin-top:4px;">飞书三方案 h5 后半期已全部转负（−0.025 ~ −0.043），
+            h20 后半期强负（−0.120 ~ −0.144）</b> → 不是「alpha 集中在前半段」，而是<b>前半段也只是勉强为正，
+            后半段明确反向</b>。唯一「双 ✅ + 前后双正」的是现行八维/七维。
+            但也要如实说明：<b>C 的后半期 IC 只剩 +0.0334
+            （h20，约为前半的 1/12）</b> —— 现行模型的 alpha 同样在衰减，只是还没到负值。
+        </div>
+
+        <div style="padding:7px 10px;border-radius:6px;background:rgba(167,139,250,0.07);
+                    border-left:3px solid #a78bfa;margin-bottom:7px;color:#cbd5e1;font-size:9.5px;">
+            <b style="color:#a78bfa;">结论三：Q7「强制块内等权」符号翻转，但这是缺失处理的副作用，不是结构优势</b>
+            <table style="width:100%;border-collapse:collapse;font-size:9px;margin-top:4px;">
+                <tr style="border-bottom:0.5px solid #334155;color:#64748b;">
+                    <th style="text-align:left;padding:2px 7px;">hop</th>
+                    <th style="text-align:right;padding:2px 7px;">Z1 平铺<br><span style="font-weight:400;">原始权重</span></th>
+                    <th style="text-align:right;padding:2px 7px;">Z2 分块<br><span style="font-weight:400;">块内等权</span></th>
+                    <th style="text-align:right;padding:2px 7px;">Z2−Z1</th>
+                    <th style="text-align:right;padding:2px 7px;">Z3 分块<br><span style="font-weight:400;">保持原权重</span></th>
+                    <th style="text-align:right;padding:2px 7px;">Z3−Z1</th>
+                </tr>
+                <tr style="border-bottom:0.5px solid #1e293b;">
+                    <td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">h5</td>
+                    <td style="padding:3px 7px;text-align:right;color:#e2e8f0;">+0.1508</td>
+                    <td style="padding:3px 7px;text-align:right;color:#e2e8f0;">+0.1646</td>
+                    <td style="padding:3px 7px;text-align:right;color:#4ade80;font-weight:700;">+0.0138</td>
+                    <td style="padding:3px 7px;text-align:right;color:#e2e8f0;">+0.1620</td>
+                    <td style="padding:3px 7px;text-align:right;color:#4ade80;font-weight:700;">+0.0112</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px 7px;color:#cbd5e1;font-weight:700;">h20</td>
+                    <td style="padding:3px 7px;text-align:right;color:#e2e8f0;">+0.1917</td>
+                    <td style="padding:3px 7px;text-align:right;color:#e2e8f0;">+0.2324</td>
+                    <td style="padding:3px 7px;text-align:right;color:#4ade80;font-weight:700;">+0.0407</td>
+                    <td style="padding:3px 7px;text-align:right;color:#e2e8f0;">+0.2211</td>
+                    <td style="padding:3px 7px;text-align:right;color:#4ade80;font-weight:700;">+0.0294</td>
+                </tr>
+            </table>
+            <b style="display:block;margin-top:4px;">纯数值验证（2000 次随机抽样）：全维有值时 max|Z1−Z3| = 4.3e-14（<b>严格恒等</b>）；
+            有维度缺失时 max = 49.2，86.8% 的样本有差异。</b>
+            所以 Z3−Z1 不是结构效应，而是「<b>缺失值归并层级</b>」效应 ——
+            Z1 是<b>个股级分母</b>（某维缺失→分子与分母同步减），Z3 是<b>块级分母</b>（块内先平均，块权重照常计入）。
+            分块写法把缺数据的股票<b>惩罚得更轻</b>；在本样本上这个副作用恰好为正，
+            因为 fund 覆盖仅 25.0%。<br>
+            Z2−Z1 还在 Z3 之上<b>又改了权重</b>（fund .15→.1333、tech .15→.125、size .10→.125），
+            混杂了「缺失处理」与「权重」两个效应，<b>不能单独归因为结构</b>。<br>
+            <b style="color:#a78bfa;">→ 这个发现的正确用法不是「改成分块」，而是<b>直接去修 fund 的覆盖率缺口</b>（见下方待裁决②）。</b>
+        </div>
+
+        <div style="padding:7px 10px;border-radius:6px;background:rgba(251,191,36,0.07);
+                    border-left:3px solid #f59e0b;margin-bottom:7px;color:#cbd5e1;font-size:9.5px;">
+            <b style="color:#fbbf24;">结论四：飞书因子并入——宽样本上五个全部为负，round28 也不该吸收</b>
+            <table style="width:100%;border-collapse:collapse;font-size:9px;margin-top:4px;">
+                <tr style="border-bottom:0.5px solid #334155;color:#64748b;">
+                    <th style="text-align:left;padding:2px 7px;width:20%;">并入方案</th>
+                    <th style="text-align:right;padding:2px 7px;">h5 IC</th>
+                    <th style="text-align:right;padding:2px 7px;">vs C</th>
+                    <th style="text-align:right;padding:2px 7px;">h20 IC</th>
+                    <th style="text-align:right;padding:2px 7px;">vs C</th>
+                    <th style="text-align:right;padding:2px 7px;">h20 后半</th>
+                </tr>
+                <tr style="border-bottom:0.5px solid #334155;">
+                    <td style="padding:3px 7px;color:#4ade80;font-weight:700;">C 基准（现行八维）</td>
+                    <td style="padding:3px 7px;text-align:right;color:#e2e8f0;">+0.1522</td>
+                    <td style="padding:3px 7px;text-align:right;color:#64748b;">—</td>
+                    <td style="padding:3px 7px;text-align:right;color:#e2e8f0;">+0.1882</td>
+                    <td style="padding:3px 7px;text-align:right;color:#64748b;">—</td>
+                    <td style="padding:3px 7px;text-align:right;color:#94a3b8;">+0.0334</td>
+                </tr>
+                <tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 7px;color:#cbd5e1;font-weight:700;">C+OCFG</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;">+0.1514</td><td style="padding:4px 7px;text-align:right;font-weight:700;color:#f87171;">-0.0008</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;">+0.1873</td><td style="padding:4px 7px;text-align:right;font-weight:700;color:#f87171;">-0.0009</td><td style="padding:4px 7px;text-align:right;color:#94a3b8;font-weight:400;">+0.0345</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 7px;color:#cbd5e1;font-weight:700;">C+NAG</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;">+0.1414</td><td style="padding:4px 7px;text-align:right;font-weight:700;color:#f87171;">-0.0108</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;">+0.1718</td><td style="padding:4px 7px;text-align:right;font-weight:700;color:#f87171;">-0.0164</td><td style="padding:4px 7px;text-align:right;color:#94a3b8;font-weight:400;">+0.0134</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 7px;color:#cbd5e1;font-weight:700;">C+EVEBIT</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;">+0.1495</td><td style="padding:4px 7px;text-align:right;font-weight:700;color:#f87171;">-0.0027</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;">+0.1728</td><td style="padding:4px 7px;text-align:right;font-weight:700;color:#f87171;">-0.0154</td><td style="padding:4px 7px;text-align:right;color:#94a3b8;font-weight:400;">+0.0310</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 7px;color:#cbd5e1;font-weight:700;">C+SUE</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;">+0.1271</td><td style="padding:4px 7px;text-align:right;font-weight:700;color:#f87171;">-0.0251</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;">+0.1519</td><td style="padding:4px 7px;text-align:right;font-weight:700;color:#f87171;">-0.0363</td><td style="padding:4px 7px;text-align:right;color:#f87171;font-weight:700;">-0.0143</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 7px;color:#cbd5e1;font-weight:700;">C+REV1M</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;">+0.1458</td><td style="padding:4px 7px;text-align:right;font-weight:700;color:#f87171;">-0.0064</td><td style="padding:4px 7px;text-align:right;color:#e2e8f0;">+0.1737</td><td style="padding:4px 7px;text-align:right;font-weight:700;color:#f87171;">-0.0145</td><td style="padding:4px 7px;text-align:right;color:#94a3b8;font-weight:400;">+0.0051</td></tr>
+            </table>
+            <b style="display:block;margin-top:4px;">五个方案<b style="color:#f87171;">全负，无一例外</b>。
+            且 NAG / SUE / REV1M 的 h20 后半期转负 → 不是「没增量」，是<b>加进去会变差</b>。</b>
+            <b style="color:#f87171;">round28 曾把 C+REV1M（+0.0121/+0.0180）称为「唯一正增量」并建议提高反转块权重，
+            这条建议在本轮撤回。</b><br>
+            冗余关系（由因子定义决定，不随样本变化）：
+            <code>REV1M</code> 与 bias60/rsi_rev 相关 +0.71/+0.79；
+            <code>EVEBIT</code> 与 ep 相关 +0.91；
+            <code>SIZE_IND_NEUT</code> 与 size_ind 相关 +0.96（已落地 v4.9）；
+            <code>ROE</code> 与 quality −0.42、与 fund +0.47；
+            <code>OCFG</code>/<code>SUE</code> 与各维 |r| ≤ 0.24（唯一可能有增量，但实测为负）。<br>
+            <b style="color:#4ade80;">→ 飞书方案中值得借鉴的只有 EP 与 SIZE_IND_NEUT，两者已在 v4.9 落地。
+            不建议再吸收其任何其他成分，也不建议照搬五维分层框架。</b>
+        </div>
+
+        <div style="padding:7px 10px;border-radius:6px;background:rgba(56,189,248,0.07);
+                    border-left:3px solid #38bdf8;margin-bottom:7px;color:#cbd5e1;font-size:9.5px;">
+            <b style="color:#38bdf8;">结论五：v4.9 八维 vs v4.8 七维——方向翻转，但两版都不可区分</b><br>
+            逐截面配对检验（同一样本、同一截面，比均值更严格）：<br>
+            · h5：v4.9 +0.1522 vs v4.8
+              +0.1508，配对差
+              +0.0014，
+              NW-t <b>+0.20</b>，
+              v4.9 胜 35/65
+              → <b>不显著</b>；<br>
+            · h20：v4.9 +0.1882 vs v4.8
+              +0.1917，配对差
+              -0.0034，
+              NW-t <b>-1.63</b>，
+              v4.9 胜 26/50
+              → <b>不显著</b>。<br>
+            round28 是 −0.92 / <b>−2.85</b>（v4.8 更好，h20 接近门槛）；round29 是
+            +0.20 / <b>-1.63</b>（v4.9 略好）。
+            <b>正确表述：在本样本上两版不可区分</b>。既不能宣称 v4.9 更优，
+            也不能推翻 round27c（那次是 3/3 档全改善且有决定性对照）。
+            <b>注意</b>：EP / SIZE_IND_NEUT 的收益在 round27c 是相对 v4.8 内的 fund/size 分项测的，
+            本轮相对的是整条 v4.8 复合分，两者不矛盾但也不能互相印证。
+        </div>
+
+        <div style="padding:7px 10px;border-radius:6px;background:rgba(239,68,68,0.07);
+                    border-left:3px solid #ef4444;margin-bottom:7px;color:#cbd5e1;font-size:9.5px;">
+            <b style="color:#f87171;">⚠️ 数据披露：fund 维覆盖仅 25.0%，是硬缺口（非 bug）</b><br>
+            各维覆盖率（宽样本实测）：质量 <b>100.0%</b> /
+            size <b>100.0%</b> /
+            低波20 <b>99.4%</b> /
+            bias60·rsi_rev <b>98.1%</b> /
+            ep <b>81.8%</b> /
+            size_ind <b>92.3%</b> /
+            tech_neg <b>69.2%</b> /
+            <b style="color:#f87171;">fund 25.0%</b>。<br>
+            <b>根因：</b><code>score_fund</code> 依赖 <code>fwd_pe</code>/<code>pe_ladder</code>/<code>cagr3</code>
+            等<b>分析师前瞻数据</b>，唯一来源 <code>data/fwd_hist/*.json</code>（仅含当时池内股票）。
+            宽样本域外约 300 只在历史上从未进过池 → 无前瞻数据。实测历史截面覆盖率仅 32~37%。<br>
+            <b>这不是代码能修的，是数据边界。</b>应对方式：①Q3b 剔除 fund 重算做稳健性校验（已做，结论不变）；
+            ②fund 维缺失一律从分母剔除、<b>禁 <code>or 0</code></b>（现行实现已遵守）。
+        </div>
+
+        <div style="font-size:9px;color:#64748b;margin-bottom:2px;">
+            <b>本轮方法论净收获</b>：
+            ① <b>样本口径必须显式核验</b>——老大一句「检查是不是老样本」直接推翻了 5 条结论，
+            以后写对比脚本，第一段输出就该是样本构成分解表（多少截面 / 每截面多少只 / 日期区间）；
+            ② <b>「样本不可救」往往是没找对锚点</b>——本例「新池完全包含老池」这一条把不可回测变成可回测，
+            先做集合关系验证，再判死刑；
+            ③ <b>符号翻转的结论必须单独列一张表</b>，不能混在正文里，老大看的是决策依据不是数字；
+            ④ <b>只看均值、只看 t0 都会误导</b>——飞书 h20 的 t0=−3.84 很「显著」，但它是负的；
+            ⑤ <b>剔除覆盖最低维度的稳健性校验是必须项</b>，Q3b 一次就发现 fund 边际贡献为零；
+            ⑥ <b>数学恒等式类结论不随样本变化，实证类会</b>——Q1 两轮都是 maxdiff=0.0，
+            Q3~Q8 全部变了，结论要分层标注「数学/实证」才不会整批作废。
+        </div>
+
+
+        <div style="margin-top:9px;padding:7px 9px;background:rgba(251,191,36,0.08);
+                    border-left:3px solid #f59e0b;border-radius:4px;color:#cbd5e1;">
+            <b style="color:#fbbf24;">⚠️ 三条不能越过的边界</b><br>            · <b>本页所有 IC 均为零成本、等权、无冲击成本口径</b>；真实交易下 H5/H10 的超额会被换手吃掉相当部分，H20 相对可行。<br>
+            · <b>「某维 IC 高」不等于「该维可单独用」</b>：9 维中，共 <b>估值锚、乖离</b> 这 2 维 单维在 h5 全 lag 过 Bonferroni，
+              其余都是靠组合贡献；任何单维独立选股都缺证据。<br>
+            · <b>多重检验已累计 304 次</b>。这意味着当前所有 p 值都<b>偏乐观</b>；
+              换维/调权的正确性只能靠「分子期双正 + 三方向互证」支撑，<b>不能靠某个 t 值单点</b>。
+              下一步最有价值的不是继续找新因子，而是<b>样本外复验并冻结权重</b>。
+        </div>
+    </div>
+  </div>
+
+  
+  <div style="padding:14px 16px;background:#111c2e;border:0.5px solid #1e293b;border-radius:10px;margin-bottom:16px;">
+    <div style="font-size:14px;font-weight:800;color:#e2e8f0;margin-bottom:6px;">📡 六、外部基准对照（飞书全 A 股近半年 · 47 因子）</div>
+    <div style="font-size:11px;color:#64748b;margin-bottom:8px;line-height:1.8;">
+      为回答「8 维数据可靠性」，将本模型 8 维与<b>全 A 股外部基准</b>（飞书 final_ranking-近半年.csv，
+      222 个日频观测 / 11 个月频，覆盖全部 A 股）逐维对照。左列「我的混合池IC」来自 audit_round33
+      （78 混合截面）；右列「外部有效IC」按<b>本模型预测方向</b>折算（反转类取反转IC，规模取小盘溢价）。
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:9.5px;margin-bottom:8px;">
+      <tr style="border-bottom:0.5px solid #334155;color:#64748b;">
+        <th style="text-align:left;padding:3px 8px;">我的维度</th>
+        <th style="text-align:right;padding:3px 8px;">我的混合池IC</th>
+        <th style="text-align:right;padding:3px 8px;">外部有效IC</th>
+        <th style="text-align:right;padding:3px 8px;">倍数</th>
+        <th style="text-align:left;padding:3px 8px;">外部因子</th>
+        <th style="text-align:left;padding:3px 8px;">判定</th>
+      </tr>
+      <tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">乖离60(反转)</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.1648</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0640</td><td style="padding:4px 8px;text-align:right;color:#f59e0b;">×2.6</td><td style="padding:4px 8px;font-size:9px;color:#64748b;">BIAS60</td><td style="padding:4px 8px;color:#f59e0b;font-weight:700;">量级夸大</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">RSI反转</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.1288</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0520</td><td style="padding:4px 8px;text-align:right;color:#f59e0b;">×2.5</td><td style="padding:4px 8px;font-size:9px;color:#64748b;">REV1M</td><td style="padding:4px 8px;color:#f59e0b;font-weight:700;">量级夸大</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">低波20</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.1189</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0076</td><td style="padding:4px 8px;text-align:right;color:#f59e0b;">×15.5</td><td style="padding:4px 8px;font-size:9px;color:#64748b;">LVOL20</td><td style="padding:4px 8px;color:#f59e0b;font-weight:700;">量级夸大</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">EP估值</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.1013</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0457</td><td style="padding:4px 8px;text-align:right;color:#f59e0b;">×2.2</td><td style="padding:4px 8px;font-size:9px;color:#64748b;">EP</td><td style="padding:4px 8px;color:#f59e0b;font-weight:700;">量级夸大</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">fund基本面</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.0762</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0401</td><td style="padding:4px 8px;text-align:right;color:#64748b;">×1.9</td><td style="padding:4px 8px;font-size:9px;color:#64748b;">BLEND</td><td style="padding:4px 8px;color:#22c55e;font-weight:700;">方向吻合</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">技术反号(反转块)</td><td style="padding:4px 8px;text-align:right;color:#22c55e;">+0.0575</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0520</td><td style="padding:4px 8px;text-align:right;color:#64748b;">×1.1</td><td style="padding:4px 8px;font-size:9px;color:#64748b;">REV1M</td><td style="padding:4px 8px;color:#22c55e;font-weight:700;">方向吻合</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">质量</td><td style="padding:4px 8px;text-align:right;color:#ef4444;">-0.0209</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0337</td><td style="padding:4px 8px;text-align:right;color:#64748b;">×0.6</td><td style="padding:4px 8px;font-size:9px;color:#64748b;">ROE</td><td style="padding:4px 8px;color:#ef4444;font-weight:700;">符号翻转 ⚠</td></tr><tr style="border-bottom:0.5px solid #1e293b;"><td style="padding:4px 8px;color:#cbd5e1;">行业内市值</td><td style="padding:4px 8px;text-align:right;color:#ef4444;">-0.0148</td><td style="padding:4px 8px;text-align:right;color:#94a3b8;">+0.0655</td><td style="padding:4px 8px;text-align:right;color:#64748b;">×0.2</td><td style="padding:4px 8px;font-size:9px;color:#64748b;">SIZE</td><td style="padding:4px 8px;color:#ef4444;font-weight:700;">符号翻转 ⚠</td></tr>
+    </table>
+    <div style="font-size:10px;color:#94a3b8;line-height:1.95;">
+      <b style="color:#f59e0b;">读表结论：</b>本模型 6 个维度（乖离/RSI/低波/EP/fund/技术反转）在外部基准上的有效 IC
+      仅为混合池的 <b>1/2 ~ 1/15</b>——混合池的高 IC 是<b>冻结旧池的 regime 顺风 + 选择偏差</b>造成的假象；
+      其中 <b style="color:#ef4444;">低波20 被夸大约 15 倍</b>（近半年 A 股低波异象本就极弱）。
+      更严重的是 <b style="color:#ef4444;">质量、行业内市值出现符号翻转</b>：
+      外部基准中高质量(+0.034)、小盘溢价(+0.066) 均显著为正，混合池却给出近零/负值，
+      说明本模型在这两维的复合方向或池内处理有问题，<b>绝不能声称「已验证」</b>。
+      唯一基本吻合的是<b style="color:#22c55e;">技术反转块（×1.1）</b>，因其反转口径与外部最接近。
+    </div>
+    <div style="font-size:10px;color:#64748b;line-height:1.85;margin-top:6px;">
+      ⚖️ <b>外部基准也不是金标准</b>：它是全 A 股（含大量被本模型筛选剔除的垃圾股）、单一近半年 regime，
+      且低波/质量在不同 regime 下强弱会变。但它作为<b>独立外部样本</b>，方向远比冻结混池可信——
+      两者冲突时，<b style="color:#f59e0b;">以外部基准的方向为准</b>。
+    </div>
+  </div>
+
+  <div style="margin-top:18px;padding-top:10px;border-top:1px solid #1e293b;font-size:10px;color:#475569;line-height:1.8;">
+    本文件由 <code>gen_report_top200.py</code> 自动生成，仅用于内部证据存档，不进入主页导航、
+    不含当日个股名单。所有数字均来自审计 JSON（audit_round*.json）与当日 scored 文件，未做任何人工调整。
+  </div>
+</div></body></html>

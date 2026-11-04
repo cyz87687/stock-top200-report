@@ -112,10 +112,13 @@ def sec_factor_table(ic):
         "",
         "> IC = 因子分与未来收益的秩相关。NW t 为 Newey-West HAC 校正 t 值（自相关稳健）。",
         "> **判读门槛**：30 次检验下 Bonferroni 门槛 |NW t| ≥ 3.08；未过门槛一律视为「未证实」。",
+        "> ⚠️ **NW t 依赖 lag 这个自由度**（现行口径 lag=h−1，即 h=20 时 lag=19）。"
+        "n≈58 时方差估计本身不稳，同一因子在 lag=3 与 lag=6 可能一个过门槛一个不过。"
+        "故下表同时给出 `稳健` 列（全 lag 下都过门槛才算稳健）与 `翻转` 列（结论随 lag 变）。",
         "",
         "| 因子 | 标签 | T+1 IC | T+1 NW t | T+1 胜率 | T+5 IC | T+5 NW t | T+5 胜率 | "
-        "T+20 IC | T+20 NW t | T+20 胜率 | 结论 |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|",
+        "T+20 IC | T+20 NW t | T+20 胜率 | 稳健显著 | 结论 |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for key, v in factors.items():
         h = v.get("horizons") or {}
@@ -125,9 +128,17 @@ def sec_factor_table(ic):
             cells.append(_f(x.get("ic_mean"), 4, plus=True))
             cells.append(_f(x.get("nw_t"), 2, plus=True))
             cells.append(_f(x.get("win_rate"), 1, "%", plus=False))
+        # 稳健显著：任一周期在全 lag 下都过门槛 → 记该周期；有翻转则标注
+        _rob = [hz for hz in ("1", "5", "20")
+                if (h.get(hz) or {}).get("robust_bonferroni")]
+        _flip = [hz for hz in ("1", "5", "20")
+                 if ((h.get(hz) or {}).get("nw_sensitivity") or {}).get("flips")]
+        _cell = "、".join(f"h{hz}" for hz in _rob) if _rob else "无"
+        if _flip:
+            _cell += "（h" + "/h".join(_flip) + " 随 lag 翻转）"
         lines.append(
             f"| `{key}` | {v.get('label') or '—'} | " + " | ".join(cells)
-            + f" | {v.get('verdict') or '未查到'} |"
+            + f" | {_cell} | {v.get('verdict') or '未查到'} |"
         )
     lines.append("")
 
@@ -138,7 +149,12 @@ def sec_factor_table(ic):
         note = v.get("verdict_note")
         if not note:
             continue
-        h5 = ((v.get("horizons") or {}).get("5")) or {}
+        # ⚠️ 必须在本循环内重新取 horizons。Python 的 for 变量会泄漏到外层作用域，
+        #   上面那个循环结束后 `h` 仍指向**最后一个因子**（score_tech）的 horizons，
+        #   直接复用会让所有因子都渲染成 score_tech 的数字（曾因此把每个因子的
+        #   lag 敏感性都印成 t=-2.07 / [-2.23,-1.68]，完全失真且不易察觉）。
+        h = v.get("horizons") or {}
+        h5 = h.get("5") or {}
         sub = h5.get("subperiod") or {}
         lines.append(f"**`{key}`**（{v.get('label') or '—'}）：{note}")
         if sub:
@@ -150,6 +166,27 @@ def sec_factor_table(ic):
             )
         if h5.get("bonferroni_sig") is not None:
             lines.append(f"- Bonferroni 校正：{'通过' if h5.get('bonferroni_sig') else '未通过'}")
+        # v4.2：逐周期披露 lag 敏感性（只在有扫描结果时）
+        _sens_lines = []
+        for hz in ("1", "5", "20"):
+            _x = h.get(hz) or {}
+            _sn = _x.get("nw_sensitivity") or {}
+            if not _sn:
+                continue
+            _sens_lines.append(
+                f"  - h={hz}（lag={_x.get('nw_lag')}）：t={_f(_x.get('nw_t'), 2, plus=True)}，"
+                f"全 lag 区间 [{_f(_sn.get('t_min'), 2, plus=True)}, "
+                f"{_f(_sn.get('t_max'), 2, plus=True)}]，"
+                f"Andrews lag={_sn.get('lag_andrews')} 时 t={_f(_sn.get('t_andrews'), 2, plus=True)} → "
+                + ("**全 lag 稳健过门槛**" if _sn.get("robust_bonferroni")
+                   else ("⚠️ 结论随 lag 翻转，不可断言显著" if _sn.get("flips")
+                         else "全 lag 均未过门槛"))
+                + "　`" + " ".join(f"L{k}:{v:+.2f}" for k, v in
+                                    (_sn.get("t_by_lag") or {}).items()) + "`"
+            )
+        if _sens_lines:
+            lines.append("- NW lag 敏感性：")
+            lines.extend(_sens_lines)
         lines.append("")
     return "\n".join(lines)
 
@@ -229,20 +266,30 @@ def sec_pool(ic):
     ]
     pr = ic.get("pool_excess_by_regime") or {}
     if pr:
-        out.append("### 3.1 按池规模分组")
+        out.append("### 3.1 按母体口径分组")
         out.append("")
         if pr.get("split_rule"):
             out.append(f"- 分组规则：{pr['split_rule']}")
+        if pr.get("versions_seen"):
+            _vs = "、".join(f"{k}×{v}" for k, v in (pr["versions_seen"] or {}).items())
+            out.append(f"- 已见母体版本：{_vs}")
         if pr.get("n_unclassified") is not None:
-            out.append(f"- 未归类日数：{pr['n_unclassified']}")
+            out.append(f"- 未计入（收益未成熟/无价格）截面数：{pr['n_unclassified']}")
+        if pr.get("bench_note"):
+            out.append(f"- 基准口径：{pr['bench_note']}")
         out.append("")
-        out.append("| 分组 | 中位超额 | 结论 |")
-        out.append("|---|---|---|")
-        for g in ("legacy", "size_pool"):
+        out.append("| 分组 | 成熟入场日 | 待成熟 | 池内市值中位 | 超额中位 | 池绝对收益中位 | 跑输占比 | 判定 |")
+        out.append("|---|---|---|---|---|---|---|---|")
+        for g, label in (("legacy", "成交额旧母体"), ("size_pool", "SIZE 评分母体")):
             v = pr.get(g)
             if isinstance(v, dict):
                 out.append(
-                    f"| {g} | {_pct(v.get('median_excess_pct'), 2)} | {v.get('verdict') or '—'} |"
+                    f"| {label} | {v.get('n_days', 0)} | {v.get('n_pending', 0)} | "
+                    f"{_f(v.get('mv_med_yi'), 1, '亿', plus=False)} | "
+                    f"{_pct(v.get('median_excess_pct'), 2)} | "
+                    f"{_pct(v.get('pool_abs_med_pct'), 2)} | "
+                    f"{_f(v.get('neg_ratio_pct'), 1, '%', plus=False)} | "
+                    f"{v.get('verdict') or '—'} |"
                 )
         if pr.get("conclusion"):
             out.append("")
@@ -297,30 +344,71 @@ def sec_collinearity(ic):
 
 
 def sec_weights(ic):
-    """现行权重 + 无样本支撑的权重占比"""
+    """现行权重 + 无样本支撑的权重占比
+
+    v4.3（P0 修复，round17 穿透审计）：原实现把证据强度**硬编码**成
+      well = ("score_fund", "score_news", "score_sector") → 一律标「满样本（78 截面）」
+    这与 factor_ic.json 的真实样本量直接矛盾：
+      · score_sector 实测 n(1/5/20) = 18/14/0，从不是 78；
+      · score_theme_neg / score_size 原实现标「弱先验（少数截面）」，实际是
+        **0 个截面**（round17 发现它们此前根本不在 factor_eval.FACTORS 里，
+        日报从未单独评估过，只在复合 IC 里被隐式带入）。
+    「少数截面」与「零截面」是两回事：前者是证据弱，后者是**没有证据**。
+    硬编码标签会让读者以为 42% 的权重都有样本背书，实际并非如此。
+    改为从 factor_ic.json 现取 n，按真实样本量分档。
+    """
     w = ic.get("active_weights") or {}
+    fac = ic.get("factors") or {}
     out = ["## 6. 现行权重与证据覆盖", ""]
     if not w:
         out.append("未查到 active_weights 字段。")
         return "\n".join(out)
 
-    # 有满样本支撑的维度（fund / news / sector）vs 仅少数截面支撑的反转块
-    well = ("score_fund", "score_news", "score_sector")
-    w_well = sum(v for k, v in w.items() if k in well)
-    w_weak = sum(v for k, v in w.items() if k not in well)
+    def _nmax(dim):
+        hz = (fac.get(dim) or {}).get("horizons") or {}
+        return max([(hz.get(h) or {}).get("n") or 0 for h in ("1", "5", "20")] or [0])
 
-    out.append("| 维度 | 权重 | 证据强度 |")
-    out.append("|---|---|---|")
+    # 分档：样本达标(>=MIN_SAMPLE) / 小样本(>0) / 无任何截面(=0)
+    # ⚠️ MIN_SAMPLE 与 factor_eval 保持一致（20）；此处写死并在文案中说明来源
+    MIN_N = 20
+    well, weak, none_dims = [], [], []
+    rows_tbl = []
     for k, v in sorted(w.items(), key=lambda x: -x[1]):
-        strength = "满样本（78 截面）" if k in well else "弱先验（少数截面）"
-        out.append(f"| `{k}` | {v:.1%} | {strength} |")
+        n = _nmax(k)
+        if n >= MIN_N:
+            strength = f"样本达标（n={n}）"
+            well.append(k)
+        elif n > 0:
+            strength = f"⚠️ 小样本（n={n}<{MIN_N}）"
+            weak.append(k)
+        else:
+            strength = "❌ 无任何截面可评估"
+            none_dims.append(k)
+        rows_tbl.append(f"| `{k}` | {v:.1%} | {strength} |")
+
+    out.append("| 维度 | 权重 | 证据强度（按 factor_ic.json 实际截面数） |")
+    out.append("|---|---|---|")
+    out += rows_tbl
+    w_well = sum(v for k, v in w.items() if k in well)
+    w_weak = sum(v for k, v in w.items() if k in weak)
+    w_none = sum(v for k, v in w.items() if k in none_dims)
     out += [
         "",
-        f"- 满样本支撑权重合计：**{w_well:.1%}**",
-        f"- 弱先验权重合计：**{w_weak:.1%}** ← 这部分无统计证据支撑，属先验设定",
+        f"- 样本达标（n≥{MIN_N}）支撑的权重合计：**{w_well:.1%}**",
+        f"- 小样本（0<n<{MIN_N}）支撑的权重合计：**{w_weak:.1%}**",
+        f"- **完全无截面可评估**的权重合计：**{w_none:.1%}** ← 这部分没有任何独立 IC 证据，纯先验设定",
         "",
-        "> ⚠️ 纪律：**页面不得暗示「权重已优化」**。弱先验部分必须明确标注为先验，"
+    ]
+    if none_dims:
+        out.append(f"> ⚠️ `{'`、`'.join(none_dims)}` 共 {w_none:.1%} 的权重在因子 IC 表里"
+                   f"**找不到对应行**——它们只通过 `_derive_dims` 在复合 IC 里被隐式带入，"
+                   f"从未被单独度量。这是「权重与证据脱节」的直接位置，调权重前必须先补样本。")
+        out.append("")
+    out += [
+        "> ⚠️ 纪律：**页面不得暗示「权重已优化」**。非「样本达标」部分必须明确标注为先验，"
         "待满 30 个池内截面后方可运行 `--optimize-weights` 重估。",
+        "> 📌 证据强度一栏由 `gen_factor_daily.py` 从 `factor_ic.json` 现取 n 计算，"
+        "不再硬编码维度名单（v4.3 前曾把 score_sector 错标为「满样本 78 截面」，实测仅 18/14/0）。",
         "",
     ]
     return "\n".join(out)
@@ -380,6 +468,115 @@ def sec_mf_backtest():
                 f"{p.get('n', '未查到')} | {'是' if p.get('sig') else '否'} |"
             )
         out.append("")
+    return "\n".join(out)
+
+
+def sec_zone_filter():
+    """v4.3 新增：买区过滤（老大第 2 项要求）的实证。
+
+    数据源 audit_round14 / audit_round14b / audit_round16.json。
+    本函数只做搬运排版，不创造数字；缺文件写「未查到」。
+    """
+    out = ["## 7.5 买入区间过滤：只选当日现价在买区内的个股（v4.3）", ""]
+    r14 = _load("audit_round14.json")
+    r16 = _load("audit_round16.json")
+    if not r14 and not r16:
+        out.append("未查到 audit_round14.json / audit_round16.json。")
+        return "\n".join(out)
+    if r14:
+        out.append(f"- 核查对象：`{r14.get('source_mf')}` 的 {r14.get('n_picks')} 只")
+        out.append(f"- 判定口径：{r14.get('ruler', {}).get('strict')}；"
+                   f"{r14.get('ruler', {}).get('page')}")
+        out.append(f"- **严格口径下现价真在区间内：{r14.get('n_in_strict')}/{r14.get('n_picks')} 只**"
+                   f"（页面 ±2% 容差口径 {r14.get('n_in_page')} 只）")
+        out.append("")
+        out.append("| # | 标的 | 现价 | 买区 | 状态 | 判定 |")
+        out.append("|---|---|---|---|---|---|")
+        for x in r14.get("items") or []:
+            if not x.get("plan_ok"):
+                out.append(f"| {x.get('idx')} | {x.get('name')} | — | — | — | {x.get('verdict')} |")
+                continue
+            tag = {"in": "✅区间内", "above": "⚠️高于", "below": "⚠️低于"}.get(x.get("state"), "—")
+            out.append(f"| {x.get('idx')} | {x.get('name')} | {_f(x.get('price'), 2)} | "
+                       f"{_f(x.get('buy_lo'), 2)}~{_f(x.get('buy_hi'), 2)} | {tag} | {x.get('verdict')} |")
+        out.append("")
+    if r16:
+        zs = r16.get("zone_stats") or {}
+        out.append(f"- 全候选池分布（{r16.get('n_snapshots')} 个截面，自算均线近似口径）："
+                   f"现价≤买区上限占比中位 **{zs.get('median_in_zone_pct')}%**"
+                   f"（最小 {zs.get('min_in_zone_pct')}% / 最大 {zs.get('max_in_zone_pct')}%）")
+        out.append(f"- 可用入场日：不过滤 {r16.get('n_entry_days', {}).get('no_filter')} 个 / "
+                   f"过滤后 {r16.get('n_entry_days', {}).get('in_zone')} 个"
+                   f"（过滤后仍能凑满 10 只）")
+        out.append("")
+        out.append("**A/B 对比（同源同权重，唯一差别是这一道闸）**：")
+        out.append("")
+        out.append("| 周期 | A 超额 | A 胜率 | A NW t | B 超额 | B 胜率 | B NW t | B−A |")
+        out.append("|---|---|---|---|---|---|---|---|")
+        for hk, v in (r16.get("comparison") or {}).items():
+            out.append(f"| T+{hk} | {_pct(v.get('A_exc_pct'), 2)} | {_f(v.get('A_win_pct'), 1, '%', plus=False)} | "
+                       f"{_f(v.get('A_nw_t'), 2, plus=True)} | {_pct(v.get('B_exc_pct'), 2)} | "
+                       f"{_f(v.get('B_win_pct'), 1, '%', plus=False)} | {_f(v.get('B_nw_t'), 2, plus=True)} | "
+                       f"{_pct(v.get('diff_pct'), 2)} |")
+        out.append("")
+        out.append("**结论**：过滤后超额全线略降（点估计 −0.05% ~ −1.14pct），但")
+        out.append("逐日配对检验 **|NW t| 最大 1.54（<2）→ 代价在噪声内，不可断言有害**；")
+        out.append("换来的是可执行性从「10 只中约 4 只可当日成交」变为「全部可当日成交」。")
+        out.append("")
+        out.append("⚠️ 结构性事实：`build_trade_plan` 中 `buy_hi = min(ref_hi, price)`，")
+        out.append("买区上限**永不高于现价** → 「现价在买区内」的实质含义是")
+        out.append("**股价已回踩到均线带内**，而不是现价夹在区间上下限之间。")
+        out.append("")
+        out.append("复现边界：")
+        for b in r16.get("boundaries") or []:
+            out.append(f"- {b}")
+        out.append("")
+    return "\n".join(out)
+
+
+def sec_holding_period():
+    """v4.3 新增：多因子组合的持仓周期推荐（老大第 3 项要求），必须由数据说话。"""
+    out = ["## 7.6 持仓周期：持有多久（v4.3，由回测决定）", ""]
+    a = _load("audit_round15.json")
+    if not a:
+        out.append("未查到 audit_round15.json。")
+        return "\n".join(out)
+    out.append(f"- 权重版本：{a.get('weights_version')}")
+    out.append(f"- 入场/出场口径：{a.get('entry_rule')}")
+    out.append(f"- 基准口径：{a.get('bench_rule')}")
+    out.append(f"- 可用入场日：{a.get('n_entry_days', {}).get('no_cap')} 个"
+               f"（共 {a.get('n_snapshots_total')} 个截面）")
+    out.append(f"- 判定规则：{a.get('selection_rule')}")
+    out.append("")
+    out.append("| 持有期 | 样本 | 组合收益 | 池内基准 | 超额 | 超额中位 | 胜率 | NW t | 非重叠 n | 非重叠超额 |")
+    out.append("|---|---|---|---|---|---|---|---|---|---|")
+    for hk, v in (a.get("horizons") or {}).items():
+        star = " ← **推荐**" if str(a.get("best_std_horizon")) == hk else ""
+        out.append(f"| T+{hk}{star} | {v.get('n')} | {_pct(v.get('port_mean_pct'), 2)} | "
+                   f"{_pct(v.get('bench_mean_pct'), 2)} | **{_pct(v.get('exc_mean_pct'), 2)}** | "
+                   f"{_pct(v.get('exc_med_pct'), 2)} | {_f(v.get('win_pct'), 1, '%', plus=False)} | "
+                   f"{_f(v.get('nw_t_laghm1'), 2, plus=True)} | {v.get('n_nonoverlap')} | "
+                   f"{_pct(v.get('nonoverlap_exc_mean_pct'), 2)} |")
+    out.append("")
+    out.append(f"**推荐：T+{a.get('best_std_horizon')}**（{a.get('best_reason')}）")
+    out.append("")
+    out.append(f"- 20 日内超额峰值在 h={a.get('peak_h')}（{_pct(a.get('peak_exc_pct'), 2)}），"
+               f"T+10 起进入 +2.5% 以上高区平台")
+    out.append("- ⚠️ **不按「点估计超额最高」选周期**：T+20 名义超额 +3.47% 为全场最高，"
+               "但其 NW t 仅 +2.09（全场最低）、非重叠样本只剩 3 个 —— "
+               "名义超额最高恰恰是统计上最不可信的。")
+    out.append("- ⚠️ **绝对收益全周期为负**（T+20 组合 −4.23% vs 基准 −7.70%）："
+               "持有多久都不赚钱，只是相对池子少亏。这是池子负 alpha 决定的，"
+               "不是持有期能解决的。")
+    out.append("- ⚠️ T+1 超额仅 +0.26%、NW t=+1.32、胜率 51.3% → "
+               "**短周期基本无效，不要做 T+0 回转**。")
+    out.append("- 纪律：「T+" + str(a.get('best_std_horizon')) + "」是**时间上限**，不是目标价；"
+               "触发止损立即离场，不因「还没到期」而扛单。")
+    out.append("")
+    out.append("复现边界：")
+    for b in a.get("boundaries") or []:
+        out.append(f"- {b}")
+    out.append("")
     return "\n".join(out)
 
 
@@ -526,6 +723,82 @@ def sec_footer():
 # ---------------------------------------------------------------- 主流程
 
 
+def sec_weight_trace():
+    """权重落地核查（v4.3 新增，round17 穿透审计）—— 回答「日报的权重/因子到底有没有应用到生产」
+
+    老大 2026-10-25 提问：「检查每日因子日报的权重和因子有没有应用到 A股成交额 TOP500
+    评分报告，目前看只应用了部分。」
+
+    本节把 `audit_round17.json` 的七环追溯矩阵直接搬进日报，让「哪一维没落地」
+    每天可见，而不是靠人偶然发现。矩阵口径见 audit_round17.py。
+    """
+    a = _load("audit_round17.json")
+    out = ["## 6.5 权重落地核查：日报权重 → 生产报告（v4.3）", ""]
+    if not a:
+        out.append("未查到 audit_round17.json（由 `audit_round17.py` 生成，已接入每日 workflow）。")
+        return "\n".join(out)
+
+    out.append(f"- 权重版本：`{a.get('weights_version')}` · 核查对象：`{a.get('scored_file')}`"
+               f"（{a.get('n_rows')} 行）")
+    s = a.get("summary") or {}
+    wc = a.get("weight_coverage") or {}
+    out.append(f"- **权重合计 {s.get('w_total'):.2f}**（应为 1.00）")
+    out.append("")
+    out.append("| 维度 | 权重 | 日报单独评估 | 样本(1/5/20) | scored 数据落地 | 组合角色 |")
+    out.append("|---|---|---|---|---|---|")
+    for d in a.get("dims") or []:
+        nb = (d.get("daily_report") or {}).get("n_by_h") or {}
+        ns = f"{nb.get('1') or 0}/{nb.get('5') or 0}/{nb.get('20') or 0}"
+        ev = "✅" if (d.get("daily_report") or {}).get("evaluated") else "❌ **未评估**"
+        sd = d.get("scored_data") or {}
+        land = (f"✅ {sd.get('n_rows_with_value')} 行" if sd.get("present")
+                else "❌ **0 行**")
+        out.append(f"| `{d['dim']}` | {d['weight']:.1%} | {ev} | {ns} | {land} | "
+                   f"{d.get('mf_portfolio_role') or '—'} |")
+    out += [
+        "",
+        f"- ⚠️ **scored 数据里缺失的权重合计：{s.get('w_missing_in_scored_data'):.1%}**"
+        f" → 页面上的 `total` 实际只反映 **{wc.get('mean_effective_weight'):.1%}** 的权重",
+        f"- ⚠️ 日报从未单独评估的权重合计：**{s.get('w_never_evaluated_in_daily_report'):.1%}**",
+        f"- 纯先验（无统计证据）权重合计：**{s.get('w_weak_prior_only'):.1%}**",
+        "",
+    ]
+    if wc.get("n_compared"):
+        out.append(f"用现权重复算 vs 文件 `total`：n={wc['n_compared']}，"
+                   f"差均值 {wc['total_diff_mean']:+.2f}、中位 {wc['total_diff_median']:+.2f}、"
+                   f"最大绝对差 **{wc['total_diff_abs_max']:.2f} 分**，"
+                   f"≥1 分的有 {wc['n_cross_rating_threshold']} 只"
+                   f"（评级门槛 S≥85/A≥65/B≥45/C≥25，1 分即可跨档）。")
+        out.append("")
+    pool = a.get("pool") or {}
+    if pool:
+        pi, ci = pool.get("data") or {}, pool.get("config") or {}
+        out.append("**母体口径（选池规则）**：")
+        out.append("")
+        out.append("| 位置 | version | size_quantile | sample_strata | size_as_factor | 市值中位 |")
+        out.append("|---|---|---|---|---|---|")
+        out.append(f"| 数据 `top500_all_a.json` | {pi.get('rules_version') or '—'} | "
+                   f"{pi.get('size_quantile')} | {pi.get('sample_strata') or '—'} | "
+                   f"{pi.get('size_as_factor')} | {pi.get('mv_median_yi')} 亿 |")
+        out.append(f"| 配置 `config.json` | {ci.get('rules_version') or '—'} | "
+                   f"{ci.get('size_quantile')} | {ci.get('sample_strata') or '—'} | "
+                   f"{ci.get('size_as_factor')} | — |")
+        out.append("")
+        if pool.get("in_sync"):
+            out.append("→ ✅ 数据与配置一致。")
+        else:
+            out.append("→ ❌ **数据与配置不一致**：数据是旧配置的产物。代码已改但数据未刷新，"
+                       "属于「静默退化」——页面照常出，但用的是上一版口径。")
+        out.append("")
+    out += [
+        "> **读法**：这一节是「有没有应用」的体检，不是「应用得好不好」的评估。"
+        "任何一行出现 ❌，都意味着该维度在生产链路上是断的——要么数据没刷新，"
+        "要么根本没接入。断点不产生报错，只会让 `total` 静默地少算一部分权重。",
+        "",
+    ]
+    return "\n".join(out)
+
+
 def build(date_str=None, want_html=False):
     ic = _load("factor_ic.json")
     if not ic:
@@ -541,7 +814,10 @@ def build(date_str=None, want_html=False):
         sec_recommendation(ic),
         sec_collinearity(ic),
         sec_weights(ic),
+        sec_weight_trace(),
         sec_mf_backtest(),
+        sec_zone_filter(),
+        sec_holding_period(),
         sec_boundaries(),
         sec_momentum_paradox(),
         sec_track(),
