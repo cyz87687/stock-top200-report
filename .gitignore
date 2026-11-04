@@ -4,6 +4,23 @@ __pycache__/
 .workbuddy/
 *.json
 !package.json
+# ⚠️ 以下 json 不是「每日数据产物」，而是**代码逻辑的直接输入**（缺了会静默失效）。
+# 2026-11-04 实测：cycle_industry.json 被 *.json 忽略 → 周期规则只靠 git 部署时会静默不生效。
+!config.json
+!factor_weights.json
+!factor_ic.json
+!factor_history.json
+!pool_pe_history.json
+!recommendation_track.json
+!ai_assessment.json
+!sector/cycle_industry.json
+!sector/backtest_ref.json
+!sector/mf_latest.json
+!data/ic_long_2020.json
+!data/dim_ic_long.json
+!data/ic_dsr_long.json
+!data/weight_scheme_curve.json
+!data/backtest_universe_summary.json
 update_rating.py
 # 本地 LLM 凭据（严禁入库；GitHub Actions 请用 repository secrets）
 .llm_env

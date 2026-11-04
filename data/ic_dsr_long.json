@@ -1,0 +1,61 @@
+{
+ "n_trials": 364,
+ "n_trials_source": "trial_log.n_trials()",
+ "sr_std_assumed": 0.05,
+ "results": {
+  "h1": {
+   "dsr": 0.8729,
+   "z": 1.1403,
+   "sr0": 0.1478,
+   "sr": 0.1762,
+   "n_obs": 1653,
+   "n_trials": 364,
+   "sr_std": 0.05,
+   "significant": false,
+   "note": "sr 口径 = 每期 IC 的均值/标准差（IC_IR），**不是**组合年化 Sharpe。n_obs 用不重叠样本 1653（=n/h）；n_trials=364 取自 trial_log；sr_std=0.05 是**假设值**（sr_std_assumed=True），因本项目没有多策略收益矩阵、无法实测该横截面离散度。⇒ DSR 结论的强度受此假设限制，须与 PBO 缺失一并披露。",
+   "available": true,
+   "ic_ir": 0.1762,
+   "ic_skew": -0.0146,
+   "ic_kurt": 3.6427,
+   "n_obs_nonoverlap": 1653,
+   "sr_std_assumed": true,
+   "h": 1
+  },
+  "h5": {
+   "dsr": 0.9996,
+   "z": 3.3707,
+   "sr0": 0.1478,
+   "sr": 0.3337,
+   "n_obs": 330,
+   "n_trials": 364,
+   "sr_std": 0.05,
+   "significant": true,
+   "note": "sr 口径 = 每期 IC 的均值/标准差（IC_IR），**不是**组合年化 Sharpe。n_obs 用不重叠样本 330（=n/h）；n_trials=364 取自 trial_log；sr_std=0.05 是**假设值**（sr_std_assumed=True），因本项目没有多策略收益矩阵、无法实测该横截面离散度。⇒ DSR 结论的强度受此假设限制，须与 PBO 缺失一并披露。",
+   "available": true,
+   "ic_ir": 0.3337,
+   "ic_skew": 0.183,
+   "ic_kurt": 3.2239,
+   "n_obs_nonoverlap": 330,
+   "sr_std_assumed": true,
+   "h": 5
+  },
+  "h20": {
+   "dsr": 0.9996,
+   "z": 3.3308,
+   "sr0": 0.1478,
+   "sr": 0.5227,
+   "n_obs": 81,
+   "n_trials": 364,
+   "sr_std": 0.05,
+   "significant": true,
+   "note": "sr 口径 = 每期 IC 的均值/标准差（IC_IR），**不是**组合年化 Sharpe。n_obs 用不重叠样本 81（=n/h）；n_trials=364 取自 trial_log；sr_std=0.05 是**假设值**（sr_std_assumed=True），因本项目没有多策略收益矩阵、无法实测该横截面离散度。⇒ DSR 结论的强度受此假设限制，须与 PBO 缺失一并披露。",
+   "available": true,
+   "ic_ir": 0.5227,
+   "ic_skew": 0.33,
+   "ic_kurt": 3.7229,
+   "n_obs_nonoverlap": 81,
+   "sr_std_assumed": true,
+   "h": 20
+  }
+ }
+}
