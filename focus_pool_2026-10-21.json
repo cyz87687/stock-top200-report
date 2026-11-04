@@ -1,0 +1,745 @@
+{
+ "date": "2026-10-21",
+ "generated_at": "2026-10-21 23:01:35",
+ "title": "每日 AI 焦点池",
+ "method": "机器源(东财人气榜/涨跌停池/强势股池) + 本地AI联网检索(题材催化/公告/政策/龙虎榜)",
+ "generated_by": "fetch_focus_list.py (互联网搜索: 东财人气榜/涨跌停池/强势股池 + Agent 检索)",
+ "sources_used": {
+  "hot_rank": 30,
+  "zt_pool": 50,
+  "dt_pool": 0,
+  "strong_pool": 20
+ },
+ "n_raw": 77,
+ "elapsed_s": 1.4,
+ "agent_search": {
+  "merged": true,
+  "n_additions": 37
+ },
+ "ai_summary": "国家数据集团10/20雄安挂牌点燃「数据要素」，成当日唯一逆势主线（20只代表股12只封板，电子行业主力净流入逾85亿、计算机逾43亿），AI漫剧传媒与光纤/光模块涨价链（TrendForce预估2026全球光纤缺口1.8亿芯公里、Q4 DRAM合约价环比+20%）同步走强；宁德时代三季报增收不增利暴跌12.03%、带崩锂电，创业板指跌1.62%创1年多新低，资金抱团题材规避权重。",
+ "n_in_pool": 26,
+ "n_out_pool": 14,
+ "focus": [
+  {
+   "name": "润建股份",
+   "code": "sz002929",
+   "score": 7.5,
+   "sources": [
+    "agent_search",
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第16位；涨停3连板 首板09:35；[联网检索·公告] 3连板，龙虎榜净买1.40亿元；公司签订2亿美元AI词元跨境销售服务合同，算力+Token业务落单。",
+   "ai_reason": "3连板，龙虎榜净买1.40亿元；公司签订2亿美元AI词元跨境销售服务合同，算力+Token业务落单。",
+   "rank": 1,
+   "in_main_pool": true,
+   "sector": "综合",
+   "rating": "C",
+   "total": 39.13,
+   "price": 56.14,
+   "pct_chg": 9.99
+  },
+  {
+   "name": "粤 传 媒",
+   "code": "sz002181",
+   "score": 7.0,
+   "sources": [
+    "agent_search",
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第6位；涨停2连板 首板09:31；[联网检索·龙虎榜] 2连板，龙虎榜净买2.54亿元；AI漫剧概念反复走强，叠加《沙丘3》官宣中国内地定档12月31日。",
+   "ai_reason": "2连板，龙虎榜净买2.54亿元；AI漫剧概念反复走强，叠加《沙丘3》官宣中国内地定档12月31日。",
+   "rank": 2,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "星光股份",
+   "code": "sz002076",
+   "score": 7.0,
+   "sources": [
+    "agent_search",
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第27位；涨停2连板 首板09:30；[联网检索·龙虎榜] 4天3板（+9.87%），龙虎榜净买入7378万元，数据要素方向连板梯队成员。",
+   "ai_reason": "4天3板（+9.87%），龙虎榜净买入7378万元，数据要素方向连板梯队成员。",
+   "rank": 3,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "海量数据",
+   "code": "sh603138",
+   "score": 6.5,
+   "sources": [
+    "agent_search",
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第13位；涨停 首板09:30；[联网检索·政策] 开盘秒板收15.38元，数据要素板块核心标的，国联民生认为国家级平台落地利好数据运营/治理厂商。",
+   "ai_reason": "开盘秒板收15.38元，数据要素板块核心标的，国联民生认为国家级平台落地利好数据运营/治理厂商。",
+   "rank": 4,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "通宇通讯",
+   "code": "sz002792",
+   "score": 6.5,
+   "sources": [
+    "agent_search",
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第24位；涨停 首板09:52；[联网检索·龙虎榜] 涨停，龙虎榜净买1.86亿元（机构净买4578万元），通信设备+基站天线+海外业务。",
+   "ai_reason": "涨停，龙虎榜净买1.86亿元（机构净买4578万元），通信设备+基站天线+海外业务。",
+   "rank": 5,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "B",
+   "total": 51.79,
+   "price": 32.09,
+   "pct_chg": 10.01
+  },
+  {
+   "name": "兆讯传媒",
+   "code": "sz301102",
+   "score": 6.5,
+   "sources": [
+    "agent_search",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:32；强势股池（60日新高）；[联网检索·题材催化] 临收盘最后6分钟封20cm涨停（+19.98%），数据要素+高铁数字媒体双属性。",
+   "ai_reason": "临收盘最后6分钟封20cm涨停（+19.98%），数据要素+高铁数字媒体双属性。",
+   "rank": 6,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "莱美药业",
+   "code": "sz300006",
+   "score": 6.5,
+   "sources": [
+    "agent_search",
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:44；[联网检索·龙虎榜] 20%涨停，机构席位净买9273万元居当日机构净买首位（2买0卖），创新药+纳米炭铁。",
+   "ai_reason": "20%涨停，机构席位净买9273万元居当日机构净买首位（2买0卖），创新药+纳米炭铁。",
+   "rank": 7,
+   "in_main_pool": true,
+   "sector": "医药生物",
+   "rating": "C",
+   "total": 36.5,
+   "price": 9.3,
+   "pct_chg": 20.0
+  },
+  {
+   "name": "东瑞股份",
+   "code": "sz001201",
+   "score": 6.5,
+   "sources": [
+    "agent_search",
+    "涨停池"
+   ],
+   "reason": "涨停 首板09:52；[联网检索·政策] 涨停（+9.99%），三季度末能繁母猪存栏3602万头同比-10.7%、首次跌破3750万头调控线，产能去化点燃养殖板块。",
+   "ai_reason": "涨停（+9.99%），三季度末能繁母猪存栏3602万头同比-10.7%、首次跌破3750万头调控线，产能去化点燃养殖板块。",
+   "rank": 8,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "宁德时代",
+   "code": "sz300750",
+   "score": 6.0,
+   "sources": [
+    "agent_search",
+    "人气榜"
+   ],
+   "reason": "东财人气榜第1位；[联网检索·公告] 风险提示：暴跌12.03%成交324亿元居首，Q3净利212.46亿同比+14.54%但环比-5.77%，消费税恢复征收叠加出口退税下调、毛利率降至20.69%，花旗下调目标价至479元。",
+   "ai_reason": "风险提示：暴跌12.03%成交324亿元居首，Q3净利212.46亿同比+14.54%但环比-5.77%，消费税恢复征收叠加出口退税下调、毛利率降至20.69%，花旗下调目标价至479元。",
+   "rank": 9,
+   "in_main_pool": true,
+   "sector": "新能源",
+   "rating": "A",
+   "total": 77.76,
+   "price": 227.9,
+   "pct_chg": -12.04
+  },
+  {
+   "name": "南威软件",
+   "code": "sh603636",
+   "score": 6.0,
+   "sources": [
+    "agent_search",
+    "人气榜",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第7位；涨停2连板 首板11:04；强势股池（60日新高且近期多次涨停）；[联网检索·题材催化] 4天3板（+10.01%），数据要素+信创双主线，板块连板梯队核心。",
+   "ai_reason": "4天3板（+10.01%），数据要素+信创双主线，板块连板梯队核心。",
+   "rank": 10,
+   "in_main_pool": true,
+   "sector": "计算机软件",
+   "rating": "C",
+   "total": 35.2,
+   "price": 9.78,
+   "pct_chg": 10.01
+  },
+  {
+   "name": "数字认证",
+   "code": "sz300579",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·产业链] 收涨8.34%，数据确权/安全认证环节直接受益数据产权登记与数据资产入表推进，数据要素板块内涨幅居前。",
+   "ai_reason": "收涨8.34%，数据确权/安全认证环节直接受益数据产权登记与数据资产入表推进，数据要素板块内涨幅居前。",
+   "rank": 11,
+   "in_main_pool": true,
+   "sector": "计算机软件",
+   "rating": "C",
+   "total": 43.1,
+   "price": 27.16,
+   "pct_chg": 8.34
+  },
+  {
+   "name": "致尚科技",
+   "code": "sz301486",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·龙虎榜] 20cm涨停开板收+17.12%，龙虎榜净买3.09亿元居次席；光通信MPO满产，CPO/NPO架构演进释放MPO需求弹性。",
+   "ai_reason": "20cm涨停开板收+17.12%，龙虎榜净买3.09亿元居次席；光通信MPO满产，CPO/NPO架构演进释放MPO需求弹性。",
+   "rank": 12,
+   "in_main_pool": true,
+   "sector": "电子制造",
+   "rating": "B",
+   "total": 52.99,
+   "price": 209.72,
+   "pct_chg": 17.12
+  },
+  {
+   "name": "天孚通信",
+   "code": "sz300394",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·产业链] 盘中主力资金净流入超7.5亿元居全市场首位，光模块/光器件龙头，9月光模块出口67.8亿元、Q3环比+29.9%。",
+   "ai_reason": "盘中主力资金净流入超7.5亿元居全市场首位，光模块/光器件龙头，9月光模块出口67.8亿元、Q3环比+29.9%。",
+   "rank": 13,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "A",
+   "total": 77.68,
+   "price": 214.98,
+   "pct_chg": 5.1
+  },
+  {
+   "name": "光库科技",
+   "code": "sz300620",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·产业链] +9.44%，盘中主力净流入超3.7亿元，光器件环节跟随光通信主线走强。",
+   "ai_reason": "+9.44%，盘中主力净流入超3.7亿元，光器件环节跟随光通信主线走强。",
+   "rank": 14,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "A",
+   "total": 67.27,
+   "price": 260.9,
+   "pct_chg": 9.44
+  },
+  {
+   "name": "长飞光纤",
+   "code": "sh601869",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·产业链] TrendForce预估2026年全球光纤供需缺口达1.8亿芯公里，现货价年增2.8至5倍，公司+3.45%跟涨。",
+   "ai_reason": "TrendForce预估2026年全球光纤供需缺口达1.8亿芯公里，现货价年增2.8至5倍，公司+3.45%跟涨。",
+   "rank": 15,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "A",
+   "total": 70.96,
+   "price": 350.8,
+   "pct_chg": 3.45
+  },
+  {
+   "name": "沪电股份",
+   "code": "sz002463",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·产业链] 盘中主力净流入超6亿元，AI服务器高多层PCB核心供应商，+3.57%。",
+   "ai_reason": "盘中主力净流入超6亿元，AI服务器高多层PCB核心供应商，+3.57%。",
+   "rank": 16,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "A",
+   "total": 69.69,
+   "price": 114.97,
+   "pct_chg": 3.57
+  },
+  {
+   "name": "生益科技",
+   "code": "sh600183",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·公告] 前三季度净利预增164%-181%，建滔10月再发CCL涨价函（薄布CCL与PP加价），公司为大陆覆铜板龙头。",
+   "ai_reason": "前三季度净利预增164%-181%，建滔10月再发CCL涨价函（薄布CCL与PP加价），公司为大陆覆铜板龙头。",
+   "rank": 17,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "A",
+   "total": 83.11,
+   "price": 118.99,
+   "pct_chg": 1.5
+  },
+  {
+   "name": "华正新材",
+   "code": "sh603186",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·产业链] +5.33%，盘中主力净流入3.63亿元，覆铜板涨价链弹性品种。",
+   "ai_reason": "+5.33%，盘中主力净流入3.63亿元，覆铜板涨价链弹性品种。",
+   "rank": 18,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "B",
+   "total": 63.09,
+   "price": 202.68,
+   "pct_chg": 5.33
+  },
+  {
+   "name": "宏昌电子",
+   "code": "sh603002",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·公告] 公告拟8亿元投建高端覆铜板及半固化片、2.7亿元投建先进封装膜材项目，扩产直指AI高端CCL与先进封装。",
+   "ai_reason": "公告拟8亿元投建高端覆铜板及半固化片、2.7亿元投建先进封装膜材项目，扩产直指AI高端CCL与先进封装。",
+   "rank": 19,
+   "in_main_pool": true,
+   "sector": "电子材料",
+   "rating": "B",
+   "total": 55.07,
+   "price": 15.3,
+   "pct_chg": 3.24
+  },
+  {
+   "name": "澜起科技",
+   "code": "sh688008",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·公告] 预告Q3净利12-13亿元、同比+154%~175%，DDR5内存接口及模组配套芯片出货大幅增加，+5.36%。",
+   "ai_reason": "预告Q3净利12-13亿元、同比+154%~175%，DDR5内存接口及模组配套芯片出货大幅增加，+5.36%。",
+   "rank": 20,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "A",
+   "total": 78.11,
+   "price": 178.34,
+   "pct_chg": 5.36
+  },
+  {
+   "name": "德明利",
+   "code": "sz001309",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·公告] 前三季度净利预增中值32600.51%居全市场首位，存储涨价传导至利润，今日+6.50%。",
+   "ai_reason": "前三季度净利预增中值32600.51%居全市场首位，存储涨价传导至利润，今日+6.50%。",
+   "rank": 21,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "A",
+   "total": 79.31,
+   "price": 233.81,
+   "pct_chg": 6.5
+  },
+  {
+   "name": "兆易创新",
+   "code": "sh603986",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·产业链] 盘中主力净流入超5.5亿元，存储涨价周期直接受益，Q4 DRAM合约价环比预增20%。",
+   "ai_reason": "盘中主力净流入超5.5亿元，存储涨价周期直接受益，Q4 DRAM合约价环比预增20%。",
+   "rank": 22,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "S",
+   "total": 90.38,
+   "price": 288.02,
+   "pct_chg": 1.98
+  },
+  {
+   "name": "佰维存储",
+   "code": "sh688525",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·产业链] +3.32%，半导体板块午后短线拉升中跟随德明利、澜起走强，存储模组弹性标的。",
+   "ai_reason": "+3.32%，半导体板块午后短线拉升中跟随德明利、澜起走强，存储模组弹性标的。",
+   "rank": 23,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "S",
+   "total": 85.59,
+   "price": 164.42,
+   "pct_chg": 3.32
+  },
+  {
+   "name": "天康生物",
+   "code": "sz002100",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·研报] +5.87%，猪周期产能去化加速，广发/银河均看好2027年生猪均价上行。",
+   "ai_reason": "+5.87%，猪周期产能去化加速，广发/银河均看好2027年生猪均价上行。",
+   "rank": 24,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "巨星农牧",
+   "code": "sh603477",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·题材催化] +5.03%，养殖板块集体拉升中弹性居前，中证畜牧养殖指数当日涨2.45%。",
+   "ai_reason": "+5.03%，养殖板块集体拉升中弹性居前，中证畜牧养殖指数当日涨2.45%。",
+   "rank": 25,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "长盈精密",
+   "code": "sz300115",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·龙虎榜] 龙虎榜净买3.76亿元居全市场首位、机构净买6630万元；人形机器人+消费电子+AI算力，收+7.05%。",
+   "ai_reason": "龙虎榜净买3.76亿元居全市场首位、机构净买6630万元；人形机器人+消费电子+AI算力，收+7.05%。",
+   "rank": 26,
+   "in_main_pool": true,
+   "sector": "电子制造",
+   "rating": "B",
+   "total": 48.86,
+   "price": 26.41,
+   "pct_chg": 7.05
+  },
+  {
+   "name": "协创数据",
+   "code": "sz300857",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·公告] 全资子公司协创智算签署不超过374.9亿元算力云服务协议，+6.86%，算力租赁方向最大单笔订单。",
+   "ai_reason": "全资子公司协创智算签署不超过374.9亿元算力云服务协议，+6.86%，算力租赁方向最大单笔订单。",
+   "rank": 27,
+   "in_main_pool": true,
+   "sector": "电子制造",
+   "rating": "A",
+   "total": 76.82,
+   "price": 215.11,
+   "pct_chg": 6.86
+  },
+  {
+   "name": "宇树科技",
+   "code": "sh688836",
+   "score": 6.0,
+   "sources": [
+    "agent_search"
+   ],
+   "reason": "[联网检索·公告] 风险/催化并存：发布异动公告提示滚动PE 388倍远超行业39.51倍、人形机器人尚处商业化早期，今日-2.10%；10/22世界物理AI大会为其生态催化节点。",
+   "ai_reason": "风险/催化并存：发布异动公告提示滚动PE 388倍远超行业39.51倍、人形机器人尚处商业化早期，今日-2.10%；10/22世界物理AI大会为其生态催化节点。",
+   "rank": 28,
+   "in_main_pool": true,
+   "sector": "高端制造",
+   "rating": "B",
+   "total": 47.01,
+   "price": 515.0,
+   "pct_chg": -2.1
+  },
+  {
+   "name": "太极股份",
+   "code": "sz002368",
+   "score": 5.8,
+   "sources": [
+    "agent_search",
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第3位；涨停 首板11:19；[联网检索·题材催化] 数据要素涨停（+9.97%），行情先于公告启动——10/17媒体预告国家数据集团挂牌后软件板块午后集体拉升。",
+   "ai_reason": "数据要素涨停（+9.97%），行情先于公告启动——10/17媒体预告国家数据集团挂牌后软件板块午后集体拉升。",
+   "rank": 29,
+   "in_main_pool": true,
+   "sector": "计算机软件",
+   "rating": "C",
+   "total": 41.73,
+   "price": 14.67,
+   "pct_chg": 9.97
+  },
+  {
+   "name": "雪人集团",
+   "code": "sz002639",
+   "score": 5.6,
+   "sources": [
+    "agent_search",
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第5位；涨停 首板10:03；[联网检索·龙虎榜] 涨停，龙虎榜净买2.10亿元，液冷+冰雪经济+压缩机设备三重题材。",
+   "ai_reason": "涨停，龙虎榜净买2.10亿元，液冷+冰雪经济+压缩机设备三重题材。",
+   "rank": 30,
+   "in_main_pool": true,
+   "sector": "高端制造",
+   "rating": "B",
+   "total": 50.15,
+   "price": 15.18,
+   "pct_chg": 10.0
+  },
+  {
+   "name": "利亚德",
+   "code": "sz300296",
+   "score": 5.5,
+   "sources": [
+    "agent_search",
+    "人气榜",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第9位；涨停 首板13:03；强势股池（60日新高）；[联网检索·龙虎榜] 午后开盘约3分钟20%涨停，龙虎榜净买2.39亿元居前（总买3.49亿/总卖1.10亿），数据要素+商业航天+IP经济多重题材叠加。",
+   "ai_reason": "午后开盘约3分钟20%涨停，龙虎榜净买2.39亿元居前（总买3.49亿/总卖1.10亿），数据要素+商业航天+IP经济多重题材叠加。",
+   "rank": 31,
+   "in_main_pool": true,
+   "sector": "电子面板",
+   "rating": "C",
+   "total": 37.34,
+   "price": 5.63,
+   "pct_chg": 20.04
+  },
+  {
+   "name": "航天信息",
+   "code": "sh600271",
+   "score": 5.5,
+   "sources": [
+    "agent_search",
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第20位；涨停 首板11:17；[联网检索·题材催化] 涨停（+9.96%），央企信创+数据要素双属性，受益国家数据集团组建后的公共数据统筹运营。",
+   "ai_reason": "涨停（+9.96%），央企信创+数据要素双属性，受益国家数据集团组建后的公共数据统筹运营。",
+   "rank": 32,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "三维天地",
+   "code": "sz301159",
+   "score": 5.5,
+   "sources": [
+    "agent_search",
+    "人气榜",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第26位；涨停 首板11:21；强势股池（60日新高）；[联网检索·题材催化] 11:21触及20%涨停，封单2.85亿元；公司为检验检测信息化与数据资产管理服务商，数据资产平台基于AI与知识图谱。",
+   "ai_reason": "11:21触及20%涨停，封单2.85亿元；公司为检验检测信息化与数据资产管理服务商，数据资产平台基于AI与知识图谱。",
+   "rank": 33,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "读者传媒",
+   "code": "sh603999",
+   "score": 5.5,
+   "sources": [
+    "agent_search",
+    "人气榜",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第28位；涨停 首板13:06；强势股池（近期多次涨停）；[联网检索·题材催化] 走出5天3板，午后直线涨停封单17万手；IP经济+数据要素+知识付费多重题材。",
+   "ai_reason": "走出5天3板，午后直线涨停封单17万手；IP经济+数据要素+知识付费多重题材。",
+   "rank": 34,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "慧辰股份",
+   "code": "sh688500",
+   "score": 5.5,
+   "sources": [
+    "agent_search",
+    "涨停池"
+   ],
+   "reason": "涨停 首板11:27；[联网检索·题材催化] 20%涨停，坚持ALL in AI提供数据应用全栈方案，经营现金流净额同比+152.51%，数据要素板块联动。",
+   "ai_reason": "20%涨停，坚持ALL in AI提供数据应用全栈方案，经营现金流净额同比+152.51%，数据要素板块联动。",
+   "rank": 35,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "敏芯股份",
+   "code": "sh688286",
+   "score": 5.5,
+   "sources": [
+    "agent_search",
+    "涨停池"
+   ],
+   "reason": "涨停 首板13:25；[联网检索·产业链] 20%涨停领涨半导体，TrendForce预估2026Q4 DRAM合约价环比上涨约20%。",
+   "ai_reason": "20%涨停领涨半导体，TrendForce预估2026Q4 DRAM合约价环比上涨约20%。",
+   "rank": 36,
+   "in_main_pool": true,
+   "sector": "AI/半导体",
+   "rating": "B",
+   "total": 47.05,
+   "price": 52.81,
+   "pct_chg": 20.0
+  },
+  {
+   "name": "海洋王",
+   "code": "sz002724",
+   "score": 5.0,
+   "sources": [
+    "人气榜",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第11位；涨停4连板 首板09:25；强势股池（60日新高且近期多次涨停）",
+   "ai_reason": "",
+   "rank": 37,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "大业股份",
+   "code": "sh603278",
+   "score": 5.0,
+   "sources": [
+    "人气榜",
+    "强势股池",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第15位；涨停4连板 首板09:25；强势股池（60日新高且近期多次涨停）",
+   "ai_reason": "",
+   "rank": 38,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "东安动力",
+   "code": "sh600178",
+   "score": 5.0,
+   "sources": [
+    "人气榜",
+    "涨停池"
+   ],
+   "reason": "东财人气榜第18位；涨停4连板 首板09:25",
+   "ai_reason": "",
+   "rank": 39,
+   "in_main_pool": false,
+   "sector": null,
+   "rating": null,
+   "total": null,
+   "price": null,
+   "pct_chg": null
+  },
+  {
+   "name": "云南锗业",
+   "code": "sz002428",
+   "score": 4.7,
+   "sources": [
+    "agent_search",
+    "人气榜"
+   ],
+   "reason": "东财人气榜第14位；[联网检索·公告] 前三季度净利1.76亿元同比+869.79%，第三大股东章建平三季度增仓1961.57万股，今日+6.51%居人气榜第4。",
+   "ai_reason": "前三季度净利1.76亿元同比+869.79%，第三大股东章建平三季度增仓1961.57万股，今日+6.51%居人气榜第4。",
+   "rank": 40,
+   "in_main_pool": true,
+   "sector": "有色资源",
+   "rating": "A",
+   "total": 67.01,
+   "price": 84.06,
+   "pct_chg": 6.51
+  }
+ ]
+}
