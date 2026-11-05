@@ -411,10 +411,14 @@ class TestWeightsConsistency(unittest.TestCase):
             self.skipTest("factor_weights.json 不存在")
         h = hashlib.sha1(open(p, "rb").read()).hexdigest()
         self.assertEqual(
-            h, "d29ada11259336596768a04955a36f2bedf8a91e",
-            "factor_weights.json 指纹变了（v4.18-c1-head-excess）。"
+            h, "c9104e9d684163d9d7554dfab29904ad5c14b2d8",
+            "factor_weights.json 指纹变了（v4.19-c1-sustain-gates）。"
             "若确为有意的权重变更，请同步八处入口 + verify_weights_round36.py "
-            "并把本断言更新为新指纹。")
+            "并把本断言更新为新指纹。"
+            "⚠️ 2026-11-05 round129 指纹更新（d29ada11→c9104e9d），是哪一步改的："
+            "仅 version 字段 v4.18→v4.19 + 新增 score_gates 说明键，"
+            "weights/dim_max 与 v4.18 **逐字节一致**（已脚本核对）——"
+            "score 口径升级（G1 成长存量门槛/G2 质量现金红旗/G3 PEG 换源），不是权重变更。")
 
     def test_six_entries_consistent(self):
         """跑 verify_weights_round36 的核心校验（子进程，避免污染本进程）"""

@@ -200,20 +200,53 @@ class TestConstraintsRespected(unittest.TestCase):
 
 
 class TestWeightsUntouched(unittest.TestCase):
-    """本轮只测算、不改权重 —— factor_weights.json 指纹必须未变。"""
+    """权重向量不可被静默改动 —— factor_weights.json 指纹锁定。
+
+    ⚠️ 2026-11-05 round129 指纹更新（d29ada11→c9104e9d），是哪一步改的：
+    只动了 version 字段（v4.18→v4.19-c1-sustain-gates）+ 新增 score_gates
+    说明键；weights/dim_max 与 v4.18 **逐字节一致**（脚本已核对）。属 score
+    口径升级（G1 成长存量门槛 / G2 质量现金红旗 / G3 PEG 换源），不是权重变更。
+    total 跨 v4.18/v4.19 禁比。
+    """
 
     def test_fingerprint_unchanged(self):
         import hashlib
         p = os.path.join(HERE, "factor_weights.json")
         h = hashlib.sha1(open(p, "rb").read()).hexdigest()
-        self.assertEqual(h, "d29ada11259336596768a04955a36f2bedf8a91e",
-                         "factor_weights.json 在本轮测算中不应被修改")
+        self.assertEqual(h, "c9104e9d684163d9d7554dfab29904ad5c14b2d8",
+                         "factor_weights.json 指纹变了 —— 改动前先回答「是哪一步改的」")
 
     def test_version_still_v417(self):
         with open(os.path.join(HERE, "factor_weights.json"), encoding="utf-8") as f:
             d = json.load(f)
-        self.assertEqual(d["version"], "v4.18-c1-head-excess")
+        self.assertEqual(d["version"], "v4.19-c1-sustain-gates")
         self.assertEqual(d["target_horizon"], 20)
+        # round129：weights 向量必须仍是 v4.18 那一组（防 score_gates 改动时误动权重）
+        self.assertEqual(d["weights"]["score_growth"], 0.2)
+        self.assertEqual(d["weights"]["score_tech_neg"], 0.0)
+        self.assertAlmostEqual(sum(float(v or 0) for v in d["weights"].values()), 1.0)
+
+
+class TestGrowthAnchorGate(unittest.TestCase):
+    """round129 G1 成长存量门槛回归锁（growth_factor_b.anchor_gate 单一实现）。
+
+    规则：cagr3 缺失或 ≤0 → 成长分封顶 5.0「让位中性」；≤5 不压（无双重惩罚）；
+    缺维不补。⚠️ step2 消费点与 enhance_scores 方式B回写**两处都必须装门**——
+    enhance 会覆盖 step2 的 score_growth，只装一处等于没装（2026-11-05 实测踩中）。
+    """
+
+    def test_gate_rules(self):
+        import growth_factor_b as G
+        self.assertEqual(G.anchor_gate(9.6, 30.5), (9.6, None))
+        s, n = G.anchor_gate(9.6, -40.7)
+        self.assertEqual(s, 5.0)
+        self.assertIn("cagr3=-40.7%", n)
+        s, n = G.anchor_gate(9.6, None)
+        self.assertEqual(s, 5.0)
+        self.assertIn("cagr3缺失", n)
+        self.assertEqual(G.anchor_gate(3.0, -10.0)[0], 3.0)    # ≤5 不压
+        self.assertIsNone(G.anchor_gate(None, None)[0])         # 缺维不补
+        self.assertEqual(G.anchor_gate(5.0, 0.0)[0], 5.0)       # cagr3=0 视为无锚
 
 
 class TestGrowthGateContinuity(unittest.TestCase):

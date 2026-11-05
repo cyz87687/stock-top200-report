@@ -289,7 +289,14 @@ def main():
         if _gfb_ok and _gfb:
             # 成长维度改由方式B给出（round105 P0-2 起 W_GROWTH=0.05 进总分；缺失=None 不计分）
             _sg = _gfb.get("score_growth")
+            # round129 G1：方式B回写必须过成长存量门槛（cagr3 缺失/≤0 → 封顶 5.0）。
+            #   ⚠️ 此处会**覆盖** step2 写的 score_growth —— 只在 step2 装门槛等于
+            #   没装（2026-11-05 实测踩中，growth 保持旧值 9.69）。单一实现
+            #   growth_factor_b.anchor_gate，与 step2 消费点同源。
+            _sg, _g1n = _gfb_mod.anchor_gate(_sg, r.get("cagr3"))
             r["score_growth"] = (round(float(_sg), 2) if isinstance(_sg, (int, float)) else None)
+            if _g1n and not r.get("growth_anchor_note"):
+                r["growth_anchor_note"] = _g1n
         total = _calc_total_10d(r)
         rating, advice = _rate_100(total)
         # ⚠️ round105 P0-1（2026-10-31）：算完必须写回。此前 total/rating/advice 算完即丢，

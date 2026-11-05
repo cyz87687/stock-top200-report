@@ -433,7 +433,17 @@ def score_rows(rows, as_of, em=None, min_present=5, pit_mode="auto"):
             if pit_mode == "actual_ok":
                 P_g = _pit_period_actual(periods_desc, as_of) or P
             if P:
-                q_raw.append(family_scores(sub_factors_pit(ind, P))[0])
+                _sub_q = sub_factors_pit(ind, P)
+                q_raw.append(family_scores(_sub_q)[0])
+                # round129 G2（2026-11-05）：现金红旗子因子透传给上游（additive）。
+                #   score_quality 语义不变（audit_round21/22 口径不受影响），
+                #   上游 step2 在消费点据 ocf_ni/accruals 扣分并留痕。
+                #   ⚠️ 必须写 r（=rows[i]，enumerate 当前行）——idx_map.append(i)
+                #      在循环末尾才执行，此处用 rows[idx_map[i]] 会 IndexError
+                #      （2026-11-05 实测：首版改动即踩中，score_rows 整体炸掉、
+                #       quality 全池 0/2174 静默缺失，step2 fail-open 不报错）。
+                r["q_ocf_ni"] = _sub_q.get("ocf_ni")
+                r["q_accruals"] = _sub_q.get("accruals")
             else:
                 q_raw.append(None)
             if P_g:

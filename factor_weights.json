@@ -1,7 +1,8 @@
 {
-  "version": "v4.18-c1-head-excess",
+  "version": "v4.19-c1-sustain-gates",
   "fitted_at": "2026-11-04 23:49:54",
   "target_horizon": 20,
+  "score_gates": "round129（2026-11-05，老大指令「按建议修改权重」）：G1 成长存量门槛——cagr3 缺失/为负 → score_growth 与 score_size_growth 封顶 5.0 让位中性（无存续锚不给成长溢价）；G2 质量现金红旗——OCF/NI<0 扣 2.0、accruals<-10 扣 1.5（floor 0，缺值不扣）；G3 PEG 分母改「cagr3 × 估值阶梯隐含增速」可用组件均值（切断脉冲增速→PEG虚小→严重低估加分的二次奖励链）。⚠️ weights 向量与 v4.18 逐字节一致（仅评分口径升级）——total 跨 v4.18/v4.19 禁比。",
   "method": "v4.18-c1-head-excess：2026-11-04 round128「全部改动」裁决，采纳 P0-4 实证里唯一全档改善的 C1 方案。tech_neg .10→0（IC −0.0069 / NW t −0.67，与 0 无法区分，属机会成本而非负 alpha）、growth .10→.20。依据 data/weight_p04_constrained.json（C1_min_techneg_to_growth）：N6/N10/N13/N30/N50 全档优于现行（+0.14~+1.13pp），代价复合 IC −10%（+0.0539→+0.0485）。⭐ 目标函数是 **TopN 头部超额**（生产持仓 6~13 只），不是全截面 IC —— 实测两者方向相反：lowvol20 IC +0.0828 但 TopN 全区间负，size_growth IC +0.0337 但 TopN 全程正。**禁按 IC 排权重**。⚠️ 仍是产品裁决、非 IC 背书：G5 样本外未闭合、fund(0.20) 长面板无历史快照，禁止表述为『经验证的 alpha』。target_horizon=20 不变。 实测逐档：N6 −0.879→+0.250、N10 −0.531→+0.140、N13 −0.283→+0.378、N30 +0.366→+0.573、N50 +0.578→+0.718（pp）。",
   "weights": {
     "score_bias60": 0.05,

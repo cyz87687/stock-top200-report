@@ -386,6 +386,35 @@ def _load_sw():
         return {}, {}, {}
 
 
+def anchor_gate(score, cagr3):
+    """round129 G1 成长存量门槛（2026-11-05，老大「按建议修改权重」）。
+
+    cagr3（三年扣非CAGR，存续锚）缺失或 ≤0 → 成长分封顶 5.0「让位中性」。
+    依据（2026-11-05 前十复核）：score_growth 与 cagr3 池内秩相关 −0.04≈0、
+    与单季 raw 增速 0.55 —— 实测口径是单季增速截面动量而非可持续成长；
+    低基数脉冲票（天津普林 cagr3=−40.7% 仍拿 9.62、永安药业无存续锚仍 9.88）
+    被 _effective_growth 饱和封顶后照样排头部分位 —— 封顶治显示不治排序。
+    ⚠️ 缺 cagr3 ≠ 最差：给中性上限而非 0（与负基数中性 0.5 同哲学）；
+       只削「无存量支撑的成长溢价」上限，不压本就 ≤5 的票。
+    ⚠️ **单一实现来源**：step2（s_growth / s_size_growth 消费点）与
+       enhance_scores（方式B回写 score_growth 时）都必须调本函数。
+       enhance 会**回写覆盖** step2 的 score_growth —— 只在 step2 装门槛
+       等于没装（2026-11-05 实测踩中，growth 保持旧值 9.69）。
+       两处各写一份实现必然漂移且不报错（round17 教训）。
+
+    返回 (score_after, note_or_None)；score 非数值时原样返回（缺维不补）。
+    """
+    def _is_num(v):
+        return isinstance(v, (int, float)) and not isinstance(v, bool) and v == v
+    if _is_num(cagr3) and cagr3 > 0:
+        return score, None
+    anc = f"cagr3={cagr3:.1f}%" if _is_num(cagr3) else "cagr3缺失"
+    note = f"{anc}→成长族封顶5.0(无存续锚)"
+    if _is_num(score):
+        score = min(float(score), 5.0)
+    return score, note
+
+
 def compute_growth(rows, style="steady", em_all=None, as_of=None, pit_grace=0):
     """方式B 成长因子截面计算（round106 口径）。
 

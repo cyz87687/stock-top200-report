@@ -13,6 +13,9 @@ from collections import Counter
 
 # v4.9：EP / SIZE_IND_NEUT 两维打分（唯一实现来源，与审计 round26/27b/27c 同构）
 import ep_size_ind
+# round129 G1：成长存量门槛 anchor_gate 的单一实现来源（growth_factor_b）。
+#   顶层 import —— 门槛是模型规则，模块加载失败必须 hard fail，不许静默跳过。
+import growth_factor_b as _gfb_mod
 # v4.10（2026-10-27 P0-4）：复合分量尺唯一实现来源（分母恒定 + 缺维中性填充）
 import scale_calc
 
@@ -1815,10 +1818,37 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
         reasons.append(f"低估值(FwdPE={effective_pe:.1f})无阶梯数据,保守加分")
         s = min(5, s + 1)
 
-    # ===== PEG指标评分 (PE/增速比) =====
+    # ===== PEG指标评分 (PE/可持续增速比) =====
+    # round129 G3（2026-11-05）：PEG 分母从单点增速换成「cagr3 存续锚 × 估值阶梯
+    #   隐含前瞻增速」的可用组件均值，切断「脉冲增速 → PEG 虚小 → 严重低估加分」
+    #   的二次奖励链（估值陷阱结构）。实证（2026-11-05 前十复核）：原口径天津普林
+    #   PEG=0.12「严重低估」而 3 年扣非 CAGR=−40.7%、单季 +667% 系低基数；
+    #   南亚新材 PEG=0.13 同因（growth 898%→饱和370%）——「便宜」是脉冲算出来的。
+    #   新口径 G_peg = mean(可用组件)：
+    #     · cagr3（与 _effective_growth 同源存续锚，负值如实参与，不取 max(,0)）
+    #     · (pe_first/pe_last)^(1/(年数-1))−1 = 估值阶梯隐含年化 EPS 增速
+    #   两者都缺 → PEG 不适用（不加分不减分，留痕）；均值 ≤0 同样不适用。
+    #   ⚠️ 量纲与原口径一致（增速用百分数），仅分母换源；bucket 阈值不动。
     peg = None
-    if effective_pe and growth and growth > 0:
-        peg = effective_pe / growth
+    _g_back = cagr3 if isinstance(cagr3, (int, float)) and cagr3 == cagr3 else None
+    _g_fwd = None
+    if pe_ladder_data and len(pe_ladder_data) >= 2:
+        _ys = sorted(pe_ladder_data.keys())
+        _p0, _p1 = pe_ladder_data[_ys[0]], pe_ladder_data[_ys[-1]]
+        if (isinstance(_p0, (int, float)) and isinstance(_p1, (int, float))
+                and not isinstance(_p0, bool) and not isinstance(_p1, bool)
+                and _p0 > 0 and _p1 > 0):
+            _g_fwd = ((_p0 / _p1) ** (1.0 / (len(_ys) - 1)) - 1.0) * 100.0
+    _g_peg_cands = [v for v in (_g_back, _g_fwd) if v is not None]
+    if effective_pe and _g_peg_cands:
+        _g_peg = sum(_g_peg_cands) / len(_g_peg_cands)
+        if _g_peg > 0:
+            peg = effective_pe / _g_peg
+        else:
+            reasons.append(f"PEG不适用(可持续增速{_g_peg:.1f}%≤0)")
+    elif effective_pe:
+        reasons.append("PEG不适用(无存续/前瞻增速锚)")
+    if peg is not None:
         if peg < 0.5:
             s = min(5, s + 0.5)
             reasons.append(f"PEG={peg:.2f}(严重低估,增速远超估值)")
@@ -4355,7 +4385,7 @@ def main():
     # v4.10：本轮 501 黑洞黑名单（async_fetch 返回）。下游据此把技术维按缺失处理，
     #   并在 scored 里留痕，禁止把这些股票当成「分数低」而不是「没数据」。
     _KL_BLACKLIST = set()
-    _quality_rank, _growth_rank = {}, {}
+    _quality_rank, _growth_rank, _quality_cash = {}, {}, {}
     _fin_cache_stats = None
     try:
         import fund_split as _fs_mod
@@ -4394,6 +4424,11 @@ def main():
                          if isinstance(r.get("score_quality"), (int, float))}
         _growth_rank = {r["code"]: r["score_growth"] for r in _qg_rows
                         if isinstance(r.get("score_growth"), (int, float))}
+        # round129 G2：现金红旗原始值（fund_split score_rows 透传 ocf_ni/accruals）。
+        #   扣分在评分环消费点执行（缺值不扣：缺维≠红旗，禁 or 0 铁律同源）。
+        _quality_cash = {r["code"]: (r.get("q_ocf_ni"), r.get("q_accruals"))
+                         for r in _qg_rows
+                         if r.get("q_ocf_ni") is not None or r.get("q_accruals") is not None}
         print(f"   🧬 质量/成长评分表 (fund_split, PIT≤{_as_of}): "
               f"quality {len(_quality_rank)}/{len(stocks)}，growth {len(_growth_rank)}/{len(stocks)}")
         # ⚠️ 2026-10-31 成长维度单源改造：一律以 growth_factor_b（方式B·单季度扣非
@@ -5417,6 +5452,31 @@ def main():
         s_size_growth = _sg_rank.get(_c6)
         s_dominant = _dom_rank.get(_c6)
         s_tech_neg = max(0.0, min(10.0, 10.0 - float(ts_adj)))
+        # ══ round129（2026-11-05，老大「按建议修改权重」）可持续性门槛 ══
+        # G1 成长存量门槛：cagr3 缺失/≤0 → 成长族（score_growth / score_size_growth）
+        #    封顶 5.0「让位中性」。单一实现 growth_factor_b.anchor_gate（依据见彼处）。
+        #    ⚠️ enhance_scores 会用方式B回写**覆盖** score_growth —— 那里必须装同一
+        #       道门，否则门槛等于没装（2026-11-05 实测踩中：growth 保持旧值 9.69）。
+        # G2 质量现金红旗：OCF/NI<0（利润未收现）→ quality −2.0；
+        #    应计 accruals<−10（盈余质量差，负向=低质）→ quality −1.5，floor 0。
+        #    依据：quality 三组等权被资本回报稀释（池内 quality~ROE 秩相关 0.26、
+        #    ~OCFG 仅 0.03），南亚新材 OCF/NI=−0.07、应计 −13.7 仍拿 8.28。
+        #    仅对实测红旗扣分；缺值不扣（缺维≠红旗）。
+        s_growth, _g1n_a = _gfb_mod.anchor_gate(s_growth, cagr3_input)
+        s_size_growth, _g1n_b = _gfb_mod.anchor_gate(s_size_growth, cagr3_input)
+        growth_anchor_note = _g1n_a or _g1n_b
+        quality_cash_flags = []
+        if isinstance(s_quality, (int, float)):
+            _ocf_ni, _accr = _quality_cash.get(code) or (None, None)
+            _q_pen = 0.0
+            if isinstance(_ocf_ni, (int, float)) and _ocf_ni == _ocf_ni and _ocf_ni < 0:
+                _q_pen += 2.0
+                quality_cash_flags.append("ocf_ni<0")
+            if isinstance(_accr, (int, float)) and _accr == _accr and _accr < -10:
+                _q_pen += 1.5
+                quality_cash_flags.append("accruals<-10")
+            if _q_pen > 0:
+                s_quality = max(0.0, s_quality - _q_pen)
         # 缺失市值/质量/成长时不参与（权重按可用维度归一），不臆造中位分
         # ⚠️ 2026-10-26 P0：_parts 改为 (维度键, 值, 权重) 三元组。
         #   原因：各维量程不统一（12 维 0-5 制 / 4 维 0-10 制），原实现直接加权 →
@@ -5570,6 +5630,9 @@ def main():
             "growth_period": _em_g.get("period"),
             "growth_src": growth_src,
             "growth_annual_ths": growth_map.get(code),   # 留档：同花顺年报口径旧值（滞后半年+）
+            # round129 门槛留痕：审计「成长溢价有无存续锚」「利润是否收现」
+            "growth_anchor_note": growth_anchor_note,
+            "quality_cash_flags": quality_cash_flags,
             # v3.5.1: Q3 预测景气加分审计（手工汇总表数据源，仅匹配个股有值）
             "q3_yoy": sustain_info.get("q3_yoy_eff"),
             "q3_yoy_raw": sustain_info.get("q3_yoy_raw"),
