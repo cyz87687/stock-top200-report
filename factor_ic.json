@@ -1,6 +1,6 @@
 {
  "date": "2026-11-04",
- "generated_at": "2026-11-05 00:34:25",
+ "generated_at": "2026-11-05 17:47:45",
  "method": {
   "name": "Rank IC（Spearman 秩相关，修正口径）",
   "formula": "IC(t→t+h) = Spearman(因子值_t 截面秩, 收益率 t→第h个后续交易日)",
@@ -15,7 +15,7 @@
   "bonferroni": "K=364（来源 trial_log；= legacy 304 + 已登记试验轮次）→ 阈值 |NW t|≥3.8129（=Φ⁻¹(1−0.05/2/364)，可复算）；若只算 legacy 304 次则为 3.7681；若只算本轮 30 次则为 3.144；宽松阈值 |t|≥2.0。⚠️ K 的**可证区间**是 364~804（下界=已登记试验轮次数；上界=把 42 个无法提取精确检验数的产物按已知中位数 8 补，**是估计不是实测**），故本阈值是「可证下界」口径；区间两端对应阈值 3.8129 ~ 4.0043，**不翻转任何已发布结论**。⚠️ 实测 bonferroni_sig 在 63 个口径中仅 2 个为 True（score_attention h=5、score_size h=5），定 verdict 的主要仍是宽松阈值"
  },
  "n_snapshots": 86,
- "n_snapshots_raw": 93,
+ "n_snapshots_raw": 94,
  "stale_snapshots_dropped": [
   "2026-09-25",
   "2026-10-01",
@@ -23,6 +23,7 @@
   "2026-10-05",
   "2026-10-06",
   "2026-10-07",
+  "2026-11-05",
   "2026-09-10"
  ],
  "contaminated_fields_stripped": [
@@ -9391,31 +9392,31 @@
       0.0867,
       0.0218,
       -0.0606,
-      0.0081
+      0.0072
      ],
-     "ic_mean": -0.0062,
+     "ic_mean": -0.0064,
      "ic_std": 0.0691,
-     "t_stat": -0.2,
-     "nw_t": -0.22,
+     "t_stat": -0.21,
+     "nw_t": -0.23,
      "bonferroni_sig": false,
      "nw_lag": 0,
      "nw_lag_adjusted_from": null,
      "nw_sensitivity": {
       "t_by_lag": {
-       "0": -0.22,
-       "1": -0.28,
-       "2": -0.44,
-       "3": -0.48,
-       "4": -0.53,
-       "6": -0.63,
-       "8": -0.71,
-       "12": -0.86,
-       "19": -1.07
+       "0": -0.23,
+       "1": -0.29,
+       "2": -0.45,
+       "3": -0.49,
+       "4": -0.55,
+       "6": -0.65,
+       "8": -0.73,
+       "12": -0.88,
+       "19": -1.09
       },
-      "t_min": -1.07,
-      "t_max": -0.22,
+      "t_min": -1.09,
+      "t_max": -0.23,
       "lag_andrews": 2,
-      "t_andrews": -0.44,
+      "t_andrews": -0.45,
       "robust_bonferroni": false,
       "flips": false
      },
@@ -9444,20 +9445,20 @@
        1079,
        1150,
        1191,
-       1107
+       1108
       ],
-      "ic_mean_after_gate": -0.0062,
+      "ic_mean_after_gate": -0.0064,
       "nw_lag_after_gate": 0,
       "nw_lag_adjusted_from": null,
-      "nw_t_after_gate": -0.22,
-      "t_stat_after_gate": -0.2,
+      "nw_t_after_gate": -0.23,
+      "t_stat_after_gate": -0.21,
       "win_rate_after_gate": 60.0,
       "ic_series_after_gate": [
        -0.0871,
        0.0867,
        0.0218,
        -0.0606,
-       0.0081
+       0.0072
       ],
       "n_effective_obs": 5.0,
       "usable": false,
@@ -9758,12 +9759,12 @@
       0.082,
       0.0322,
       -0.07,
-      0.0274,
-      0.1159
+      0.0277,
+      0.1149
      ],
      "ic_mean": 0.0392,
      "ic_std": 0.1226,
-     "t_stat": 2.95,
+     "t_stat": 2.94,
      "nw_t": 2.96,
      "bonferroni_sig": false,
      "nw_lag": 0,
@@ -9773,12 +9774,12 @@
        "0": 2.96,
        "1": 2.8,
        "2": 2.68,
-       "3": 2.61,
+       "3": 2.6,
        "4": 2.49,
        "6": 2.33,
        "8": 2.25,
        "12": 2.16,
-       "19": 2.27
+       "19": 2.26
       },
       "t_min": 2.16,
       "t_max": 2.96,
@@ -9862,8 +9863,8 @@
        0.082,
        0.0322,
        -0.07,
-       0.0274,
-       0.1159
+       0.0277,
+       0.1149
       ],
       "n_effective_obs": 16.0,
       "usable": false,
@@ -12462,7 +12463,7 @@
      -0.0753,
      0.2684,
      -0.1856,
-     -0.0493
+     -0.0492
     ],
     "ic_mean": 0.0446,
     "ic_std": 0.1554,
@@ -12563,7 +12564,7 @@
       -0.0753,
       0.2684,
       -0.1856,
-      -0.0493
+      -0.0492
      ],
      "n_effective_obs": 15.0,
      "usable": false,
@@ -13095,35 +13096,35 @@
  },
  "factor_correlation": {
   "score_fund|score_news": {
-   "mean": 0.151,
+   "mean": 0.154,
    "n": 17
   },
   "score_fund|score_oversold60": {
-   "mean": 0.23,
+   "mean": 0.236,
    "n": 17
   },
   "score_fund|score_bias60": {
-   "mean": 0.274,
+   "mean": 0.28,
    "n": 17
   },
   "score_fund|score_rsi_rev": {
-   "mean": 0.274,
+   "mean": 0.279,
    "n": 17
   },
   "score_fund|score_vol_pulse": {
-   "mean": 0.148,
+   "mean": 0.147,
    "n": 17
   },
   "score_fund|score_overbought": {
-   "mean": 0.163,
+   "mean": 0.165,
    "n": 17
   },
   "score_fund|score_theme_intrinsic": {
-   "mean": 0.194,
+   "mean": 0.196,
    "n": 17
   },
   "score_fund|score_attention": {
-   "mean": 0.15,
+   "mean": 0.151,
    "n": 17
   },
   "score_news|score_oversold60": {
@@ -13135,7 +13136,7 @@
    "n": 17
   },
   "score_news|score_rsi_rev": {
-   "mean": 0.178,
+   "mean": 0.179,
    "n": 17
   },
   "score_news|score_vol_pulse": {
@@ -13151,7 +13152,7 @@
    "n": 17
   },
   "score_news|score_attention": {
-   "mean": 0.379,
+   "mean": 0.378,
    "n": 17
   },
   "score_oversold60|score_bias60": {
@@ -13441,7 +13442,7 @@
     0.1149,
     -0.0722,
     -0.0667,
-    0.1506
+    0.1499
    ],
    "ic_mean": 0.0526,
    "ic_std": 0.165,
@@ -13453,7 +13454,7 @@
    "nw_sensitivity": {
     "t_by_lag": {
      "0": 2.96,
-     "1": 2.88,
+     "1": 2.87,
      "2": 2.84,
      "3": 2.88,
      "4": 2.91,
@@ -13523,11 +13524,11 @@
      1450,
      1365
     ],
-    "ic_mean_after_gate": 0.0643,
+    "ic_mean_after_gate": 0.0642,
     "nw_lag_after_gate": 0,
     "nw_lag_adjusted_from": null,
     "nw_t_after_gate": 2.36,
-    "t_stat_after_gate": 2.29,
+    "t_stat_after_gate": 2.28,
     "win_rate_after_gate": 62.5,
     "ic_series_after_gate": [
      0.0527,
@@ -13545,7 +13546,7 @@
      0.1149,
      -0.0722,
      -0.0667,
-     0.1506
+     0.1499
     ],
     "n_effective_obs": 16.0,
     "usable": false,
@@ -14045,7 +14046,7 @@
    "cross_section_max": 1897,
    "n_below_gate": 69,
    "n_after_gate": 16,
-   "ic_mean_after_gate": 0.0643,
+   "ic_mean_after_gate": 0.0642,
    "nw_t_after_gate": 2.36,
    "usable": false,
    "gated_note": "16 个截面 / h=1 → **有效独立观测仅 16.0** (< 30)。逐日截面在 h=1 窗口下重叠 0/1，不能当作 16 个独立证据；lag=0 的 NW t 在此样本量下**无信息量**（纯噪声亦可达 3+）。⇒ 该周期的 IC / t 值不得作为权重依据，只能说「当前样本跨度不足以检验 h=1」",
@@ -14239,8 +14240,8 @@
    "min_cross_section_gate": 200,
    "pool_size_config": 0,
    "pool_size_config_note": "v4.11（老大 2026-10-26 指令「不再有500只的限制，筛选完之后初筛池每只股票都要拉数据跑一遍评分」）：**0 = 不限规模**，apply_pool_rules 跳过分层抽样与一切截断，初筛池（实测 1898 只）全量进 step2 完整评分。⚠️ 0 的语义必须由 fetch_top200_sina.POOL_UNLIMITED 统一解释——原实现 `if user.get('pool_size')` 会把 0 当假值静默回退缺省 500，限流开关形同虚设。⚠️ 反向改回有限值（如 500）即恢复分层抽样，两处行为差异只由这一个数字控制，不需要改代码。",
-   "production_pool_size": 2174,
-   "production_pool_source": "top200_scored_2026-11-04.json",
+   "production_pool_size": 2190,
+   "production_pool_source": "top200_scored_2026-11-05.json",
    "median_of_medians": 194,
    "n_zero_rows": 1,
    "n_zero_by_reason": {
@@ -24266,6 +24267,9 @@
     }
    }
   },
+  "kernel": null,
+  "results_kernel": null,
+  "evidence_boundary": null,
   "yearly_liq": {
    "h1": {
     "2020": {
@@ -24622,11 +24626,172 @@
   "note": "⚠️ 这是唯一可引用 IC 口径。判据链：① n_effective_obs = n/h 必须 ≥30，否则 NW t 无信息量（纯噪声 n=82/lag=19 时 |t|95% 已达 2.69）；② 必须同时过同 (n,lag) 的白噪声临界值；③ 必须过 Bonferroni（k 走 trial_log.n_trials()）。旧 factor_history 口径（本文件上方 factors/tradable_*）截面中位仅 194 只、h=20 门槛后 n=0，**不得**用于权重论证。"
  },
  "notes": [
-  "有效截面 86 个交易日（2026-06-26 ~ 2026-11-04），剔除非交易日陈旧快照 7 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差；价格 store 日常自动增量刷新，--bootstrap-prices 全量重建）",
+  "有效截面 86 个交易日（2026-06-26 ~ 2026-11-04），剔除非交易日陈旧快照 8 个；收益对 t 日全部 TOP200 个股计算（消除留存偏差；价格 store 日常自动增量刷新，--bootstrap-prices 全量重建）",
   "IC 衡量排序能力而非绝对收益；分层多空为未扣成本毛利口径",
   "TOP200 为高换手关注度筛选池：动量/关注型因子的负向 IC 更可能反映'关注度脉冲后的均值回复'，而非因子构造错误；解读时须结合本池的选择机制",
   "⚠️ total 的 IC 使用历史快照中「当时实际产出的 total 字段」，跨越 4→5→10 维三次口径变更，故 total IC 是分段混合口径的加权结果，不代表当前 v3.6 权重的真实预测力；评估当前权重应看 current_weights_composite_ic（按现权重重算）与 tradable_ic。",
   "v3.6-fund-led 口径自 2026-10-24 生效，需累计 ≥20 个新截面后 current_weights_composite_ic 才具参考意义。",
   "历史截面来自 git 提交记录（含早期综合行业归类版本，v2.46 已修复）"
- ]
+ ],
+ "weight_optimization": {
+  "version": "v3.6-fund-led",
+  "fitted_at": "2026-11-05 17:47:45",
+  "target_horizon": 1,
+  "method": "v3.6 基本面主导: 以全样本可验证维度为主(fund/news)，反转块等权压缩消除共线性虚增，小样本维度降至地板; 走步验证(训练≥30截面,每5截面重拟,样本外比对); score_sector 有效样本<20 维持0.10(样本积累中)",
+  "weights": {
+   "score_fund": 0.6,
+   "score_news": 0.0,
+   "score_oversold60": 0.0,
+   "score_bias60": 0.15,
+   "score_rsi_rev": 0.15,
+   "score_vol_pulse": 0.0,
+   "score_overbought": 0.0,
+   "score_theme_intrinsic": 0.0,
+   "score_attention": 0.0,
+   "score_sector": 0.1
+  },
+  "prior_weights": {
+   "score_fund": 0.6,
+   "score_news": 0.0,
+   "score_oversold60": 0.0,
+   "score_bias60": 0.15,
+   "score_rsi_rev": 0.15,
+   "score_vol_pulse": 0.0,
+   "score_overbought": 0.0,
+   "score_theme_intrinsic": 0.0,
+   "score_attention": 0.0,
+   "score_sector": 0.1
+  },
+  "adopted": "prior",
+  "walkforward": {
+   "n_oos_dates": 0,
+   "oos_ic_prior": null,
+   "oos_ic_new": null,
+   "oos_t_new": null,
+   "lambda": null,
+   "note": "十维池内截面 1 < MIN_TRAIN(30)，样本外观测不足 → 维持先验权重（每日重估登记，满 30 后自动启用走步验证）"
+  },
+  "full_period_composite_ic": {
+   "prior": {
+    "1": {
+     "n": 1,
+     "ic_mean": -0.1532,
+     "nw_t": null,
+     "win_rate": 0.0
+    },
+    "5": {
+     "n": 1,
+     "ic_mean": -0.0272,
+     "nw_t": null,
+     "win_rate": 0.0
+    },
+    "20": {
+     "n": 0,
+     "ic_mean": null,
+     "nw_t": null,
+     "win_rate": null
+    }
+   },
+   "lam_best": {
+    "1": {
+     "n": 1,
+     "ic_mean": -0.1532,
+     "nw_t": null,
+     "win_rate": 0.0
+    },
+    "5": {
+     "n": 1,
+     "ic_mean": -0.0272,
+     "nw_t": null,
+     "win_rate": 0.0
+    },
+    "20": {
+     "n": 0,
+     "ic_mean": null,
+     "nw_t": null,
+     "win_rate": null
+    }
+   }
+  },
+  "factor_ic_target_h": {
+   "score_fund": -0.0898,
+   "score_news": -0.1517,
+   "score_oversold60": -0.0748,
+   "score_bias60": -0.2116,
+   "score_rsi_rev": -0.1522,
+   "score_vol_pulse": -0.0565,
+   "score_overbought": -0.0633,
+   "score_theme_intrinsic": -0.3277,
+   "score_attention": -0.1985
+  },
+  "lambda_scan": [
+   {
+    "lambda": 0.0,
+    "n_oos": 0,
+    "oos_ic_mean": null,
+    "oos_t": null,
+    "oos_win_rate": null
+   },
+   {
+    "lambda": 0.2,
+    "n_oos": 0,
+    "oos_ic_mean": null,
+    "oos_t": null,
+    "oos_win_rate": null
+   },
+   {
+    "lambda": 0.4,
+    "n_oos": 0,
+    "oos_ic_mean": null,
+    "oos_t": null,
+    "oos_win_rate": null
+   },
+   {
+    "lambda": 0.6,
+    "n_oos": 0,
+    "oos_ic_mean": null,
+    "oos_t": null,
+    "oos_win_rate": null
+   },
+   {
+    "lambda": 0.8,
+    "n_oos": 0,
+    "oos_ic_mean": null,
+    "oos_t": null,
+    "oos_win_rate": null
+   },
+   {
+    "lambda": 1.0,
+    "n_oos": 0,
+    "oos_ic_mean": null,
+    "oos_t": null,
+    "oos_win_rate": null
+   }
+  ],
+  "notes": [
+   "复合总分由 9 维分量按权重线性合成后与未来收益求 Rank IC（与生产 total 口径一致，score_sector 因样本不足未纳入复合评估，权重固定 0.10）",
+   "训练窗因子 IC 仅使用基准快照 T+1 收益完整落在训练窗内的观测，避免边界泄漏",
+   "样本外日期集合对先验与 IC 驱动权重完全相同，公平比对",
+   "先验权重与生产同源（factor_weights.json prior_weights），拟合失败时回退该先验"
+  ],
+  "ic_driven_guard": {
+   "verdict": "DIAGNOSTIC_ONLY",
+   "reason": "本结果按 IC 比例分配权重，未经 TopN 超额对照，不得直接作为生产权重",
+   "optimizer_objective": "cross_section_IC",
+   "production_objective": "TopN_head_excess",
+   "ic_rank_rho": null,
+   "n_common_dims": 2,
+   "required_before_adoption": [
+    "在 data/weight_scheme_curve.json 口径下补 N6/N10/N13/N30/N50 超额对照",
+    "过 weight_admission_gate.py 五门",
+    "八处同步 + verify_weights_round36.py PASS"
+   ]
+  }
+ },
+ "weight_optimization_skipped_overwrite": {
+  "current_version": "v4.19-c1-sustain-gates",
+  "attempted_version": "v3.6-fund-led",
+  "written_to": "factor_weights_optimized_20261105.json",
+  "reason": "现存权重为受约束管理版本（含 weight_constraints 或 v4.x），禁止被 v3.6 拟合结果整份覆盖。如需强制覆盖请加 --force-overwrite-weights。"
+ }
 }
