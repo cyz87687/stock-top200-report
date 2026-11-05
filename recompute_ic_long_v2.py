@@ -140,7 +140,7 @@ def main():
         print("  ⚠️ 代码顺序不同，已重排对齐")
     kdmap = {d: i for i, d in enumerate(kdates)}
 
-    # 权重数组（只含面板里真实存在的维）
+    # 权重数组（只含面板里真实存在的维）—— legacy 对照口径专用
     wv = np.zeros(len(dims), dtype=np.float64)
     for i, d in enumerate(dims):
         wv[i] = W.get(d, 0.0) / DIM_MAX.get(d, 10.0)
@@ -148,13 +148,59 @@ def main():
         f"{d}={wv[i]:.4f}" for i, d in enumerate(dims)))
     print(f"  Σ原始权重 = {sum(W.get(d,0) for d in dims):.2f}")
 
-    # 预先算好「分母」（有值维的权重和），raw/liq/trad 三档共用
-    mask = ~np.isnan(S)                            # (D, N, 8) bool
-    Sf = np.where(mask, S, 0.0).astype(np.float64)
-    num_all = Sf @ wv                              # (D, N)
-    den_all = mask.astype(np.float64) @ wv          # (D, N)
-    with np.errstate(invalid="ignore", divide="ignore"):
-        comp = np.where(den_all > 1e-9, num_all / np.maximum(den_all, 1e-12), np.nan)
+    # ⭐ round130 / P0-1：合成分统一到生产唯一内核 scale_calc.composite_total。
+    #   旧口径 comp = (S @ W/DMAX) / (mask @ W/DMAX) 的分母**随个股缺维数变化**，
+    #   与生产「固定名义权重分母 + 缺维中性填充」不是同一把尺子；用它算出的 IC
+    #   不能作为生产模型的证据（审计 §三.2）。
+    #   `composite_total_matrix` 是同一函数的向量化等价实现，selfcheck 用真实
+    #   面板逐股验证二者相等；因此「同一输入、同一时点、逐股总分一致」可证。
+    from scoring_core import (artifact_meta, classify_artifact,
+                              composite_total_matrix, selfcheck)
+    KERNEL_MODE = os.environ.get("IC_KERNEL_MODE", "production").strip().lower()
+    if KERNEL_MODE not in ("production", "legacy"):
+        raise SystemExit(f"❌ IC_KERNEL_MODE 只能是 production/legacy，收到 {KERNEL_MODE!r}")
+
+    if KERNEL_MODE == "production":
+        comp, _kmeta = composite_total_matrix(S, dims, W, DIM_MAX)
+        print(f"  ✅ 合成内核 = production（统一量尺）: 固定分母 Σw="
+              f"{_kmeta['denominator']:.4f}, 盲区中性填充权重="
+              f"{_kmeta['blind_weight']:.4f}, 量程={_kmeta['scale']}")
+    else:
+        # 仅供口径对照；默认禁用。缺维从分母剔除 = 已废弃的旧口径。
+        mask = ~np.isnan(S)
+        Sf = np.where(mask, S, 0.0).astype(np.float64)
+        num_all = Sf @ wv
+        den_all = mask.astype(np.float64) @ wv
+        with np.errstate(invalid="ignore", divide="ignore"):
+            comp = np.where(den_all > 1e-9,
+                            num_all / np.maximum(den_all, 1e-12), np.nan)
+        _kmeta = {"denominator": "per_row_variable", "scale": "legacy_0_10"}
+        print("  ⚠️ 合成内核 = legacy（旧口径，仅供对照，产物不得引用为生产证据）")
+
+    # 真实面板一致性自检：向量化版 vs 生产标量版，逐股最大绝对误差
+    _sc = selfcheck(S[:min(3, len(S))], dims, W, DIM_MAX, sample=256)
+    if not _sc["passed"]:
+        raise SystemExit(f"❌ 内核一致性自检失败: {_sc}")
+    print(f"  ✅ 内核一致性自检 PASS: {_sc['n_checked']} 股逐股比对，"
+          f"max|Δ|={_sc['max_abs_diff']:.2e}")
+
+    # --selfcheck 模式：只验证内核，不重算 IC、不写产物（避免误改证据链）
+    if "--selfcheck" in sys.argv:
+        print("\n--selfcheck 完成：未写出任何产物。")
+        return 0
+
+    _kernel_meta = artifact_meta(
+        kernel_mode=KERNEL_MODE, factor_parity=False,
+        extra={
+            "composite": _kmeta,
+            "selfcheck": _sc,
+            "artifact_class": classify_artifact(
+                artifact_meta(kernel_mode=KERNEL_MODE, factor_parity=False)),
+            "migration_note": (
+                "production 内核与 legacy 量尺的合成分不是仿射等比缩放"
+                "（旧分母逐行变化）→ IC/超额数字可能与旧版不同，跨内核禁直接比较。"
+                "本次切换需同步重跑 factor_eval.py / ic_dsr.py / 页面后方可引用。"),
+        })
     print(f"  总分矩阵 {comp.shape}，有值行占比 "
           f"{np.mean(np.isfinite(comp)):.2%}")
 
@@ -303,8 +349,13 @@ def main():
             "effective_weight_sum": round(sum(float(W.get(d, 0))
                                               for d in dims), 4),
             "coverage_note": ("长面板 IC 只在「面板里实际有列」的维度上成立；"
-                              "缺维从分母剔除、禁 or 0。effective_weight_sum < 1.0 "
-                              "的差额即从未被本检验覆盖的名义权重。"),
+                              "effective_weight_sum < 1.0 的差额即从未被本检验"
+                              "覆盖的名义权重。⚠️ round130 起 production 内核对"
+                              "盲区做中性填充（固定分母），不再从分母剔除。"),
+            # ⭐ round130 / P0-1：产物绑定代码与数据指纹，供页面/报告校验代际。
+            "kernel": _kernel_meta,
+            "results_kernel": KERNEL_MODE,
+            "evidence_boundary": _kernel_meta["artifact_class"]["verdict"],
             "dim_max": DIM_MAX,
             "min_cross_section": MIN_CS,
             "min_amount_wan": MIN_AMOUNT,

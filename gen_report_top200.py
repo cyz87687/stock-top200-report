@@ -6071,6 +6071,26 @@ if quant_json or ai_pick_names:
         _lp_dsr = (_lph.get("dsr") or {}).get("dsr")
         _lp_dsr_sig = (_lph.get("dsr") or {}).get("significant")
 
+        # ⭐ round130 / P0-1 内核守卫：长面板 IC 只有在「内核指纹一致 + 因子逐维复现」
+        #   时才能作为生产模型证据。现有 factor_ic.json 的 long_panel_ic 未绑定
+        #   kernel_id（旧代际产物）→ 判 UNKNOWN，页面必须显式披露，不得默认互证。
+        try:
+            import scoring_core as _SC
+            _lp_kernel = _SC.classify_artifact(_lp.get("kernel") or {}, strict=True)
+        except Exception as _ke:
+            _lp_kernel = {"status": "UNKNOWN", "comparable": False,
+                          "reason": f"内核守卫执行失败：{str(_ke)[:120]}",
+                          "verdict": "禁止用于证明当前生产模型有效性",
+                          "disclosure": "内核守卫不可用，按 UNKNOWN 从严处理"}
+        _lp_kernel_txt = (
+            f'<b>内核一致性守卫（round130 / P0-1）</b>：长面板产物状态 '
+            f'<code>{_lp_kernel["status"]}</code>'
+            + (f'（产物 {_lp_kernel.get("kernel_id") or "未绑定"} / '
+               f'当前生产 {_lp_kernel.get("current_kernel_id", "?")}）'
+               if not _lp_kernel["comparable"] else '')
+            + f' → <b>{_lp_kernel["verdict"]}</b>。'
+            + (_lp_kernel.get("disclosure") or _lp_kernel["reason"]))
+
         if _lp_ok or _nh20 == 0 or _noos == 0:
             _rows_ev = []
             # ① 长面板（权威口径）
@@ -6088,6 +6108,8 @@ if quant_json or ai_pick_names:
                     '<b>链路 B（权威）</b> 长面板 h=20 尚不可用'
                     f'（<code>long_panel_ic.available={_lp.get("available")}</code>）→ '
                     '需先跑 <code>recompute_ic_long_v2.py</code>。')
+            # ⭐ round130：内核守卫结论必须紧跟长面板数字，避免读者误当作生产证据
+            _rows_ev.append(_lp_kernel_txt)
             # ② 短窗快照（这是「近端截面太小」，不是「h=20 无证据」）
             if _nh20 == 0:
                 _rows_ev.append(

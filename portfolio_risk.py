@@ -59,6 +59,9 @@ OUT = os.path.join(HERE, 'portfolio_risk.json')
 TRADING_DAYS = 244
 MIN_DAYS_FOR_VOL = 8        # 与 portfolio_metrics.MIN_DR 同口径，防小样本伪值
 MIN_DAYS_FOR_BETA = 20      # beta 需要更多点，否则 cov/var 比值极不稳定
+# ⭐ round130 / P0-2：有效持仓权重覆盖率下限。低于此值说明大量持仓无价，
+#   此时缺价被隐式当作「当日 0 收益」会系统性低估波动/回撤 → 拒绝出结论。
+MIN_PRICE_COVERAGE = 0.80
 
 CAVEATS = [
     "窗口=回望60个交易日（组合日==数据截止日时无未来数据）：度量的是**持仓结构的固有风险**，不是未来收益预测",
@@ -197,7 +200,11 @@ def compute_one(pf, px, cal, bench_codes=None):
     codes = [_c6(r.get('code')) for r in picks]
 
     # ── 逐日组合收益（占总资产口径，现金 0 收益）──
+    # ⭐ round130 / P0-2：wsum 原先算出来**从未使用** → 缺价持仓被静默当作
+    #   0 收益，且无人知道当天到底覆盖了多少权重。现在逐日记录覆盖率。
     days = []
+    cov_list = []
+    denom_w = sum(abs(float(x)) for x in w_asset.values()) or 1.0
     prev = {}
     for i in range(i_start, len(cal) if mode_w == 'forward' else i0 + 1):
         d = cal[i]
@@ -218,12 +225,44 @@ def compute_one(pf, px, cal, bench_codes=None):
                 ret += w * (cur[c] - prev[c]) / prev[c]
                 wsum += w
         days.append((d, ret, len(cur)))
+        cov_list.append(wsum / denom_w)
         prev = cur
 
     n_days = len(days) - 1
     out['n_days'] = n_days
     if n_days < 2:
         out['reason'] = f'路径仅 {n_days} 个交易日，不足 2 天'
+        return out
+
+    # ⭐ round130 / P0-2：行情覆盖门禁必须**先于**任何风险结论。
+    #   覆盖率 = 当日有价持仓权重 / 全部持仓权重；分母不用 w_total 是因为
+    #   weights 已按 4 位小数舍入，两者可能有微小差异。
+    if cov_list:
+        out['price_coverage_mean'] = round(sum(cov_list) / len(cov_list), 4)
+        out['price_coverage_min'] = round(min(cov_list), 4)
+        out['n_days_below_coverage'] = sum(
+            1 for c in cov_list if c < MIN_PRICE_COVERAGE)
+    else:
+        out['price_coverage_mean'] = None
+        out['price_coverage_min'] = None
+        out['n_days_below_coverage'] = n_days
+    out['coverage_threshold'] = MIN_PRICE_COVERAGE
+    out['coverage_gate_ok'] = bool(
+        out['price_coverage_mean'] is not None
+        and out['price_coverage_mean'] >= MIN_PRICE_COVERAGE)
+    out['missing_price_policy'] = (
+        '区间内无价持仓当日按 0 收益处理；仅当有效权重覆盖率 ≥ '
+        f'{MIN_PRICE_COVERAGE:.0%} 时才输出波动/回撤/收益/beta 结论')
+    if not out['coverage_gate_ok']:
+        for _k in ('mdd', 'mdd_at', 'period_ret', 'vol_ann',
+                   'vol_ann_of_equity', 'beta_vs_pool'):
+            out[_k] = None
+        out['reason'] = (
+            f"有效持仓权重覆盖率均值 {out['price_coverage_mean']} < "
+            f"{MIN_PRICE_COVERAGE:.0%}"
+            f"（{out['n_days_below_coverage']}/{n_days} 天不足）→ "
+            "缺价不可无条件视作零收益，波动/回撤/收益/beta 结论不予输出")
+        out['computable'] = False
         return out
 
     # 净值（从 1.0 起，含现金的 0 收益 → 组合净值 = 1 + 累计加权收益）

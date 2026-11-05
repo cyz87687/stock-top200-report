@@ -337,7 +337,14 @@ class TestTwoSidedExposure(unittest.TestCase):
 
 
 class TestLoadWTotal(unittest.TestCase):
-    """10：仓位来源的各种降级路径都必须**显式标注**，禁静默满仓。"""
+    """10：仓位来源降级路径必须**不扩大风险**且显式标注（round130 / P0-2 新契约）。
+
+    ⭐ 行为变更根因：旧实现的六条故障分支一律回退**满仓 1.0**，属于
+       「故障扩大风险」；且 final_hi=0 被误判为越界。round130 改为
+       故障默认回退空仓 0.0、降级产物 executable=False、0 仓位合法。
+       本类断言相应收紧（新增 executable / budget_status / 0 仓位合法性），
+       **未放宽任何原有检查**。
+    """
 
     def _write(self, obj):
         f = tempfile.NamedTemporaryFile('w', suffix='.json', delete=False,
@@ -347,11 +354,16 @@ class TestLoadWTotal(unittest.TestCase):
         self.addCleanup(os.unlink, f.name)
         return f.name
 
+    def _assert_safe_degrade(self, w, info, keyword):
+        self.assertEqual(w, 0.0, '故障不得放大到满仓')
+        self.assertTrue(info['fallback'])
+        self.assertFalse(info['executable'], '降级产物不得标为可执行')
+        self.assertEqual(info['budget_status'], 'FALLBACK_ZERO')
+        self.assertIn(keyword, info['note'])
+
     def test_missing_file_falls_back_with_note(self):
         w, info = pp.load_w_total('/tmp/__definitely_not_here_round122.json')
-        self.assertEqual(w, 1.0)
-        self.assertTrue(info['fallback'])
-        self.assertIn('未找到', info['note'])
+        self._assert_safe_degrade(w, info, '未找到')
 
     def test_gate_blocked_falls_back(self):
         """日期门禁未通过时仓位建议不可用（沿用 v1 铁律）。"""
@@ -360,9 +372,7 @@ class TestLoadWTotal(unittest.TestCase):
                          'combine': {'final_hi': 0.2, 'final_lo': 0.0,
                                      'available': True}})
         w, info = pp.load_w_total(p)
-        self.assertEqual(w, 1.0)
-        self.assertTrue(info['fallback'])
-        self.assertIn('门禁', info['note'])
+        self._assert_safe_degrade(w, info, '门禁')
 
     def test_valid_file_returns_final_hi(self):
         p = self._write({'date': '2026-11-03',
@@ -372,15 +382,35 @@ class TestLoadWTotal(unittest.TestCase):
         w, info = pp.load_w_total(p)
         self.assertAlmostEqual(w, 0.2, places=9)
         self.assertFalse(info['fallback'])
+        self.assertTrue(info['executable'])
+        self.assertEqual(info['budget_status'], 'OK')
         self.assertEqual(info['bound_by'], '情绪阶梯')
 
     def test_out_of_range_falls_back(self):
-        for bad in (0.0, -0.3, 1.5):
+        # 0.0 已从「非法值」改为「合法空仓决策」，单独在下面断言
+        for bad in (-0.3, 1.5):
             p = self._write({'gate': {'ok': True},
                              'combine': {'final_hi': bad, 'available': True}})
             w, info = pp.load_w_total(p)
-            self.assertEqual(w, 1.0, f'final_hi={bad} 应降级')
-            self.assertTrue(info['fallback'])
+            self._assert_safe_degrade(w, info, 'final_hi')
+
+    def test_zero_budget_is_legal_and_executable(self):
+        """P0-2：合法 0 仓位必须保留，且标为可执行决策（不是降级）。"""
+        p = self._write({'gate': {'ok': True},
+                         'combine': {'final_hi': 0.0, 'available': True}})
+        w, info = pp.load_w_total(p)
+        self.assertEqual(w, 0.0)
+        self.assertFalse(info['fallback'])
+        self.assertTrue(info['executable'])
+        self.assertEqual(info['budget_status'], 'OK')
+
+    def test_full_fallback_is_explicit_and_not_executable(self):
+        """即使显式要求回满仓（对照），产物也必须标为不可执行。"""
+        w, info = pp.load_w_total('/tmp/__no_such_budget_round130.json',
+                                  fallback_mode='full')
+        self.assertEqual(w, 1.0)
+        self.assertFalse(info['executable'])
+        self.assertEqual(info['budget_status'], 'FALLBACK_FULL_EXPOSURE')
 
     def test_corrupt_json_falls_back(self):
         f = tempfile.NamedTemporaryFile('w', suffix='.json', delete=False,
@@ -389,9 +419,7 @@ class TestLoadWTotal(unittest.TestCase):
         f.close()
         self.addCleanup(os.unlink, f.name)
         w, info = pp.load_w_total(f.name)
-        self.assertEqual(w, 1.0)
-        self.assertTrue(info['fallback'])
-        self.assertIn('解析失败', info['note'])
+        self._assert_safe_degrade(w, info, '解析失败')
 
 
 class TestConfigHonesty(unittest.TestCase):

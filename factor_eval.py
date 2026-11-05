@@ -2873,6 +2873,12 @@ def main():
                 "min_amount_wan": _li.get("min_amount_wan"),
                 "neff_min": _li.get("neff_min"),
                 "horizons": _pick,
+                # ⭐ round130 / P0-1：把长面板产物的内核指纹原样透传到页面唯一入口，
+                #   供 gen_report_top200.py 的 classify_artifact() 校验代际。
+                #   旧产物没有这些键 → 守卫判 UNKNOWN 并强制披露，不会静默互证。
+                "kernel": _li.get("kernel"),
+                "results_kernel": _li.get("results_kernel"),
+                "evidence_boundary": _li.get("evidence_boundary"),
                 "yearly_liq": _li.get("yearly_liq"),
                 "leave_one_year_out_liq": _li.get("leave_one_year_out_liq"),
                 "dim_detail": _dim,

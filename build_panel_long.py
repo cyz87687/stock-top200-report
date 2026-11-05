@@ -471,6 +471,15 @@ def main():
             "score_bias60", "score_rsi_rev", "score_lowvol20", "score_tech_neg",
             "score_size_growth", "score_ep", "score_quality", "score_growth",
             "score_dominant", "score_fund"]
+    # ⭐ round130 / P0-1：面板产物必须绑定生产内核指纹，并显式声明「因子是代理」。
+    #   这样下游 classify_artifact() 会判为 PROXY_ONLY，自动禁止把本面板的 IC
+    #   写作当前生产模型的证据。局部 import 避免影响本脚本的既有导入顺序。
+    from scoring_core import artifact_meta, classify_artifact
+    _kernel_meta = artifact_meta(
+        kernel_mode="proxy_panel", factor_parity=False,
+        extra={"producer": "build_panel_long.py",
+               "artifact_class": classify_artifact(
+                   artifact_meta(kernel_mode="proxy_panel", factor_parity=False))})
     panel = {
         "version": "round124-long",
         "meta": {
@@ -502,7 +511,22 @@ def main():
             "dim_max": {"score_bias60": DIM_MAX_REV, "score_rsi_rev": DIM_MAX_REV,
                         "其余": DIM_MAX_STD},
             "pit": {"mode": "strict", "rule": _PERIOD_DEADLINE,
-                    "note": "报告期按法定披露截止日截断，1231 算次年 4/30"},
+                    "note": "报告期按法定披露截止日截断，1231 算次年 4/30",
+                    "provenance": "statutory_deadline_approx",
+                    "limitation": ("无真实公告时点/延期/历史修订版本 → 仅近似 PIT；"
+                                   "真实覆盖率见 pit_store.audit_cache() 回执")},
+            # ⭐ round130 / P0-1：产物绑定内核指纹 + 明示代理因子，禁止误用
+            "kernel": _kernel_meta,
+            "factor_parity": False,
+            "factor_proxies": {
+                "score_size_growth": "流通市值分位，非生产 size_growth 复合分",
+                "score_quality": "ROE 单指标分位，非生产三族质量分",
+                "score_growth": "归母净利同比分位，非生产成长存量+方式B+三门槛",
+                "score_fund": "逐日资金流无历史快照 → 全 None（真盲区）",
+            },
+            "evidence_boundary": ("PROXY_ONLY：本面板未逐维复现生产算法，"
+                                  "其 IC/超额只能作历史代理诊断，"
+                                  "禁止用于证明当前生产模型有效性"),
         },
         "dates": [dates[i] for i in use_days],
         "domain": codes,

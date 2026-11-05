@@ -410,34 +410,52 @@ def _base_shares_of(cands):
     return {k: v / n for k, v in acc.items()}
 
 
-def load_w_total(regime_path=None):
+def load_w_total(regime_path=None, fallback_mode="zero"):
     """从 regime_forecast.json 读「股票仓位上限」作为 w_total。
 
-    v4.18 P0-3（round122）：此前 `regime_model.risk_budget()` 算出 final_hi=0.2
-    （今日只该 2 成仓），但 pick_portfolio **完全不读它**，输出里也没有 weights
-    字段 —— 风险预算算给空气。此处把它接成真实权重来源。
+    v4.18 P0-3（round122）：把 regime 风险预算接成真实权重来源。
+    ⭐ round130 / P0-2：修复「任何预算故障都回退**满仓 1.0**」——
+      缺文件 / 解析失败 / 门禁失败 / 字段缺失 / 非数值 / 越界六条分支
+      原本一律放大到 100% 股票仓位，是**故障扩大风险**，且 0 预算
+      被当成非法值。现在：
+        ① 故障默认回退 **0 仓位（空仓）**，绝不放大风险；
+        ② 合法 `final_hi=0` 保留，且 `executable=True`（0 仓位是有效决策）；
+        ③ 所有降级产物 `executable=False`，下游不得标为可执行建议；
+        ④ 只有显式 `--risk-fallback full`（对照模式）才回满仓，并留痕。
 
-    返回 (w_total, info)。w_total ∈ (0,1]；读不到则 1.0 并**显式标注降级**，
-    绝不静默按满仓处理。
+    返回 (w_total, info)；info 必带 `executable` 与 `budget_status`。
     """
     p = regime_path or os.path.join(HERE, 'regime_forecast.json')
+    label = {"zero": "空仓 0.0", "conservative": "保守仓",
+             "full": "满仓 1.0（显式对照）"}.get(fallback_mode, "空仓 0.0")
     info = {'source': None, 'available': False, 'date': None,
             'gate_ok': None, 'final_hi': None, 'final_lo': None,
-            'bound_by': None, 'fallback': False, 'note': None}
+            'bound_by': None, 'fallback': False, 'note': None,
+            'executable': False, 'budget_status': 'unread',
+            'fallback_mode': fallback_mode}
+
+    def _degrade(reason):
+        if fallback_mode == "full":
+            w, st = 1.0, "FALLBACK_FULL_EXPOSURE"
+        elif fallback_mode == "conservative":
+            w = float(os.environ.get("RISK_FALLBACK_CONSERVATIVE", "0.2"))
+            st = "FALLBACK_CONSERVATIVE"
+        else:
+            w, st = 0.0, "FALLBACK_ZERO"
+        info.update({'note': f"{reason} → 按 fallback_mode={fallback_mode} "
+                             f"降级为 {label}（不静默按满仓处理）",
+                     'fallback': True, 'budget_status': st,
+                     'executable': False, 'w_total_fallback': w})
+        return w, info
+
     if not os.path.exists(p):
-        info['note'] = f"未找到 {os.path.basename(p)}，w_total 降级为满仓 1.0"
-        info['fallback'] = True
-        return 1.0, info
+        return _degrade(f"未找到 {os.path.basename(p)}")
     try:
-        # ⚠️ 必须用 with 关句柄：裸 `json.load(open(...))` 在 CPython 里靠
-        #   引用计数立即回收，看起来「没事」，但一旦抛异常或换实现就会泄漏。
-        #   round122 单测（ResourceWarning）暴露了这一点。
+        # ⚠️ 必须用 with 关句柄（round122 ResourceWarning 单测暴露过裸 open 泄漏）。
         with open(p, encoding='utf-8') as _f:
             d = json.load(_f)
     except Exception as e:
-        info['note'] = f"regime_forecast 解析失败({str(e)[:40]})，w_total 降级为满仓 1.0"
-        info['fallback'] = True
-        return 1.0, info
+        return _degrade(f"regime_forecast 解析失败({str(e)[:40]})")
     info['source'] = os.path.basename(p)
     info['date'] = d.get('date') or d.get('data_date')
     gate = d.get('gate') or {}
@@ -446,28 +464,58 @@ def load_w_total(regime_path=None):
     info['final_hi'] = cb.get('final_hi')
     info['final_lo'] = cb.get('final_lo')
     info['bound_by'] = cb.get('bound_by')
-    info['available'] = bool(cb.get('available'))
-    # 🔒 日期门禁：指数最新交易日必须等于数据日，否则仓位建议不可用（沿用 v1 铁律）
+    info['available'] = cb.get('available')
+    # 🔒 日期门禁：指数最新交易日必须等于数据日，否则仓位建议不可用（v1 铁律）
     if gate and gate.get('ok') is False:
-        info['note'] = f"风险预算日期门禁未通过（{gate.get('detail')}），w_total 降级为满仓 1.0"
-        info['fallback'] = True
-        return 1.0, info
+        return _degrade(f"风险预算日期门禁未通过（{gate.get('detail')}）")
+    # 显式 False 才算预算未就绪；字段缺失沿用旧行为（避免历史产物被误判）
+    if cb.get('available') is False:
+        return _degrade("combine.available=False（风险预算尚未就绪）")
     _fh = cb.get('final_hi')
     if _fh is None:
-        info['note'] = "combine.final_hi 缺失，w_total 降级为满仓 1.0"
-        info['fallback'] = True
-        return 1.0, info
+        return _degrade("combine.final_hi 缺失")
     try:
         w = float(_fh)
     except (TypeError, ValueError):
-        info['note'] = f"combine.final_hi={_fh!r} 非数值，w_total 降级为满仓 1.0"
-        info['fallback'] = True
-        return 1.0, info
-    if not (0.0 < w <= 1.0):
-        info['note'] = f"combine.final_hi={w} 超出 (0,1]，w_total 降级为满仓 1.0"
-        info['fallback'] = True
-        return 1.0, info
+        return _degrade(f"combine.final_hi={_fh!r} 非数值")
+    # ⭐ 0 是合法决策（空仓），不再被判为越界
+    if not (0.0 <= w <= 1.0):
+        return _degrade(f"combine.final_hi={w} 超出 [0,1]")
+    info['budget_status'] = 'OK'
+    info['executable'] = True
     return w, info
+
+
+def validate_final_weights(portfolio):
+    """对**最终权重**做硬验收（round130 / P0-2）。
+
+    审计 §四：行业只数限制不等于最终权重限制；选不满时不得把缺口摊到
+    已选股上放大单票，也不得让总股票仓位突破风险预算。任何一项不满足
+    → `ok=False`，调用方必须把产物标为不可执行。
+    """
+    w = portfolio.get('weights') or {}
+    rk = portfolio.get('risk') or {}
+    v = []
+    vals = [float(x) for x in w.values()]
+    s = sum(vals)
+    cash = float(rk.get('cash_weight') or 0.0)
+    w_total = float(rk.get('w_total') or 0.0)
+    if any(x < -1e-9 for x in vals):
+        v.append("存在负权重")
+    if abs(s + cash - 1.0) > 2e-3:
+        v.append(f"Σ权重({s:.4f})+现金({cash:.4f}) ≠ 1.0")
+    if s > w_total + 2e-3:
+        v.append(f"股票仓位 {s:.4f} 突破风险预算 w_total={w_total:.4f}"
+                 "（选不满时缺口必须留现金，不得摊到已选股）")
+    cap = rk.get('single_weight_cap')
+    scope = rk.get('single_weight_cap_scope') or 'assets'
+    if cap:
+        mx = (rk.get('single_weight_max_of_equity') if scope == 'equity'
+              else rk.get('single_weight_max_of_assets'))
+        if mx is not None and float(mx) > float(cap) + 1e-6:
+            v.append(f"单票 {scope} 口径 {float(mx):.4f} 超上限 {float(cap):.4f}")
+    return {'ok': not v, 'violations': v, 'sum_weights': round(s, 6),
+            'cash_weight': cash, 'w_total': w_total}
 
 
 def main():
@@ -487,6 +535,13 @@ def main():
                     help='回滚开关: 板块层级仍按「候选数」判停止(旧行为), 用于对照')
     ap.add_argument('--no-risk', action='store_true',
                     help='不读 regime 风险预算, w_total 强制 1.0(满仓), 用于对照')
+    ap.add_argument('--risk-fallback', choices=('zero', 'conservative', 'full'),
+                    default='zero',
+                    help='预算故障时的回退仓位：zero=空仓(默认,不扩大风险) / '
+                         'conservative=0.2 / full=满仓(仅对照,产物标不可执行)')
+    ap.add_argument('--auto-cap-scale', action='store_true',
+                    help='选不满时按单票上限反推并**缩减**股票仓位、缺口留现金，'
+                         '使最终权重合规（默认关闭：保持现有权重，仅标记不可执行）')
     ap.add_argument('--out', default=None)
     args = ap.parse_args()
 
@@ -497,9 +552,13 @@ def main():
     # P0-3: 接入 regime 风险预算作为真实仓位（--no-risk 强制满仓，用于对照）
     if args.no_risk:
         w_total, rinfo = 1.0, {'source': None, 'available': False, 'fallback': True,
-                               'note': '--no-risk 指定满仓 1.0（对照模式）'}
+                               'executable': False,
+                               'budget_status': 'DISABLED_BY_FLAG',
+                               'note': '--no-risk 指定满仓 1.0（对照模式，非可执行建议）'}
     else:
-        w_total, rinfo = load_w_total()
+        w_total, rinfo = load_w_total(fallback_mode=args.risk_fallback)
+        if not rinfo.get('executable'):
+            print(f"⚠️ 风险预算不可用：{rinfo.get('note')} → 本产物标为不可执行")
 
     scored = args.scored
     if scored is None:
@@ -652,7 +711,27 @@ def main():
         # P0-3: 等权真实权重（含现金）。w_total 来自 regime 风险预算。
         #   ⚠️ 两个口径必须分开命名，否则「3.3% vs 上限 8%」看着合规、
         #   实际股票仓位里单票已 16.7%（momentum 6 只今天正是如此）。
-        _eq_w = (float(w_total) / _n_pick) if _n_pick else 0.0     # 占总资产
+        # ⭐ round130 / P0-2：选不满时的「重新求解约束」选项（默认关闭）。
+        #   行业只数上限可能让实际只数远小于 target，等权下单票占比随之升高；
+        #   开启后按 max_single_stock 反推允许的最大股票仓位，缺口**留现金**，
+        #   而不是把预算全压在少数几只上。关闭时保持既有权重，由
+        #   validate_final_weights() 如实标为不可执行（不擅自改模型行为）。
+        _w_budget = float(w_total)
+        _w_eff = _w_budget
+        _cap_scale = None
+        if args.auto_cap_scale and _n_pick:
+            _mss = bdiag.get('max_single_stock')
+            _scope2 = bdiag.get('max_single_stock_scope') or 'assets'
+            if _mss and _scope2 == 'assets':
+                _max_w = float(_mss) * _n_pick
+                if _w_eff > _max_w:
+                    _cap_scale = {
+                        'from': round(_w_eff, 4), 'to': round(_max_w, 4),
+                        'n_picks': _n_pick, 'cap': float(_mss),
+                        'reason': (f'实选 {_n_pick} 只 < 目标 {bdiag.get("target")}，'
+                                   f'等权下单票上限 {float(_mss):.2%} 反推最大仓位')}
+                    _w_eff = _max_w
+        _eq_w = (_w_eff / _n_pick) if _n_pick else 0.0             # 占总资产
         _eq_of_equity = (1.0 / _n_pick) if _n_pick else None        # 占股票仓位
         _weights = {r['code']: round(_eq_w, 4) for r in picked}
         # 现金必须用**舍入后**的权重反推，否则 6×0.0333=0.1998 与 cash=0.8000
@@ -663,14 +742,19 @@ def main():
         #    momentum 6 只曾因此报出 effective_n=150.3，纯属口径错误。
         _hhi = (sum((1.0 / _n_pick) ** 2 for _ in picked)) if _n_pick else None
         _risk = {
-            'w_total': round(float(w_total), 4),
+            # 实际生效仓位（auto-cap-scale 开启时可能小于风险预算上限）
+            'w_total': round(float(_w_eff), 4),
+            'w_total_budget': round(float(_w_budget), 4),
+            'cap_scaled': _cap_scale,
             'w_total_source': rinfo,
             # 两个口径都输出；合规判定按 configured scope
             'single_weight_max_of_equity': round(_eq_of_equity, 4) if _eq_of_equity else None,
             'single_weight_max_of_assets': round(_eq_w, 4),
             'single_weight_cap': bdiag.get('max_single_stock'),
             'single_weight_cap_scope': bdiag.get('max_single_stock_scope'),
-            'cap_satisfied': bdiag.get('cap_satisfied'),
+            'cap_satisfied': (bool(_eq_w <= float(bdiag['max_single_stock']) + 1e-9)
+                              if (_cap_scale and bdiag.get('max_single_stock'))
+                              else bdiag.get('cap_satisfied')),
             'cap_scope_verdict': bdiag.get('cap_scope_verdict'),
             'n_picks': _n_pick,
             'target': bdiag.get('target'),
@@ -721,9 +805,16 @@ def main():
                        'sector_mom60': r.get('sector_mom60'), 'sector_mom10': r.get('sector_mom10'),
                        'score_sector': r.get('score_sector'),
                        'score_news': r.get('score_news'), 'score_tech': r.get('score_tech'),
-                       'score_fund': r.get('score_fund'), 'score_theme': r.get('score_theme')}
+                       'score_fund': r.get('score_fund'),                        'score_theme': r.get('score_theme')}
                       for r in picked],
         }
+        # ⭐ round130 / P0-2：最终权重硬验收（行业只数限制 ≠ 最终权重限制）
+        _fw = validate_final_weights(out['portfolios'][mode])
+        out['portfolios'][mode]['final_weight_validation'] = _fw
+        out['portfolios'][mode]['executable'] = (bool(rinfo.get('executable'))
+                                                 and _fw['ok'])
+        if _fw['violations']:
+            print(f"  🔴 最终权重验收失败（产物标为不可执行）: {_fw['violations']}")
         print(f"\n=== {mode} 路线 | {level} | 路线池 {len(route_results)} 只 ===")
         if elig_stats.get(mode):
             _e = elig_stats[mode]
@@ -788,6 +879,16 @@ def main():
                   f"{str(t.get('trend')):<6} 板块R60={r.get('sector_r60')} R10={r.get('sector_r10')} "
                   f"权重{_eq_w:.1%}")
 
+    # ⭐ round130 / P0-2：顶层可执行性 = 预算来源可执行 + 每条路线最终权重验收通过。
+    #   降级 / 对照模式 / 验收失败一律 false，异常产物不得标为可执行建议。
+    out['executable'] = (bool(rinfo.get('executable'))
+                         and bool(out['portfolios'])
+                         and all(p.get('executable') for p in out['portfolios'].values()))
+    out['executability_note'] = (
+        'true 仅表示「风险预算有效 + 最终权重约束通过」，不代表策略有效性；'
+        '预算降级、--no-risk 对照、权重验收失败一律 false。')
+    if not out['executable']:
+        print(f"⚠️ 组合产物 executable=false（来源状态 {rinfo.get('budget_status')}）")
     op = args.out or os.path.join(SECTOR_DIR, f"portfolio_{sdate}.json")
     with open(op, 'w', encoding='utf-8') as f:
         json.dump(out, f, ensure_ascii=False, indent=1)
