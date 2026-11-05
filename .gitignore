@@ -25,6 +25,16 @@ __pycache__/
 !data/weight_scheme_curve.json
 !data/weight_scheme_curve_round128.json
 !data/backtest_universe_summary.json
+# T+1/T0 可执行性证据链（gen_report_top200 直接读取，缺失则卡片渲染「证据文件缺失」）
+!audit_round111b_t1_decompose.json
+!audit_round111c_t1_executable.json
+!audit_round113_holding_period.json
+!audit_round113b_holdout.json
+!audit_round114_t0_cost_ceiling.json
+!audit_round114f_gap_signal_final.json
+!audit_round130_total_t1.json
+# 多重检验台账（K 的唯一硬输入，决定 Bonferroni 阈值；缺失则阈值不可审计）
+!data/trial_log.json
 update_rating.py
 # 本地 LLM 凭据（严禁入库；GitHub Actions 请用 repository secrets）
 .llm_env

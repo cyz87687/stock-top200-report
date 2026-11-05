@@ -1,0 +1,119 @@
+{
+ "meta": {
+  "purpose": "total 评分对 T+1 超额的区分力（供 T+1/T0 卡片读取，替代硬编码）",
+  "source": "recommendation_track.json records",
+  "bench": "sh000300",
+  "basis": "个股与基准均为前复权收盘价；交易日轴=全市场交易日历",
+  "horizon": 1,
+  "sample_filter": "status['1']=='ok' 且 total/excess1 均为数值（未到期样本剔除）",
+  "note": "Spearman 用平均秩处理并列；Top/Bot 按 total 的 p90/p10 分位。total 是推荐当时的评分，excess1 是相对 sh000300 的次日超额。",
+  "must_not_claim": [
+   "不得把 Spearman 与 0 的差异当作「预测力」",
+   "不得据此反向做空高分或做多低分（分位差异方向在不同样本期之间翻转）"
+  ]
+ },
+ "n_samples": 2907,
+ "n_reco_days": 16,
+ "date_min": "2026-10-08",
+ "date_max": "2026-11-02",
+ "spearman_total_vs_excess1": 0.0154,
+ "top10": {
+  "label": "Top10%（最高分）",
+  "threshold_total": 81.75,
+  "n": 292,
+  "mean_excess_pct": -0.961,
+  "win_rate": 0.4212
+ },
+ "bot10": {
+  "label": "Bot10%（最低分）",
+  "threshold_total": 53.46,
+  "n": 291,
+  "mean_excess_pct": -1.1663,
+  "win_rate": 0.3058
+ },
+ "deciles": [
+  {
+   "d": 1,
+   "n": 290,
+   "total_min": 8.99,
+   "total_max": 53.42,
+   "mean_excess_pct": -1.1633,
+   "win_rate": 0.3069
+  },
+  {
+   "d": 2,
+   "n": 290,
+   "total_min": 53.46,
+   "total_max": 66.22,
+   "mean_excess_pct": -0.9574,
+   "win_rate": 0.3862
+  },
+  {
+   "d": 3,
+   "n": 290,
+   "total_min": 66.22,
+   "total_max": 67.64,
+   "mean_excess_pct": -1.0451,
+   "win_rate": 0.431
+  },
+  {
+   "d": 4,
+   "n": 290,
+   "total_min": 67.64,
+   "total_max": 69.36,
+   "mean_excess_pct": -1.3173,
+   "win_rate": 0.3759
+  },
+  {
+   "d": 5,
+   "n": 290,
+   "total_min": 69.37,
+   "total_max": 71.33,
+   "mean_excess_pct": -1.2353,
+   "win_rate": 0.3621
+  },
+  {
+   "d": 6,
+   "n": 290,
+   "total_min": 71.34,
+   "total_max": 73.25,
+   "mean_excess_pct": -0.8506,
+   "win_rate": 0.4345
+  },
+  {
+   "d": 7,
+   "n": 290,
+   "total_min": 73.25,
+   "total_max": 75.46,
+   "mean_excess_pct": -1.1708,
+   "win_rate": 0.3931
+  },
+  {
+   "d": 8,
+   "n": 290,
+   "total_min": 75.48,
+   "total_max": 78.06,
+   "mean_excess_pct": -1.5993,
+   "win_rate": 0.3483
+  },
+  {
+   "d": 9,
+   "n": 290,
+   "total_min": 78.07,
+   "total_max": 81.59,
+   "mean_excess_pct": -1.1641,
+   "win_rate": 0.3862
+  },
+  {
+   "d": 10,
+   "n": 297,
+   "total_min": 81.67,
+   "total_max": 93.44,
+   "mean_excess_pct": -0.9297,
+   "win_rate": 0.4276
+  }
+ ],
+ "deciles_monotone": false,
+ "mean_excess_all_pct": -1.1428,
+ "verdict": "total 对 T+1 超额 Spearman = +0.0154（2907 样本 / 16 个推荐日），与 0 无实质差异；Top10% 均值 -0.96% vs Bot10% -1.17%，十等分非单调。→ total 不是次日方向信号，既不能正向用于次日买，也不能反向用。"
+}

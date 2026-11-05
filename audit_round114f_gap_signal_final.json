@@ -1,0 +1,317 @@
+{
+ "meta": {
+  "purpose": "主板低开反转最终定性（含前一版索引 bug 的纠错记录）",
+  "self_correction": "上一版用 prev_ret[t]=C[t]/C[t−1]（信号日当天收益）分「前日跌停」组，等价于按 intra 分组（循环论证），「46 只胜率 0%」结论作废。正确为 C[t−1]/C[t−2]。",
+  "universe": "主板 1197 只，成交额≥3e+07",
+  "date_range": [
+   "2025-06-09",
+   "2026-11-05"
+  ],
+  "n_signal_samples": 4086,
+  "n_signal_days": 279,
+  "signal_rule": "gap[t] <= 历史[0,t) 的 p1 分位（扩展窗口 ≥60 日），主板",
+  "exit_rule": "同日 close 卖出（open→close）",
+  "data_limit": "无分钟线 → 开盘成交率、盘中最大回撤、滑点均未验证"
+ },
+ "V1_prev_day_split": {
+  "note": "⚠️ 修正版。上一版按 prev_ret[t]=C[t]/C[t−1] 分组是错的（那是信号日当天收益，等价于按 intra 分组=循环论证），结论已作废。",
+  "groups": {
+   "前日跌停(≤-9.5%)": {
+    "label": "前日跌停(≤-9.5%)",
+    "n": 563,
+    "mean_pct": 1.3283,
+    "median_pct": 0.2999,
+    "win_rate": 0.5187,
+    "t": 5.862
+   },
+   "前日大跌(-9.5%~-5%)": {
+    "label": "前日大跌(-9.5%~-5%)",
+    "n": 408,
+    "mean_pct": 1.9294,
+    "median_pct": 0.8691,
+    "win_rate": 0.5686,
+    "t": 7.138
+   },
+   "前日小跌(-5%~0)": {
+    "label": "前日小跌(-5%~0)",
+    "n": 1232,
+    "mean_pct": 1.7329,
+    "median_pct": 1.6393,
+    "win_rate": 0.6429,
+    "t": 14.414
+   },
+   "前日上涨(>0)": {
+    "label": "前日上涨(>0)",
+    "n": 1865,
+    "mean_pct": 1.5101,
+    "median_pct": 1.0824,
+    "win_rate": 0.585,
+    "t": 12.694
+   }
+  },
+  "prev_ret_mean_pct": -0.6004,
+  "frac_prev_limit_down": 0.1378,
+  "frac_prev_down": 0.5392
+ },
+ "V2_monthly": {
+  "months": [
+   {
+    "label": "2025-09",
+    "n": 300,
+    "mean_pct": 1.1543,
+    "median_pct": 0.5595,
+    "win_rate": 0.5667,
+    "t": 4.009
+   },
+   {
+    "label": "2025-10",
+    "n": 807,
+    "mean_pct": 3.6742,
+    "median_pct": 3.2944,
+    "win_rate": 0.8971,
+    "t": 29.122
+   },
+   {
+    "label": "2025-11",
+    "n": 167,
+    "mean_pct": 0.2234,
+    "median_pct": -1.3025,
+    "win_rate": 0.4251,
+    "t": 0.55
+   },
+   {
+    "label": "2025-12",
+    "n": 126,
+    "mean_pct": 1.7923,
+    "median_pct": 1.2682,
+    "win_rate": 0.5794,
+    "t": 3.671
+   },
+   {
+    "label": "2026-01",
+    "n": 242,
+    "mean_pct": 0.5427,
+    "median_pct": -0.7502,
+    "win_rate": 0.4339,
+    "t": 1.595
+   },
+   {
+    "label": "2026-02",
+    "n": 158,
+    "mean_pct": 1.2986,
+    "median_pct": 0.2307,
+    "win_rate": 0.5443,
+    "t": 3.377
+   },
+   {
+    "label": "2026-03",
+    "n": 309,
+    "mean_pct": 1.4846,
+    "median_pct": 0.6993,
+    "win_rate": 0.5728,
+    "t": 5.519
+   },
+   {
+    "label": "2026-04",
+    "n": 201,
+    "mean_pct": 1.2149,
+    "median_pct": 0.9094,
+    "win_rate": 0.6219,
+    "t": 4.048
+   },
+   {
+    "label": "2026-05",
+    "n": 114,
+    "mean_pct": 0.9584,
+    "median_pct": 0.0,
+    "win_rate": 0.4474,
+    "t": 1.878
+   },
+   {
+    "label": "2026-06",
+    "n": 398,
+    "mean_pct": 1.3455,
+    "median_pct": 0.5154,
+    "win_rate": 0.5276,
+    "t": 5.849
+   },
+   {
+    "label": "2026-07",
+    "n": 429,
+    "mean_pct": 0.7923,
+    "median_pct": -0.7794,
+    "win_rate": 0.4452,
+    "t": 2.9
+   },
+   {
+    "label": "2026-08",
+    "n": 203,
+    "mean_pct": 0.6085,
+    "median_pct": -0.2054,
+    "win_rate": 0.4828,
+    "t": 1.673
+   },
+   {
+    "label": "2026-09",
+    "n": 187,
+    "mean_pct": 1.304,
+    "median_pct": 0.3872,
+    "win_rate": 0.5348,
+    "t": 3.067
+   },
+   {
+    "label": "2026-10",
+    "n": 415,
+    "mean_pct": 1.0,
+    "median_pct": 0.0388,
+    "win_rate": 0.5012,
+    "t": 4.028
+   },
+   {
+    "label": "2026-11",
+    "n": 30,
+    "mean_pct": 2.5552,
+    "median_pct": 2.6858,
+    "win_rate": 0.7667,
+    "t": 3.144
+   }
+  ],
+  "n_months": 15,
+  "n_positive": 15,
+  "positive_frac": 1.0,
+  "worst_month_mean_pct": 0.2234,
+  "best_month_mean_pct": 3.6742
+ },
+ "V3_exclude_limit_up_close": {
+  "all": {
+   "label": "全部",
+   "n": 4086,
+   "mean_pct": 1.5804,
+   "median_pct": 1.2436,
+   "win_rate": 0.5903,
+   "t": 20.391
+  },
+  "excl_close_limit_up": {
+   "label": "剔除收盘涨停",
+   "n": 4001,
+   "mean_pct": 1.266,
+   "median_pct": 1.1097,
+   "win_rate": 0.5816,
+   "t": 17.795
+  },
+  "only_close_limit_up": {
+   "label": "仅收盘涨停",
+   "n": 85,
+   "mean_pct": 16.381,
+   "median_pct": 16.0652,
+   "win_rate": 1.0,
+   "t": 87.786
+  },
+  "n_limit_up": 85,
+  "limit_up_share": 0.0208
+ },
+ "V4_threshold_robust": [
+  {
+   "label": "gap<=-5%",
+   "n": 2314,
+   "mean_pct": 1.7397,
+   "median_pct": 1.099,
+   "win_rate": 0.5717,
+   "t": 16.066,
+   "threshold_pct": -5.0,
+   "n_days": 284,
+   "day_cluster_t": 6.422,
+   "day_cluster_mean_pct": 1.3495
+  },
+  {
+   "label": "gap<=-6%",
+   "n": 1130,
+   "mean_pct": 2.207,
+   "median_pct": 1.5585,
+   "win_rate": 0.5938,
+   "t": 14.141,
+   "threshold_pct": -6.0,
+   "n_days": 234,
+   "day_cluster_t": 6.075,
+   "day_cluster_mean_pct": 1.6283
+  },
+  {
+   "label": "gap<=-7%",
+   "n": 541,
+   "mean_pct": 2.7839,
+   "median_pct": 1.8229,
+   "win_rate": 0.6081,
+   "t": 12.121,
+   "threshold_pct": -7.0,
+   "n_days": 175,
+   "day_cluster_t": 6.785,
+   "day_cluster_mean_pct": 2.2801
+  },
+  {
+   "label": "gap<=-8%",
+   "n": 245,
+   "mean_pct": 3.0466,
+   "median_pct": 1.8323,
+   "win_rate": 0.6286,
+   "t": 9.259,
+   "threshold_pct": -8.0,
+   "n_days": 112,
+   "day_cluster_t": 5.917,
+   "day_cluster_mean_pct": 2.8512
+  },
+  {
+   "label": "gap<=-9%",
+   "n": 49,
+   "mean_pct": 4.3984,
+   "median_pct": 2.1295,
+   "win_rate": 0.6327,
+   "t": 5.124,
+   "threshold_pct": -9.0,
+   "n_days": 38,
+   "day_cluster_t": 4.344,
+   "day_cluster_mean_pct": 4.229
+  }
+ ],
+ "V5_halfyear": [
+  {
+   "label": "2025H2",
+   "n": 1400,
+   "mean_pct": 2.5532,
+   "median_pct": 2.5141,
+   "win_rate": 0.7414,
+   "t": 21.091
+  },
+  {
+   "label": "2026H1",
+   "n": 1422,
+   "mean_pct": 1.1844,
+   "median_pct": 0.4588,
+   "win_rate": 0.5302,
+   "t": 9.298
+  },
+  {
+   "label": "2026H2",
+   "n": 1264,
+   "mean_pct": 0.9485,
+   "median_pct": -0.1333,
+   "win_rate": 0.4905,
+   "t": 6.254
+  }
+ ],
+ "checks": {
+  "V2_months_pos>=60%": true,
+  "V2_worst_month>-1%": true,
+  "V3_excl_limitup_mean>1%": true,
+  "V3_excl_limitup_win>55%": true,
+  "V4_no_island": true,
+  "V5_all_halves_pos": true
+ },
+ "n_pass": 6,
+ "verdict": "主板低开反转在「前日涨跌拆分、逐月一致性、剔除地天板、阈值稳健性、半年度一致性」五项定性检验中全部通过：剔除收盘涨停后均值仍 +1.27%（胜率 58.2%），15/15 个月为正，最差月 +0.22%，固定阈值 −5%~−9% 全部为正（无孤岛）。→ **这是目前唯一经得起反复证伪的日内可执行候选**。但必须继续声明三条边界：①样本仅 341 日单一样本期；②无分钟线，无法验证「开盘价成交率」与盘中路径（最大回撤未知）；③「低开 6%+ 的股票」往往伴随利空事件，实盘需人工排除退市/立案类。**在扩样本（≥1500 日跨牛熊）+ 分钟线验证前，只能作为「观察名单触发的人工决策辅助」，不得自动化下单，也不得承诺胜率。**",
+ "must_not_claim": [
+  "不得自动化下单（样本 341 日单期，未跨牛熊）",
+  "不得承诺胜率（无分钟线，盘中路径未知，最大回撤未知）",
+  "不得把「剔除地天板后仍正」理解为「一定能卖在收盘价」",
+  "不得忽略事件风险（利空/立案/退市类低开需人工排除）"
+ ]
+}

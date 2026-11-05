@@ -5454,19 +5454,28 @@ _transformer_card_html = _transformer_html()
 #
 # ⚠️ 渲染原则（数据纪律，不是美观问题）：
 #   ① 本轮把「T+1 靠预测方向」和「T0 靠模型择时」两条路都实证证伪了：
-#      · total 评分对 T+1 超额 Spearman = −0.0257（排名越高反而越差）
-#      · 13 因子在 H=1 的 4 个可执行口径下**零通过**（含扣费）
+#      · total 评分对 T+1 超额零区分力（round130 重跑：Spearman +0.0154，
+#        且 Top10% vs Bot10% 的相对优劣在两个样本期之间**方向翻转**）
+#      · 13 因子在 H=1 的 3 个可执行口径下**零通过**（含扣费）
 #      · T0 无分钟线 → 收益无法回测，只能算成本门槛
 #      所以**不能给任何 T0 仓位建议**，也不能假装 total 高分适合次日买。
 #   ② 必须展示「为什么不能」，而不是简单写「不建议」——
 #      否则会显得是能力不足而非实证结论。
 #   ③ 唯一候选信号（主板极端低开日内反转）必须连同它的 **5 条边界**一起展示，
-#      尤其是「2026H2 胜率已跌到 48.9%」这条，不能只报 8/8 通过。
+#      尤其是「2026H2 胜率已跌到 49.0%」这条，不能只报 6/6 通过。
 #   ④ 全部数字从 JSON 读取，页面不复算（同口径两处实现必然漂移）。
+#   ⑤ round130 血泪：本块曾长期违反 ④ —— Spearman/Top10%/成本边际/名义通过数
+#      四处硬编码，其中三处与自身产物不一致（0.26% vs 0.31%、5 个 vs 4 个、
+#      3.7pp vs 5.86pp）。凡新增结论数字，**必须先落 JSON 产物再渲染**；
+#      没有产物的统计（如 total 对 T+1）要补 audit_*.py 脚本，禁直接写死。
 # ═══════════════════════════════════════════════════════════════════════════
 _r113_data = {}
 _r114f_data = {}
 _r114_t0 = {}
+_r111b = {}
+_r111c = {}
+_r113b = {}
+_r130_total = {}
 _t1t0_warn = ""
 try:
     def _load_j(_name):
@@ -5480,6 +5489,9 @@ try:
     _r114f_data = _load_j("audit_round114f_gap_signal_final.json")
     _r114_t0 = _load_j("audit_round114_t0_cost_ceiling.json")
     _r111c = _load_j("audit_round111c_t1_executable.json")
+    _r111b = _load_j("audit_round111b_t1_decompose.json")
+    _r113b = _load_j("audit_round113b_holdout.json")
+    _r130_total = _load_j("audit_round130_total_t1.json")   # round130：补产出物，替代硬编码
 except Exception as _e:
     _t1t0_warn = f"读取 T+1/T0 证据失败: {type(_e).__name__}: {_e}"
     print(f"⚠️ {_t1t0_warn}")
@@ -5503,24 +5515,73 @@ def _t1_t0_html():
         '<span style="font-size:10px;font-weight:400;color:#64748b;">'
         '扣费四门检验 · 持有期扫描 · 成本门槛反算</span></div>')
 
-    # ── 首屏结论（红框）
+    # ── 首屏结论（红框）── round130：①②全部改为读 JSON，禁硬编码 ──
+    _t30 = _r130_total or {}
+    _t30_sp = _t30.get("spearman_total_vs_excess1")
+    _t30_n = _t30.get("n_samples")
+    _t30_nd = _t30.get("n_reco_days")
+    _t30_top = _t30.get("top10") or {}
+    _t30_bot = _t30.get("bot10") or {}
+    _t30_mono = _t30.get("deciles_monotone")
+    if _t30_sp is not None:
+        _c1 = (
+            f'① total 评分对 T+1 超额 Spearman = '
+            f'<b style="color:#fca5a5;">{float(_t30_sp):+.4f}</b>'
+            f'（{_t30_n} 样本 / {_t30_nd} 个推荐日，{html_mod.escape(str(_t30.get("date_min")))}~'
+            f'{html_mod.escape(str(_t30.get("date_max")))})，'
+            f'<b>与 0 无实质差异、十等分{"单调" if _t30_mono else "非单调"}</b>：'
+            f'Top10%（≥{float(_t30_top.get("threshold_total") or 0):.1f} 分）T+1 超额 '
+            f'<b style="color:#fca5a5;">{float(_t30_top.get("mean_excess_pct") or 0):+.2f}%</b>'
+            f'、胜率 {float(_t30_top.get("win_rate") or 0)*100:.1f}%，'
+            f'Bot10%（≤{float(_t30_bot.get("threshold_total") or 0):.1f} 分）'
+            f'{float(_t30_bot.get("mean_excess_pct") or 0):+.2f}%、'
+            f'胜率 {float(_t30_bot.get("win_rate") or 0)*100:.1f}%。'
+            f'<br><b style="color:#fcd34d;">⚠️ 方向在两个样本期之间翻转</b>：'
+            f'round111 首测（1211 样本/12 日）Top10% 差于 Bot10%（−1.28% vs −0.76%），'
+            f'本轮刷新 Top10% 反而略好（−0.96% vs −1.17%）。'
+            f'故既<b>不能正向用于次日买</b>，也<b>不能反向做空高分</b>——'
+            f'分位差异本身不稳，只有「无区分力」这一条稳定成立。'
+        )
+    else:
+        _c1 = ('① total 评分对 T+1 超额的区分力产物 '
+               '<code>audit_round130_total_t1.json</code> 缺失，本条不渲染。')
+    _ew = (_r111c or {}).get("executable_winners") or {}
+    _ew_n = sum(1 for v in _ew.values() if not v)
+    _ew_k = len(_ew)
+    # 不可执行对照口径里四门全过的因子（如实展示，说明信号在不可执行段）
+    _ctl_names = []
+    for _vk, _vv in ((_r111c or {}).get("by_vehicle") or {}).items():
+        if _vv.get("executable"):
+            continue
+        for _fk, _fv in (_vv.get("factors") or {}).items():
+            if _fv.get("pass") and _fk not in _ctl_names:
+                _ctl_names.append(_fk)
+    _ctl_txt = " / ".join(_ctl_names) if _ctl_names else "无"
     _q.append(
         '<div style="margin-top:10px;padding:10px 12px;background:#7f1d1d22;'
         'border-radius:8px;border-left:3px solid #dc2626;font-size:12px;'
         'color:#fca5a5;line-height:1.75;">'
         '<b>结论：现有评分不能用于 T+1 选股，T0 在无分钟线前不能给仓位建议。</b>'
         '<br><span style="color:#94a3b8;">'
-        '① total 评分对 T+1 超额 Spearman = <b style="color:#fca5a5;">−0.0257</b>'
-        '（1211 样本 / 12 个推荐日），<b>排名越高反而越差</b>：'
-        'Top10%（≥85.3 分）T+1 超额 <b style="color:#fca5a5;">−1.28%</b>、胜率 41.0%，'
-        '比 Bot10% 的 −0.76% 还低。'
-        '<br>② 13 个日频因子在 H=1 的 3 个可执行口径（开盘买/开盘卖）下'
-        '<b style="color:#fca5a5;">零通过</b>（|IC|≥0.02 &amp; |t|≥2.0 &amp; 胜率≥55% &amp; 扣费后&gt;0）。'
+        f'{_c1}'
+        f'<br>② {len((_r111b or {}).get("results") or {})} 个日频因子在 H=1 的 '
+        f'{_ew_k} 个可执行口径（open→close / open→open / close[t+1]→close[t+2]）下'
+        f'<b style="color:#fca5a5;">零通过</b>（|IC|≥0.02 &amp; |t|≥2.0 &amp; 胜率≥55% &amp; 扣费后&gt;0）；'
+        f'同批因子在「收盘→收盘」这类<b>不可执行对照口径</b>下反而有通过项（{html_mod.escape(_ctl_txt)}）'
+        f'——正好证明信号躺在散户吃不到的那一段。'
         '<br>③ 不是"阈值没调好"——9 个生效维里没有一维是设计来预测次日方向的，'
         'fund/growth 是季度频率、quality 是年报频率，用季度因子解释日频收益是维度错配。'
         '</span></div>')
 
-    # ── 隔夜/日内拆解（为什么信号用不上）
+    # ── 隔夜/日内拆解（为什么信号用不上）── round130：改为读 111b 产物 ──
+    _b111 = (_r111b or {}).get("results") or {}
+    _n_fac = len(_b111)
+    _n_overn = sum(1 for v in _b111.values() if "隔夜" in str(v.get("where") or ""))
+    _n_intra = sum(1 for v in _b111.values() if "日内" in str(v.get("where") or ""))
+    _flip = [k for k, v in _b111.items() if v.get("sign_flip")]
+    _flip_txt = " / ".join(_flip) if _flip else "无"
+    _intra_max_t = max((abs(float((v.get("intra") or {}).get("t") or 0))
+                        for v in _b111.values()), default=0.0)
     _q.append(
         '<div style="margin-top:10px;padding:9px 12px;background:#78350f22;'
         'border-radius:6px;border-left:3px solid #f59e0b;font-size:11px;'
@@ -5529,36 +5590,78 @@ def _t1_t0_html():
         '<br><span style="color:#94a3b8;">把次日收益拆成 '
         'gap = open[t+1]/close[t]−1（隔夜，收盘后无法参与）与 '
         'intra = close[t+1]/open[t+1]−1（日内，开盘可买）：'
-        '13 个因子里 <b style="color:#fcd34d;">12 个信号全在隔夜段</b>，'
-        '日内段<b>无一显著</b>（|t| 全 &lt; 1.7）；'
-        'turn_z / vol_ratio / rsi14 / dist_ma20 <b>符号直接翻转</b>（隔夜强负 → 日内微正）。'
+        f'{_n_fac} 个因子里 <b style="color:#fcd34d;">{_n_overn} 个信号全在隔夜段</b>'
+        f'（日内段命中 {_n_intra} 个），'
+        f'日内段<b>无一显著</b>（|t| 最大仅 {_intra_max_t:.2f}）；'
+        f'{html_mod.escape(_flip_txt)} <b>符号直接翻转</b>（隔夜强负 → 日内微正）。'
         '所以「收盘→收盘」那个漂亮的 IC，散户一分钱也拿不到。</span></div>')
 
-    # ── 持有期扫描：拉长持有期能不能救？
+    # ── 持有期扫描：拉长持有期能不能救？── round130：读 113/113b 产物 ──
+    _bh = (_r113_data or {}).get("by_horizon") or {}
+    _h_parts = " / ".join(
+        f'H={k} 通过 {int((v or {}).get("n_pass") or 0)} 个'
+        for k, v in sorted(_bh.items(), key=lambda kv: int(kv[0]))
+    )
+    _claimed = (_r113b or {}).get("claimed_by_round113") or []
+    _n_claim = len(_claimed)
+    _t1no = (_r113b or {}).get("t1_nonoverlap") or {}
+    _defl = []
+    for _fk, _hv in _t1no.items():
+        for _h, _sv in (_hv or {}).items():
+            for _c in _claimed:
+                if _c.get("factor") == _fk and str(_c.get("horizon")) == str(_h):
+                    _d = (_sv or {}).get("t_deflate")
+                    if isinstance(_d, (int, float)):
+                        _defl.append(float(_d))
+    _defl_txt = (f'{min(_defl):.2f}~{max(_defl):.2f} 倍' if _defl else '—')
+    _n_surv = len((_r113b or {}).get("survivors") or [])
+    _zthr = (_r113b or {}).get("meta", {}).get("z_threshold")
+    _cost_rt = (_r113_data or {}).get("meta", {}).get("cost_roundtrip")
+    _cost_pct = (float(_cost_rt) * 100) if isinstance(_cost_rt, (int, float)) else 0.31
+    _h20_n = (_bh.get("20") or {}).get("n_pass") or 0
     _q.append(
         '<div style="margin-top:8px;padding:9px 12px;background:#0f172a;'
         'border-radius:6px;font-size:11px;color:#94a3b8;line-height:1.75;">'
         '<b style="color:#e2e8f0;">把持有期拉长能救吗？不能。</b>'
-        'H=1/2/3/5/10 全部 <b>0 个因子通过</b>；只有 H=20 名义跑出 5 个，'
+        f'{html_mod.escape(_h_parts)}。'
+        f'只有 H=20 名义跑出 {_h20_n} 个，'
         '但那是<b style="color:#fca5a5;">重叠窗口伪影</b>：'
         '304 个日截面算 20 日收益，相邻 19 个截面重叠 95% → t 值被放大 '
-        '√20≈4.5 倍（实测 1.56~3.97 倍）。'
-        '按 Bonferroni 阈值 |t|≥3.22 且用不重叠截面重估后，'
-        '<b style="color:#fca5a5;">5 个全部淘汰</b>（最高 mom5 的 t 仅 3.00）。'
+        f'√20≈4.5 倍（实测 {_defl_txt}）。'
+        f'按 Bonferroni 阈值 |t|≥{_zthr} 且用不重叠截面重估后，'
+        f'<b style="color:#fca5a5;">round113 原判 {_n_claim} 个全部淘汰</b>，'
+        f'存活 {_n_surv} 个。'
         '<br><b style="color:#22c55e;">拉长持有期唯一确定的好处是降成本频率，不是涨 IC。</b>'
-        '单周期成本约 0.26%（佣金万三×2 + 印花税 0.05% + 滑点 0.10%×2），'
-        '年化 ≈ 0.26%×244/H：H=1 约 63%、H=5 约 13%。'
+        f'单周期成本 {_cost_pct:.2f}%（佣金万三×2 + 印花税 0.05% + 滑点 0.10%×2），'
+        f'年化 ≈ {_cost_pct:.2f}%×244/H：H=1 约 {_cost_pct*244:.0f}%、'
+        f'H=5 约 {_cost_pct*244/5:.0f}%。'
         '</div>')
 
     # ── T0 成本门槛表（核心：T0 的敌人是成本/幅度比）
+    # round130：`_meaning` 全部改为从 114 产物现算（旧版四个数字与产物不一致：
+    #   写 53.4% 实为 54.7%、写 3.7pp 实为 5.86pp、写 1.3pp 边际、写 82.2%）。
     _bep = (_r114_t0.get("breakeven_table") or {})
     _dst = (_r114_t0.get("distribution_pct") or {}).get("abs_intra_pct") or {}
+    _feas = (_r114_t0.get("feasibility") or {})
     if _bep and _dst:
+        _edge = None
+        for _fv in _feas.values():
+            if isinstance(_fv, dict) and isinstance(_fv.get("daily_data_provable_edge"), (int, float)):
+                _edge = float(_fv["daily_data_provable_edge"]) * 100
+                break
         _q.append(
             '<div style="margin-top:10px;font-size:11px;color:#94a3b8;line-height:1.7;">'
-            '<b style="color:#e2e8f0;">T0 为什么难：成本门槛反算</b>'
+            '<b style="color:#e2e8f0;">T0 的门槛：成本反算</b>'
             '<span style="color:#64748b;">（p* = 0.5 + c/2e，'
-            f'e 取日内实际涨跌中位数 {_dst.get("p50")}%）</span></div>')
+            f'e 取日内实际涨跌中位数 {_dst.get("p50")}%）</span>'
+            f'<br><span style="color:#fcd34d;">⚠️ round130 修正口径：</span>'
+            f'日线能证明的方向可预测性上界 = gap→intra 反转同号率，'
+            f'偏离 50% 约 <b>{_edge:.2f}pp</b>（方向是<b>反转</b>）；'
+            f'据此 ETF 与主板大市值<b>名义可行</b>（安全边际约 '
+            f'{_edge - (( _feas.get("etf_no_stamp") or {}).get("p_star_minus_base") or 0)*100:.1f}pp / '
+            f'{_edge - (( _feas.get("large_cap") or {}).get("p_star_minus_base") or 0)*100:.1f}pp），'
+            f'小市值不可行。但这是<b>同一批日线算出的上界</b>：未计开盘成交率、'
+            f'盘中路径与未建模滑点，故仍<b>不给仓位建议</b>，只作成本约束披露。</span></div>')
         _q.append('<div style="margin-top:6px;overflow-x:auto;">'
                   '<table style="width:100%;border-collapse:collapse;font-size:11px;">'
                   '<thead><tr style="color:#94a3b8;border-bottom:0.5px solid #334155;">'
@@ -5566,14 +5669,22 @@ def _t1_t0_html():
                   '<th style="padding:5px 8px;text-align:right;">单次回转成本</th>'
                   '<th style="padding:5px 8px;text-align:right;">盈亏平衡命中率 p*</th>'
                   '<th style="padding:5px 8px;text-align:left;">含义</th></tr></thead><tbody>')
-        _meaning = {
-            "etf_no_stamp": ("ETF 口径唯一可能成立，但只剩 1.3pp 安全边际，"
-                             "扛不住未建模的滑点"),
-            "large_cap": ("主板个股需 53.4% 命中率，日线能证明的日内方向可预测性"
-                          "仅偏离 50% 约 3.7pp（且方向是反转）"),
-            "small_cap": ("低波动日（|intra| p10 = 0.44%）时 p* 高达 82.2%，"
-                          "接近不可能 → T0 只可能在高波动日 + 低成本标的上成立"),
-        }
+        # 含义列改为逐档现算（round130）：p* 与「日线可证上界」的差即安全边际
+        _meaning = {}
+        for _pk in ("etf_no_stamp", "large_cap", "small_cap"):
+            _fr = _feas.get(_pk) or {}
+            _need = float(_fr.get("p_star_minus_base") or 0) * 100
+            _ed = float(_fr.get("daily_data_provable_edge") or 0) * 100
+            _ok = bool(_fr.get("feasible_on_daily_evidence"))
+            _p10s = (((_bep.get(_pk) or {}).get("breakeven") or {}).get("p10") or {}).get("p_star")
+            _p10s_txt = (f'低波动日（|intra| p10 = {_dst.get("p10")}%）p* 升到 '
+                         f'{float(_p10s)*100:.1f}%；' if isinstance(_p10s, (int, float)) else '')
+            _meaning[_pk] = (
+                f'需命中率超出 50% 约 {_need:.1f}pp，日线可证上界 {_ed:.2f}pp → '
+                f'{"名义可行" if _ok else "不可行"}（安全边际 {_ed - _need:+.1f}pp）。'
+                f'{_p10s_txt}'
+                '上界未含成交率/盘中路径，不作交易依据。'
+            )
         for _pk in ("etf_no_stamp", "large_cap", "small_cap"):
             _row = _bep.get(_pk) or {}
             _be = (_row.get("breakeven") or {}).get("p50") or {}
@@ -5644,7 +5755,10 @@ def _t1_t0_html():
         _b5.append('<b>③盘中最大回撤未知</b>：只知 open→close，'
                    '不知中途是否先跌 5%')
         _b5.append('<b>④事件风险</b>：低开 6%+ 常伴随立案/退市/业绩爆雷，需人工排除')
-        _b5.append('<b>⑤样本仅 341 日单期</b>，跨不了牛熊')
+        _meta114f = _sig.get("meta") or {}
+        _dr = _meta114f.get("date_range") or []
+        _dr_txt = (f'{_dr[0]}~{_dr[-1]}' if len(_dr) == 2 else "见产物")
+        _b5.append(f'<b>⑤样本仅 {_dr_txt} 单一样本期</b>，跨不了牛熊')
         _q.append('<br>'.join(_b5))
         _q.append('</span></div>')
 
@@ -5667,7 +5781,14 @@ def _t1_t0_html():
         'audit_round113_holding_period.json（H=1~20 扫描）· '
         'audit_round113b_holdout.json（重叠窗口证伪）· '
         'audit_round114_t0_cost_ceiling.json（T0 成本门槛）· '
-        'audit_round114f_gap_signal_final.json（候选信号 + 自我纠错）'
+        'audit_round114f_gap_signal_final.json（候选信号 + 自我纠错）· '
+        'audit_round130_total_t1.json（total 对 T+1 超额，round130 补产出物）'
+        '<br><b style="color:#94a3b8;">round130 刷新记录：</b>'
+        '六个证据脚本按 2026-11-05 数据重跑（K 线库 344 日），结论未翻转；'
+        '但 total 对 T+1 超额的 Spearman 由 −0.0257 变为 +0.0154、Top10% 与 Bot10% 的相对优劣'
+        '<b style="color:#fca5a5;">方向翻转</b>，故删去「排名越高反而越差」的旧表述，'
+        '改为「无区分力且方向不稳定」；同时修正了三处与产物不符的硬编码'
+        '（持有期成本 0.26%→0.31%、名义通过 5 个→4 个、T0 边际 3.7pp→5.86pp）。'
         '<br><b style="color:#94a3b8;">纠错记录：</b>'
         '候选信号第一版诊断脚本把「信号日当天收益」误当「前一日收益」分组'
         '（等价于按 intra 分组 = 循环论证），'

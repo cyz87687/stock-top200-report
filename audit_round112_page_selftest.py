@@ -91,14 +91,41 @@ def main():
     chk("C 未出现「部分指数有效」",
         "部分指数" not in S or "不得" in S)
 
-    # ── C2 T+1/T0 可执行性卡片（round113/114 新增）
-    print("\n── C2 T+1/T0 可执行性卡片（round113/114 新增）──")
+    # ── C2 T+1/T0 可执行性卡片（round113/114 新增，round130 刷新）
+    print("\n── C2 T+1/T0 可执行性卡片（round113/114 新增，round130 刷新）──")
+    # round130：断言改为**读产物 JSON 再校验页面**，比锁死字面量更严：
+    # 页面数字必须与 audit_round130_total_t1.json / 114f 一致，产物一变页面就必须跟着变。
+    _t30j, _g114f = {}, {}
+    try:
+        with open(os.path.join(HERE, "audit_round130_total_t1.json"), encoding="utf-8") as _f:
+            _t30j = json.load(_f)
+    except Exception as _e:
+        print(f"   ⚠️ 读取 audit_round130_total_t1.json 失败: {_e}")
+    try:
+        with open(os.path.join(HERE, "audit_round114f_gap_signal_final.json"), encoding="utf-8") as _f:
+            _g114f = json.load(_f)
+    except Exception as _e:
+        print(f"   ⚠️ 读取 audit_round114f_gap_signal_final.json 失败: {_e}")
+
     chk("C2 卡片存在", "T+1 / T0 可执行性" in S)
     chk("C2 结论「不能用于 T+1 选股」", "不能用于 T+1 选股" in S)
     chk("C2 明确 T0 不给仓位建议", "不能给仓位建议" in S or "不给仓位建议" in S)
-    chk("C2 披露 total 零区分力（Spearman）", "−0.0257" in S or "-0.0257" in S)
-    chk("C2 披露 Top10% 反而更差", "排名越高反而越差" in S)
-    chk("C2 披露 Top10% 具体数值", "−1.28%" in S or "-1.28%" in S)
+
+    _sp = _t30j.get("spearman_total_vs_excess1")
+    if isinstance(_sp, (int, float)):
+        _sp_s = f"{float(_sp):+.4f}"
+        chk(f"C2 披露 total 零区分力（Spearman={_sp_s}）", _sp_s in S, _sp_s)
+        chk("C2 Spearman 结论写明与 0 无实质差异", "与 0 无实质差异" in S)
+    else:
+        chk("C2 total 区分力产物存在", False, "audit_round130_total_t1.json 缺失")
+    # ⚠️ 反例断言（round130）：Top10%/Bot10% 的相对优劣已在两个样本期之间**方向翻转**，
+    #    旧结论「排名越高反而越差」不再成立，页面若再出现该表述即为**谎报**。
+    chk("C2 未出现已证伪的「排名越高反而越差」", "排名越高反而越差" not in S.replace("故删去「排名越高反而越差」的旧表述", ""))
+    chk("C2 披露分位方向在样本期之间翻转", "方向在两个样本期之间翻转" in S)
+    _t10 = _t30j.get("top10") or {}
+    if isinstance(_t10.get("mean_excess_pct"), (int, float)):
+        _t10_s = f"{float(_t10['mean_excess_pct']):+.2f}%"
+        chk(f"C2 披露 Top10% 具体数值（{_t10_s}）", _t10_s in S, _t10_s)
     chk("C2 隔夜/日内拆解已说明", "隔夜" in S and "日内" in S)
     chk("C2 披露符号翻转", "符号直接翻转" in S or "符号翻转" in S)
     chk("C2 持有期扫描结论", "拉长持有期" in S)
@@ -108,10 +135,19 @@ def main():
     chk("C2 T0 三档成本已列", "ETF" in S and "小市值" in S)
     chk("C2 候选信号已披露", "极端低开" in S)
     chk("C2 候选信号 5 条边界已披露", "5 条边界" in S)
-    # ⚠️ 最关键的反例断言：H2 衰减必须写出来（不能只报 8/8 通过）
-    chk("C2 已披露 2026H2 胜率衰减", "48.9%" in S)
+    # ⚠️ 最关键的反例断言：H2 衰减必须写出来（不能只报 6/6 通过）。
+    #    round130 改为读 V5 最后一期胜率，页面数字必须与产物一致。
+    _v5 = _g114f.get("V5_halfyear") or []
+    if _v5:
+        _wr = float(_v5[-1].get("win_rate") or 0) * 100
+        _wr_s = f"{_wr:.1f}%"
+        chk(f"C2 已披露半年度胜率衰减（{_v5[-1].get('label')}={_wr_s}）",
+            _wr_s in S, _wr_s)
+    else:
+        chk("C2 半年度一致性产物存在", False, "V5_halfyear 缺失")
     chk("C2 已披露无分钟线限制", "无分钟线" in S)
     chk("C2 纠错记录已披露（索引 bug）", "纠错记录" in S)
+    chk("C2 round130 刷新记录已披露", "round130 刷新记录" in S)
     # 反例：不得出现「T0 已验证」「候选信号可用于实盘」
     chk("C2 未宣称 T0 已回测验证",
         not re.search(r"T0[^。；]{0,10}(回测验证通过|已验证成立)", S))

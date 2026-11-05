@@ -1,0 +1,551 @@
+{
+ "meta": {
+  "purpose": "找出 T+1 真正可执行的口径（用 5 个口径对照，含成本）",
+  "cost_per_roundtrip": 0.002,
+  "min_amt": 30000000.0,
+  "gates": "|IC|>=0.02 且 |t|>=2.0 且 IC胜率>=55%或<=45% 且 扣费后多空>0",
+  "verdict": "可执行口径下的 winners 为空 → 说明书里所有「次日方向预测」能力在扣费后可执行层面均不成立"
+ },
+ "by_vehicle": {
+  "E1_open_to_close": {
+   "label": "open[t+1]→close[t+1]",
+   "executable": true,
+   "desc": "当日回转（T0 代理）",
+   "n_days": 309,
+   "factors": {
+    "amp": {
+     "ic": -0.01991,
+     "t": -1.73,
+     "pos_rate": 0.4531,
+     "ls_gross": 0.303,
+     "ls_net": 0.103,
+     "n_gate": 1,
+     "pass": false
+    },
+    "vol_ratio": {
+     "ic": 0.00182,
+     "t": 0.25,
+     "pos_rate": 0.4884,
+     "ls_gross": 0.391,
+     "ls_net": 0.191,
+     "n_gate": 1,
+     "pass": false
+    },
+    "turn_z": {
+     "ic": -0.00514,
+     "t": -0.567,
+     "pos_rate": 0.4862,
+     "ls_gross": 0.456,
+     "ls_net": 0.256,
+     "n_gate": 1,
+     "pass": false
+    },
+    "rsi14": {
+     "ic": -0.00463,
+     "t": -0.449,
+     "pos_rate": 0.4757,
+     "ls_gross": 0.327,
+     "ls_net": 0.127,
+     "n_gate": 1,
+     "pass": false
+    },
+    "vol20": {
+     "ic": -0.02717,
+     "t": -1.844,
+     "pos_rate": 0.4712,
+     "ls_gross": 0.139,
+     "ls_net": -0.061,
+     "n_gate": 1,
+     "pass": false
+    },
+    "dist_ma20": {
+     "ic": 0.0034,
+     "t": 0.311,
+     "pos_rate": 0.5116,
+     "ls_gross": 0.421,
+     "ls_net": 0.221,
+     "n_gate": 1,
+     "pass": false
+    },
+    "mom1": {
+     "ic": -0.00729,
+     "t": -0.762,
+     "pos_rate": 0.4854,
+     "ls_gross": 0.13,
+     "ls_net": -0.07,
+     "n_gate": 0,
+     "pass": false
+    },
+    "rev1": {
+     "ic": 0.00729,
+     "t": 0.762,
+     "pos_rate": 0.5146,
+     "ls_gross": -0.13,
+     "ls_net": -0.33,
+     "n_gate": 0,
+     "pass": false
+    },
+    "close_pos": {
+     "ic": -0.01054,
+     "t": -1.254,
+     "pos_rate": 0.4693,
+     "ls_gross": -0.048,
+     "ls_net": -0.248,
+     "n_gate": 0,
+     "pass": false
+    },
+    "gap": {
+     "ic": 0.00917,
+     "t": 1.166,
+     "pos_rate": 0.5405,
+     "ls_gross": 0.044,
+     "ls_net": -0.156,
+     "n_gate": 0,
+     "pass": false
+    },
+    "mom5": {
+     "ic": 0.01301,
+     "t": 1.294,
+     "pos_rate": 0.5275,
+     "ls_gross": 0.421,
+     "ls_net": 0.221,
+     "n_gate": 1,
+     "pass": false
+    }
+   }
+  },
+  "E2_open_to_open": {
+   "label": "open[t+1]→open[t+2]",
+   "executable": true,
+   "desc": "持 1 日，抓一次隔夜",
+   "n_days": 309,
+   "factors": {
+    "amp": {
+     "ic": -0.03602,
+     "t": -3.17,
+     "pos_rate": 0.4401,
+     "ls_gross": 0.073,
+     "ls_net": -0.127,
+     "n_gate": 3,
+     "pass": false
+    },
+    "vol_ratio": {
+     "ic": -0.01927,
+     "t": -2.77,
+     "pos_rate": 0.412,
+     "ls_gross": 0.093,
+     "ls_net": -0.107,
+     "n_gate": 2,
+     "pass": false
+    },
+    "turn_z": {
+     "ic": -0.02921,
+     "t": -3.393,
+     "pos_rate": 0.4087,
+     "ls_gross": 0.125,
+     "ls_net": -0.075,
+     "n_gate": 3,
+     "pass": false
+    },
+    "rsi14": {
+     "ic": -0.02432,
+     "t": -2.436,
+     "pos_rate": 0.4272,
+     "ls_gross": 0.082,
+     "ls_net": -0.118,
+     "n_gate": 3,
+     "pass": false
+    },
+    "vol20": {
+     "ic": -0.03766,
+     "t": -2.55,
+     "pos_rate": 0.4508,
+     "ls_gross": -0.016,
+     "ls_net": -0.216,
+     "n_gate": 2,
+     "pass": false
+    },
+    "dist_ma20": {
+     "ic": -0.01803,
+     "t": -1.745,
+     "pos_rate": 0.4352,
+     "ls_gross": 0.116,
+     "ls_net": -0.084,
+     "n_gate": 1,
+     "pass": false
+    },
+    "mom1": {
+     "ic": -0.01782,
+     "t": -1.924,
+     "pos_rate": 0.4369,
+     "ls_gross": 0.037,
+     "ls_net": -0.163,
+     "n_gate": 1,
+     "pass": false
+    },
+    "rev1": {
+     "ic": 0.01782,
+     "t": 1.924,
+     "pos_rate": 0.5631,
+     "ls_gross": -0.037,
+     "ls_net": -0.237,
+     "n_gate": 1,
+     "pass": false
+    },
+    "close_pos": {
+     "ic": -0.01575,
+     "t": -1.9,
+     "pos_rate": 0.4628,
+     "ls_gross": -0.096,
+     "ls_net": -0.296,
+     "n_gate": 0,
+     "pass": false
+    },
+    "gap": {
+     "ic": 0.01567,
+     "t": 1.995,
+     "pos_rate": 0.5502,
+     "ls_gross": 0.16,
+     "ls_net": -0.04,
+     "n_gate": 1,
+     "pass": false
+    },
+    "mom5": {
+     "ic": -0.00519,
+     "t": -0.533,
+     "pos_rate": 0.4822,
+     "ls_gross": 0.169,
+     "ls_net": -0.031,
+     "n_gate": 0,
+     "pass": false
+    }
+   }
+  },
+  "E3_close_next_to_close": {
+   "label": "close[t+1]→close[t+2]",
+   "executable": true,
+   "desc": "T+1 收盘买",
+   "n_days": 309,
+   "factors": {
+    "amp": {
+     "ic": -0.05249,
+     "t": -4.635,
+     "pos_rate": 0.3851,
+     "ls_gross": -0.057,
+     "ls_net": -0.257,
+     "n_gate": 3,
+     "pass": false
+    },
+    "vol_ratio": {
+     "ic": -0.0218,
+     "t": -2.943,
+     "pos_rate": 0.3987,
+     "ls_gross": -0.016,
+     "ls_net": -0.216,
+     "n_gate": 3,
+     "pass": false
+    },
+    "turn_z": {
+     "ic": -0.03317,
+     "t": -3.746,
+     "pos_rate": 0.3968,
+     "ls_gross": 0.034,
+     "ls_net": -0.166,
+     "n_gate": 3,
+     "pass": false
+    },
+    "rsi14": {
+     "ic": -0.02722,
+     "t": -2.663,
+     "pos_rate": 0.4272,
+     "ls_gross": 0.068,
+     "ls_net": -0.132,
+     "n_gate": 3,
+     "pass": false
+    },
+    "vol20": {
+     "ic": -0.04312,
+     "t": -2.933,
+     "pos_rate": 0.4271,
+     "ls_gross": -0.058,
+     "ls_net": -0.258,
+     "n_gate": 3,
+     "pass": false
+    },
+    "dist_ma20": {
+     "ic": -0.01701,
+     "t": -1.542,
+     "pos_rate": 0.4352,
+     "ls_gross": 0.085,
+     "ls_net": -0.115,
+     "n_gate": 1,
+     "pass": false
+    },
+    "mom1": {
+     "ic": 0.00343,
+     "t": 0.365,
+     "pos_rate": 0.4984,
+     "ls_gross": 0.215,
+     "ls_net": 0.015,
+     "n_gate": 1,
+     "pass": false
+    },
+    "rev1": {
+     "ic": -0.00343,
+     "t": -0.365,
+     "pos_rate": 0.5016,
+     "ls_gross": -0.215,
+     "ls_net": -0.415,
+     "n_gate": 0,
+     "pass": false
+    },
+    "close_pos": {
+     "ic": -0.0012,
+     "t": -0.144,
+     "pos_rate": 0.4725,
+     "ls_gross": 0.072,
+     "ls_net": -0.128,
+     "n_gate": 0,
+     "pass": false
+    },
+    "gap": {
+     "ic": 0.01797,
+     "t": 2.204,
+     "pos_rate": 0.5405,
+     "ls_gross": 0.26,
+     "ls_net": 0.06,
+     "n_gate": 2,
+     "pass": false
+    },
+    "mom5": {
+     "ic": -0.00648,
+     "t": -0.633,
+     "pos_rate": 0.4595,
+     "ls_gross": 0.119,
+     "ls_net": -0.081,
+     "n_gate": 0,
+     "pass": false
+    }
+   }
+  },
+  "E4_close_to_close": {
+   "label": "close[t]→close[t+1]",
+   "executable": false,
+   "desc": "含隔夜，不可执行（对照）",
+   "n_days": 309,
+   "factors": {
+    "amp": {
+     "ic": -0.04884,
+     "t": -4.312,
+     "pos_rate": 0.3754,
+     "ls_gross": 0.037,
+     "ls_net": -0.163,
+     "n_gate": 3,
+     "pass": false
+    },
+    "vol_ratio": {
+     "ic": -0.02739,
+     "t": -3.686,
+     "pos_rate": 0.3754,
+     "ls_gross": 0.032,
+     "ls_net": -0.168,
+     "n_gate": 3,
+     "pass": false
+    },
+    "turn_z": {
+     "ic": -0.04015,
+     "t": -4.55,
+     "pos_rate": 0.4071,
+     "ls_gross": 0.073,
+     "ls_net": -0.127,
+     "n_gate": 3,
+     "pass": false
+    },
+    "rsi14": {
+     "ic": -0.02716,
+     "t": -2.651,
+     "pos_rate": 0.4498,
+     "ls_gross": 0.209,
+     "ls_net": 0.009,
+     "n_gate": 4,
+     "pass": true
+    },
+    "vol20": {
+     "ic": -0.04549,
+     "t": -3.107,
+     "pos_rate": 0.4237,
+     "ls_gross": -0.006,
+     "ls_net": -0.206,
+     "n_gate": 3,
+     "pass": false
+    },
+    "dist_ma20": {
+     "ic": -0.0189,
+     "t": -1.702,
+     "pos_rate": 0.4452,
+     "ls_gross": 0.227,
+     "ls_net": 0.027,
+     "n_gate": 2,
+     "pass": false
+    },
+    "mom1": {
+     "ic": -0.00885,
+     "t": -0.917,
+     "pos_rate": 0.4919,
+     "ls_gross": 0.455,
+     "ls_net": 0.255,
+     "n_gate": 1,
+     "pass": false
+    },
+    "rev1": {
+     "ic": 0.00885,
+     "t": 0.917,
+     "pos_rate": 0.5081,
+     "ls_gross": -0.455,
+     "ls_net": -0.655,
+     "n_gate": 0,
+     "pass": false
+    },
+    "close_pos": {
+     "ic": -0.01311,
+     "t": -1.488,
+     "pos_rate": 0.4531,
+     "ls_gross": 0.203,
+     "ls_net": 0.003,
+     "n_gate": 1,
+     "pass": false
+    },
+    "gap": {
+     "ic": 0.02513,
+     "t": 3.127,
+     "pos_rate": 0.6019,
+     "ls_gross": 0.454,
+     "ls_net": 0.254,
+     "n_gate": 4,
+     "pass": true
+    },
+    "mom5": {
+     "ic": -0.00219,
+     "t": -0.213,
+     "pos_rate": 0.4919,
+     "ls_gross": 0.349,
+     "ls_net": 0.149,
+     "n_gate": 1,
+     "pass": false
+    }
+   }
+  },
+  "E5_close_to_close_2d": {
+   "label": "close[t]→close[t+2]",
+   "executable": false,
+   "desc": "2 日（对照）",
+   "n_days": 309,
+   "factors": {
+    "amp": {
+     "ic": -0.0559,
+     "t": -5.194,
+     "pos_rate": 0.4045,
+     "ls_gross": -0.01,
+     "ls_net": -0.21,
+     "n_gate": 3,
+     "pass": false
+    },
+    "vol_ratio": {
+     "ic": -0.02288,
+     "t": -3.281,
+     "pos_rate": 0.392,
+     "ls_gross": 0.025,
+     "ls_net": -0.175,
+     "n_gate": 3,
+     "pass": false
+    },
+    "turn_z": {
+     "ic": -0.03533,
+     "t": -4.168,
+     "pos_rate": 0.3968,
+     "ls_gross": 0.124,
+     "ls_net": -0.076,
+     "n_gate": 3,
+     "pass": false
+    },
+    "rsi14": {
+     "ic": -0.02328,
+     "t": -2.436,
+     "pos_rate": 0.4142,
+     "ls_gross": 0.29,
+     "ls_net": 0.09,
+     "n_gate": 4,
+     "pass": true
+    },
+    "vol20": {
+     "ic": -0.05209,
+     "t": -3.755,
+     "pos_rate": 0.4407,
+     "ls_gross": -0.057,
+     "ls_net": -0.257,
+     "n_gate": 3,
+     "pass": false
+    },
+    "dist_ma20": {
+     "ic": -0.01277,
+     "t": -1.223,
+     "pos_rate": 0.4419,
+     "ls_gross": 0.323,
+     "ls_net": 0.123,
+     "n_gate": 2,
+     "pass": false
+    },
+    "mom1": {
+     "ic": 0.00244,
+     "t": 0.26,
+     "pos_rate": 0.4984,
+     "ls_gross": 0.684,
+     "ls_net": 0.484,
+     "n_gate": 1,
+     "pass": false
+    },
+    "rev1": {
+     "ic": -0.00244,
+     "t": -0.26,
+     "pos_rate": 0.5016,
+     "ls_gross": -0.684,
+     "ls_net": -0.884,
+     "n_gate": 0,
+     "pass": false
+    },
+    "close_pos": {
+     "ic": -0.0069,
+     "t": -0.788,
+     "pos_rate": 0.4725,
+     "ls_gross": 0.282,
+     "ls_net": 0.082,
+     "n_gate": 1,
+     "pass": false
+    },
+    "gap": {
+     "ic": 0.02915,
+     "t": 3.875,
+     "pos_rate": 0.5728,
+     "ls_gross": 0.714,
+     "ls_net": 0.514,
+     "n_gate": 4,
+     "pass": true
+    },
+    "mom5": {
+     "ic": 0.00587,
+     "t": 0.611,
+     "pos_rate": 0.5405,
+     "ls_gross": 0.478,
+     "ls_net": 0.278,
+     "n_gate": 1,
+     "pass": false
+    }
+   }
+  }
+ },
+ "executable_winners": {
+  "E1_open_to_close": [],
+  "E2_open_to_open": [],
+  "E3_close_next_to_close": []
+ }
+}

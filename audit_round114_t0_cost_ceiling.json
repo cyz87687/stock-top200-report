@@ -1,0 +1,269 @@
+{
+ "meta": {
+  "purpose": "T0 成本天花板与盈亏平衡命中率反算（**非 T0 回测**）",
+  "what_this_is_not": "这不是 T0 回测。K 线库只有日线（341 日 × 2138 只），无分钟数据 → T0 收益无法由此脚本产生，任何 T0 收益数字都不成立。",
+  "what_this_is": "T0 决策真正需要的成本门槛反算：p* = 0.5 + c/(2e)。e 由日线可测的日内幅度分布给出，c 为已知成本常数。",
+  "formula": "期望收益 = e·(2p−1) − c；盈亏平衡 p* = 0.5 + c/(2e)",
+  "cost_profiles": {
+   "etf_no_stamp": {
+    "label": "ETF（免印花税）",
+    "commission_2way": 0.0002,
+    "stamp": 0.0,
+    "slippage_2way": 0.0004
+   },
+   "large_cap": {
+    "label": "主板大市值个股",
+    "commission_2way": 0.0003,
+    "stamp": 0.0005,
+    "slippage_2way": 0.0008
+   },
+   "small_cap": {
+    "label": "小市值高波动个股",
+    "commission_2way": 0.0003,
+    "stamp": 0.0005,
+    "slippage_2way": 0.002
+   }
+  },
+  "n_valid_samples": 634550,
+  "date_range": [
+   "2025-06-09",
+   "2026-11-05"
+  ],
+  "data_limit": "无分钟线 → T0 不可回测"
+ },
+ "distribution_pct": {
+  "amp_over_prev_pct": {
+   "p10": 1.8784,
+   "p25": 2.6906,
+   "p50": 4.0457,
+   "p75": 6.1327,
+   "p90": 8.89
+  },
+  "amp_over_open_pct": {
+   "p10": 1.8789,
+   "p25": 2.6934,
+   "p50": 4.0514,
+   "p75": 6.1441,
+   "p90": 8.8987
+  },
+  "abs_intra_pct": {
+   "p10": 0.3096,
+   "p25": 0.774,
+   "p50": 1.7073,
+   "p75": 3.2593,
+   "p90": 5.4856
+  },
+  "abs_gap_pct": {
+   "p10": 0.014,
+   "p25": 0.1868,
+   "p50": 0.5508,
+   "p75": 1.2011,
+   "p90": 2.2049
+  }
+ },
+ "gap_to_intra": {
+  "same_sign_rate": 0.4414,
+  "group_mean_intra_pct": [
+   0.425,
+   0.1793,
+   0.0733,
+   0.1228,
+   0.0809
+  ],
+  "group_n": [
+   126910,
+   126908,
+   72425,
+   181386,
+   126921
+  ],
+  "note": "同号率≈0.5 且分组均值无单调 → 开盘前信息对日内方向无预测力，与 round111b「日内段 13 因子零显著」一致。"
+ },
+ "breakeven_table": {
+  "etf_no_stamp": {
+   "label": "ETF（免印花税）",
+   "cost_roundtrip_pct": 0.06,
+   "breakeven": {
+    "p10": {
+     "capture_e_pct": 0.3096,
+     "p_star": 0.5969
+    },
+    "p25": {
+     "capture_e_pct": 0.774,
+     "p_star": 0.5388
+    },
+    "p50": {
+     "capture_e_pct": 1.7073,
+     "p_star": 0.5176
+    },
+    "p75": {
+     "capture_e_pct": 3.2593,
+     "p_star": 0.5092
+    },
+    "p90": {
+     "capture_e_pct": 5.4856,
+     "p_star": 0.5055
+    },
+    "amp_p10": {
+     "capture_e_pct": 1.8789,
+     "p_star": 0.516,
+     "note": "吃满全天振幅（理论上界，实际不可能）"
+    },
+    "amp_p25": {
+     "capture_e_pct": 2.6934,
+     "p_star": 0.5111,
+     "note": "吃满全天振幅（理论上界，实际不可能）"
+    },
+    "amp_p50": {
+     "capture_e_pct": 4.0514,
+     "p_star": 0.5074,
+     "note": "吃满全天振幅（理论上界，实际不可能）"
+    },
+    "amp_p75": {
+     "capture_e_pct": 6.1441,
+     "p_star": 0.5049,
+     "note": "吃满全天振幅（理论上界，实际不可能）"
+    },
+    "amp_p90": {
+     "capture_e_pct": 8.8987,
+     "p_star": 0.5034,
+     "note": "吃满全天振幅（理论上界，实际不可能）"
+    }
+   }
+  },
+  "large_cap": {
+   "label": "主板大市值个股",
+   "cost_roundtrip_pct": 0.16,
+   "breakeven": {
+    "p10": {
+     "capture_e_pct": 0.3096,
+     "p_star": 0.7584
+    },
+    "p25": {
+     "capture_e_pct": 0.774,
+     "p_star": 0.6034
+    },
+    "p50": {
+     "capture_e_pct": 1.7073,
+     "p_star": 0.5469
+    },
+    "p75": {
+     "capture_e_pct": 3.2593,
+     "p_star": 0.5245
+    },
+    "p90": {
+     "capture_e_pct": 5.4856,
+     "p_star": 0.5146
+    },
+    "amp_p10": {
+     "capture_e_pct": 1.8789,
+     "p_star": 0.5426,
+     "note": "吃满全天振幅（理论上界，实际不可能）"
+    },
+    "amp_p25": {
+     "capture_e_pct": 2.6934,
+     "p_star": 0.5297,
+     "note": "吃满全天振幅（理论上界，实际不可能）"
+    },
+    "amp_p50": {
+     "capture_e_pct": 4.0514,
+     "p_star": 0.5197,
+     "note": "吃满全天振幅（理论上界，实际不可能）"
+    },
+    "amp_p75": {
+     "capture_e_pct": 6.1441,
+     "p_star": 0.513,
+     "note": "吃满全天振幅（理论上界，实际不可能）"
+    },
+    "amp_p90": {
+     "capture_e_pct": 8.8987,
+     "p_star": 0.509,
+     "note": "吃满全天振幅（理论上界，实际不可能）"
+    }
+   }
+  },
+  "small_cap": {
+   "label": "小市值高波动个股",
+   "cost_roundtrip_pct": 0.28,
+   "breakeven": {
+    "p10": {
+     "capture_e_pct": 0.3096,
+     "p_star": 0.9522
+    },
+    "p25": {
+     "capture_e_pct": 0.774,
+     "p_star": 0.6809
+    },
+    "p50": {
+     "capture_e_pct": 1.7073,
+     "p_star": 0.582
+    },
+    "p75": {
+     "capture_e_pct": 3.2593,
+     "p_star": 0.543
+    },
+    "p90": {
+     "capture_e_pct": 5.4856,
+     "p_star": 0.5255
+    },
+    "amp_p10": {
+     "capture_e_pct": 1.8789,
+     "p_star": 0.5745,
+     "note": "吃满全天振幅（理论上界，实际不可能）"
+    },
+    "amp_p25": {
+     "capture_e_pct": 2.6934,
+     "p_star": 0.552,
+     "note": "吃满全天振幅（理论上界，实际不可能）"
+    },
+    "amp_p50": {
+     "capture_e_pct": 4.0514,
+     "p_star": 0.5346,
+     "note": "吃满全天振幅（理论上界，实际不可能）"
+    },
+    "amp_p75": {
+     "capture_e_pct": 6.1441,
+     "p_star": 0.5228,
+     "note": "吃满全天振幅（理论上界，实际不可能）"
+    },
+    "amp_p90": {
+     "capture_e_pct": 8.8987,
+     "p_star": 0.5157,
+     "note": "吃满全天振幅（理论上界，实际不可能）"
+    }
+   }
+  }
+ },
+ "feasibility": {
+  "etf_no_stamp": {
+   "cost_pct": 0.06,
+   "e_conservative_pct": 1.7073,
+   "p_star_conservative": 0.5176,
+   "p_star_minus_base": 0.0176,
+   "daily_data_provable_edge": 0.0586,
+   "feasible_on_daily_evidence": true
+  },
+  "large_cap": {
+   "cost_pct": 0.16,
+   "e_conservative_pct": 1.7073,
+   "p_star_conservative": 0.5469,
+   "p_star_minus_base": 0.0469,
+   "daily_data_provable_edge": 0.0586,
+   "feasible_on_daily_evidence": true
+  },
+  "small_cap": {
+   "cost_pct": 0.28,
+   "e_conservative_pct": 1.7073,
+   "p_star_conservative": 0.582,
+   "p_star_minus_base": 0.082,
+   "daily_data_provable_edge": 0.0586,
+   "feasible_on_daily_evidence": false
+  }
+ },
+ "verdict": "T0 的核心矛盾是成本门槛而非模型精度：ETF 口径单次回转 0.060%、小市值口径 0.280%。以日内实际涨跌幅度中位数 1.71% 作为可捕获空间 e，盈亏平衡命中率 p* 分别为 ETF（免印花税） 51.8%、主板大市值个股 54.7%、小市值高波动个股 58.2%。而日线数据能证明的方向可预测性偏离 50% 仅 5.86pp（gap→intra 同号率），远不足以覆盖 p* 与 50% 的差距。→ **T0 在当前数据与成本结构下不具备可行性证据，需接入分钟线后重新验证**；在此之前任何 T0 仓位/信号建议都只能是假设，不能声称已验证。",
+ "must_not_claim": [
+  "不得声称本脚本验证了 T0 策略收益（无分钟线）",
+  "不得把 BREAKEVEN 表当成'T0 能达到的胜率'（那是必要条件的反算）",
+  "不得在无分钟线验证前给出 T0 具体仓位比例"
+ ]
+}

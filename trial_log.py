@@ -147,6 +147,8 @@ CURATION = {
     "audit_round111b_t1_decompose.json": KIND_FACTOR,     # T+1 收益拆解（隔夜/日内）
     "audit_round113_holding_period.json": KIND_FACTOR,    # 持有期扫描
     "audit_round113b_holdout.json": KIND_FACTOR,          # 对 round113 三重证伪
+    # round130：补产出物（T+1/T0 卡片原本硬编码的统计），与 111 同类 → 计入 K
+    "audit_round130_total_t1.json": KIND_FACTOR,          # total 对 T+1 超额区分力
     "data/audit_round118c_ic_decay.json": KIND_FACTOR,    # IC 衰减曲线
     # ── round118e/118f：dominant 扩张决策链 ──
     # ⚠️ 这两条为什么算 KIND_FACTOR 而不是 KIND_DIAG：
