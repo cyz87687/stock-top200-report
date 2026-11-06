@@ -1,0 +1,1004 @@
+{
+ "generated_at": "2026-11-06T09:55:52+08:00",
+ "writer": "audit_round131_random20.py",
+ "seed": 20261106,
+ "n_sample": 20,
+ "tolerance": 0.05,
+ "weights_version": "v4.19-c1-sustain-gates",
+ "active_weights": {
+  "score_fund": 0.2,
+  "score_quality": 0.1,
+  "score_growth": 0.2,
+  "score_bias60": 0.05,
+  "score_rsi_rev": 0.05,
+  "score_ep": 0.1,
+  "score_size_growth": 0.2,
+  "score_dominant": 0.1
+ },
+ "aggregate": {
+  "n_sample": 20,
+  "n_total_recompute_ok": 20,
+  "n_dim_range_ok": 20,
+  "n_neutral_consistent": 20,
+  "n_anchor_gate_ok": 20,
+  "pool_size_growth_vs_logmv_rank_corr": -0.2972338991852742,
+  "n_fwd_stale_in_sample": 0,
+  "n_fwd_soft_in_sample": 0,
+  "n_findings": 0
+ },
+ "findings": [],
+ "rows": [
+  {
+   "code": "sh600105",
+   "name": "永鼎股份",
+   "sector": "AI/半导体",
+   "total_stored": 77.45,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 1.58,
+    "score_quality": 0.992,
+    "score_growth": 1.848,
+    "score_bias60": 0.49,
+    "score_rsi_rev": 0.489,
+    "score_ep": 0.568,
+    "score_size_growth": 1.0,
+    "score_dominant": 0.778
+   },
+   "key_dims": {
+    "score_fund": 3.95,
+    "score_quality": 9.92,
+    "score_growth": 9.24,
+    "score_bias60": 4.9,
+    "score_rsi_rev": 4.89,
+    "score_ep": 5.68,
+    "score_size_growth": null,
+    "score_dominant": 7.78
+   },
+   "cagr3": 45.8,
+   "growth_raw": 130.32,
+   "pe": 52.05,
+   "fwd_pe": 30.1,
+   "pe_ladder": {
+    "2026": 30.1,
+    "2027": 12.1,
+    "2028": 9.5
+   },
+   "quality_cash_flags": [],
+   "neutral_filled": [
+    "score_size_growth"
+   ],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 337.0,
+   "verdict": "OK"
+  },
+  {
+   "code": "sz000960",
+   "name": "锡业股份",
+   "sector": "有色资源",
+   "total_stored": 75.4,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 1.64,
+    "score_quality": 0.821,
+    "score_growth": 1.56,
+    "score_bias60": 0.444,
+    "score_rsi_rev": 0.444,
+    "score_ep": 0.972,
+    "score_size_growth": 1.0,
+    "score_dominant": 0.659
+   },
+   "key_dims": {
+    "score_fund": 4.1,
+    "score_quality": 8.21,
+    "score_growth": 7.8,
+    "score_bias60": 4.44,
+    "score_rsi_rev": 4.44,
+    "score_ep": 9.72,
+    "score_size_growth": null,
+    "score_dominant": 6.59
+   },
+   "cagr3": 24.8,
+   "growth_raw": 53.61,
+   "pe": 14.48,
+   "fwd_pe": 11.3,
+   "pe_ladder": {
+    "2026": 11.3,
+    "2027": 10.1,
+    "2028": 9.3
+   },
+   "quality_cash_flags": [],
+   "neutral_filled": [
+    "score_size_growth"
+   ],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 404.0,
+   "verdict": "OK"
+  },
+  {
+   "code": "sz002636",
+   "name": "金安国纪",
+   "sector": "AI/半导体",
+   "total_stored": 74.1,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 1.748,
+    "score_quality": 0.896,
+    "score_growth": 1.934,
+    "score_bias60": 0.215,
+    "score_rsi_rev": 0.201,
+    "score_ep": 0.854,
+    "score_size_growth": 1.0,
+    "score_dominant": 0.562
+   },
+   "key_dims": {
+    "score_fund": 4.37,
+    "score_quality": 8.96,
+    "score_growth": 9.67,
+    "score_bias60": 2.15,
+    "score_rsi_rev": 2.01,
+    "score_ep": 8.54,
+    "score_size_growth": null,
+    "score_dominant": 5.62
+   },
+   "cagr3": 232.3,
+   "growth_raw": 1179.19,
+   "pe": 23.37,
+   "fwd_pe": 23.4,
+   "pe_ladder": null,
+   "quality_cash_flags": [],
+   "neutral_filled": [
+    "score_size_growth"
+   ],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 477.8,
+   "verdict": "OK"
+  },
+  {
+   "code": "sh603283",
+   "name": "赛腾股份",
+   "sector": "高端制造",
+   "total_stored": 64.52,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 1.632,
+    "score_quality": 0.347,
+    "score_growth": 1.51,
+    "score_bias60": 0.322,
+    "score_rsi_rev": 0.2,
+    "score_ep": 0.869,
+    "score_size_growth": 1.0,
+    "score_dominant": 0.572
+   },
+   "key_dims": {
+    "score_fund": 4.08,
+    "score_quality": 3.47,
+    "score_growth": 7.55,
+    "score_bias60": 3.22,
+    "score_rsi_rev": 2.0,
+    "score_ep": 8.69,
+    "score_size_growth": null,
+    "score_dominant": 5.72
+   },
+   "cagr3": 16.9,
+   "growth_raw": 36.86,
+   "pe": 21.97,
+   "fwd_pe": 20.6,
+   "pe_ladder": {
+    "2026": 20.6,
+    "2027": 15.8,
+    "2028": 12.6
+   },
+   "quality_cash_flags": [],
+   "neutral_filled": [
+    "score_size_growth"
+   ],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 131.5,
+   "verdict": "OK"
+  },
+  {
+   "code": "sh688035",
+   "name": "德邦科技",
+   "sector": "电子材料",
+   "total_stored": 54.36,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 1.256,
+    "score_quality": 0.656,
+    "score_growth": 1.0,
+    "score_bias60": 0.358,
+    "score_rsi_rev": 0.302,
+    "score_ep": 0.525,
+    "score_size_growth": 1.0,
+    "score_dominant": 0.339
+   },
+   "key_dims": {
+    "score_fund": 3.14,
+    "score_quality": 6.56,
+    "score_growth": 5.0,
+    "score_bias60": 3.58,
+    "score_rsi_rev": 3.02,
+    "score_ep": 5.25,
+    "score_size_growth": 5.0,
+    "score_dominant": 3.39
+   },
+   "cagr3": -0.1,
+   "growth_raw": 49.9,
+   "pe": 55.45,
+   "fwd_pe": 49.4,
+   "pe_ladder": {
+    "2026": 49.4,
+    "2027": 27.2,
+    "2028": 17.0
+   },
+   "quality_cash_flags": [],
+   "neutral_filled": [],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 80.0,
+   "verdict": "OK"
+  },
+  {
+   "code": "sz002187",
+   "name": "广百股份",
+   "sector": "消费",
+   "total_stored": 43.85,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 1.0,
+    "score_quality": 0.575,
+    "score_growth": 0.796,
+    "score_bias60": 0.079,
+    "score_rsi_rev": 0.092,
+    "score_ep": 0.5,
+    "score_size_growth": 0.93,
+    "score_dominant": 0.413
+   },
+   "key_dims": {
+    "score_fund": null,
+    "score_quality": 5.75,
+    "score_growth": 3.98,
+    "score_bias60": 0.79,
+    "score_rsi_rev": 0.92,
+    "score_ep": null,
+    "score_size_growth": 4.65,
+    "score_dominant": 4.13
+   },
+   "cagr3": null,
+   "growth_raw": null,
+   "pe": 0,
+   "fwd_pe": null,
+   "pe_ladder": null,
+   "quality_cash_flags": [],
+   "neutral_filled": [
+    "score_fund",
+    "score_ep"
+   ],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 41.6,
+   "verdict": "OK"
+  },
+  {
+   "code": "sz300378",
+   "name": "鼎捷数智",
+   "sector": "计算机软件",
+   "total_stored": 42.54,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 0.432,
+    "score_quality": 0.0,
+    "score_growth": 1.62,
+    "score_bias60": 0.07,
+    "score_rsi_rev": 0.136,
+    "score_ep": 0.426,
+    "score_size_growth": 1.0,
+    "score_dominant": 0.57
+   },
+   "key_dims": {
+    "score_fund": 1.08,
+    "score_quality": 0.0,
+    "score_growth": 8.1,
+    "score_bias60": 0.7,
+    "score_rsi_rev": 1.36,
+    "score_ep": 4.26,
+    "score_size_growth": null,
+    "score_dominant": 5.7
+   },
+   "cagr3": 5.5,
+   "growth_raw": -13.44,
+   "pe": 34.89,
+   "fwd_pe": 39.2,
+   "pe_ladder": {
+    "2026": 39.2,
+    "2027": 40.8,
+    "2028": 33.7
+   },
+   "quality_cash_flags": [
+    "ocf_ni<0"
+   ],
+   "neutral_filled": [
+    "score_size_growth"
+   ],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 107.8,
+   "verdict": "OK"
+  },
+  {
+   "code": "sh600258",
+   "name": "首旅酒店",
+   "sector": "消费",
+   "total_stored": 40.77,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 1.308,
+    "score_quality": 0.438,
+    "score_growth": 1.0,
+    "score_bias60": 0.034,
+    "score_rsi_rev": 0.002,
+    "score_ep": 0.907,
+    "score_size_growth": 0.038,
+    "score_dominant": 0.35
+   },
+   "key_dims": {
+    "score_fund": 3.27,
+    "score_quality": 4.38,
+    "score_growth": 5.0,
+    "score_bias60": 0.34,
+    "score_rsi_rev": 0.02,
+    "score_ep": 9.07,
+    "score_size_growth": 0.19,
+    "score_dominant": 3.5
+   },
+   "cagr3": null,
+   "growth_raw": 10.46,
+   "pe": 17.26,
+   "fwd_pe": 16.6,
+   "pe_ladder": {
+    "2026": 16.6,
+    "2027": 14.8,
+    "2028": 13.3
+   },
+   "quality_cash_flags": [],
+   "neutral_filled": [],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 151.5,
+   "verdict": "OK"
+  },
+  {
+   "code": "sh600853",
+   "name": "龙建股份",
+   "sector": "综合",
+   "total_stored": 38.99,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 0.968,
+    "score_quality": 0.155,
+    "score_growth": 0.466,
+    "score_bias60": 0.089,
+    "score_rsi_rev": 0.115,
+    "score_ep": 0.6,
+    "score_size_growth": 1.0,
+    "score_dominant": 0.506
+   },
+   "key_dims": {
+    "score_fund": 2.42,
+    "score_quality": 1.55,
+    "score_growth": 2.33,
+    "score_bias60": 0.89,
+    "score_rsi_rev": 1.15,
+    "score_ep": 6.0,
+    "score_size_growth": null,
+    "score_dominant": 5.06
+   },
+   "cagr3": 2.9,
+   "growth_raw": -18.04,
+   "pe": 10.66,
+   "fwd_pe": 10.7,
+   "pe_ladder": null,
+   "quality_cash_flags": [
+    "ocf_ni<0"
+   ],
+   "neutral_filled": [
+    "score_size_growth"
+   ],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 36.4,
+   "verdict": "OK"
+  },
+  {
+   "code": "sz000059",
+   "name": "华锦股份",
+   "sector": "化工",
+   "total_stored": 36.74,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 1.412,
+    "score_quality": 0.427,
+    "score_growth": 0.54,
+    "score_bias60": 0.296,
+    "score_rsi_rev": 0.422,
+    "score_ep": 0.183,
+    "score_size_growth": 0.0,
+    "score_dominant": 0.394
+   },
+   "key_dims": {
+    "score_fund": 3.53,
+    "score_quality": 4.27,
+    "score_growth": 2.7,
+    "score_bias60": 2.96,
+    "score_rsi_rev": 4.22,
+    "score_ep": 1.83,
+    "score_size_growth": 0.0,
+    "score_dominant": 3.94
+   },
+   "cagr3": null,
+   "growth_raw": 127.2,
+   "pe": 683.58,
+   "fwd_pe": 14.2,
+   "pe_ladder": {
+    "2026": 14.2,
+    "2027": 12.7,
+    "2028": 10.3
+   },
+   "quality_cash_flags": [],
+   "neutral_filled": [],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 74.2,
+   "verdict": "OK"
+  },
+  {
+   "code": "sh603800",
+   "name": "洪田股份",
+   "sector": "高端制造",
+   "total_stored": 35.66,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 1.112,
+    "score_quality": 0.448,
+    "score_growth": 0.352,
+    "score_bias60": 0.481,
+    "score_rsi_rev": 0.476,
+    "score_ep": 0.5,
+    "score_size_growth": 0.0,
+    "score_dominant": 0.197
+   },
+   "key_dims": {
+    "score_fund": 2.78,
+    "score_quality": 4.48,
+    "score_growth": 1.76,
+    "score_bias60": 4.81,
+    "score_rsi_rev": 4.76,
+    "score_ep": null,
+    "score_size_growth": 0.0,
+    "score_dominant": 1.97
+   },
+   "cagr3": null,
+   "growth_raw": -276.04,
+   "pe": 528.57,
+   "fwd_pe": 36.5,
+   "pe_ladder": {
+    "2026": 36.5,
+    "2027": 15.8,
+    "2028": 10.0
+   },
+   "quality_cash_flags": [],
+   "neutral_filled": [
+    "score_ep"
+   ],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 77.0,
+   "verdict": "OK"
+  },
+  {
+   "code": "sh688007",
+   "name": "光峰科技",
+   "sector": "电子制造",
+   "total_stored": 35.51,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 0.512,
+    "score_quality": 0.164,
+    "score_growth": 0.796,
+    "score_bias60": 0.205,
+    "score_rsi_rev": 0.251,
+    "score_ep": 0.5,
+    "score_size_growth": 1.0,
+    "score_dominant": 0.123
+   },
+   "key_dims": {
+    "score_fund": 1.28,
+    "score_quality": 1.64,
+    "score_growth": 3.98,
+    "score_bias60": 2.05,
+    "score_rsi_rev": 2.51,
+    "score_ep": null,
+    "score_size_growth": 5.0,
+    "score_dominant": 1.23
+   },
+   "cagr3": null,
+   "growth_raw": -142.1,
+   "pe": 0,
+   "fwd_pe": 112.1,
+   "pe_ladder": {
+    "2027": 112.1,
+    "2028": 76.6
+   },
+   "quality_cash_flags": [],
+   "neutral_filled": [
+    "score_ep"
+   ],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 46.0,
+   "verdict": "OK"
+  },
+  {
+   "code": "sz002139",
+   "name": "拓邦股份",
+   "sector": "电子制造",
+   "total_stored": 34.18,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 0.532,
+    "score_quality": 0.234,
+    "score_growth": 0.508,
+    "score_bias60": 0.118,
+    "score_rsi_rev": 0.094,
+    "score_ep": 0.424,
+    "score_size_growth": 1.0,
+    "score_dominant": 0.508
+   },
+   "key_dims": {
+    "score_fund": 1.33,
+    "score_quality": 2.34,
+    "score_growth": 2.54,
+    "score_bias60": 1.18,
+    "score_rsi_rev": 0.94,
+    "score_ep": 4.24,
+    "score_size_growth": null,
+    "score_dominant": 5.08
+   },
+   "cagr3": -8.3,
+   "growth_raw": -55.13,
+   "pe": 87.62,
+   "fwd_pe": 21.2,
+   "pe_ladder": {
+    "2026": 21.2,
+    "2027": 20.1,
+    "2028": 17.2
+   },
+   "quality_cash_flags": [],
+   "neutral_filled": [
+    "score_size_growth"
+   ],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 106.6,
+   "verdict": "OK"
+  },
+  {
+   "code": "sh600199",
+   "name": "金种子酒",
+   "sector": "消费",
+   "total_stored": 33.46,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 0.68,
+    "score_quality": 0.369,
+    "score_growth": 0.796,
+    "score_bias60": 0.082,
+    "score_rsi_rev": 0.082,
+    "score_ep": 0.5,
+    "score_size_growth": 0.694,
+    "score_dominant": 0.143
+   },
+   "key_dims": {
+    "score_fund": 1.7,
+    "score_quality": 3.69,
+    "score_growth": 3.98,
+    "score_bias60": 0.82,
+    "score_rsi_rev": 0.82,
+    "score_ep": null,
+    "score_size_growth": 3.47,
+    "score_dominant": 1.43
+   },
+   "cagr3": null,
+   "growth_raw": 1.71,
+   "pe": 0,
+   "fwd_pe": 132.1,
+   "pe_ladder": {
+    "2028": 132.1
+   },
+   "quality_cash_flags": [],
+   "neutral_filled": [
+    "score_ep"
+   ],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 51.5,
+   "verdict": "OK"
+  },
+  {
+   "code": "sz002456",
+   "name": "欧菲光",
+   "sector": "电子面板",
+   "total_stored": 33.36,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 0.44,
+    "score_quality": 0.899,
+    "score_growth": 0.234,
+    "score_bias60": 0.367,
+    "score_rsi_rev": 0.405,
+    "score_ep": 0.5,
+    "score_size_growth": 0.0,
+    "score_dominant": 0.491
+   },
+   "key_dims": {
+    "score_fund": 1.1,
+    "score_quality": 8.99,
+    "score_growth": 1.17,
+    "score_bias60": 3.67,
+    "score_rsi_rev": 4.05,
+    "score_ep": null,
+    "score_size_growth": 0.0,
+    "score_dominant": 4.91
+   },
+   "cagr3": null,
+   "growth_raw": -442.72,
+   "pe": 458.73,
+   "fwd_pe": 458.7,
+   "pe_ladder": null,
+   "quality_cash_flags": [],
+   "neutral_filled": [
+    "score_ep"
+   ],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 191.7,
+   "verdict": "OK"
+  },
+  {
+   "code": "sz002792",
+   "name": "通宇通讯",
+   "sector": "AI/半导体",
+   "total_stored": 30.61,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 0.44,
+    "score_quality": 0.073,
+    "score_growth": 0.796,
+    "score_bias60": 0.271,
+    "score_rsi_rev": 0.239,
+    "score_ep": 0.5,
+    "score_size_growth": 0.548,
+    "score_dominant": 0.194
+   },
+   "key_dims": {
+    "score_fund": 1.1,
+    "score_quality": 0.73,
+    "score_growth": 3.98,
+    "score_bias60": 2.71,
+    "score_rsi_rev": 2.39,
+    "score_ep": null,
+    "score_size_growth": 2.74,
+    "score_dominant": 1.94
+   },
+   "cagr3": null,
+   "growth_raw": -4695.06,
+   "pe": 350.0,
+   "fwd_pe": 272.0,
+   "pe_ladder": {
+    "2026": 272.0,
+    "2027": 185.9,
+    "2028": 83.5
+   },
+   "quality_cash_flags": [],
+   "neutral_filled": [
+    "score_ep"
+   ],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 95.1,
+   "verdict": "OK"
+  },
+  {
+   "code": "sh688006",
+   "name": "杭可科技",
+   "sector": "新能源",
+   "total_stored": 29.95,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 0.8,
+    "score_quality": 0.804,
+    "score_growth": 0.114,
+    "score_bias60": 0.268,
+    "score_rsi_rev": 0.191,
+    "score_ep": 0.426,
+    "score_size_growth": 0.0,
+    "score_dominant": 0.392
+   },
+   "key_dims": {
+    "score_fund": 2.0,
+    "score_quality": 8.04,
+    "score_growth": 0.57,
+    "score_bias60": 2.68,
+    "score_rsi_rev": 1.91,
+    "score_ep": 4.26,
+    "score_size_growth": 0.0,
+    "score_dominant": 3.92
+   },
+   "cagr3": -10.0,
+   "growth_raw": -56.62,
+   "pe": 76.13,
+   "fwd_pe": 23.9,
+   "pe_ladder": {
+    "2026": 23.9,
+    "2027": 17.2,
+    "2028": 14.2
+   },
+   "quality_cash_flags": [],
+   "neutral_filled": [],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 112.7,
+   "verdict": "OK"
+  },
+  {
+   "code": "sh688352",
+   "name": "颀中科技",
+   "sector": "AI/半导体",
+   "total_stored": 28.85,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 0.572,
+    "score_quality": 0.238,
+    "score_growth": 0.508,
+    "score_bias60": 0.347,
+    "score_rsi_rev": 0.215,
+    "score_ep": 0.5,
+    "score_size_growth": 0.0,
+    "score_dominant": 0.505
+   },
+   "key_dims": {
+    "score_fund": 1.43,
+    "score_quality": 2.38,
+    "score_growth": 2.54,
+    "score_bias60": 3.47,
+    "score_rsi_rev": 2.15,
+    "score_ep": null,
+    "score_size_growth": 0.0,
+    "score_dominant": 5.05
+   },
+   "cagr3": -2.9,
+   "growth_raw": -81.37,
+   "pe": 65.09,
+   "fwd_pe": 93.1,
+   "pe_ladder": {
+    "2026": 93.1,
+    "2027": 40.9,
+    "2028": 32.5
+   },
+   "quality_cash_flags": [],
+   "neutral_filled": [
+    "score_ep"
+   ],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 170.3,
+   "verdict": "OK"
+  },
+  {
+   "code": "sh600488",
+   "name": "津药药业",
+   "sector": "医药生物",
+   "total_stored": 28.4,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 0.172,
+    "score_quality": 0.983,
+    "score_growth": 0.114,
+    "score_bias60": 0.318,
+    "score_rsi_rev": 0.385,
+    "score_ep": 0.477,
+    "score_size_growth": 0.0,
+    "score_dominant": 0.391
+   },
+   "key_dims": {
+    "score_fund": 0.43,
+    "score_quality": 9.83,
+    "score_growth": 0.57,
+    "score_bias60": 3.18,
+    "score_rsi_rev": 3.85,
+    "score_ep": 4.77,
+    "score_size_growth": 0.0,
+    "score_dominant": 3.91
+   },
+   "cagr3": 15.0,
+   "growth_raw": -66.26,
+   "pe": 116.12,
+   "fwd_pe": 116.1,
+   "pe_ladder": null,
+   "quality_cash_flags": [],
+   "neutral_filled": [],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 54.7,
+   "verdict": "OK"
+  },
+  {
+   "code": "sz000799",
+   "name": "酒鬼酒",
+   "sector": "消费",
+   "total_stored": 26.98,
+   "checks": {
+    "total_recompute": true,
+    "dim_range": true,
+    "neutral_fill_consistent": true,
+    "growth_anchor_gate": true,
+    "cash_flags_recorded": true,
+    "peg_sanity": true
+   },
+   "contrib_pct": {
+    "score_fund": 0.68,
+    "score_quality": 0.094,
+    "score_growth": 0.796,
+    "score_bias60": 0.212,
+    "score_rsi_rev": 0.218,
+    "score_ep": 0.108,
+    "score_size_growth": 0.09,
+    "score_dominant": 0.5
+   },
+   "key_dims": {
+    "score_fund": 1.7,
+    "score_quality": 0.94,
+    "score_growth": 3.98,
+    "score_bias60": 2.12,
+    "score_rsi_rev": 2.18,
+    "score_ep": 1.08,
+    "score_size_growth": 0.45,
+    "score_dominant": 5.0
+   },
+   "cagr3": null,
+   "growth_raw": 142.94,
+   "pe": 0,
+   "fwd_pe": 323.4,
+   "pe_ladder": {
+    "2026": 323.4,
+    "2027": 155.2,
+    "2028": 97.0
+   },
+   "quality_cash_flags": [
+    "ocf_ni<0"
+   ],
+   "neutral_filled": [],
+   "fwd_2026_status": null,
+   "circ_mv_yi": 116.4,
+   "verdict": "OK"
+  }
+ ]
+}

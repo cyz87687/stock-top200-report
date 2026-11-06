@@ -5252,6 +5252,24 @@ def main():
     _codes6 = [s["code"][2:] for s in stocks if len(s.get("code", "")) >= 6]
     report_map = fetch_research_reports_map(days=7, codes=_codes6)
 
+    # --- Step 4.9: FY2026 卖方预测陈旧守卫（fwd_stale_guard，2026-11-06）---
+    #   背景：华正新材 fwd_pe 36.2 > pe 22.9 是「卖方 2026 预测未更新」伪象
+    #   （THS/东财/Wind 三源一致预期 ~6.42 亿 < 前三季已实现归母 8.00 亿），
+    #   不是「预期下修」。判定/锚定规则与行级留痕见 fwd_stale_guard.py 单一实现。
+    #   只修 THS 阶梯派生的 computed_fwd_pe/pe_ladder 2026 位；fwd_pe_map（fwd_np
+    #   持续性闸门用）保留卖方原值不动，implied_h2 去重闸门口径不变。
+    from fwd_stale_guard import guard_pe_ladder
+    fwd_guard_meta = guard_pe_ladder(
+        pe_ladder, computed_fwd_pe, fwd_pe_map,
+        em_growth_map, mktcap_map)
+    if fwd_guard_meta:
+        print(f"   ⚠️ FY2026 卖方预测陈旧守卫: {len(fwd_guard_meta)} 只锚定"
+              f"（一致预期<已实现累计）→ " +
+              ", ".join("%s %.1f→%.1f亿" % (
+                  next((x.get('name') for x in stocks if x.get('code') == _c), _c),
+                  _m['consensus_yi'], _m['anchor_yi'])
+                  for _c, _m in list(fwd_guard_meta.items())[:8]))
+
     # --- Step 5: Score all ---
     _T("Step4.8b 研报")
     print(f"\n🎯 Step 5: 四维评分(题材30%+基本面30%(含行业前景)+消息20%+技术面20%)")
@@ -5333,6 +5351,11 @@ def main():
             hist_loss_free=hist_loss_free_map.get(code, False),
             fwd_np=fwd_pe_map.get(code), sw_l2=sw_l2, cagr3=cagr3_input,
             q3_info=q3_map.get(code), roe_unit=roe_unit_input)
+        # 陈旧守卫留痕（fwd_stale_guard）：行级披露 + fund_reasons 注记，
+        # 防止下游把 fwd_pe>pe 误读成「预期下修」。
+        _fg = fwd_guard_meta.get(code)
+        if _fg and (_fg.get("stale") or _fg.get("stale_soft")):
+            fr = list(fr) + [_fg.get("note")]
         
         # Tech (传入CAGR3用于成长加分, 传入周线用于双线多头判断)
         wkl = wklines.get(code)
@@ -5621,6 +5644,16 @@ def main():
             "fwd_pe": round(fwd_pe_resolved, 1) if fwd_pe_resolved else None,
             "growth": round(growth_resolved, 1) if growth_resolved else None,
             "pe_ladder": ladder_resolved if ladder_resolved else None,
+            # fwd_stale_guard（2026-11-06）：卖方FY2026预测陈旧锚定留痕。
+            #   fwd_stale=True 时 fwd_pe/pe_ladder 2026 位已按确定性年化锚定，
+            #   禁止把 fwd_pe>pe 读作「预期下修」（一致预期原值见 fwd_2026_consensus）。
+            "fwd_stale": bool(_fg and _fg.get("stale")),
+            "fwd_stale_soft": bool(_fg and _fg.get("stale_soft")),
+            "fwd_2026_src": (_fg or {}).get("src"),
+            "fwd_2026_consensus": (_fg or {}).get("consensus_yi"),
+            "fwd_2026_ytd": (_fg or {}).get("ytd_yi"),
+            "fwd_2026_period": (_fg or {}).get("period"),
+            "fwd_2026_anchor": (_fg or {}).get("anchor_yi"),
             "cagr3": cagr3_input,
             # v3.5: 低基数失真审计——原始增速 vs 评分实际采用增速（触发修正时才有差异）
             "growth_raw": sustain_info.get("growth_raw"),

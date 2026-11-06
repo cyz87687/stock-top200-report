@@ -1,0 +1,1400 @@
+{
+ "generated_at": "2026-11-06T09:51:51+08:00",
+ "writer": "refresh_fwd_2026.py",
+ "scored_source": "top200_scored_2026-11-05.json",
+ "rule": {
+  "stale_test": "一致预期FY2026E>0 且 2026报告期归母累计>0 且 一致预期<累计 且 核心增速>0",
+  "materiality": "一致预期<累计×0.9（implied Q4 亏损>一成累计）→ stale 改数；0.9~1.0 倍区间 → stale_soft 只留痕不改数",
+  "anchor": "max(一致预期, 归母累计×12/已实现月数)（确定性年化，禁季节假设）",
+  "scope": "只覆盖 pe_ladder/computed_fwd_pe 的 2026 位；2027/2028 保留卖方原值；fwd_np（持续性闸门）与 implied_h2（Q3去重闸门）口径不变",
+  "guard_impl": "fwd_stale_guard.py（step2 与本脚本共用单一实现）",
+  "interpretation": "fwd_pe>pe 且增速>0 且一致预期<已实现累计 → 卖方预测陈旧伪象，禁止读作「预期下修」"
+ },
+ "pool_stats": {
+  "n_rows": 2190,
+  "n_with_ladder": 1355,
+  "n_stale_overridden": 25,
+  "n_stale_soft_flag_only": 20,
+  "n_fwd_gt_115pe_pattern": 72
+ },
+ "stale_scan": [
+  {
+   "code": "sh688331",
+   "name": "荣昌生物",
+   "sector": "医药生物",
+   "total": 56.51,
+   "pe": 8.4,
+   "fwd_pe_before": 12.8,
+   "fwd_pe_after": 7.8,
+   "ladder_before": {
+    "2026": 12.8,
+    "2027": 78.1,
+    "2028": 46.4
+   },
+   "ladder_after": {
+    "2026": 7.8,
+    "2027": 78.1,
+    "2028": 46.4
+   },
+   "growth_raw": 909.19,
+   "growth_period": "20260930",
+   "consensus_yi": 42.83,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 52.7323,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 70.3097,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期42.87亿<已实现前三季归母52.73亿(20260930)，非'预期下修'；估值已按确定性年化锚定70.31亿(FwdPE=7.8)",
+   "n_inst": 12
+  },
+  {
+   "code": "sz002432",
+   "name": "九安医疗",
+   "sector": "医药生物",
+   "total": 51.59,
+   "pe": 4.33,
+   "fwd_pe_before": 5.8,
+   "fwd_pe_after": 3.7,
+   "ladder_before": {
+    "2026": 5.8,
+    "2027": 5.7,
+    "2028": 5.1
+   },
+   "ladder_after": {
+    "2026": 3.7,
+    "2027": 5.7,
+    "2028": 5.1
+   },
+   "growth_raw": 223.77,
+   "growth_period": "20260930",
+   "consensus_yi": 43.57,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 52.0536,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 69.4048,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期43.92亿<已实现前三季归母52.05亿(20260930)，非'预期下修'；估值已按确定性年化锚定69.40亿(FwdPE=3.7)",
+   "n_inst": 2
+  },
+  {
+   "code": "sz002156",
+   "name": "通富微电",
+   "sector": "AI/半导体",
+   "total": 63.4,
+   "pe": 21.09,
+   "fwd_pe_before": 33.8,
+   "fwd_pe_after": 17.7,
+   "ladder_before": {
+    "2026": 33.8,
+    "2027": 31.4,
+    "2028": 25.5
+   },
+   "ladder_after": {
+    "2026": 17.7,
+    "2027": 31.4,
+    "2028": 25.5
+   },
+   "growth_raw": 77.1,
+   "growth_period": "20260930",
+   "consensus_yi": 21.35,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 30.6061,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 40.8081,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期21.34亿<已实现前三季归母30.61亿(20260930)，非'预期下修'；估值已按确定性年化锚定40.81亿(FwdPE=17.7)",
+   "n_inst": 7
+  },
+  {
+   "code": "sh688019",
+   "name": "安集科技",
+   "sector": "电子材料",
+   "total": 64.7,
+   "pe": 31.55,
+   "fwd_pe_before": 40.6,
+   "fwd_pe_after": 26.7,
+   "ladder_before": {
+    "2026": 40.6,
+    "2027": 34.7,
+    "2028": 27.6
+   },
+   "ladder_after": {
+    "2026": 26.7,
+    "2027": 34.7,
+    "2028": 27.6
+   },
+   "growth_raw": 35.32,
+   "growth_period": "20260930",
+   "consensus_yi": 12.03,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 13.7379,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 18.3172,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期12.04亿<已实现前三季归母13.74亿(20260930)，非'预期下修'；估值已按确定性年化锚定18.32亿(FwdPE=26.7)",
+   "n_inst": 5
+  },
+  {
+   "code": "sh600267",
+   "name": "海正药业",
+   "sector": "医药生物",
+   "total": 68.34,
+   "pe": 13.32,
+   "fwd_pe_before": 16.3,
+   "fwd_pe_after": 10.7,
+   "ladder_before": {
+    "2026": 16.3,
+    "2027": 14.0,
+    "2028": 12.4
+   },
+   "ladder_after": {
+    "2026": 10.7,
+    "2027": 14.0,
+    "2028": 12.4
+   },
+   "growth_raw": 100.11,
+   "growth_period": "20260930",
+   "consensus_yi": 10.04,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 11.457,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 15.276,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期10.01亿<已实现前三季归母11.46亿(20260930)，非'预期下修'；估值已按确定性年化锚定15.28亿(FwdPE=10.7)",
+   "n_inst": 1
+  },
+  {
+   "code": "sh688729",
+   "name": "屹唐股份",
+   "sector": "AI/半导体",
+   "total": 53.13,
+   "pe": 50.28,
+   "fwd_pe_before": 65.1,
+   "fwd_pe_after": 43.2,
+   "ladder_before": {
+    "2026": 65.1,
+    "2027": 49.8,
+    "2028": 34.7
+   },
+   "ladder_after": {
+    "2026": 43.2,
+    "2027": 49.8,
+    "2028": 34.7
+   },
+   "growth_raw": 3.38,
+   "growth_period": "20260930",
+   "consensus_yi": 9.48,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 10.7272,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 14.3029,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期9.48亿<已实现前三季归母10.73亿(20260930)，非'预期下修'；估值已按确定性年化锚定14.30亿(FwdPE=43.2)",
+   "n_inst": 8
+  },
+  {
+   "code": "sh603186",
+   "name": "华正新材",
+   "sector": "AI/半导体",
+   "total": 78.87,
+   "pe": 22.9,
+   "fwd_pe_before": 36.2,
+   "fwd_pe_after": 21.8,
+   "ladder_before": {
+    "2026": 36.2,
+    "2027": 24.3,
+    "2028": 20.1
+   },
+   "ladder_after": {
+    "2026": 21.8,
+    "2027": 24.3,
+    "2028": 20.1
+   },
+   "growth_raw": 1499.31,
+   "growth_period": "20260930",
+   "consensus_yi": 6.42,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 7.9996,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 10.6661,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期6.42亿<已实现前三季归母8.00亿(20260930)，非'预期下修'；估值已按确定性年化锚定10.67亿(FwdPE=21.8)",
+   "n_inst": 1
+  },
+  {
+   "code": "sz300613",
+   "name": "富瀚微",
+   "sector": "AI/半导体",
+   "total": 46.74,
+   "pe": 19.99,
+   "fwd_pe_before": 32.1,
+   "fwd_pe_after": 16.2,
+   "ladder_before": {
+    "2026": 32.1,
+    "2027": 33.4,
+    "2028": 31.1
+   },
+   "ladder_after": {
+    "2026": 16.2,
+    "2027": 33.4,
+    "2028": 31.1
+   },
+   "growth_raw": 934.65,
+   "growth_period": "20260930",
+   "consensus_yi": 5.22,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 7.7521,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 10.3361,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期5.22亿<已实现前三季归母7.75亿(20260930)，非'预期下修'；估值已按确定性年化锚定10.34亿(FwdPE=16.2)",
+   "n_inst": 1
+  },
+  {
+   "code": "sh688469",
+   "name": "芯联集成",
+   "sector": "AI/半导体",
+   "total": 47.41,
+   "pe": 112.78,
+   "fwd_pe_before": 138.7,
+   "fwd_pe_after": 68.4,
+   "ladder_before": {
+    "2026": 138.7,
+    "2027": 80.0,
+    "2028": 46.6
+   },
+   "ladder_after": {
+    "2026": 68.4,
+    "2027": 80.0,
+    "2028": 46.6
+   },
+   "growth_raw": 139.32,
+   "growth_period": "20260930",
+   "consensus_yi": 4.54,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 6.9007,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 9.2009,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期4.54亿<已实现前三季归母6.90亿(20260930)，非'预期下修'；估值已按确定性年化锚定9.20亿(FwdPE=68.4)",
+   "n_inst": 10
+  },
+  {
+   "code": "sh688428",
+   "name": "诺诚健华",
+   "sector": "医药生物",
+   "total": 53.37,
+   "pe": 34.26,
+   "fwd_pe_before": 133.4,
+   "fwd_pe_after": 53.4,
+   "ladder_before": {
+    "2026": 133.4,
+    "2027": 154.1,
+    "2028": 86.5
+   },
+   "ladder_after": {
+    "2026": 53.4,
+    "2027": 154.1,
+    "2028": 86.5
+   },
+   "growth_raw": 532.98,
+   "growth_period": "20260930",
+   "consensus_yi": 3.5,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 6.557,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 8.7427,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期3.50亿<已实现前三季归母6.56亿(20260930)，非'预期下修'；估值已按确定性年化锚定8.74亿(FwdPE=53.4)",
+   "n_inst": 12
+  },
+  {
+   "code": "sh688802",
+   "name": "沐曦股份",
+   "sector": "AI/半导体",
+   "total": 32.8,
+   "pe": 999.12,
+   "fwd_pe_before": 1571.5,
+   "fwd_pe_after": 228.7,
+   "ladder_before": {
+    "2026": 1571.5,
+    "2027": 143.3,
+    "2028": 57.0
+   },
+   "ladder_after": {
+    "2026": 228.7,
+    "2027": 143.3,
+    "2028": 57.0
+   },
+   "growth_raw": 166.03,
+   "growth_period": "20260930",
+   "consensus_yi": 1.24,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 6.3898,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 8.5197,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期1.24亿<已实现前三季归母6.39亿(20260930)，非'预期下修'；估值已按确定性年化锚定8.52亿(FwdPE=228.7)",
+   "n_inst": 8
+  },
+  {
+   "code": "sz300199",
+   "name": "翰宇药业",
+   "sector": "医药生物",
+   "total": 46.44,
+   "pe": 54.66,
+   "fwd_pe_before": 64.6,
+   "fwd_pe_after": 37.7,
+   "ladder_before": {
+    "2026": 64.6,
+    "2027": 37.7,
+    "2028": 21.4
+   },
+   "ladder_after": {
+    "2026": 37.7,
+    "2027": 37.7,
+    "2028": 21.4
+   },
+   "growth_raw": 741.83,
+   "growth_period": "20260930",
+   "consensus_yi": 3.4,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 4.3664,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 5.8219,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期3.40亿<已实现前三季归母4.37亿(20260930)，非'预期下修'；估值已按确定性年化锚定5.82亿(FwdPE=37.7)",
+   "n_inst": 1
+  },
+  {
+   "code": "sh688220",
+   "name": "翱捷科技",
+   "sector": "AI/半导体",
+   "total": 30.1,
+   "pe": 158.32,
+   "fwd_pe_before": 272.1,
+   "fwd_pe_after": 97.9,
+   "ladder_before": {
+    "2026": 272.1,
+    "2027": 99.8,
+    "2028": 55.6
+   },
+   "ladder_after": {
+    "2026": 97.9,
+    "2027": 99.8,
+    "2028": 55.6
+   },
+   "growth_raw": 117.39,
+   "growth_period": "20260930",
+   "consensus_yi": 1.72,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 3.585,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 4.78,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期1.72亿<已实现前三季归母3.58亿(20260930)，非'预期下修'；估值已按确定性年化锚定4.78亿(FwdPE=97.9)",
+   "n_inst": 7
+  },
+  {
+   "code": "sh605189",
+   "name": "富春染织",
+   "sector": "消费",
+   "total": 56.34,
+   "pe": 8.88,
+   "fwd_pe_before": 12.1,
+   "fwd_pe_after": 7.7,
+   "ladder_before": {
+    "2026": 12.1,
+    "2027": 13.9,
+    "2028": 12.4
+   },
+   "ladder_after": {
+    "2026": 7.7,
+    "2027": 13.9,
+    "2028": 12.4
+   },
+   "growth_raw": 1268.12,
+   "growth_period": "20260930",
+   "consensus_yi": 2.98,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 3.5284,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 4.7045,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期2.98亿<已实现前三季归母3.53亿(20260930)，非'预期下修'；估值已按确定性年化锚定4.70亿(FwdPE=7.7)",
+   "n_inst": 6
+  },
+  {
+   "code": "sz301239",
+   "name": "普瑞眼科",
+   "sector": "医药生物",
+   "total": 53.27,
+   "pe": 74.13,
+   "fwd_pe_before": 49.7,
+   "fwd_pe_after": 27.2,
+   "ladder_before": {
+    "2026": 49.7,
+    "2027": 26.3,
+    "2028": 18.7
+   },
+   "ladder_after": {
+    "2026": 27.2,
+    "2027": 26.3,
+    "2028": 18.7
+   },
+   "growth_raw": 543.98,
+   "growth_period": "20260930",
+   "consensus_yi": 1.1,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 1.5106,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 2.0141,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期1.10亿<已实现前三季归母1.51亿(20260930)，非'预期下修'；估值已按确定性年化锚定2.01亿(FwdPE=27.2)",
+   "n_inst": 2
+  },
+  {
+   "code": "sz000070",
+   "name": "特发信息",
+   "sector": "AI/半导体",
+   "total": 41.11,
+   "pe": 0,
+   "fwd_pe_before": 143.1,
+   "fwd_pe_after": 64.2,
+   "ladder_before": {
+    "2026": 143.1,
+    "2027": 69.2,
+    "2028": 46.9
+   },
+   "ladder_after": {
+    "2026": 64.2,
+    "2027": 69.2,
+    "2028": 46.9
+   },
+   "growth_raw": 6901.86,
+   "growth_period": "20260930",
+   "consensus_yi": 0.76,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 1.2692,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 1.6923,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期0.76亿<已实现前三季归母1.27亿(20260930)，非'预期下修'；估值已按确定性年化锚定1.69亿(FwdPE=64.2)",
+   "n_inst": 2
+  },
+  {
+   "code": "sh600573",
+   "name": "惠泉啤酒",
+   "sector": "消费",
+   "total": 62.95,
+   "pe": 32.84,
+   "fwd_pe_before": 33.3,
+   "fwd_pe_after": 20.7,
+   "ladder_before": {
+    "2026": 33.3,
+    "2027": 26.9,
+    "2028": 20.9
+   },
+   "ladder_after": {
+    "2026": 20.7,
+    "2027": 26.9,
+    "2028": 20.9
+   },
+   "growth_raw": 14.97,
+   "growth_period": "20260930",
+   "consensus_yi": 0.96,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 1.1601,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 1.5468,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期0.96亿<已实现前三季归母1.16亿(20260930)，非'预期下修'；估值已按确定性年化锚定1.55亿(FwdPE=20.7)",
+   "n_inst": 5
+  },
+  {
+   "code": "sz002365",
+   "name": "永安药业",
+   "sector": "医药生物",
+   "total": 56.15,
+   "pe": 32.95,
+   "fwd_pe_before": 38.2,
+   "fwd_pe_after": 24.1,
+   "ladder_before": {
+    "2026": 38.2,
+    "2027": 33.4,
+    "2028": 29.1
+   },
+   "ladder_after": {
+    "2026": 24.1,
+    "2027": 33.4,
+    "2028": 29.1
+   },
+   "growth_raw": 2009.75,
+   "growth_period": "20260930",
+   "consensus_yi": 0.96,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 1.1443,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 1.5257,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期0.96亿<已实现前三季归母1.14亿(20260930)，非'预期下修'；估值已按确定性年化锚定1.53亿(FwdPE=24.1)",
+   "n_inst": 1
+  },
+  {
+   "code": "sh603738",
+   "name": "泰晶科技",
+   "sector": "AI/半导体",
+   "total": 52.08,
+   "pe": 79.93,
+   "fwd_pe_before": 126.2,
+   "fwd_pe_after": 69.7,
+   "ladder_before": {
+    "2026": 126.2,
+    "2027": 96.5,
+    "2028": 66.9
+   },
+   "ladder_after": {
+    "2026": 69.7,
+    "2027": 96.5,
+    "2028": 66.9
+   },
+   "growth_raw": 253.62,
+   "growth_period": "20260930",
+   "consensus_yi": 0.78,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 1.0591,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 1.4121,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期0.78亿<已实现前三季归母1.06亿(20260930)，非'预期下修'；估值已按确定性年化锚定1.41亿(FwdPE=69.7)",
+   "n_inst": 1
+  },
+  {
+   "code": "sh688553",
+   "name": "汇宇制药",
+   "sector": "医药生物",
+   "total": 46.91,
+   "pe": 55.24,
+   "fwd_pe_before": 792.8,
+   "fwd_pe_after": 51.8,
+   "ladder_before": {
+    "2026": 792.8,
+    "2027": 129.7,
+    "2028": 56.6
+   },
+   "ladder_after": {
+    "2026": 51.8,
+    "2027": 129.7,
+    "2028": 56.6
+   },
+   "growth_raw": 68.59,
+   "growth_period": "20260930",
+   "consensus_yi": 0.09,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 1.0332,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 1.3776,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期0.09亿<已实现前三季归母1.03亿(20260930)，非'预期下修'；估值已按确定性年化锚定1.38亿(FwdPE=51.8)",
+   "n_inst": 2
+  },
+  {
+   "code": "sh600118",
+   "name": "中国卫星",
+   "sector": "航天军工",
+   "total": 42.9,
+   "pe": 636.59,
+   "fwd_pe_before": 1401.5,
+   "fwd_pe_after": 594.1,
+   "ladder_before": {
+    "2026": 1401.5,
+    "2027": 947.5,
+    "2028": 546.9
+   },
+   "ladder_after": {
+    "2026": 594.1,
+    "2027": 947.5,
+    "2028": 546.9
+   },
+   "growth_raw": 1321.23,
+   "growth_period": "20260930",
+   "consensus_yi": 0.48,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 0.8493,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 1.1324,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期0.48亿<已实现前三季归母0.85亿(20260930)，非'预期下修'；估值已按确定性年化锚定1.13亿(FwdPE=594.1)",
+   "n_inst": 2
+  },
+  {
+   "code": "sh688620",
+   "name": "安凯微",
+   "sector": "AI/半导体",
+   "total": 41.91,
+   "pe": 523.3,
+   "fwd_pe_before": 98.4,
+   "fwd_pe_after": 54.7,
+   "ladder_before": {
+    "2026": 98.4,
+    "2027": 58.6,
+    "2028": 37.3
+   },
+   "ladder_after": {
+    "2026": 54.7,
+    "2027": 58.6,
+    "2028": 37.3
+   },
+   "growth_raw": 179.09,
+   "growth_period": "20260930",
+   "consensus_yi": 0.5,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 0.6751,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 0.9001,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期0.50亿<已实现前三季归母0.68亿(20260930)，非'预期下修'；估值已按确定性年化锚定0.90亿(FwdPE=54.7)",
+   "n_inst": 1
+  },
+  {
+   "code": "sz002439",
+   "name": "启明星辰",
+   "sector": "计算机软件",
+   "total": 32.49,
+   "pe": 0,
+   "fwd_pe_before": 708.4,
+   "fwd_pe_after": 345.9,
+   "ladder_before": {
+    "2026": 708.4,
+    "2027": 158.1,
+    "2028": 75.7
+   },
+   "ladder_after": {
+    "2026": 345.9,
+    "2027": 158.1,
+    "2028": 75.7
+   },
+   "growth_raw": 119.93,
+   "growth_period": "20260930",
+   "consensus_yi": 0.25,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 0.384,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 0.512,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期0.25亿<已实现前三季归母0.38亿(20260930)，非'预期下修'；估值已按确定性年化锚定0.51亿(FwdPE=345.9)",
+   "n_inst": 4
+  },
+  {
+   "code": "sh688135",
+   "name": "利扬芯片",
+   "sector": "AI/半导体",
+   "total": 44.72,
+   "pe": 252.78,
+   "fwd_pe_before": 711.4,
+   "fwd_pe_after": 136.1,
+   "ladder_before": {
+    "2026": 711.4,
+    "2027": 156.2,
+    "2028": 81.1
+   },
+   "ladder_after": {
+    "2026": 136.1,
+    "2027": 156.2,
+    "2028": 81.1
+   },
+   "growth_raw": 1867.08,
+   "growth_period": "20260930",
+   "consensus_yi": 0.09,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 0.3528,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 0.4704,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期0.09亿<已实现前三季归母0.35亿(20260930)，非'预期下修'；估值已按确定性年化锚定0.47亿(FwdPE=136.1)",
+   "n_inst": 1
+  },
+  {
+   "code": "sz300642",
+   "name": "透景生命",
+   "sector": "医药生物",
+   "total": 38.27,
+   "pe": 143.21,
+   "fwd_pe_before": 192.6,
+   "fwd_pe_after": 96.2,
+   "ladder_before": {
+    "2026": 192.6,
+    "2027": 77.1,
+    "2028": 62.7
+   },
+   "ladder_after": {
+    "2026": 96.2,
+    "2027": 77.1,
+    "2028": 62.7
+   },
+   "growth_raw": 745.69,
+   "growth_period": "20260930",
+   "consensus_yi": 0.14,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 0.2102,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 0.2803,
+   "src": "run_rate_anchor_9m_x4_3",
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期0.14亿<已实现前三季归母0.21亿(20260930)，非'预期下修'；估值已按确定性年化锚定0.28亿(FwdPE=96.2)",
+   "n_inst": 1
+  }
+ ],
+ "soft_scan": [
+  {
+   "code": "sz002958",
+   "name": "青农商行",
+   "sector": "金融",
+   "total": 42.43,
+   "pe": 5.12,
+   "fwd_pe_before": 5.2,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 5.2,
+    "2027": 4.9,
+    "2028": 4.5
+   },
+   "ladder_after": null,
+   "growth_raw": 6.58,
+   "growth_period": "20260930",
+   "consensus_yi": 31.79,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 34.0095,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 31.79,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期31.62亿略低于已实现累计34.01亿（implied Q4=-2.38亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 3
+  },
+  {
+   "code": "sh688072",
+   "name": "拓荆科技",
+   "sector": "AI/半导体",
+   "total": 55.94,
+   "pe": 52.45,
+   "fwd_pe_before": 65.6,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 65.6,
+    "2027": 50.7,
+    "2028": 37.2
+   },
+   "ladder_after": null,
+   "growth_raw": 102.66,
+   "growth_period": "20260930",
+   "consensus_yi": 22.4,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 24.3079,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 22.4,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期22.40亿略低于已实现累计24.31亿（implied Q4=-1.91亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 16
+  },
+  {
+   "code": "sh688808",
+   "name": "联讯仪器",
+   "sector": "高端制造",
+   "total": 65.89,
+   "pe": 59.82,
+   "fwd_pe_before": 66.3,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 66.3,
+    "2027": 34.0,
+    "2028": 22.8
+   },
+   "ladder_after": null,
+   "growth_raw": 1980.84,
+   "growth_period": "20260930",
+   "consensus_yi": 19.65,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 20.0592,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 19.65,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期18.79亿略低于已实现累计20.06亿（implied Q4=-1.27亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 15
+  },
+  {
+   "code": "sz002185",
+   "name": "华天科技",
+   "sector": "AI/半导体",
+   "total": 52.61,
+   "pe": 42.54,
+   "fwd_pe_before": 51.3,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 51.3,
+    "2027": 42.4,
+    "2028": 34.1
+   },
+   "ladder_after": null,
+   "growth_raw": 481.32,
+   "growth_period": "20260930",
+   "consensus_yi": 10.52,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 11.0049,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 10.52,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期10.52亿略低于已实现累计11.00亿（implied Q4=-0.49亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 1
+  },
+  {
+   "code": "sh600521",
+   "name": "华海药业",
+   "sector": "医药生物",
+   "total": 55.49,
+   "pe": 28.33,
+   "fwd_pe_before": 26.0,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 26.0,
+    "2027": 27.7,
+    "2028": 22.8
+   },
+   "ladder_after": null,
+   "growth_raw": 159.96,
+   "growth_period": "20260930",
+   "consensus_yi": 10.31,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 10.5971,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 10.31,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期10.31亿略低于已实现累计10.60亿（implied Q4=-0.29亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 6
+  },
+  {
+   "code": "sh600345",
+   "name": "长江通信",
+   "sector": "AI/半导体",
+   "total": 58.72,
+   "pe": 10.3,
+   "fwd_pe_before": 12.9,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 12.9,
+    "2027": 8.7,
+    "2028": 6.5
+   },
+   "ladder_after": null,
+   "growth_raw": 1315.89,
+   "growth_period": "20260930",
+   "consensus_yi": 10.24,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 10.7822,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 10.24,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期10.23亿略低于已实现累计10.78亿（implied Q4=-0.55亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 1
+  },
+  {
+   "code": "sh603127",
+   "name": "昭衍新药",
+   "sector": "医药生物",
+   "total": 54.85,
+   "pe": 30.42,
+   "fwd_pe_before": 37.9,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 37.9,
+    "2027": 45.3,
+    "2028": 33.9
+   },
+   "ladder_after": null,
+   "growth_raw": 2933.08,
+   "growth_period": "20260930",
+   "consensus_yi": 9.2,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 9.2969,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 9.2,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期9.20亿略低于已实现累计9.30亿（implied Q4=-0.09亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 11
+  },
+  {
+   "code": "sh600763",
+   "name": "通策医疗",
+   "sector": "医药生物",
+   "total": 52.47,
+   "pe": 26.9,
+   "fwd_pe_before": 26.2,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 26.2,
+    "2027": 24.6,
+    "2028": 22.1
+   },
+   "ladder_after": null,
+   "growth_raw": 5.57,
+   "growth_period": "20260930",
+   "consensus_yi": 6.37,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 6.6994,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 6.37,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期6.38亿略低于已实现累计6.70亿（implied Q4=-0.32亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 11
+  },
+  {
+   "code": "sh603883",
+   "name": "老百姓",
+   "sector": "医药生物",
+   "total": 53.03,
+   "pe": 24.32,
+   "fwd_pe_before": 19.4,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 19.4,
+    "2027": 17.0,
+    "2028": 14.8
+   },
+   "ladder_after": null,
+   "growth_raw": 22.17,
+   "growth_period": "20260930",
+   "consensus_yi": 5.91,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 6.177,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 5.91,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期5.90亿略低于已实现累计6.18亿（implied Q4=-0.27亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 13
+  },
+  {
+   "code": "sz300058",
+   "name": "蓝色光标",
+   "sector": "传媒娱乐",
+   "total": 31.44,
+   "pe": 142.89,
+   "fwd_pe_before": 165.0,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 165.0,
+    "2027": 142.9,
+    "2028": 114.6
+   },
+   "ladder_after": null,
+   "growth_raw": 6.2,
+   "growth_period": "20260930",
+   "consensus_yi": 2.91,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 3.0694,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 2.91,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期2.91亿略低于已实现累计3.07亿（implied Q4=-0.16亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 4
+  },
+  {
+   "code": "sz300620",
+   "name": "光库科技",
+   "sector": "AI/半导体",
+   "total": 49.46,
+   "pe": 127.19,
+   "fwd_pe_before": 158.2,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 158.2,
+    "2027": 67.4,
+    "2028": 45.1
+   },
+   "ladder_after": null,
+   "growth_raw": 212.09,
+   "growth_period": "20260930",
+   "consensus_yi": 2.83,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 2.9069,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 2.83,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期2.83亿略低于已实现累计2.91亿（implied Q4=-0.08亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 6
+  },
+  {
+   "code": "sh688368",
+   "name": "晶丰明源",
+   "sector": "AI/半导体",
+   "total": 53.57,
+   "pe": 72.47,
+   "fwd_pe_before": 81.6,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 81.6,
+    "2027": 48.9,
+    "2028": 35.6
+   },
+   "ladder_after": null,
+   "growth_raw": 1437.38,
+   "growth_period": "20260930",
+   "consensus_yi": 2.34,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 2.513,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 2.34,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期2.34亿略低于已实现累计2.51亿（implied Q4=-0.17亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 5
+  },
+  {
+   "code": "sz301630",
+   "name": "同宇新材",
+   "sector": "电子材料",
+   "total": 59.84,
+   "pe": 35.78,
+   "fwd_pe_before": 42.3,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 42.3,
+    "2027": 31.0,
+    "2028": 23.8
+   },
+   "ladder_after": null,
+   "growth_raw": 108.8,
+   "growth_period": "20260930",
+   "consensus_yi": 2.05,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 2.1786,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 2.05,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期2.05亿略低于已实现累计2.18亿（implied Q4=-0.13亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 1
+  },
+  {
+   "code": "sh688416",
+   "name": "恒烁股份",
+   "sector": "AI/半导体",
+   "total": 60.74,
+   "pe": 28.87,
+   "fwd_pe_before": 28.9,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 28.9,
+    "2027": 22.4,
+    "2028": 17.9
+   },
+   "ladder_after": null,
+   "growth_raw": 283.69,
+   "growth_period": "20260930",
+   "consensus_yi": 1.97,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 2.0168,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 1.97,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期1.97亿略低于已实现累计2.02亿（implied Q4=-0.04亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 1
+  },
+  {
+   "code": "sh603938",
+   "name": "三孚股份",
+   "sector": "化工",
+   "total": 55.91,
+   "pe": 60.78,
+   "fwd_pe_before": 72.9,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 72.9,
+    "2027": 52.7,
+    "2028": 39.8
+   },
+   "ladder_after": null,
+   "growth_raw": 205.8,
+   "growth_period": "20260930",
+   "consensus_yi": 1.61,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 1.7703,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 1.61,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期1.61亿略低于已实现累计1.77亿（implied Q4=-0.16亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 1
+  },
+  {
+   "code": "sh600693",
+   "name": "东百集团",
+   "sector": "消费",
+   "total": 50.93,
+   "pe": 86.71,
+   "fwd_pe_before": 64.5,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 64.5,
+    "2027": 51.8,
+    "2028": 42.3
+   },
+   "ladder_after": null,
+   "growth_raw": 19.45,
+   "growth_period": "20260930",
+   "consensus_yi": 1.22,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 1.3307,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 1.22,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期1.22亿略低于已实现累计1.33亿（implied Q4=-0.11亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 1
+  },
+  {
+   "code": "sz002134",
+   "name": "天津普林",
+   "sector": "AI/半导体",
+   "total": 56.96,
+   "pe": 45.36,
+   "fwd_pe_before": 43.8,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 43.8,
+    "2027": 25.2,
+    "2028": 19.7
+   },
+   "ladder_after": null,
+   "growth_raw": 667.19,
+   "growth_period": "20260930",
+   "consensus_yi": 0.99,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 1.0599,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 0.99,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期0.99亿略低于已实现累计1.06亿（implied Q4=-0.07亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 2
+  },
+  {
+   "code": "sz002907",
+   "name": "华森制药",
+   "sector": "医药生物",
+   "total": 52.45,
+   "pe": 59.81,
+   "fwd_pe_before": 59.7,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 59.7,
+    "2027": 59.1,
+    "2028": 56.7
+   },
+   "ladder_after": null,
+   "growth_raw": 60.17,
+   "growth_period": "20260930",
+   "consensus_yi": 0.94,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 1.012,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 0.94,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期0.94亿略低于已实现累计1.01亿（implied Q4=-0.07亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 1
+  },
+  {
+   "code": "sz002707",
+   "name": "众信旅游",
+   "sector": "消费",
+   "total": 35.48,
+   "pe": 679.24,
+   "fwd_pe_before": 85.3,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 85.3,
+    "2027": 62.9,
+    "2028": 45.6
+   },
+   "ladder_after": null,
+   "growth_raw": 2.3,
+   "growth_period": "20260930",
+   "consensus_yi": 0.62,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 0.6774,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 0.62,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期0.62亿略低于已实现累计0.68亿（implied Q4=-0.06亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 5
+  },
+  {
+   "code": "sz300410",
+   "name": "正业科技",
+   "sector": "新能源",
+   "total": 58.34,
+   "pe": 49.24,
+   "fwd_pe_before": 67.2,
+   "fwd_pe_after": null,
+   "ladder_before": {
+    "2026": 67.2,
+    "2027": 38.4,
+    "2028": 29.9
+   },
+   "ladder_after": null,
+   "growth_raw": 395.94,
+   "growth_period": "20260930",
+   "consensus_yi": 0.4,
+   "consensus_src": "ths_mean_live",
+   "ytd_yi": 0.4084,
+   "period": "20260930",
+   "annualize_factor": 1.333333,
+   "anchor_yi": 0.4,
+   "src": "flag_only",
+   "note": "⚠️卖方FY2026一致预期0.40亿略低于已实现累计0.41亿（implied Q4=-0.01亿）：疑轻微预测滞后或真实Q4走弱，未改数仅留痕，勿读作「预期下修」",
+   "n_inst": 1
+  }
+ ],
+ "huazheng_evidence": {
+  "code": "sh603186",
+  "name": "华正新材",
+  "retrieved_at": "2026-11-06T09:15+08:00",
+  "sell_side_consensus": [
+   {
+    "src": "同花顺 ak.stock_profit_forecast_ths(预测年报净利润)",
+    "as_of": "2026-11-06 实时",
+    "fy2026_yi": 6.42,
+    "n_inst": 1,
+    "fy2027_yi": 9.57,
+    "fy2028_yi": 11.54
+   },
+   {
+    "src": "东方财富 机构预测统计（mx-ds-mcp mx_ashare_finance_data）",
+    "as_of": "2026-11-05",
+    "fy2026_yi": 6.42,
+    "eps2026": 4.09,
+    "pe2026_implied": 36.18,
+    "fy2025a_yi": 2.767
+   },
+   {
+    "src": "Wind 一致预测（wind-finance get_financial_data）",
+    "as_of": "latest",
+    "fy2026_yi": 6.4176,
+    "drift_6m": [
+     {
+      "window": "2026-05-07~09-15",
+      "fy2026_yi": 5.2298
+     },
+     {
+      "window": "2026-09-16~09-24",
+      "fy2026_yi": 5.5738
+     },
+     {
+      "window": "latest",
+      "fy2026_yi": 6.4176
+     }
+    ]
+   }
+  ],
+  "disclosed_actuals": [
+   {
+    "src": "2026年三季报（公告 2026-10-22，东财 fin_cache_em 同源核对）",
+    "ytd9m_nm_yi": 8.0,
+    "ytd9m_deduct_yi": 7.93,
+    "q1_nm_yi": 0.31,
+    "q2_nm_yi": 1.42,
+    "q3_nm_yi": 6.27,
+    "q3_yoy_pct": 3044.6,
+    "ytd_rev_yi": 56.1,
+    "q3_gpm_pct": 36.06
+   }
+  ],
+  "broker_reports_pre_q3": [
+   {
+    "src": "申万宏源 2026-04-04 首次覆盖",
+    "fy2026_yi": 4.7,
+    "fy2027_yi": 7.7,
+    "fy2028_yi": 9.7
+   },
+   {
+    "src": "浙商证券 2026-03-25 年报点评",
+    "fy2026_yi": 5.73,
+    "fy2027_yi": 8.02,
+    "fy2028_yi": 10.54
+   }
+  ],
+  "channel_tracking_l3": [
+   {
+    "src": "中信建材 2026-10-22 三季报拆解（韭研公社转载，L3 非正式，仅参考不入模）",
+    "note": "月度利润 6-9月 0.9/1.5/2.0/2.7亿；预计10月单月~3.3亿、12月单月4亿+"
+   }
+  ],
+  "falsification": {
+   "claim": "一致预期 FY2026E 6.42亿 < 前三季已实现归母 8.00亿",
+   "implied_q4_nm_yi": -1.58,
+   "verdict": "全年预测低于已实现利润 = 被事实证伪（除非 Q4 巨亏 1.58亿，与 Q3 单季 6.27亿、毛利率 36% 环比抬升的经营轨迹相悖）→ 判定预测陈旧"
+  },
+  "anchor_sensitivity": [
+   {
+    "method": "已实现下限（9M 归母，事实）",
+    "fy2026_yi": 8.0,
+    "fwd_pe": 29.0,
+    "use": "证伪下限"
+   },
+   {
+    "method": "确定性年化 9M×4/3（入模锚定）",
+    "fy2026_yi": 10.67,
+    "fwd_pe": 21.8,
+    "use": "生产锚定（无季节假设）"
+   },
+   {
+    "method": "Q4=Q3（乐观上限参考）",
+    "fy2026_yi": 14.27,
+    "fwd_pe": 16.3,
+    "use": "仅敏感性，不入模"
+   }
+  ],
+  "mktcap_yi_note": "锚定前后 FwdPE 按 11-05 scored 的 total_mv 232.25亿折算，与建阶梯口径（腾讯总市值）一致；华正 circ_mv=total_mv"
+ },
+ "caveats": [
+  "锚定值=确定性年化推算（真实已披露利润+固定年化系数），非卖方一致预期，行级以 fwd_2026_src 区分；卖方原值保留于 fwd_2026_consensus 留档",
+  "若个别公司 Q4 真实巨亏使 FY<已实现累计，锚定偏高——触发条件已要求核心增速>0，残余误伤可按 fwd_stale 行级复核",
+  "生产 scored 的分数刷新由 step2 陈旧守卫在日更链落地（本脚本只审计不改写）"
+ ]
+}

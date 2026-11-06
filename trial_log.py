@@ -149,6 +149,11 @@ CURATION = {
     "audit_round113b_holdout.json": KIND_FACTOR,          # 对 round113 三重证伪
     # round130：补产出物（T+1/T0 卡片原本硬编码的统计），与 111 同类 → 计入 K
     "audit_round130_total_t1.json": KIND_FACTOR,          # total 对 T+1 超额区分力
+    # round131：随机20只得分逻辑体检（总分复算/量程/中性一致性/锚定门槛）——
+    # 机械一致性核对，未产出「改模型」裁决（优化建议待老大裁决后另行试验）→ 诊断类。
+    # 同日 fwd_2026_refresh_2026-11-06.json 是数据证伪修复（FY一致预期<已实现累计），
+    # 非假设检验，且不匹配 audit_round* 扫描模式，不进 K。
+    "data/audit_round131_random20.json": KIND_DIAG,       # 得分逻辑体检（seed=20261106）
     "data/audit_round118c_ic_decay.json": KIND_FACTOR,    # IC 衰减曲线
     # ── round118e/118f：dominant 扩张决策链 ──
     # ⚠️ 这两条为什么算 KIND_FACTOR 而不是 KIND_DIAG：
