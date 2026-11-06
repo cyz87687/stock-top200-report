@@ -38,9 +38,10 @@ WEEK_CN = ("周一", "周二", "周三", "周四", "周五", "周六", "周日")
 
 def load_cfg():
     try:
-        c = json.load(open(CONFIG, encoding="utf-8"))
+        with open(CONFIG, encoding="utf-8") as f:
+            c = json.load(f)
         return c.get("schedule") or {}
-    except Exception:
+    except (OSError, ValueError):
         return {}
 
 
@@ -90,7 +91,8 @@ def latest_scored(date_str=None):
         files = [f for f in files if date_str not in f]
     for f in files:
         try:
-            d = json.load(open(f, encoding="utf-8"))
+            with open(f, encoding="utf-8") as _fh:
+                d = json.load(_fh)
             dt = d.get("date")
             rs = d.get("results") or []
             if dt and rs:
