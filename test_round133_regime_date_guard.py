@@ -207,21 +207,42 @@ class TestPageArtifacts(unittest.TestCase):
 
         ⚠️ 不能用裸 '58%' 做判据：主页实测出现 156 次，全部来自个股详情卡
           （「3年收缩58%」/「+3.58%」/「技反 58% 低波」），与 regime 无关。
-          故锁定唯一可归因于陈旧预算的三种写法。
+
+        ⚠️ 判据不得随当前 regime 文件漂移（2026-11-06 日更修）：
+          `regime_model.py` 每日重跑会把 regime_forecast.json 更新为当日，
+          final_hi 从 11-04 的 0.5837 变成 11-06 的 0.2。原实现直接拿当前
+          文件的 final_hi 当「陈旧值」，当日合法数值被误判（裸 '0.2' 在
+          个股详情小数里出现上千次）。根因是**判据没绑定日期守卫**。
+          修法（不放宽断言）：① 固定历史事故值写法恒禁，与当前产物无关；
+          ② 仅当 `regime_date_guard` 判当前产物陈旧时，才追加当前 final_hi
+          的可归因写法禁令；③ 产物为当日时改验正向契约（不得残留陈旧标记）。
         """
         with open(os.path.join(HERE, 'regime_forecast.json'), encoding='utf-8') as f:
             rf = json.load(f)
+        # 数据日期取主页标题（生成器写入，随当日变化，不锁死）
+        m = re.search(r'\|\s*(\d{4}-\d{2}-\d{2})', self.main)
+        self.assertIsNotNone(m, '主页标题缺少数据日期')
+        chk = g.check_payload(rf, m.group(1))
         fh = (rf.get('combine') or {}).get('final_hi')
-        if fh is None:
-            self.skipTest('产物无 final_hi')
-        exact = f"{float(fh):.4f}".rstrip('0').rstrip('.')
-        pct_exact = f"{float(fh) * 100:.2f}%".replace('.00%', '%')
+
+        # ① 固定历史陈旧值（round133 事故产物 11-04 / 0.5837）恒不得出现
+        forbidden = ('0.5837', '58.37%', '风险预算 58%', '单日最大敞口 58%')
+        # ② 守卫判陈旧 → 追加当前 final_hi 的可归因写法
+        if not chk['ok'] and fh is not None:
+            pct = f"{float(fh) * 100:.0f}%"
+            forbidden = forbidden + (
+                f"风险预算 {pct}", f"单日最大敞口 {pct}",
+                f"{float(fh):.4f}".rstrip('0').rstrip('.'),
+                f"{float(fh) * 100:.2f}%".replace('.00%', '%'),
+            )
         for page, name in ((self.main, '主页'), (self.detail, '独立页')):
             with self.subTest(page=name):
-                self.assertNotIn(exact, page, f'{name}仍展示陈旧 final_hi 原值')
-                self.assertNotIn(pct_exact, page, f'{name}仍展示陈旧预算百分比')
-                self.assertNotIn('风险预算 58%', page, f'{name}仍展示陈旧预算结论')
-                self.assertNotIn('单日最大敞口 58%', page, f'{name}仍展示陈旧敞口')
+                for w in forbidden:
+                    self.assertNotIn(w, page, f'{name}仍展示陈旧预算写法 {w}')
+                # ③ 当日产物不得残留陈旧标记（正向契约）
+                if chk['ok']:
+                    self.assertNotIn('STALE_DATE_HIDDEN', page,
+                                     f'{name}当日预算仍被标为陈旧')
 
     def test_32_placeholder_is_visible_and_anchor_survives(self):
         self.assertIn('id="sec-mf-pick"', self.detail)

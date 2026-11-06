@@ -1,25 +1,25 @@
-fetch_top200_sina	0	1		2026-11-05 17:02:06	
-check_data_fresh	0	1		2026-11-05 17:02:06	
-step2_stockscorer	0	1		2026-11-05 17:12:07	
-append_klines_latest	0	1		2026-11-05 17:19:43	
-refresh_kline_meta	0	1		2026-11-05 17:19:44	
-verify_qfq_anchor	0	1		2026-11-05 17:19:52	
-archive_fund_universe	0	1		2026-11-05 17:20:15	
-archive_fwd_snapshot	0	1		2026-11-05 17:20:15	
-generate_ai_assessment	0	1		2026-11-05 17:20:25	
-enhance_scores	0	1		2026-11-05 17:20:47	
-sector_momentum_daily	0	1		2026-11-05 17:22:57	
-apply_sector_momentum	0	1		2026-11-05 17:22:58	
-pick_portfolio	0	1		2026-11-05 17:22:58	
-portfolio_risk	0	1		2026-11-05 17:22:58	
-track_recommendations	0	1		2026-11-05 17:23:54	
-portfolio_metrics	0	1		2026-11-05 17:23:54	
-panel_audit	0	1		2026-11-05 17:23:55	
-factor_eval	0	1		2026-11-05 17:47:48	
-long_panel_ic	0	1		2026-11-05 17:47:49	新鲜度 0d < 7d，按设计跳过重建（非漏跑）
-selfcheck_pipeline	0	1		2026-11-05 17:47:50	
-fetch_focus_list	0	1		2026-11-05 17:47:53	
-fetch_bench	1	0		2026-11-05 17:47:58	指数基准未更新 → 市场状态可能基于陈旧指数而失真
-regime_model	2	0		2026-11-05 17:47:58	日期门禁拦截（指数缓存落后于数据日期）→ 报告显示管道告警占位
-gen_report_top200	0	1		2026-11-05 17:48:58	
-orphan_scan	0	1		2026-11-05 17:49:22	
+fetch_top200_sina	0	1		2026-11-06 18:25:23	
+check_data_fresh	0	1		2026-11-06 18:25:24	
+step2_stockscorer	0	1		2026-11-06 18:31:56	
+append_klines_latest	1	0		2026-11-06 20:59:30	行情源大面积超时(1600/2138 失败313只, 2914s)，已终止；价格库停在 11-05，未写盘
+refresh_kline_meta	1	0		2026-11-06 20:59:30	依附价格库增量，本轮未执行；有效截面日历仍停在 11-05
+verify_qfq_anchor	1	0		2026-11-06 20:59:30	本轮未执行
+archive_fund_universe	1	0		2026-11-06 20:59:30	价格库停在 11-05，避免陈旧收盘价写入 fund 归档，本轮未执行
+archive_fwd_snapshot	0	1		2026-11-06 20:59:30	补跑完成
+generate_ai_assessment	0	1		2026-11-06 20:59:30	LLM 429 周配额用尽(重置 11-09)，按设计 fallback 规则生成
+enhance_scores	0	1		2026-11-06 20:59:30	补跑完成
+sector_momentum_daily	0	1		2026-11-06 20:59:30	补跑完成 5203/5218 只有效
+apply_sector_momentum	0	1		2026-11-06 20:59:30	补跑完成
+pick_portfolio	0	1		2026-11-06 20:59:30	当日 regime 就绪后二次重跑，产出 2 条路线 w_total=0.2
+portfolio_risk	1	0		2026-11-06 20:59:31	组合日 11-06 不在有效截面日历(价格库停在 11-05) → KeyError window
+portfolio_metrics	0	1		2026-11-06 20:59:31	补跑完成
+track_recommendations	0	1		2026-11-06 20:59:31	补跑完成，数据截止 11-06
+panel_audit	0	1		2026-11-06 20:59:31	补跑完成
+factor_eval	1	0		2026-11-06 20:59:31	本轮执行被中断未完成；IC/权重视图沿用上一日
+long_panel_ic	0	1		2026-11-06 20:59:31	新鲜度 1d < 7d，按设计跳过重建（非漏跑）
+selfcheck_pipeline	0	1		2026-11-06 20:59:31	补跑完成
+fetch_focus_list	0	1		2026-11-06 20:59:31	补跑完成
+fetch_bench	0	1		2026-11-06 20:59:31	补跑完成，三指数均到 11-06（含此前失效的 000985）
+regime_model	0	1		2026-11-06 20:59:31	补跑完成，date=11-06 gate.ok=True final_hi=0.2
+orphan_scan	0	1		2026-11-06 20:59:31	日链 prune 段未执行；不影响当日数字
+gen_report_top200	0	1		2026-11-06 20:59:50	补跑生成完成
