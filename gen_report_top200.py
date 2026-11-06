@@ -189,6 +189,21 @@ _DIM_MAX = 10  # v3.3 问题2: 量纲升级为「每维满分10 / 总分满分10
 SHOW_LEGACY_3LINES = False   # 动量线/反转线/AI线 三合一「今日候选组合」（20 只，方向互斥不可执行）
 SHOW_ANALYSIS = False        # 因子分析/方法论区块（IC 表、衰减、证伪、覆盖率、口径说明等）
 SHOW_DIM_MATRIX = False      # 个股「十维评分明细·权重×分数」矩阵 → 改为「评分结构摘要」
+# ═══════════════════════════════════════════════════════════════════════
+# round132 P0（2026-11-06 老大指令）：主页面轻量 = 仅核心个股评分
+# ───────────────────────────────────────────────────────────────────────
+#   主页只回答「每只票多少分、什么评级、按什么口径」；以下一律迁到独立页
+#   analysis_<date>.html（同目录，主页导航直达）：
+#     ① 过程分析：复盘点评长文、模型结构/维数/47因子证据、动量低 IC 悖论、
+#        推荐跟踪胜率与回测口径、原 SHOW_ANALYSIS 切片（原本直接丢弃 → 改为留痕）
+#     ② 未使用 / 已证伪的预测：regime 市场状态卡、Transformer 方向预测、
+#        T+1/T0 可执行性、焦点池「关注线索」、Hero 市场状态与风险预算
+#   ⚠️ 保留在主页（项目硬规则「页面必须说实话」）：链路状态/面板盲区/截面规模/
+#      K线/回测口径五条披露、评级双口径、数据时效、目标周期证据缺口横幅。
+#   ⚠️ 采用「计算保留、渲染迁移」：被迁走的区块代码照常执行，后续变量依赖不断。
+#   ⚠️ False = 回到旧版单页（可回退对照 / 排障），不要删旧分支。
+# ═══════════════════════════════════════════════════════════════════════
+SHOW_CORE_ONLY = True
 SHOW_FULL_RANK = True        # 完整排名 490 只（含展开详情卡）—— 保留，是个股尽调入口
 SHOW_FOCUS_POOL = True       # 每日 AI 焦点池 —— 保留，是「池外线索」的唯一来源
 
@@ -1306,6 +1321,19 @@ def route_of(r):
 # 开始生成HTML
 html_parts = []
 
+# ─── round132 P0：独立分析页收集器 ─────────────────────────────────────
+# 与既有 `SHOW_ANALYSIS` 切片同型：只改「渲染去向」，不改任何计算。
+# 每个被迁走的区块仍照常生成字符串（保证后续变量/依赖完整），只是不进主页。
+_DETAIL_PARTS = []
+
+
+def _detail_append(fragment):
+    """过程分析/未使用预测 → 独立页；SHOW_CORE_ONLY=False 时回落到主页。"""
+    if SHOW_CORE_ONLY:
+        _DETAIL_PARTS.append(fragment)
+    else:
+        html_parts.append(fragment)
+
 # ===================================================================
 # v4.0 页面信息架构收敛（2026-10-25 老大指令）
 # -------------------------------------------------------------------
@@ -1330,6 +1358,23 @@ html_parts = []
 #       73 只各重复一遍；各维原始分已在上方四张 dim-card 呈现，此处只留摘要。
 # ===================================================================
 
+
+# round132 P0：锚点导航按「主页仅评分」重排。
+#   ⚠️ 迁出的 #sec-mf-pick / #sec-focus-pool 若留在导航里就是死链（项目踩过同类坑），
+#      故改用独立页绝对链接，并在主页补一个入口。
+if SHOW_CORE_ONLY:
+    _NAV_LINKS = (
+        '        <a href="#sec-decision">① 今日评分</a>\n'
+        '        <a href="#sec-list">② 完整排名</a>\n'
+        '        <a href="#sec-notes">ⓘ 说明</a>\n'
+        f'        <a href="analysis_{_data_date}.html">📄 过程分析 / 已证伪预测</a>')
+else:
+    _NAV_LINKS = (
+        '        <a href="#sec-decision">① 今日环境</a>\n'
+        '        <a href="#sec-mf-pick">② 买什么</a>\n'
+        '        <a href="#sec-list">③ 完整排名</a>\n'
+        '        <a href="#sec-focus-pool">④ 焦点池</a>\n'
+        '        <a href="#sec-notes">ⓘ 说明</a>')
 
 html_parts.append('''<!DOCTYPE html>
 <html lang="zh-CN">
@@ -1682,11 +1727,7 @@ th.sorted-desc .sort-arrow {color:#ef4444;}
 <div class="container">
     <!-- v4.0 锚点导航: 决策页三问（环境 → 买什么 → 池子里还有什么） -->
     <nav class="nav-bar">
-        <a href="#sec-decision">① 今日环境</a>
-        <a href="#sec-mf-pick">② 买什么</a>
-        <a href="#sec-list">③ 完整排名</a>
-        <a href="#sec-focus-pool">④ 焦点池</a>
-        <a href="#sec-notes">ⓘ 说明</a>
+''' + _NAV_LINKS + '''
         <span class="nav-date">数据日期 ''' + date_str + '''</span>
     </nav>
 ''')
@@ -4791,6 +4832,42 @@ except Exception as _msx:
     print(f"⚠️ 模型结构摘要生成失败（主页将只显示占位）: {type(_msx).__name__}: {_msx}")
     _ms_digest_html = "结构体检摘要生成失败，请见 reports/ 目录下的独立报告。"
 
+# ═══════════════════════════════════════════════════════════════════════
+# round132 P0：Hero 只留评分；市场状态段 + 权重条内嵌的结构体检长文迁独立页
+#   ⚠️ 这两处原本把「已证伪的方向预测 / 方法论推导」直接塞在首屏，
+#      与「主页仅核心个股评分」冲突；但计算照常做，全文进独立页留痕。
+# ═══════════════════════════════════════════════════════════════════════
+_hero_market_html = f'''        <div style="font-size:11px;color:#94a3b8;">🎯 今日市场状态 → 风险预算上限（赚钱效应 {mkt_score if mkt_score is not None else '—'} 分）</div>
+        <div class="hero-verdict" style="color:{mkt_color};">{mkt_phase} · 单日最大敞口 {mkt_pos_full}</div>
+        <div style="font-size:13px;color:#cbd5e1;">{mkt_disc}</div>
+        {_fc_hero_line}
+        <div style="font-size:10px;color:#64748b;margin-top:4px;line-height:1.65;">
+            ⚠️ 该档位是<b>风险预算上限</b>（情绪过热时压低最大敞口），<b>不是买入信号、未经回测</b>：
+            audit_round3~22 全部产物中<b>没有</b>「仓位比例 vs 后续收益」的验证，
+            其数值沿用早期经验设定。同页下方回测已明确：池内<b>绝对收益全周期为负</b>
+            （T+20 组合 −4.23%），故「敞口给多少」与「能不能赚钱」是两个独立问题，
+            前者不构成后者的证据。
+        </div>'''
+
+_ms_digest_full = _ms_digest_html
+if SHOW_CORE_ONLY:
+    _DETAIL_PARTS.append(
+        '<div class="chart-card" id="sec-market" style="padding:16px;margin:14px 0;">'
+        '<h3 style="font-size:13px;margin-bottom:8px;">🎯 今日市场状态与风险预算（主页已迁出）</h3>'
+        '<div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">'
+        '方向预测已被证伪（T2 AUC 0.51~0.59 / 降仓择时 0/16），本段只作仓位纪律留痕，不构成买入信号。</div>'
+        + _hero_market_html + '</div>')
+    _hero_market_html = (
+        '<div style="font-size:11px;color:#64748b;margin-top:4px;line-height:1.65;">'
+        '🎯 市场状态 / 风险预算 / 方向预测均<b>未经回测、已证伪或不可用</b>，'
+        f'已迁至 <a href="analysis_{_data_date}.html">独立分析页</a>；'
+        '本页只展示个股评分。</div>')
+    # 权重条仍显示生效维与权重（评分口径核心），只把内嵌长摘要换成一行指向独立页。
+    _ms_digest_html = (
+        '<b>模型结构结论与完整方法论证据</b>见 '
+        f'<a href="analysis_{_data_date}.html#sec-methodology">独立分析页</a>'
+        f'（另有 reports/model_structure_{_data_date}.html 完整存档）。')
+
 # 权重条必须在摘要之后构建（内部内嵌 _ms_digest_html），见上方顺序说明。
 _weight_strip_html = _build_weight_strip()
 
@@ -4811,17 +4888,7 @@ html_parts.append(f'''
     <!-- A1 首屏 Hero 决策区 -->
     <div class="hero" id="sec-decision">
         <h1>📊 A股成交额 TOP{_POOL_N} 评分<span class="hero-ver">报告层 {_ver_tag} · 评分层 {_SCORER_VER}</span></h1>
-        <div style="font-size:11px;color:#94a3b8;">🎯 今日市场状态 → 风险预算上限（赚钱效应 {mkt_score if mkt_score is not None else '—'} 分）</div>
-        <div class="hero-verdict" style="color:{mkt_color};">{mkt_phase} · 单日最大敞口 {mkt_pos_full}</div>
-        <div style="font-size:13px;color:#cbd5e1;">{mkt_disc}</div>
-        {_fc_hero_line}
-        <div style="font-size:10px;color:#64748b;margin-top:4px;line-height:1.65;">
-            ⚠️ 该档位是<b>风险预算上限</b>（情绪过热时压低最大敞口），<b>不是买入信号、未经回测</b>：
-            audit_round3~22 全部产物中<b>没有</b>「仓位比例 vs 后续收益」的验证，
-            其数值沿用早期经验设定。同页下方回测已明确：池内<b>绝对收益全周期为负</b>
-            （T+20 组合 −4.23%），故「敞口给多少」与「能不能赚钱」是两个独立问题，
-            前者不构成后者的证据。
-        </div>
+        {_hero_market_html}
         <div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;background:{_fresh_color}1a;color:{_fresh_color};border:0.5px solid {_fresh_color}55;">
             🕒 {_fresh_txt}
         </div>
@@ -6078,7 +6145,7 @@ else:
                    f'background:#0f172a;border-left:3px solid #3b82f6;padding:12px 14px;border-radius:8px;margin:10px 0;">'
                    f'{html_mod.escape(mr_text)}</div>')
 
-html_parts.append(f'''
+_detail_append(f'''
     <!-- 复盘点评 (v2.22 AI生成优先; v2.42 A5 长文折叠) -->
     <div class="core-conclusion review-card" id="sec-summary">
         <h2>{review_title}</h2>
@@ -6101,20 +6168,20 @@ html_parts.append(f'''
 #   两者相邻便于读者对照「今日情绪 82 分」vs「当前风险刻度」是否背离。
 # ⚠️ round109b 定位修正：不再声称"预测未来 5~10 日风险"——
 #   该预测在 2873 日样本上已被证伪（T2 AUC 0.51~0.59、经济价值 0/8、降仓择时 0/16）。
-html_parts.append(_regime_fc_html)
+_detail_append(_regime_fc_html)
 
 # round112：Transformer 实证卡片紧邻市场状态卡 —— 两者是「同一个问题的两种答案」：
 #   上面用零训练分位法得到可用风险刻度（不预测方向），
 #   这里用真 Transformer 尝试预测方向、实测失败。
 #   放在一起读者才能理解「为什么最终选择不预测方向」。
-html_parts.append(_transformer_card_html)
+_detail_append(_transformer_card_html)
 
 # round113/114：T+1/T0 可执行性卡 —— 三张卡构成一条完整逻辑链：
 #   ① regime 卡：不预测方向，改用零训练分位做风险刻度（可用）
 #   ② Transformer 卡：真的试了预测方向，实测失败（不可用）
 #   ③ 本卡：既然方向不可预测，T+1/T0 就只能走「执行层纪律 + 成本门槛」，
 #      并把唯一候选信号的 5 条边界一并披露（不可实盘）
-html_parts.append(_t1_t0_card_html)
+_detail_append(_t1_t0_card_html)
 
 # v2.11: 原"大盘赚钱效应"独立卡片已并入上方"📝 盘面复盘点评"卡片(指数/成交/涨跌/赚钱效应速览)
 
@@ -7452,7 +7519,7 @@ try:
         except Exception as _mwe:
             print(f"⚠️ 组合权重披露生成失败: {type(_mwe).__name__}: {_mwe}")
 
-        html_parts.append(f'''
+        _detail_append(f'''
     <!-- v3.9 多因子精选组合（≤10 只）+ 动量路线低 IC 悖论解释 -->
     <div class="chart-card" id="sec-mf-pick" style="padding:16px;margin:14px 0;border:1px solid #a3e63555;">
         <h3 style="font-size:13px;margin-bottom:4px;">🧮 多因子精选组合
@@ -10357,7 +10424,7 @@ html_parts.append('''
 #   = 机器源(东财人气榜/涨跌停池/强势股池) + 本地AI联网检索(题材催化/公告/政策/龙虎榜)。
 #   数据缺失时静默不渲染（不阻断报告生成）。
 if _focus_pool.get("focus"):
-    html_parts.append(_focus_pool_html(_focus_pool))
+    _detail_append(_focus_pool_html(_focus_pool))
 
 # ===== v3.5.3: 原「📊 评分模型总结」区块已删除 =====
 # 删除原因（老大巡检指示）：该区块读 data['ai_model_summary']（enhance 注入的 LLM 旧口径综述），
@@ -12379,9 +12446,21 @@ except Exception as _qe:
 # SHOW_ANALYSIS=True 时原样保留（用于调试或需要出方法论页时）。
 if not SHOW_ANALYSIS:
     _n_analysis_blocks = len(html_parts) - _ANALYSIS_SLICE_START
+    # round132 P0：原实现 `del` 后**直接丢弃、无任何留痕** → 改为迁入独立分析页。
+    #   这些区块本就「计算保留、渲染丢弃」，此处只是把渲染结果换个落点，零计算改动。
+    if SHOW_CORE_ONLY:
+        _DETAIL_PARTS.append(
+            '<div class="chart-card" id="sec-analysis" style="padding:16px;margin:14px 0;">'
+            '<h3 style="font-size:13px;margin-bottom:8px;">🔬 分析与计算过程（主页已隐藏）</h3>'
+            '<div style="font-size:11px;color:#94a3b8;margin-bottom:10px;line-height:1.8;">'
+            f'共 {_n_analysis_blocks} 个区块：因子 IC / 时间衰减 / 证伪检验 / 共线矩阵 / '
+            '市值下限扫描 / 47 因子对照 / 覆盖率 / 盈利取数口径等。'
+            '仅用于调权重与复核，<b>不构成当日选股依据</b>；'
+            '数字多为 PROXY_ONLY / 样本内，禁称「经验证的 alpha」。</div>'
+            + "\n".join(html_parts[_ANALYSIS_SLICE_START:]) + '</div>')
     del html_parts[_ANALYSIS_SLICE_START:]
     print(f"🧹 v4.0 已隐藏 {_n_analysis_blocks} 个分析/方法论区块"
-          f"（迁至 reports/factor_<date>.md）")
+          f"（{'迁至独立分析页' if SHOW_CORE_ONLY else '仅丢弃'}）")
 
 
 # ===== v2.41 P0-4 推荐跟踪与胜率 (真实K线回填) =====
@@ -12572,7 +12651,7 @@ try:
             '口径修正本身对 T+1 均值影响 +0.007pct，但样本补齐（补回此前因个股停牌'
             '而被跳过的批次）会改变样本构成。</div>')
 
-        html_parts.append(f'''
+        _detail_append(f'''
     <!-- v2.41 P0-4 推荐跟踪 (v2.42 R3 空态折叠; v2.44 P1-2 超额收益 / P1-4 偏差披露)
          P0-4 (2026-10-28): T+20 成熟日披露 + 口径对齐(前复权/交易日历) -->
     <details class="track-block" style="margin:14px 0;"{_track_open}>
@@ -13028,6 +13107,35 @@ function debounce(func, wait) {
 # 合并并保存
 html = "\n".join(html_parts)
 
+# ─── round132 P0：页脚「评分模型口径变更沿革」长文迁独立页 ───────────────
+# 该段挂在页脚 <p>评分模型(...)</p> 内，是 round24/34/36/37 换维、NaN 污染修复、
+# 47 因子 / Bonferroni 裁决的**过程记录**，不是当日评分本身。
+# ⚠️ 但「权重仍是先验 / 门禁 G5 未过 / 禁称经验证的 alpha」是硬披露，
+#    迁移后必须在主页留一句浓缩声明，不能整段搬空（页面必须说实话）。
+if SHOW_CORE_ONLY:
+    _fh = re.search(r'(<p>评分模型 \([^<]*?\): )(.*?)(</p>)', html, flags=re.S)
+    if _fh:
+        _DETAIL_PARTS.append(
+            '<div class="chart-card" id="sec-model-history" '
+            'style="padding:16px;margin:14px 0;">'
+            '<h3 style="font-size:13px;margin-bottom:8px;">'
+            '🧾 评分模型口径变更沿革（页脚全文）</h3>'
+            '<div style="font-size:11px;color:#94a3b8;margin-bottom:8px;line-height:1.8;">'
+            'round24 / 34 / 36 / 37 的换维、污染修复与裁决过程记录，'
+            '仅供复核历史口径，<b>非当日评分依据</b>；'
+            '其中 IC 数字均为样本内 / PROXY_ONLY。</div>'
+            + _fh.group(2) + '</div>')
+        html = (html[:_fh.start(2)]
+                + ('权重为<b>先验配置</b>（非 IC 背书），准入闸门 G5 未过、'
+                   'walk-forward 前视验证未完成，<b>禁称「经验证的 alpha」</b>；'
+                   f'完整口径变更沿革见 '
+                   f'<a href="analysis_{_data_date}.html#sec-model-history">'
+                   '独立分析页</a>。')
+                + html[_fh.end(2):])
+        print(f"🧾 页脚沿革长文已迁独立页（{len(_fh.group(2)):,} 字符）")
+    else:
+        print("⚠️ 未匹配到页脚评分模型段落，沿革迁移跳过（主页保持原样）")
+
 # ═══════════════════════════════════════════════════════════════════════
 # v4.18（round117 P0-3）：生成期页面瘦身
 # ─────────────────────────────────────────────────────────────────────
@@ -13160,6 +13268,64 @@ try:
 except Exception as _she:
     print(f"⚠️ 页面瘦身失败，使用原 HTML: {_she}")
     html = "\n".join(html_parts)
+
+# ═══════════════════════════════════════════════════════════════════════
+# round132 P0：独立分析页落盘
+#   ⚠️ 必须做在生成器内部（与 _shrink_attrs 同纪律）：一次性后处理脚本不在日链
+#      = 必然陈旧，主页改了独立页没改是必然结局。
+#   ⚠️ 复用主页 <head>（含 _shrink_attrs 注入的 .sN 类），风格逐像素一致；
+#      被迁区块本身仍带内联 style，独立页无需再跑瘦身。
+#   ⚠️ 双产物：analysis_<date>.html 归档 + analysis.html 固定入口（书签不失效）。
+#   ⚠️ 独立页是归档，生成失败不得拖垮主页（fail-open，与日更链同纪律）。
+# ═══════════════════════════════════════════════════════════════════════
+if SHOW_CORE_ONLY:
+    try:
+        _hm = re.search(r'<head>.*?</head>', html, flags=re.S)
+        _head = _hm.group(0) if _hm else '<head><meta charset="UTF-8"></head>'
+        _head = re.sub(r'<title>.*?</title>',
+                       f'<title>📄 过程分析与已证伪预测 | {_data_date}</title>',
+                       _head, count=1, flags=re.S)
+        _detail_html = (
+            '<!DOCTYPE html><html lang="zh-CN">' + _head +
+            '<body><div class="container">'
+            '<nav class="nav-bar">'
+            '<a href="index.html">← 返回核心评分页</a>'
+            '<a href="#sec-market">市场状态</a>'
+            '<a href="#sec-analysis">分析过程</a>'
+            '<a href="#sec-methodology">结构证据</a>'
+            f'<span class="nav-date">数据日期 {_data_date}</span></nav>'
+            '<div class="chart-card" style="padding:16px;margin:14px 0;'
+            'border:1px solid #f59e0b55;">'
+            '<h2 style="font-size:16px;margin-bottom:6px;">📄 过程分析与已证伪预测</h2>'
+            '<div style="font-size:11px;color:#cbd5e1;line-height:1.9;">'
+            '本页承接主页面的<b>过程分析</b>与<b>未使用 / 已证伪的预测内容</b>，'
+            '目的是留痕与复核，<b style="color:#f59e0b;">不参与每日选股决策</b>。<br>'
+            '· Transformer 方向预测、T+1/T0 择时、regime 方向层均已实证关死；<br>'
+            '· 回测与胜率数字均为 PROXY_ONLY / 样本内，'
+            '<b>禁当策略收益或「经验证的 alpha」</b>；<br>'
+            '· 主页仅保留核心个股评分与五项数据可信度披露。</div></div>'
+            '<div class="chart-card" id="sec-methodology" '
+            'style="padding:16px;margin:14px 0;">'
+            '<h3 style="font-size:13px;margin-bottom:8px;">'
+            '🔬 模型结构结论与方法论证据（主页权重条摘要全文）</h3>'
+            f'{_ms_digest_full}</div>'
+            + "\n".join(_DETAIL_PARTS) +
+            '<div class="footer" style="margin-top:20px;font-size:11px;color:#64748b;">'
+            f'生成 {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} · 数据日期 {_data_date} · '
+            '由 gen_report_top200.py 自动生成（SHOW_CORE_ONLY=True） · '
+            '<a href="index.html">返回核心评分页</a></div>'
+            '</div></body></html>')
+        _adir = os.path.dirname(os.path.abspath(out)) or '.'
+        _dated = os.path.join(_adir, f"analysis_{_data_date}.html")
+        with open(_dated, "w", encoding="utf-8") as _df:
+            _df.write(_detail_html)
+        with open(os.path.join(_adir, "analysis.html"), "w", encoding="utf-8") as _df:
+            _df.write(_detail_html)
+        print(f"📄 独立分析页已生成: {_dated}（{len(_DETAIL_PARTS)} 区块 / "
+              f"{len(_detail_html):,} 字符；同步 analysis.html 固定入口）")
+    except Exception as _de:
+        print(f"⚠️ 独立分析页生成失败（主页不受影响）: "
+              f"{type(_de).__name__}: {_de}")
 
 with open(out, "w", encoding="utf-8") as f:
     f.write(html)
