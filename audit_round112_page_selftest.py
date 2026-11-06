@@ -24,6 +24,8 @@ import re
 import sys
 import json
 
+from regime_date_guard import check_artifact_date  # round133 日期守卫（单一实现）
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -239,14 +241,34 @@ def main():
             chk(f"G 基线 {_b} 出现在页面", _b in S, _b)
     rf_p = os.path.join(HERE, "regime_forecast.json")
     if os.path.exists(rf_p):
-        RF = json.load(open(rf_p, encoding="utf-8"))
+        with open(rf_p, encoding="utf-8") as _rf:
+            RF = json.load(_rf)
+        # round133 裁决 2：产物日期与数据日期不一致时，陈旧数值**不得**出现在页面。
+        #   旧版无条件断言「必须出现」，等价于强迫页面展示过期预算 —— 是死断言。
+        _rchk = check_artifact_date(RF.get("date") or RF.get("data_date"), data_date)
         c = RF.get("combine") or {}
         if c.get("final_hi") is not None:
             _v = f"{float(c['final_hi'])*100:.0f}%"
-            chk(f"G 取小结果 {_v} 出现在页面", _v in S, _v)
+            if _rchk['ok']:
+                chk(f"G 取小结果 {_v} 出现在页面", _v in S, _v)
+            else:
+                # ⚠️ 不能用裸 '58%' 判据：主页实测 156 处来自个股详情卡
+                #    （3年收缩58% / +3.58% / 技反 58% 低波），与 regime 无关。
+                _fh = float(c['final_hi'])
+                _raw = f"{_fh:.4f}".rstrip('0').rstrip('.')
+                _markers = (_raw, f"{_fh*100:.2f}%",
+                            f"风险预算 {_fh*100:.0f}%",
+                            f"单日最大敞口 {_fh*100:.0f}%")
+                _leaked = [x for x in _markers if x in S]
+                chk(f"G 陈旧取小结果未展示（{_rchk['reason']}）",
+                    not _leaked, f"残留 {_leaked}")
         if (RF.get("L2_risk") or {}).get("vol20_ann") is not None:
             _v = f"{float(RF['L2_risk']['vol20_ann'])*100:.2f}%"
-            chk(f"G 已实现波动 {_v} 出现在页面", _v in S, _v)
+            if _rchk['ok']:
+                chk(f"G 已实现波动 {_v} 出现在页面", _v in S, _v)
+            else:
+                chk(f"G 陈旧已实现波动 {_v} 未展示（{_rchk['reason']}）",
+                    _v not in S, _v)
 
     # ── 汇总
     n_ok, n_fail = len(ok), len(fail)

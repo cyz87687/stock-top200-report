@@ -32,6 +32,8 @@ import math as _math
 import argparse
 from datetime import datetime
 
+from regime_date_guard import check_payload, hidden_notice  # round133 日期守卫（单一实现）
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 SECTOR_DIR = os.path.join(HERE, 'sector')
 MAP_PATH = os.path.join(SECTOR_DIR, 'sw_map.json')
@@ -410,8 +412,15 @@ def _base_shares_of(cands):
     return {k: v / n for k, v in acc.items()}
 
 
-def load_w_total(regime_path=None, fallback_mode="zero"):
+def load_w_total(regime_path=None, fallback_mode="zero", data_date=None):
     """从 regime_forecast.json 读「股票仓位上限」作为 w_total。
+
+    ⭐ round133（2026-11-06 裁决 2）：新增 `data_date`。传了数据日期时，
+      **产物日期必须等于数据日期**，否则 `budget_status=STALE_DATE_HIDDEN`、
+      `hide_data=True`，并清空 info 里所有来自陈旧产物的数值；main 见到
+      `hide_data` 就不写任何清单/权重（「日期不一致数据不要展示」）。
+      `data_date=None` 为离线/单测上下文，跳过时效校验（不改变旧契约）。
+
 
     v4.18 P0-3（round122）：把 regime 风险预算接成真实权重来源。
     ⭐ round130 / P0-2：修复「任何预算故障都回退**满仓 1.0**」——
@@ -432,7 +441,10 @@ def load_w_total(regime_path=None, fallback_mode="zero"):
             'gate_ok': None, 'final_hi': None, 'final_lo': None,
             'bound_by': None, 'fallback': False, 'note': None,
             'executable': False, 'budget_status': 'unread',
-            'fallback_mode': fallback_mode}
+            'fallback_mode': fallback_mode,
+            # round133：时效校验留痕；hide_data=True 时下游不得产出/展示任何组合数据
+            'date_check': 'SKIPPED_NO_DATA_DATE' if not data_date else None,
+            'hide_data': False, 'stale_date': None}
 
     def _degrade(reason):
         if fallback_mode == "full":
@@ -458,6 +470,21 @@ def load_w_total(regime_path=None, fallback_mode="zero"):
         return _degrade(f"regime_forecast 解析失败({str(e)[:40]})")
     info['source'] = os.path.basename(p)
     info['date'] = d.get('date') or d.get('data_date')
+    # 🔒 round133 外部时效门禁：文件内部的 gate.ok 只证明「写它那天」没问题，
+    #    不能证明它对**今天**有效（11-05 陈旧预算被标 OK 就是这个漏洞）。
+    if data_date:
+        _chk = check_payload(d, data_date)
+        info['date_check'] = _chk['status']
+        if not _chk['ok']:
+            w, info = _degrade(f"风险预算日期不一致（{_chk['reason']}）→ "
+                               f"{hidden_notice(_chk, '风险预算')}")
+            # 陈旧数值一律不进 info：下游即使误读 info 也拿不到 0.5837
+            info.update({'budget_status': 'STALE_DATE_HIDDEN',
+                         'date_check': _chk['status'],
+                         'hide_data': True, 'stale_date': _chk['artifact_date'],
+                         'final_hi': None, 'final_lo': None, 'bound_by': None,
+                         'available': False, 'gate_ok': None})
+            return w, info
     gate = d.get('gate') or {}
     info['gate_ok'] = gate.get('ok')
     cb = d.get('combine') or {}
@@ -549,17 +576,8 @@ def main():
     route_pool = cfg.get('route_pool_map', {})
     mom_w = float(cfg.get('momentum_route_weight', 0.5) or 0.5)
 
-    # P0-3: 接入 regime 风险预算作为真实仓位（--no-risk 强制满仓，用于对照）
-    if args.no_risk:
-        w_total, rinfo = 1.0, {'source': None, 'available': False, 'fallback': True,
-                               'executable': False,
-                               'budget_status': 'DISABLED_BY_FLAG',
-                               'note': '--no-risk 指定满仓 1.0（对照模式，非可执行建议）'}
-    else:
-        w_total, rinfo = load_w_total(fallback_mode=args.risk_fallback)
-        if not rinfo.get('executable'):
-            print(f"⚠️ 风险预算不可用：{rinfo.get('note')} → 本产物标为不可执行")
-
+    # round133：必须先解析 scored 拿到**数据日期**，才能对风险预算做外部时效校验。
+    #   原顺序是先读预算、后读 scored —— 这正是「想校验也没日期可比对」的根因。
     scored = args.scored
     if scored is None:
         fs = [f for f in sorted(glob.glob(os.path.join(HERE, 'top200_scored_*.json')), reverse=True)
@@ -575,6 +593,21 @@ def main():
     mdate = mom.get('date')
     sdate = data.get('date')
     n = len(rows)
+
+    # P0-3: 接入 regime 风险预算作为真实仓位（--no-risk 强制满仓，用于对照）
+    if args.no_risk:
+        w_total, rinfo = 1.0, {'source': None, 'available': False, 'fallback': True,
+                               'executable': False,
+                               'budget_status': 'DISABLED_BY_FLAG',
+                               'note': '--no-risk 指定满仓 1.0（对照模式，非可执行建议）'}
+    else:
+        w_total, rinfo = load_w_total(fallback_mode=args.risk_fallback,
+                                      data_date=sdate)
+        if rinfo.get('hide_data'):
+            print(f"⛔ 风险预算日期不一致（{rinfo.get('stale_date')} ≠ {sdate}）"
+                  f"→ 按裁决本期组合清单不产出、不展示")
+        elif not rinfo.get('executable'):
+            print(f"⚠️ 风险预算不可用：{rinfo.get('note')} → 本产物标为不可执行")
 
     # ---- 路线差异化池：按成交额(turnover)排名切分 ----
     # 依据: TOP200 vs TOP500 对照回测 —— B 反转路线在 TOP500 全胜(选股超额 +6.3pp),
@@ -878,6 +911,22 @@ def main():
                   f"总分{r['total']:>5.1f}({r['rating']}) RSI{t.get('rsi') if t.get('rsi') is not None else 0:>5.1f} "
                   f"{str(t.get('trend')):<6} 板块R60={r.get('sector_r60')} R10={r.get('sector_r10')} "
                   f"权重{_eq_w:.1%}")
+
+    # ⭐ round133 裁决 2：风险预算日期不一致 → **不产出任何组合数据**。
+    #   计算照跑（保持链路可观测），但写盘前把清单/权重/仓位全部清空，
+    #   只留一段「未更新」披露；否则页面会把基于 T-1 预算的 10 只票照单展示。
+    if rinfo.get('hide_data'):
+        out['portfolios'] = {}
+        out['budget_status'] = 'STALE_DATE_HIDDEN'
+        out['hidden_reason'] = hidden_notice(
+            {'artifact_date': rinfo.get('stale_date'), 'data_date': sdate},
+            '本期组合')
+        out['budget_source'] = {
+            'source': rinfo.get('source'), 'date': rinfo.get('stale_date'),
+            'date_check': rinfo.get('date_check'),
+            'budget_status': rinfo.get('budget_status'),
+            'note': '陈旧预算数值未写入产物（按裁决不展示）'}
+        print(f"⛔ {out['hidden_reason']}")
 
     # ⭐ round130 / P0-2：顶层可执行性 = 预算来源可执行 + 每条路线最终权重验收通过。
     #   降级 / 对照模式 / 验收失败一律 false，异常产物不得标为可执行建议。

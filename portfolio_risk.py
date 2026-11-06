@@ -51,6 +51,8 @@ import math
 import argparse
 from datetime import datetime
 
+from regime_date_guard import check_payload, hidden_notice  # round133 日期守卫（单一实现）
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 SECTOR_DIR = os.path.join(HERE, 'sector')
 KLONG = os.path.join(HERE, 'data', 'klines_long.json')
@@ -330,18 +332,26 @@ def compute_one(pf, px, cal, bench_codes=None):
     else:
         out['beta_bench'] = f'路径 {n_days} 天 < {MIN_DAYS_FOR_BETA} 天，beta 不给值'
 
-    # ── 风险预算对齐 ──
+    # ── 风险预算对齐（round133：日期不一致 → 陈旧预算数值一律不写入 risk）──
     rp = os.path.join(HERE, 'regime_forecast.json')
     if os.path.exists(rp):
         try:
-            rf = json.load(open(rp, encoding='utf-8'))
-            rb = rf.get('risk_budget') or {}
-            tv = rb.get('target_vol')
-            out['budget_target_vol'] = tv
-            if tv and out.get('vol_ann') is not None:
-                # 组合实际风险敞口 = 波动（已含仓位稀释）；与 target_vol 直接比
-                out['vol_vs_target'] = round(out['vol_ann'] / 100.0 / float(tv), 3)
-                out['vol_aligned'] = bool(out['vol_ann'] / 100.0 <= float(tv) + 1e-9)
+            # ⚠️ 必须用 with 关句柄（round122/round132 ResourceWarning 教训）。
+            with open(rp, encoding='utf-8') as _bf:
+                rf = json.load(_bf)
+            _dd = pf.get('_date')  # main 注入的数据日期；离线调用为 None
+            _bchk = check_payload(rf, _dd) if _dd else None
+            if _bchk and not _bchk['ok']:
+                out['budget_note'] = hidden_notice(_bchk, '风险预算对齐')
+                out['budget_date_check'] = _bchk['status']
+            else:
+                rb = rf.get('risk_budget') or {}
+                tv = rb.get('target_vol')
+                out['budget_target_vol'] = tv
+                if tv and out.get('vol_ann') is not None:
+                    # 组合实际风险敞口 = 波动（已含仓位稀释）；与 target_vol 直接比
+                    out['vol_vs_target'] = round(out['vol_ann'] / 100.0 / float(tv), 3)
+                    out['vol_aligned'] = bool(out['vol_ann'] / 100.0 <= float(tv) + 1e-9)
         except Exception as e:
             out['budget_note'] = f'regime_forecast 读取失败: {str(e)[:40]}'
 

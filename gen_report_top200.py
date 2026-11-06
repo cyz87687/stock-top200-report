@@ -18,6 +18,9 @@ import glob
 import html as html_mod
 from datetime import datetime
 
+from regime_date_guard import (check_artifact_date, check_payload,
+                               budget_source_stale, hidden_notice)
+
 # 输入输出配置
 inp = sys.argv[1] if len(sys.argv) > 1 else f"top200_scored_{datetime.now().strftime('%Y-%m-%d')}.json"
 
@@ -836,10 +839,10 @@ def _forecast_hero_line():
             return ""
         with open(_p, encoding="utf-8") as _f:
             _o = json.load(_f)
-        # ---- 日期校验（与卡片层同规则，不可省）----
-        _od = str(_o.get("date") or "")
-        if date_str and (date_str not in _od):
-            print(f"⚠️ Hero 敞口行跳过：regime_forecast.json 日期 {_od} ≠ 数据日期 {date_str}")
+        # ---- 日期校验（round133：与卡片层共用 regime_date_guard 单一实现）----
+        _hchk = check_payload(_o, date_str)
+        if not _hchk['ok']:
+            print(f"⚠️ Hero 敞口行跳过：{_hchk['reason']}（按裁决不展示陈旧数值）")
             return ""
         # ---- 门禁状态校验：未通过门禁的产物不得进 Hero ----
         _g = _o.get("gate") or {}
@@ -1333,6 +1336,31 @@ def _detail_append(fragment):
         _DETAIL_PARTS.append(fragment)
     else:
         html_parts.append(fragment)
+
+
+def _detail_target():
+    """当前 detail 区块落到的列表（回退分支也要能用替换逻辑）。"""
+    return _DETAIL_PARTS if SHOW_CORE_ONLY else html_parts
+
+
+def _stale_placeholder(subject, check, anchor_id="", hidden_items=()):
+    """「日期不一致 → 数据不展示」的统一占位块（保留锚点，页面必须说实话）。
+
+    ⚠️ 只留披露，不输出任何来自陈旧产物的数值；保留标题/锚点避免导航死链。
+    `hidden_items` 只列被隐藏的**模块名**，不列任何数值。
+    """
+    _id = f' id="{anchor_id}"' if anchor_id else ''
+    _items = ('<div style="font-size:10px;color:#94a3b8;margin-top:5px;">本期隐藏内容：'
+              + html_mod.escape('、'.join(hidden_items)) + '</div>') if hidden_items else ''
+    return ('<div class="chart-card"' + _id +
+            ' style="padding:14px 16px;margin:14px 0;border-left:3px solid #f59e0b;">' +
+            '<div style="font-size:13px;color:#e2e8f0;font-weight:700;">' +
+            html_mod.escape(subject) + ' <span style="font-size:11px;color:#f59e0b;">（本期不展示）</span></div>' +
+            '<div style="font-size:11px;color:#f59e0b;margin-top:6px;line-height:1.75;">⚠️ ' +
+            html_mod.escape(hidden_notice(check, subject)) + '</div>' + _items +
+            '<div style="font-size:10px;color:#64748b;margin-top:6px;line-height:1.65;">' +
+            '数据纪律：产物日期与数据日期不一致时，相关数值一律不产出、不展示；' +
+            '这是数据管道告警，不是「今日无数据」。</div></div>')
 
 # ===================================================================
 # v4.0 页面信息架构收敛（2026-10-25 老大指令）
@@ -4985,9 +5013,9 @@ try:
     if os.path.exists(_rfp):
         with open(_rfp, "r", encoding="utf-8") as _f:
             _robj = json.load(_f)
-        _rdate = str(_robj.get("date", ""))
+        _rchk = check_payload(_robj, date_str)  # round133：统一日期守卫
         _rgate = _robj.get("gate") or {}
-        if (not date_str) or (date_str in _rdate):
+        if _rchk['ok']:
             _regime_fc = _robj
             print(f"📐 市场状态: {(_robj.get('L1_state') or {}).get('state_name')} / "
                   f"风险 {(_robj.get('L2_risk') or {}).get('level_name')}")
@@ -4996,9 +5024,9 @@ try:
                 _regime_gate_warn = str(_rgate.get("detail") or "")
         else:
             _regime_gate_warn = (
-                f"regime_forecast.json 的日期（{_rdate}）≠ 当日数据日期（{date_str}），"
-                f"本卡片已跳过渲染 —— 这是**数据管道告警**，不是「今日无风险信息」。"
-                f"请检查日链是否执行了 fetch_bench.py 与 regime_model.py。")
+                hidden_notice(_rchk, "市场状态卡片 / 风险预算")
+                + " 本卡片已跳过渲染 —— 这是数据管道告警，不是「今日无风险信息」。"
+                  "请检查日链是否执行了 fetch_bench.py 与 regime_model.py。")
             print(f"⚠️ {_regime_gate_warn}")
     else:
         print("ℹ️ 未找到 regime_forecast.json，状态卡片将显示占位说明")
@@ -6574,6 +6602,11 @@ if _ev_gap:
     html_parts.append(f'<div class="chart-card" style="padding:14px 16px;margin:14px 0;">'
                       f'{_ev_gap}</div>')
 
+# round133 裁决 2：记下组合区块在 detail 收集器里的起点。
+#   计算照常生成（依赖链完整），若依据产物日期与数据日期不一致，
+#   在区块末尾把这段整块换成「本期不展示」占位，不输出任何陈旧数值。
+_combo_detail_at = len(_detail_target())
+
 # ===== v3.9 多因子精选组合（≤10 只）+ 动量路线低 IC 悖论解释 =====
 # 老大第 3 项：「今日候选组合数量太多，请用多因子的思路选出一个组合，今日组合总数不要超过 10 只。
 #   另外请解释为什么动量路线的 ic 值和胜率低但是会选出动量路线的个股。」
@@ -7585,6 +7618,30 @@ try:
     </div>''')
 except Exception as _mfe:
     print(f"⚠️ 多因子组合区块渲染失败: {str(_mfe)[:160]}")
+
+# ===== round133 裁决 2「日期不一致数据不要展示」=====
+# 两处独立依据，任一不过期即整块隐藏：
+#   ① mf_pick_<date>.json / mf_latest.json 的 date（实测 11-05 页面用的是 10-23 陈旧件）
+#   ② 组合产物 risk.w_total_source.date（实测 11-05 用的是 11-04 陈旧预算）
+# ⚠️ 不能只信产物里的 budget_status：历史产物写它时还没装守卫，仍标 OK。
+_mf_obj = globals().get('_mf') or {}
+_mf_chk = check_payload(_mf_obj, date_str)
+_qb_chk = None
+for _qm, _qp in (quant_json.get('portfolios') or {}).items():
+    _qc = budget_source_stale((_qp.get('risk') or {}).get('w_total_source'), date_str)
+    if _qc and not _qc['ok']:
+        _qb_chk = _qc
+        break
+_combo_chk = _mf_chk if not _mf_chk['ok'] else _qb_chk
+if _combo_chk is not None:
+    del _detail_target()[_combo_detail_at:]
+    _detail_append(_stale_placeholder(
+        '🧮 多因子精选组合', _combo_chk, 'sec-mf-pick',
+        hidden_items=('≤10 只组合清单 / 买入区间 / 目标价',
+                      '动量路线低 IC 悖论解释',
+                      '组合权重反推披露', '双引擎交集与资金分配')))
+    print(f"⛔ 组合区块按裁决不展示：{_combo_chk['reason']}")
+
 html_parts.append('''
     <!-- A6 快捷筛选: 9 按钮 → 4 高频 + 「更多」折叠 -->
     <div class="quick-filters">
