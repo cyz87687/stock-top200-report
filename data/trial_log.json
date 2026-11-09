@@ -1,7 +1,7 @@
 {
  "schema": "trial_log/1",
  "created_at": "2026-11-03T14:38:06",
- "updated_at": "2026-11-09T12:02:26",
+ "updated_at": "2026-11-09T17:38:09",
  "policy": {
   "k_outlet": "n_trials() 是 K 的唯一出口，任何脚本不得自行计数",
   "append_only": "只允许追加；已有记录不得原地改，只能追加新记录并用 superseded_by 指向它",
@@ -1172,6 +1172,19 @@
    "source": "reports/round136_intraday_guard_2026-11-09.md",
    "n_tests": null,
    "superseded_by": null
+  },
+  {
+   "id": "T0073",
+   "round": 137,
+   "kind": "data_audit",
+   "trial_date": "2026-11-09",
+   "recorded_at": "2026-11-09T17:38:09",
+   "backfilled": false,
+   "needs_review": false,
+   "what": "round137 基准源与复权校验的判据修复：①fetch_bench 接入腾讯 kline/kline 第三源解决 000985 两源全废（东财拒连/新浪停 2016），并加重叠一致率门禁防止脏源覆盖真历史；②verify_qfq_anchor 加源级失效守卫（全失败 exit 4、不推进游标、不记 covered）",
+   "nw_t": null,
+   "outcome": "pending",
+   "why": "两处均为「判据/守卫」修复，不产生新的因子或策略假设 → 不计入 K。n_trials 保持 365（364+1）。证据：000985 历史 2878 条完整保留（起 2015-01-05），11-09 正确补入；腾讯重叠日 15 处头部脏段（2018-08-03~08-24 同值重复 15 次，偏差 +19%）被识别并拒绝覆盖；14 处 0.01 级舍入差按相对差容差正确放行。权衡：一致率改按相对差算（原按字符串相等，会把舍入差误判为脏源）。"
   }
  ]
 }
