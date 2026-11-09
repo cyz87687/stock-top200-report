@@ -1,7 +1,7 @@
 {
  "schema": "trial_log/1",
  "created_at": "2026-11-03T14:38:06",
- "updated_at": "2026-11-06T10:06:46",
+ "updated_at": "2026-11-09T12:02:26",
  "policy": {
   "k_outlet": "n_trials() 是 K 的唯一出口，任何脚本不得自行计数",
   "append_only": "只允许追加；已有记录不得原地改，只能追加新记录并用 superseded_by 指向它",
@@ -1155,6 +1155,22 @@
    "why": "从审计产物回填；kind 取自 trial_log.CURATION 策展表",
    "source": "data/audit_round131_random20.json",
    "n_tests": 20,
+   "superseded_by": null
+  },
+  {
+   "id": "T0072",
+   "round": 136,
+   "kind": "data_audit",
+   "trial_date": "2026-11-09",
+   "recorded_at": "2026-11-09T12:02:26",
+   "backfilled": false,
+   "needs_review": false,
+   "what": "round136 价格库盘中污染防护 + 11-06 遗留 6 项降级补齐（append_klines_latest/refresh_kline_meta/verify_qfq_anchor/archive_fund_universe/portfolio_risk/factor_eval）",
+   "nw_t": null,
+   "outcome": "pending",
+   "why": "腾讯 fqkline 盘中返回未收盘当日行 + 「已有日期绝不覆盖」→ 半日 K 永久写死；新增 kline_cutoff.py 单一日期上限实现（09:30~15:05 自动排除当日）。补跑后 11-06 有价 1348→2134(99.8%)、新增 2153 点、失败仅 2 只；2026-11-09 未入库。verdict degraded→ok。权重指纹 9347d48f 未变。",
+   "source": "reports/round136_intraday_guard_2026-11-09.md",
+   "n_tests": null,
    "superseded_by": null
   }
  ]
