@@ -71,6 +71,50 @@ def fetch(secid, beg="20150101", end="20261231"):
 SINA_KL = ("https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/"
            "CN_MarketData.getKLineData?symbol=%s&scale=240&ma=no&datalen=%d")
 
+# 腾讯「kline/kline」端点（2026-11-09 新增第三源）
+#   背景：000985 中证全指在接入本源之前**两个源都不可用** ——
+#     东财 secid `1.000985` 直接 RemoteDisconnected（拒连）；
+#     新浪 `sh000985` 是死数据（最后一根 2016-04-28）。
+#   而 regime_model 的 PRIMARY_BENCH 恰是 000985 → 日期门禁每天拦 3 天滞后，
+#   整条 regime/组合链路被卡死（实测 11-09 门禁 exit 2）。
+#   ⚠️ 必须用 `kline/kline` 而非 `fqkline`：后者对指数返回 **HTTP 501**。
+#   ⚠️ datalen 实测上限在 2000~3000 之间（3000 → data 为空列表），取 2000。
+#   ⚠️ 返回结构 [date, open, close, high, low, volume]，与东财口径**逐字节一致**
+#     （已用 11-03~11-06 四天 OHLC 全等校验过），故无需任何换算。
+TX_KL = ("https://web.ifzq.gtimg.cn/appstock/app/kline/kline"
+         "?param=%s,day,,,%d")
+
+
+def fetch_tx(code, datalen=2000):
+    """腾讯指数日线 → {date: [open, close, high, low]}。
+
+    仅补足 000985 这类「东财拒连 + 新浪死数据」的宽基指数。
+    覆盖起点约 2018-08（比盘上 2015-01 短），因此调用方必须做**并集合并**
+    而不是整份替换，否则会丢掉更长的历史。
+    """
+    sym = ("sh" if code.startswith("000") or code.startswith("9") else "sz") + code
+    url = TX_KL % (sym, int(datalen))
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    raw = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "ignore")
+    d = json.loads(raw)
+    data = d.get("data") or {}
+    node = data.get(sym) if isinstance(data, dict) else None
+    if not node:
+        raise RuntimeError(f"腾讯无节点: {str(raw)[:120]}")
+    rows = node.get("day") or node.get("qfqday") or []
+    if not rows:
+        raise RuntimeError(f"腾讯空数据(datalen={datalen}): {str(raw)[:120]}")
+    out = {}
+    for r in rows:
+        try:
+            out[str(r[0])[:10]] = [float(r[1]), float(r[2]),
+                                   float(r[3]), float(r[4])]
+        except Exception:
+            continue
+    if not out:
+        raise RuntimeError("腾讯数据无可解析行")
+    return out
+
 
 def fetch_sina(code, datalen=3000):
     """新浪指数日线 → {date: [open, close, high, low]}。
@@ -104,7 +148,7 @@ def fetch_sina(code, datalen=3000):
 
 
 def fetch_any(code, secid, old_path=None):
-    """多源取优：东财 → 新浪。取「最新日期更晚」的那份；并列优先东财。
+    """多源取优：东财 → 新浪 → 腾讯。取「最新日期更晚」的那份；并列取优先源。
 
     ⚠️ **防止烂源覆盖好源**（2026-11-04 实测）：新浪的 000985 中证全指是**死数据**，
        最后一根停在 2016-06-13（datalen=50/300/3000 都如此），而旧缓存
@@ -112,51 +156,112 @@ def fetch_any(code, secid, old_path=None):
        若只按「源之间取最新」比较，某天东财也挂了就会让新浪的 2016 死数据
        覆盖掉盘上已有的 2874 根 —— 数据不但没更新，反而**倒退十年**。
        ⇒ 必须再和「盘上旧文件」比一次：候选源的最新日 < 旧文件最新日 → 拒用该源。
+
+    == 2026-11-09 变更：接入腾讯第三源 + **并集合并** ==
+      000985 中证全指是 regime_model 的 PRIMARY_BENCH，而它两源全废
+      （东财 RemoteDisconnected / 新浪停在 2016）→ 门禁每天拦 3 天滞后。
+      腾讯 `kline/kline` 可补足，但**只回溯到 2018-08**（盘上自 2015-01），
+      故不能整份替换，必须「盘上更早的历史 ∪ 源的最新数据」做并集合并。
+      合并前已用 11-03~11-06 四天 OHLC 与盘上逐字节比对全等，口径无需换算。
     """
     errs = []
     got = []
-    for nm, fn in (("eastmoney", lambda: fetch(secid)),
-                   ("sina", lambda: fetch_sina(code))):
+    # pri 越小越优先：并列时取优先源，避免无谓换源造成口径漂移
+    for pri, nm, fn in ((0, "eastmoney", lambda: fetch(secid)),
+                        (1, "sina", lambda: fetch_sina(code)),
+                        (2, "tx", lambda: fetch_tx(code))):
         try:
             px = fn()
             if px:
-                got.append((nm, px))
+                got.append((pri, nm, px))
         except Exception as e:
             errs.append(f"{nm}:{type(e).__name__}")
     if not got:
         raise RuntimeError("全部源失败（%s）" % ", ".join(errs))
 
-    # 与盘上旧数据比对，剔除「比现状还旧」的源
+    # 读盘上旧数据（既用于「拒用陈旧源」，也用于并集合并保留更早历史）
+    old = {}
     old_last = None
     if old_path and os.path.exists(old_path):
         try:
-            _o = json.load(open(old_path, encoding="utf-8")).get("px") or {}
-            if _o:
-                old_last = max(_o)
+            old = json.load(open(old_path, encoding="utf-8")).get("px") or {}
+            if old:
+                old_last = max(old)
         except Exception:
-            old_last = None
+            old, old_last = {}, None
     if old_last:
         _keep = []
-        for nm, px in got:
+        for pri, nm, px in got:
             if max(px) < old_last:
                 print(f"   ⛔ 拒用 {nm} 源 {code}：最新 {max(px)} 早于盘上 {old_last}"
                       f"（该源已停止维护）")
             else:
-                _keep.append((nm, px))
+                _keep.append((pri, nm, px))
         if _keep:
             got = _keep
-        elif old_last:
+        else:
             # 所有源都比盘上旧 → 保留旧文件不动，明确报错交给上层
             raise RuntimeError(f"全部源均早于盘上最新 {old_last}（疑似源失效），保留旧数据")
 
-    if len(got) == 1:
-        return got[0][1]
-    got.sort(key=lambda t: max(t[1]))
-    if max(got[0][1]) != max(got[1][1]):
+    # 最新日期优先；并列取优先源（-pri 降序 = pri 升序）
+    got.sort(key=lambda t: (max(t[2]), -t[0]))
+    pri, nm, px = got[-1]
+    if len({max(p) for _, _, p in got}) > 1:
         print(f"   ⚠️ 指数源不同步 {code}: "
-              + " / ".join(f"{n}={max(p)}" for n, p in got)
-              + f" → 取最新 {max(got[-1][1])}")
-    return got[-1][1]
+              + " / ".join(f"{n}={max(p)}" for _, n, p in got)
+              + f" → 取最新 {max(px)}（{nm}）")
+
+    if not old:
+        return px
+
+    # == 重叠一致率门禁（2026-11-09 实测教训）==
+    # 腾讯源对 000985 的重叠日有 29/2000 处与盘上不一致，其中 15 处是**头部脏段**：
+    #   2018-08-03~08-24 腾讯返回同一组 OHLC 连续重复 15 次（4707.51/4666.50/...），
+    #   而盘上该段为 3943→3830 的真实走势，偏差 +19%。若按「源值覆盖」，会把
+    #   盘上 15 天真实历史替换成一段假横盘 —— 与 11-04「烂源覆盖好源」同类事故。
+    # 故：先算重叠一致率，不合格的源**只补盘上缺失日期，绝不覆盖重叠日**。
+    #
+    # ⚠️ 一致率必须按**相对差是否在容差内**算，不能按「值是否完全相等」算。
+    #    实测：腾讯与盘上有 14/2000 处只差 0.01（3536.77 vs 3536.76），
+    #    若按「不等即不一致」统计会虚报不一致，极端情况下（全部只差 1 分）
+    #    一致率会算成 0% → 把一个正确的源误判成脏源。
+    #    判据口径：单日 |Δclose|/close <= REL_TOL 视为一致。
+    REL_TOL = 0.005            # 单日相对差容差 0.5%（与最大偏离判据同源）
+    BAD_RATIO_MAX = 0.02       # 不一致日占比上限 2%
+
+    def _rel(a, b):
+        try:
+            return abs(a[1] - b[1]) / max(1e-9, abs(b[1]))
+        except Exception:
+            return 0.0
+
+    ov = [d for d in px if d in old]
+    # 一致 = 相对差在容差内（而非字符串完全相等）
+    bad = [d for d in ov if _rel(px[d], old[d]) > REL_TOL]
+    max_rel = max((_rel(px[d], old[d]) for d in ov), default=0.0)
+    trust = bool(ov) and (len(bad) / len(ov) <= BAD_RATIO_MAX) and (max_rel <= REL_TOL)
+
+    merged = dict(old)
+    if trust:
+        merged.update(px)
+        n_keep = sum(1 for d in old if d not in px)
+        if n_keep:
+            print(f"   ⊕ 并集合并 {code}: {nm} {len(px)} 条（起 {min(px)}）"
+                  f" + 盘上更早 {n_keep} 条 → 共 {len(merged)} 条（起 {min(merged)}）")
+        if bad:
+            print(f"   ↺ {nm} 重叠日 {len(bad)} 处超容差已按源值更新"
+                  f"（max 相对差 {max_rel:.4%}，容差 {REL_TOL:.2%}）")
+    else:
+        # 只补增量：盘上已有的日期一律保留盘上值
+        n_add = 0
+        for d, v in px.items():
+            if d not in merged:
+                merged[d] = v
+                n_add += 1
+        print(f"   ⛔ {nm} 源 {code} 重叠日不一致 {len(bad)}/{len(ov)}"
+              f"（max 相对差 {max_rel:.2%}）→ 判为不同口径/含脏段，"
+              f"**只补盘上缺失 {n_add} 天，不覆盖已有历史** → 共 {len(merged)} 条")
+    return merged
 
 
 def main():

@@ -833,7 +833,7 @@ class TestGatedDatesConsecutive(unittest.TestCase):
         self.assertEqual(sp["n_in_axis"], 0)
 
     def test_real_data_is_consecutive(self):
-        """实测锁定：2026-11-04 快照的门槛后 16 个截面是连续交易日
+        """实测锁定：2026-11-09 快照的门槛后 19 个截面是连续交易日
 
         `current_weights_composite_ic|h1` 的 dates_after_gate 在 snapshot_dates
         中严格连续。若未来数据变化导致不再连续，这条会失败——
@@ -857,6 +857,17 @@ class TestGatedDatesConsecutive(unittest.TestCase):
            ③ 新增的两个日期为 `2026-10-27` 与 `2026-11-03`，集合是**只增不减**
               （旧 14 个全部保留），且仍严格连续 → 「连续」的披露文案无需改动。
            ⇒ 与 P0-5 同性质：数据覆盖变好，不是判据放宽。
+
+        ⚠️ 2026-11-09（round137）16 → 19，变化来源已逐项核对（非代码改动）：
+           ① `factor_ic.json` 的 `snapshot_dates` 末端 11-04 → 11-09
+              （新增 11-05 / 11-06 / 11-09 三个快照，见 factor_history 96 vs HEAD 95）；
+           ② `dates_after_gate` 新增恰为 `2026-11-04/11-05/11-06` 三日，**删除 0 个**
+              （旧 16 个全部保留，集合只增不减），末日 11-03 → 11-06；
+           ③ 原因同上：价格库 11-09 增量把 11-04~11-06 的收盘价补齐后，这三日才同时
+              满足「有字段值 + 起止两端有收盘价」→ 进入 dates_after_gate；
+           ④ h=1 末日只到 11-06（11-09 缺 T+1 前向收益，属正常未成熟）；
+           ⑤ 19 个日期在 snapshot_dates 中仍**严格连续** → 披露文案无需改动。
+           ⇒ 同样是「数据覆盖变好」，不是判据放宽。
         """
         import json
         import cs_consecutive as C
@@ -872,10 +883,11 @@ class TestGatedDatesConsecutive(unittest.TestCase):
         sp = C.consecutive_span(ds, axis)
         self.assertTrue(sp["is_consecutive"],
                         f"门槛后日期不再连续（{sp}）—— 页面披露文案需同步复核")
-        self.assertEqual(sp["n"], 16,
+        self.assertEqual(sp["n"], 19,
                          "门槛后截面数变了 —— 请先回答「是哪一步改动的」再更新本数字"
                          "（P0-5 价格补洞时 10→14；round128 数据推进到 11-04 且"
-                         "factor_history 补回 10-27 快照后 14→16，见 docstring）")
+                         "factor_history 补回 10-27 快照后 14→16；round137 价格库"
+                         "11-09 增量补齐 11-04~11-06 收盘价后 16→19，见 docstring）")
         self.assertEqual(sp["n"], len(ds),
                          "连续性探针的 n 必须等于 dates_after_gate 的真实长度")
 

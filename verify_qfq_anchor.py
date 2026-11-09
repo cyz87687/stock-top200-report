@@ -307,13 +307,34 @@ def main():
         print("\n处置建议：不要自动改数据。先看漂移日期是否集中在某个除权日之后；")
         print("          确认是锚点混用后，用 fetch_klines_long.py 对该股做定向重建。")
 
+    # ── 源级全失效守卫（2026-11-09 新增）──
+    # 实测 11-09：东财 push2his 经代理**整体断连**
+    #   （ProxyError: Unable to connect to proxy / RemoteDisconnected）
+    #   → 36 只抽样**全部**落到 nodata 分支，但旧实现照旧「跳过」并 return 0，
+    #     日链据此认定「复权校验通过」。这正是硬规则里的「全失败 exit 0 = 假成功」。
+    # ⇒ 三条判定：
+    #   ① sampled>0 且 ok+drift==0 → 源级失效，exit 4（独立码，便于日链区分）
+    #   ② 且**不推进游标、不记 covered**（没测过就不许算覆盖，否则覆盖率虚增）
+    #   ③ 判定仍写 verdict="unknown"（绝不写 clean）
+    _source_dead = bool(sample) and (len(ok_l) == 0 and len(drift) == 0)
+    if _source_dead:
+        print("\n" + "=" * 92)
+        print(f"❌ 源级全失效：抽样 {len(sample)} 只**无一取到东财数据**"
+              f"（ok=0 drift=0 nodata={len(nodata)}）")
+        print(f"   首条原因：{nodata[0][1][:160] if nodata else '—'}")
+        print("   判定：本次**未完成任何校验**，不得记为通过；游标与覆盖不推进。")
+        print("   处置：换网络/稍后重跑；数据层不受影响（库内一根未改）。")
+        print("=" * 92)
+
     # ── 更新游标与覆盖率 ──
     covered = cur.get("covered") or {}
     for c in ok_l:
         covered[c[0]] = date
     n_cov = len(covered)
     cov_pct = round(100.0 * n_cov / len(px), 2) if px else 0.0
-    if not a.full:
+    if _source_dead:
+        pass                                  # 不推进游标、不动 rounds
+    elif not a.full:
         nxt = (shard_used + 1) % a.shards
         rounds = int(cur.get("rounds", 0)) + (1 if nxt == 0 else 0)
         _save_cursor({"shard": nxt, "covered": covered, "rounds": rounds,
@@ -337,10 +358,10 @@ def main():
         "tol": a.tol,
         "scope": scope,
         "shard": shard_used,
-        "shards": a.shards,
-        "full": bool(a.full),
+        "shards": a.shards,        "full": bool(a.full),
         "counts": {"candidates": len(codes), "sampled": len(sample),
                    "ok": len(ok_l), "drift": len(drift), "nodata": len(nodata)},
+        "source_dead": bool(_source_dead),
         "ok_ratio_range": [min((r for _, r in ok_l), default=None),
                            max((r for _, r in ok_l), default=None)],
         "drift": [{"code": c, "ratio": round(r, 8),
@@ -351,11 +372,15 @@ def main():
                      "rounds_completed": int(cur.get("rounds", 0)),
                      "next_shard": (shard_used + 1) % a.shards if not a.full else 0},
         "verdict": "drift" if drift else ("clean" if len(ok_l) else "unknown"),
-        "note": ("全量校验" if a.full else
-                 f"分片轮转校验，本次仅覆盖 {len(sample)} 只；"
-                 f"累积覆盖 {cov_pct:.2f}%。未覆盖≠已通过"),
+        "note": ("源级全失效：抽样全部取不到东财数据，本次未完成任何校验，游标未推进"
+                 if _source_dead else
+                 ("全量校验" if a.full else
+                  f"分片轮转校验，本次仅覆盖 {len(sample)} 只；"
+                  f"累积覆盖 {cov_pct:.2f}%。未覆盖≠已通过")),
     })
     print("=" * 92)
+    if _source_dead:
+        return 4
     return 0 if not drift else 1
 
 
