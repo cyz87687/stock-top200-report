@@ -16,24 +16,98 @@
   python append_klines_latest.py                 # 追加最新交易日
   python append_klines_latest.py --dry-run       # 只看将追加多少
   python append_klines_latest.py --need 30       # 多拉几根（补几天缺口）
+  python append_klines_latest.py --until 2026-11-06   # 只补到指定日（补历史缺口/盘中补跑）
+
+## 盘中污染保护（--until 的由来）
+
+腾讯 `fqkline` 在**盘中**就返回当日行，且价与量都是**未收盘的瞬时值**
+（实测 2026-11-09 10:50 茅台当日 vol=12532 手，而 11-06 整日 42848 手）。
+本脚本「已有日期绝不覆盖」，一旦盘中缺陷跑，那条半日 K 线会被**永久写死**，
+事后收盘也不会被修正 —— 污染不可逆。
+
+因此：
+  1. `--until` 硬上限：晚于该日期的 bar 一律丢弃
+  2. 未显式给 `--until` 时，若当前处于**交易时段内**（工作日 09:30~15:05），
+     自动把「当天」排除并打印警告（收盘后跑不受影响，保留原行为）
+
+日链正常在收盘后运行，不需要传参；**盘中手工补跑必须显式 `--until`**。
 """
 import os
 import sys
 import json
 import time
 import argparse
+import datetime
 import urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 os.chdir(HERE)
 
+import kline_cutoff      # noqa: E402  日期上限判据的单一实现
+
 KLONG = os.path.join(HERE, "data", "klines_long.json")
 TQ_HOSTS = ["https://ifzq.gtimg.cn", "https://web.ifzq.gtimg.cn",
             "https://proxy.finance.qq.com/ifzqgtimg"]
+SINA_URL = ("https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/"
+            "CN_MarketData.getKLineData?symbol={sym}&scale=240&ma=no&datalen={n}")
+
+
+def _fetch_sina(sym, need=8):
+    """新浪个股日线备源。返回 (bars, vol_scale)。
+
+    ⚠️ 三个必须记住的性质：
+      1. **个股日线滞后 T-1**（MEMORY 已记：新浪 getKLineData 当日不出）。
+         补 11-06 这类历史日期时它**天然安全**，不可能带进 11-09 半日价。
+         但**不能依赖**它当保护 —— 硬保护始终是 cutoff。
+      2. `volume` 单位是**股**，而库内口径是 `kline_units` 定义的
+         **688=股 / 其余=手**。故这里把 (date,o,c,h,l,vol) 算成「库口径」，
+         需要乘的系数由返回的 `vol_scale` 表达，**不在 fetch 内部硬编码**
+         （硬编码 /100 会把 688 算错 100 倍 —— round116 血案同型）。
+      3. `strict_until` 由调用方统一施加，此函数不做日期过滤。
+    """
+    url = SINA_URL.format(sym=sym, n=int(need))
+    req = urllib.request.Request(url, headers={
+        "User-Agent": "Mozilla/5.0",
+        "Referer": "https://finance.sina.com.cn"})
+    try:
+        with urllib.request.urlopen(req, timeout=12) as r:
+            txt = r.read().decode("utf-8", "ignore")
+    except Exception:
+        return None, 1.0
+    try:
+        arr = json.loads(txt)
+    except Exception:
+        return None, 1.0
+    if not isinstance(arr, list) or not arr:
+        return None, 1.0
+    out = []
+    for k in arr:
+        try:
+            out.append((str(k["day"])[:10], float(k["open"]), float(k["close"]),
+                        float(k["high"]), float(k["low"]), float(k["volume"])))
+        except Exception:
+            continue
+    if not out:
+        return None, 1.0
+    # 新浪给的是「股」；库口径 688 要股（×1）、其余要手（÷100）
+    scale = 1.0 if sym.startswith("sh688") else 0.01
+    return out, scale
 
 
 def fetch_ohlcv(sym, need=8):
+    """返回 (bars, vol_scale)。bar = (date, open, close, high, low, vol_raw)。
+
+    `vol_raw * vol_scale` 才是**库口径**成交量（688=股，其余=手）。
+    先腾讯（当日可得），全域名失败则回退新浪。
+    """
+    bars, scale = _fetch_tx(sym, need)
+    if bars:
+        return bars, scale
+    return _fetch_sina(sym, need)
+
+
+def _fetch_tx(sym, need=8):
     for _host in TQ_HOSTS:
         url = f"{_host}/appstock/app/fqkline/get?param={sym},day,,,{need},qfq"
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
@@ -60,8 +134,9 @@ def fetch_ohlcv(sym, need=8):
             except Exception:
                 continue
         if out:
-            return out
-    return None
+            # 腾讯原值**已经是库口径**（688=股、其余=手）→ scale 恒为 1
+            return out, 1.0
+    return None, 1.0
 
 
 def sym_of(code6):
@@ -74,16 +149,42 @@ def sym_of(code6):
     return "sh" + code6
 
 
+def _now_cst():
+    """当前北京时间（不依赖本机时区设置）。"""
+    return kline_cutoff.now_cst()
+
+
+def resolve_cutoff(until, now=None):
+    """日期硬上限 —— 判据单一实现，见 kline_cutoff.resolve_cutoff。
+
+    保留本函数只为兼容既有测试与调用点，逻辑不在此重复。
+    """
+    cut, reason = kline_cutoff.resolve_cutoff(until, now)
+    if not until and cut:
+        reason = reason.replace("未指定上限且当前", "未传 --until 且当前")
+    elif until:
+        reason = "显式 --until"
+    return cut, reason
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--need", type=int, default=8)
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--until", default="",
+                    help="日期硬上限 YYYY-MM-DD，晚于该日的 bar 一律丢弃（盘中补跑必用）")
     args = ap.parse_args()
+
+    cutoff, cutoff_reason = resolve_cutoff(args.until)
 
     print("=" * 96)
     print("append_klines_latest · 增量补最新交易日")
     print("=" * 96)
+    if cutoff:
+        print(f"🔒 日期上限：{cutoff}（{cutoff_reason}）→ 晚于该日的 bar 丢弃")
+    else:
+        print(f"ℹ️  日期上限：无（{cutoff_reason}）")
 
     raw = json.load(open(KLONG, encoding="utf-8"))
     codes = sorted({str(c)[-6:] for c in raw if str(c)[-6:].isdigit()})
@@ -102,10 +203,12 @@ def main():
     n_new = 0
     n_fail = 0
     n_codes_touched = 0
+    n_cut = 0                      # 被日期上限丢弃的 bar 数
+    cut_dates = set()
     t0 = time.time()
     for i, c6 in enumerate(codes):
         sym = sym_of(c6)
-        bars = fetch_ohlcv(sym, args.need)
+        bars, vol_scale = fetch_ohlcv(sym, args.need)
         if not bars:
             n_fail += 1
             continue
@@ -125,9 +228,13 @@ def main():
         touched = False
         for bar in bars:
             d, o, cl, hi, lo, vol = bar
+            if not kline_cutoff.bar_allowed(d, cutoff):
+                n_cut += 1                 # 盘中未收盘价 / 超出补跑范围 → 一律丢弃
+                cut_dates.add(d)
+                continue
             if d in m:
                 continue                     # 已有日期绝不覆盖
-            m[d] = [o, cl, hi, lo, vol]
+            m[d] = [o, cl, hi, lo, vol * vol_scale]
             added_dates.add(d)
             n_new += 1
             touched = True
@@ -140,6 +247,8 @@ def main():
 
     print()
     print(f"完成：{n_codes_touched} 只被追加，新增 {n_new} 个价格点，失败 {n_fail} 只")
+    if n_cut:
+        print(f"🔒 按日期上限丢弃 {n_cut} 个 bar（日期：{sorted(cut_dates)}）")
     if added_dates:
         print(f"新增日期：{sorted(added_dates)}")
     else:

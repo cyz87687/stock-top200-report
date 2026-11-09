@@ -455,7 +455,15 @@ def main():
             if pf is not None:
                 old = pf.get('risk') or {}
                 merged = dict(old)
-                merged.update({k: r[k] for k in
+                # round136 修复：此处原为 `r[k]` 硬取 —— 但 compute_one 的**早期返回**
+                #   分支（无持仓 / 缺 date / 组合日不在交易日历 / 价格覆盖率不足）
+                #   根本不会写 window 三字段，于是回填阶段直接 KeyError: 'window'，
+                #   整个 --inplace 崩掉、risk 块一个字段都没写回。
+                #   2026-11-06 实测就是这个路径（价格库停在 11-05 → 11-06 不在日历）。
+                #   ⚠️ 改成 .get() 不是「把错误藏起来」：缺失字段写 None 是**真实信息**
+                #   （= 该口径未计算），下游 `if rk.get("window")` 的假分支本来就是
+                #   为此设计的；真正要防的是崩溃导致**全部**字段丢失。
+                merged.update({k: r.get(k) for k in
                                ('vol_ann', 'vol_ann_of_equity', 'beta_vs_pool',
                                 'mdd', 'mdd_at', 'period_ret', 'n_days',
                                 # round122 修复：回填白名单**漏了窗口三字段**，

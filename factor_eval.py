@@ -56,6 +56,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 import ep_size_ind
 # v4.10（2026-10-27 P0-4）：复合分量尺唯一实现来源（分母恒定 + 缺维中性填充）
 import scale_calc
+# round136：行情日期硬上限的单一实现（与 append_klines_latest 共用，禁各写一份）
+import kline_cutoff
 HISTORY_PATH = os.path.join(HERE, "factor_history.json")
 OUT_PATH = os.path.join(HERE, "factor_ic.json")
 TRACK_PATH = os.path.join(HERE, "recommendation_track.json")
@@ -717,7 +719,42 @@ def _fetch_qfq(sym, need=PX_NEED, with_open=False):
                     continue
             if out:
                 return out
-    return None
+    return _fetch_qfq_sina(sym, need, with_open)
+
+
+def _fetch_qfq_sina(sym, need=PX_NEED, with_open=False):
+    """新浪日线备源（round136）。
+
+    为什么需要：2026-11-09 实测腾讯三个域名**同时**返回 HTTP 501，
+    `refresh_price_tail` 就此全军覆没（786 只抓不到）。没有备源时
+    整条 IC 价格轴会静默停在旧日期 —— 而它「保留旧值」的设计会让
+    这种失败**看起来完全正常**（只打一行「无新交易日」）。
+
+    ⚠️ 只取 close/open，不取成交量，故不涉及 kline_units 双口径问题。
+    ⚠️ 该源个股日线滞后 T-1，补历史日期够用；当日补数仍以腾讯为主源。
+    """
+    url = ("https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/"
+           f"CN_MarketData.getKLineData?symbol={sym}&scale=240&ma=no&datalen={int(need)}")
+    req = urllib.request.Request(url, headers={
+        "User-Agent": "Mozilla/5.0",
+        "Referer": "https://finance.sina.com.cn"})
+    try:
+        with urllib.request.urlopen(req, timeout=12) as r:
+            arr = json.loads(r.read().decode("utf-8", "ignore"))
+    except Exception:
+        return None
+    if not isinstance(arr, list) or not arr:
+        return None
+    out = []
+    for k in arr:
+        try:
+            if with_open:
+                out.append((str(k["day"])[:10], float(k["open"]), float(k["close"])))
+            else:
+                out.append((str(k["day"])[:10], float(k["close"])))
+        except Exception:
+            continue
+    return out or None
 
 
 def bootstrap_prices():
@@ -837,7 +874,7 @@ def merge_snapshot_prices(hist):
     return changed
 
 
-def refresh_price_tail(hist, verbose=True):
+def refresh_price_tail(hist, verbose=True, until_cutoff=None):
     """价格 store 落后最新快照时**增量**抓取缺失尾部（日常自愈，无需手动 --bootstrap-prices）。
 
     背景：日常登记只 upsert 截面、不刷新 prices store；若长期不跑 --bootstrap-prices，
@@ -848,6 +885,8 @@ def refresh_price_tail(hist, verbose=True):
     · 抓取范围：历史全部出现过的代码，need = clamp(缺口日历天数+12, 30, PX_NEED) 根；
     · 只追加 dates[-1] 之后的新交易日，并顺带填补已有日期上的 None 空洞（不覆盖旧值）；
     · 接口失败保留旧值；无新交易日则原样返回。返回 bool 表示是否有更新。
+    · round136：`until_cutoff` 为日期硬上限（'YYYY-MM-DD'），盘中跑必须给，
+      否则未收盘的当日价会被当成定稿值写进 store（详见 kline_cutoff 模块）。
     """
     p = hist.get("prices") or {}
     dates, px = p.get("dates") or [], p.get("px") or {}
@@ -870,6 +909,14 @@ def refresh_price_tail(hist, verbose=True):
     need = min(PX_NEED, max(30, gap + 12))
     tail = {}          # code -> {date: close}
     tail_op = {}       # code -> {date: open}（v3.6 可交易 IC）
+    # round136：盘中污染防护。腾讯 fqkline 盘中就返回当日行（价/量均未收盘），
+    #   而本函数只往 store 的**空格子里填**、不覆盖旧值 → 半日 K 线一旦落进
+    #   factor_history.json 就永久固化。判据走单一实现 kline_cutoff（与
+    #   append_klines_latest 共用），交易时段内自动排除当日。
+    _cutoff, _cut_reason = kline_cutoff.resolve_cutoff(until_cutoff)
+    if verbose:
+        print(f"   🔒 价格尾部日期上限：{_cutoff or '无'}（{_cut_reason}）")
+    n_cut = 0
     n_ok = n_fail = 0
     for i, c in enumerate(codes):
         sym = _symbol(c)
@@ -877,6 +924,9 @@ def refresh_price_tail(hist, verbose=True):
             continue
         kl = _fetch_qfq(sym, need=need, with_open=True)
         if kl:
+            kl = [r for r in kl if kline_cutoff.bar_allowed(r[0], _cutoff)]
+            if not kl:
+                continue
             tail[c] = {d: cl for d, op, cl in kl}
             tail_op[c] = {d: op for d, op, cl in kl if op}
             n_ok += 1
@@ -2347,6 +2397,11 @@ def main():
     # 默认 False → 现权重为受约束管理版本（v4.x / 含 weight_constraints）时
     #   拒绝整份覆盖，改写到 factor_weights_optimized_YYYYMMDD.json。
     force_overwrite = "--force-overwrite-weights" in args
+    # round136：行情日期硬上限（盘中补跑必给；不给则按 kline_cutoff 自动判）
+    until_arg = ""
+    for _i, _a in enumerate(args):
+        if _a == "--until" and _i + 1 < len(args):
+            until_arg = args[_i + 1]
     # v3.0 A2/E3: 池口径过滤(扩池TOP500后, 新旧截面分布不同不可混算)
     pool_filter = None
     for _i, _a in enumerate(args):
@@ -2379,7 +2434,7 @@ def main():
             print(f"⚠️ {os.path.basename(p)} 解析失败: {str(e)[:60]}")
     if merge_snapshot_prices(hist):
         pass
-    _px_refreshed = refresh_price_tail(hist)
+    _px_refreshed = refresh_price_tail(hist, until_cutoff=until_arg or None)
     if n_added or _px_refreshed:
         save_history(hist)
         if n_added:
