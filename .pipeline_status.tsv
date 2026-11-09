@@ -1,31 +1,25 @@
-fetch_top200_sina	0	1		2026-11-06 18:25:23	
-check_data_fresh	0	1		2026-11-06 18:25:24	
-step2_stockscorer	0	1		2026-11-06 18:31:56	
-append_klines_latest	1	0		2026-11-06 20:59:30	行情源大面积超时(1600/2138 失败313只, 2914s)，已终止；价格库停在 11-05，未写盘
-refresh_kline_meta	1	0		2026-11-06 20:59:30	依附价格库增量，本轮未执行；有效截面日历仍停在 11-05
-verify_qfq_anchor	1	0		2026-11-06 20:59:30	本轮未执行
-archive_fund_universe	1	0		2026-11-06 20:59:30	价格库停在 11-05，避免陈旧收盘价写入 fund 归档，本轮未执行
-archive_fwd_snapshot	0	1		2026-11-06 20:59:30	补跑完成
-generate_ai_assessment	0	1		2026-11-06 20:59:30	LLM 429 周配额用尽(重置 11-09)，按设计 fallback 规则生成
-enhance_scores	0	1		2026-11-06 20:59:30	补跑完成
-sector_momentum_daily	0	1		2026-11-06 20:59:30	补跑完成 5203/5218 只有效
-apply_sector_momentum	0	1		2026-11-06 20:59:30	补跑完成
-pick_portfolio	0	1		2026-11-06 20:59:30	当日 regime 就绪后二次重跑，产出 2 条路线 w_total=0.2
-portfolio_risk	1	0		2026-11-06 20:59:31	组合日 11-06 不在有效截面日历(价格库停在 11-05) → KeyError window
-portfolio_metrics	0	1		2026-11-06 20:59:31	补跑完成
-track_recommendations	0	1		2026-11-06 20:59:31	补跑完成，数据截止 11-06
-panel_audit	0	1		2026-11-06 20:59:31	补跑完成
-factor_eval	1	0		2026-11-06 20:59:31	本轮执行被中断未完成；IC/权重视图沿用上一日
-long_panel_ic	0	1		2026-11-06 20:59:31	新鲜度 1d < 7d，按设计跳过重建（非漏跑）
-selfcheck_pipeline	0	1		2026-11-06 20:59:31	补跑完成
-fetch_focus_list	0	1		2026-11-06 20:59:31	补跑完成
-fetch_bench	0	1		2026-11-06 20:59:31	补跑完成，三指数均到 11-06（含此前失效的 000985）
-regime_model	0	1		2026-11-06 20:59:31	补跑完成，date=11-06 gate.ok=True final_hi=0.2
-orphan_scan	0	1		2026-11-06 20:59:31	日链 prune 段未执行；不影响当日数字
-gen_report_top200	0	1		2026-11-06 20:59:50	补跑生成完成
-append_klines_latest	0	1		2026-11-09 12:01:15	round136 补跑完成：1348→2134 只(99.8%)，新增 2153 点，失败仅 2 只；备源新浪生效；11-09 污染已拦截
-refresh_kline_meta	0	1		2026-11-09 12:01:15	round136 补跑完成：有效截面 308→309，date_range 更新至 11-06
-verify_qfq_anchor	0	1		2026-11-09 12:01:19	round136 补跑完成：11-06 分片 4/60 抽查 35 只全部锚点一致，0 漂移；轮转累积覆盖 5.00%
-archive_fund_universe	0	1		2026-11-09 12:01:19	round136 补跑完成：11-06 入档 2111 只(有价∩EM∩申万)，growth/roe/毛利 100%/99.8%/100%
-portfolio_risk	0	1		2026-11-09 12:01:19	round136 补跑完成：修 r.get 回填 bug；momentum 波动8.7%/收益6.14%/MDD-1.44%，reversal 11.2%/-8.62%/-10.65%
-factor_eval	0	1		2026-11-09 12:01:22	round136 补跑完成：价格尾部 +2 日(11-05~11-06) 覆盖 3206 只(成功 3204/失败 31)；权重守卫拦截自动覆盖，指纹 9347d48f 未变
+fetch_top200_sina	0	1		2026-11-09 17:28:13	11-09 实跑：5380 只母体→规则选池 1835 只，top500_all_a.json
+check_data_fresh	0	1		2026-11-09 17:28:13	11-09 实跑：指数日线最新 2026-11-09=北京当日；池覆盖 1835/1835
+step2_stockscorer	0	1		2026-11-09 17:28:13	11-09 实跑：top200_scored_2026-11-09.json，1830 只入评分
+append_klines_latest	0	1		2026-11-09 17:28:13	11-09 实跑：2134 只追加，新增 2134 点，失败 0；新增日期仅 2026-11-09（无盘中污染）
+refresh_kline_meta	0	1		2026-11-09 17:28:13	11-09 实跑：2138x346 日，有效截面 309→310，date_range 至 11-09
+verify_qfq_anchor	0	1		2026-11-09 17:28:13	11-09 实跑：东财 push2his 经代理间歇性全断(ProxyError)；分片5 全失败 exit4、分片6 仅 3/35；新增源级失效守卫，verdict=unknown
+archive_fund_universe	0	1		2026-11-09 17:28:13	11-09 实跑：归档域 2111 只；growth 99.9% roe 99.8% 毛利 100%
+archive_fwd_snapshot	0	1		2026-11-09 17:28:13	11-09 实跑：1830 行，fwd_pe 有值 1591
+generate_ai_assessment	0	1		2026-11-09 17:28:13	11-09 实跑：带 .llm_env，fallback=False，真实 LLM(deepseek-v4-flash)，15 主题
+enhance_scores	0	1		2026-11-09 17:28:13	11-09 实跑：A168/B618/C851/D193；Top5 生益83.3 亨通81.8 沪电79.8 亚宝79.3 三环79.2
+sector_momentum_daily	0	1		2026-11-09 17:28:20	11-09 实跑：124 板块；影视院线 60日 +22.96% 居首，能源金属 -31.98% 垫底
+apply_sector_momentum	0	1		2026-11-09 17:28:20	11-09 实跑：--mode evidence，8 维生效，板块命中 1824/1830
+pick_portfolio	0	1		2026-11-09 17:28:20	11-09 实跑：补 11-09 regime 后重跑；w_total=40%；reversal 10只可执行，momentum 仅3只→单票13.3%>8%上限判不可执行（候选耗尽，非降级）
+portfolio_risk	0	1		2026-11-09 17:28:20	11-09 实跑：--inplace 回填成功(r.get 修复生效)；data_cutoff=2026-11-09；momentum 23.0%、reversal 18.6% 均超 15% 目标
+track_recommendations	0	1		2026-11-09 17:28:20	11-09 实跑：数据截止 11-09，4206 样本；T+1 均 -0.54% 超额 -0.56%，T+5 均 -1.71% 超额 -2.67%
+portfolio_metrics	0	1		2026-11-09 17:28:20	11-09 实跑：平均重叠度 55.9%；11-06→11-09 交 136/并 194=70.1%
+panel_audit	0	1		2026-11-09 17:28:20	11-09 实跑：panel 末日仍 2026-10-30（落后 10 日）；score_fund(0.20) 在 panel 无列
+factor_eval	0	1		2026-11-09 17:28:20	11-09 实跑：价格尾部 3253 只全成功；权重守卫拦截拟合结果，主文件指纹 9347d48f 未变；另存 factor_weights_optimized_20261109.json；factor_ic.json 已生成(89 截面)
+long_panel_ic	0	1		2026-11-09 17:28:20	新鲜度 < 7 天，按设计跳过重建（非漏跑）
+selfcheck_pipeline	0	1		2026-11-09 17:28:20	11-09 实跑：十维一致性抽样 20 只全吻合，权重覆盖度 89.5%
+fetch_focus_list	0	1		2026-11-09 17:28:20	11-09 实跑：focus_pool_2026-11-09.json 40 只（池内31/池外9）
+fetch_bench	0	1		2026-11-09 17:28:20	11-09 实跑：4/4 更新到 11-09；新增腾讯 kline 第三源+重叠一致率门禁，000985 补齐且保留 2015 起历史
+regime_model	0	1		2026-11-09 17:28:20	11-09 实跑：日期门禁滞后 0 天通过；L1 高波动市(medium)，L2 高风险 0.902，风险预算 57%，情绪阶梯约束取 40%
+orphan_scan	0	1		2026-11-09 17:28:20	日链 prune 段本轮未执行（手工分批跑，未走 prune）；不影响当日数字
+gen_report_top200	0	1		2026-11-09 17:28:20	11-09 实跑：报告页面已生成
