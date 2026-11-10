@@ -181,6 +181,61 @@ T_BONF_SINGLE_ROUND = round(_bonferroni_t(N_TESTS), 4)  # = 3.1440（仅本轮 3
 T_BONF_STRICT_30 = 3.08            # 历史阈值，**保留仅为对照**（实对应 K≈24.2，非 30）
 T_LOOSE = 2.0                      # 宽松阈值（业界常用）
 
+
+def build_bonferroni_method_note(factors):
+    """构造 factor_ic.method.bonferroni 披露文案 —— **唯一实现**。
+
+    ⚠️ 禁止在文案里写死「不翻转任何已发布结论」这类随数据变化的结论。
+       round138 实测（2026-11-10）：价格轴推进 1 天后 h=5 三个负 IC 因子的
+       NW |t| 由 6.56 / 5.30 / 3.21 变为 3.94 / 4.25 / 3.97，其中 2 行低于
+       K 上界阈值 4.0067 → 旧断言当天即为假。虽该句未渲染到页面，但产物
+       元数据失真同样违反「不硬编码会变结论」。
+    ⇒ 改为按 factors **现算** K 敏感行数并据实披露；产物与代码共用本函数，
+      避免「代码改了、产物仍是旧文案」的两套口径。
+    """
+    n_tot, n_sig, sig_names, sensitive = 0, 0, [], []
+    th_hi = _bonferroni_t(K_UPPER)
+    for _f, _fv in (factors or {}).items():
+        for _h, _hv in ((_fv or {}).get("horizons") or {}).items():
+            _hv = _hv or {}
+            n_tot += 1
+            if _hv.get("bonferroni_sig") is not True:
+                continue
+            n_sig += 1
+            sig_names.append(f"{_f} h={_h}")
+            _t = _hv.get("nw_t")
+            if _t is not None and abs(_t) < th_hi:
+                sensitive.append(f"{_f} h={_h}(|t|={abs(_t):.2f})")
+    names = "、".join(sig_names)
+    neg_all = all((((_hv or {}).get("ic_mean")) or 0) < 0
+                  for _fv in (factors or {}).values()
+                  for _hv in (((_fv or {}).get("horizons") or {}).values())
+                  if (_hv or {}).get("bonferroni_sig") is True)
+    if sensitive:
+        flip = (f"⚠️ 其中 {len(sensitive)} 行在 K 上界阈值 {round(th_hi, 4)} 下不再显著"
+                f"（{'、'.join(sensitive)}）→ 结论对 K 敏感，"
+                f"**不得据此宣称「经验证 alpha」或「有因子过 Bonferroni**」。")
+    else:
+        flip = "不翻转任何已发布结论。"
+    neg_note = "，且全部为负 IC（跑输）" if (n_sig and neg_all) else ""
+    return (f"K={N_TESTS_LIVE}（来源 {K_SOURCE}；= legacy 304 + 已登记试验轮次）"
+            f"→ 阈值 |NW t|≥{T_BONF}（=Φ⁻¹(1−{ALPHA}/2/{N_TESTS_LIVE})，可复算）；"
+            f"若只算 legacy 304 次则为 {T_BONF_LEGACY}；"
+            f"若只算本轮 {N_TESTS} 次则为 {T_BONF_SINGLE_ROUND}；"
+            f"宽松阈值 |t|≥{T_LOOSE}。"
+            f"⚠️ K 的**可证区间**是 {K_LOWER}~{K_UPPER}（下界=已登记试验轮次数；"
+            f"上界=把 {K_RANGE_META.get('n_without_n_tests', '?')} 个无法提取精确"
+            f"检验数的产物按已知中位数 {K_RANGE_META.get('median_n_tests_when_known', '?')} 补，"
+            f"**是估计不是实测**），故本阈值是「可证下界」口径；"
+            f"区间两端对应阈值 {round(_bonferroni_t(K_LOWER), 4)} ~ "
+            f"{round(th_hi, 4)}，"
+            f"{flip}"
+            f"⚠️ 实测 bonferroni_sig 在 {n_tot} 个口径中仅 "
+            f"{n_sig} 个为 True"
+            f"{'（' + names + '）' if names else ''}"
+            f"，定 verdict 的主要仍是宽松阈值{neg_note}")
+
+
 # ── round124 P1-1：有效独立观测下限 ────────────────────────────────────
 # 为什么需要：逐日截面在 h 日前瞻窗口下彼此重叠 h-1/h → 不能当 n 个独立证据。
 #   n_eff = n / h。实测 h=20 / n=218 → n_eff=10.9。
@@ -2949,20 +3004,9 @@ def main():
     except Exception as _le:
         _long_panel_ic = {"available": False, "reason": str(_le)[:200]}
 
-    # ── bonferroni_sig 计数：**现算，不硬编码** ────────────────────────────
-    # 原来文案写「78 个口径中仅 1 个为 True」，实测是 21 因子 × 3 周期 = 63 个。
-    # 这个计数是用来支撑「该阈值从未影响任何结论」的论断 —— 论据错，论断就不可信。
-    _n_bonf_tot = 0
-    _n_bonf_sig = 0
-    _bonf_sig_names = []
-    for _f, _fv in (factors or {}).items():
-        for _h, _hv in ((_fv or {}).get("horizons") or {}).items():
-            _n_bonf_tot += 1
-            if (_hv or {}).get("bonferroni_sig") is True:
-                _n_bonf_sig += 1
-                _bonf_sig_names.append(f"{_f} h={_h}")
-    _bonf_sig_names = "、".join(_bonf_sig_names)
-
+    # ── bonferroni 披露：唯一实现在 build_bonferroni_method_note() ──────────
+    # ⚠️ 「不翻转任何已发布结论」曾写死在这里，round138 实测该断言随 IC 重算失真，
+    #    故改为按 factors 现算 K 敏感行数并据实披露（详见该函数 docstring）。
     out = {
         "date": aligned[-1]["date"],
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -2973,22 +3017,7 @@ def main():
             "t_stat": "普通 t = mean/(std/√n)；NW t = Newey-West HAC(Bartlett, lag=h-1)，重叠窗口下以 NW t 为准",
             "min_sample": MIN_SAMPLE,
             "quantile_spread": f"每截面按因子分 {QUANTILES} 组，头部组均值收益 − 尾部组均值收益（未扣成本，毛利口径）",
-            "bonferroni": (f"K={N_TESTS_LIVE}（来源 {K_SOURCE}；= legacy 304 + 已登记试验轮次）"
-                           f"→ 阈值 |NW t|≥{T_BONF}（=Φ⁻¹(1−{ALPHA}/2/{N_TESTS_LIVE})，可复算）；"
-                           f"若只算 legacy 304 次则为 {T_BONF_LEGACY}；"
-                           f"若只算本轮 {N_TESTS} 次则为 {T_BONF_SINGLE_ROUND}；"
-                           f"宽松阈值 |t|≥{T_LOOSE}。"
-                           f"⚠️ K 的**可证区间**是 {K_LOWER}~{K_UPPER}（下界=已登记试验轮次数；"
-                           f"上界=把 {K_RANGE_META.get('n_without_n_tests', '?')} 个无法提取精确"
-                           f"检验数的产物按已知中位数 {K_RANGE_META.get('median_n_tests_when_known', '?')} 补，"
-                           f"**是估计不是实测**），故本阈值是「可证下界」口径；"
-                           f"区间两端对应阈值 {round(_bonferroni_t(K_LOWER), 4)} ~ "
-                           f"{round(_bonferroni_t(K_UPPER), 4)}，"
-                           f"**不翻转任何已发布结论**。"
-                           f"⚠️ 实测 bonferroni_sig 在 {_n_bonf_tot} 个口径中仅 "
-                           f"{_n_bonf_sig} 个为 True"
-                           f"{'（' + _bonf_sig_names + '）' if _bonf_sig_names else ''}"
-                           f"，定 verdict 的主要仍是宽松阈值"),
+            "bonferroni": build_bonferroni_method_note(factors),
         },
         "n_snapshots": len(aligned),
         "n_snapshots_raw": len(snaps),

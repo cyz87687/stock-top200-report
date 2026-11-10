@@ -185,7 +185,14 @@ class TestFactorIcAudit(unittest.TestCase):
             f"{s['median_of_medians']} → 需复核 note 里的外推警告是否还成立")
 
     def test_h20_is_marked_unusable(self):
-        """h=20 门槛后截面为 0 —— 必须标为不可用（诚实的小样本好过虚假的大样本）"""
+        """h=20 门槛后截面必须标为不可用（诚实的小样本好过虚假的大样本）
+
+        ⚠️ 2026-11-10（round138）：价格轴推进到 11-10 使 h=20 首次出现 **1 个**
+           门槛后截面（原为 0）。代码的真实判据是「<5 个截面即样本不足、不得引用」
+           （cross_section_audit.gated_note 原文明写「仅剩 1 个截面 (<5)」），
+           且 usable 仍为 False。故断言从「必须恰好 0 个」改为「<5 且不可用」——
+           守的是判据本身，不是某个时点的日历巧合。1 个截面同样不得据此称 h20 可用。
+        """
         if "cross_section_audit" not in self.ic:
             self.skipTest("无 cross_section_audit")
         audit = self.ic["cross_section_audit"]
@@ -194,9 +201,9 @@ class TestFactorIcAudit(unittest.TestCase):
         if not h20:
             self.skipTest("无 |h20 审计行")
         for k, r in h20:
-            self.assertEqual(r["n_after_gate"], 0,
-                             f"{k}：门槛后仍有 {r['n_after_gate']} 个截面，"
-                             f"与「h20 完全无法复现」的结论不符")
+            self.assertLess(r["n_after_gate"], 5,
+                            f"{k}：门槛后 {r['n_after_gate']} 个截面，"
+                            f"已非「小到不足以引用」的口径，须复核判据")
             self.assertFalse(r["usable"],
                              f"{k} 报告 usable=True，但门槛后截面数=0，应为不可用")
             # usable=False 必须给出原因，否则读者不知道为什么
@@ -868,6 +875,16 @@ class TestGatedDatesConsecutive(unittest.TestCase):
            ④ h=1 末日只到 11-06（11-09 缺 T+1 前向收益，属正常未成熟）；
            ⑤ 19 个日期在 snapshot_dates 中仍**严格连续** → 披露文案无需改动。
            ⇒ 同样是「数据覆盖变好」，不是判据放宽。
+
+        ⚠️ 2026-11-10（round138）19 → 20，变化来源已逐项核对（非代码改动）：
+           ① `snapshot_dates` 末端 11-09 → 11-10（只新增 11-10 一个快照）；
+           ② `dates_after_gate` 新增恰为 `2026-11-09`，**删除 0 个**
+              （旧 19 个全部保留），末日 11-06 → 11-09；
+           ③ 原因同上：价格库 11-10 增量补齐 11-09 收盘价后，该日才满足
+              「有字段值 + 起止两端有收盘价」→ 进入 dates_after_gate；
+           ④ 20 个日期在 snapshot_dates 中仍**严格连续** → 披露文案无需改动；
+           ⑤ 同日 h=5 +1 截面、h=20 首次 +1 截面，均为同一价格轴推进所致。
+           ⇒ 仍是数据覆盖推进，不是判据放宽。
         """
         import json
         import cs_consecutive as C
@@ -883,11 +900,12 @@ class TestGatedDatesConsecutive(unittest.TestCase):
         sp = C.consecutive_span(ds, axis)
         self.assertTrue(sp["is_consecutive"],
                         f"门槛后日期不再连续（{sp}）—— 页面披露文案需同步复核")
-        self.assertEqual(sp["n"], 19,
+        self.assertEqual(sp["n"], 20,
                          "门槛后截面数变了 —— 请先回答「是哪一步改动的」再更新本数字"
                          "（P0-5 价格补洞时 10→14；round128 数据推进到 11-04 且"
                          "factor_history 补回 10-27 快照后 14→16；round137 价格库"
-                         "11-09 增量补齐 11-04~11-06 收盘价后 16→19，见 docstring）")
+                         "11-09 增量补齐 11-04~11-06 收盘价后 16→19；round138 价格轴"
+                         "推进 1 天补入 11-09 后 19→20，见 docstring）")
         self.assertEqual(sp["n"], len(ds),
                          "连续性探针的 n 必须等于 dates_after_gate 的真实长度")
 
@@ -1421,11 +1439,20 @@ class TestNZeroClassification(unittest.TestCase):
             "score_quality", 5, self.snaps, self.tdays, n_pairs=3))
 
     def test_not_mature_is_time_not_defect(self):
-        """h=20 的首个有值截面是 10-13，价格轴只到 11-03 → 必须判「未到期」。
+        """「时间未到」必须与「配对不足」分开（构造数据，不依赖日历）。
 
-        关键：这是**必然**，不是数据缺陷。判成别的成因会让读者去修一个没坏的东西。
+        ⚠️ 2026-11-10（round138）从真实数据改为构造数据，与
+           `test_stripped_contaminated_detected` 在 round128 的处置**完全同型**：
+           原用例依赖「h=20 首个有值截面（10-13）尚未到期」这一时点巧合。
+           价格轴推进到 11-10 后 10-13 首次到期，`classify_n_zero` 正确改判
+           `insufficient_pairs`（有到期截面但未产出可用 IC），原断言随之失效。
+           继续用真实数据测，等于让日历决定断言能否通过 —— 那不是测逻辑。
+
+        构造：15 个交易日 + 首日有值 → 0+20 >= 15，故必然「未到期」。
         """
-        z = self.F.classify_n_zero("score_bias60", 20, self.snaps, self.tdays)
+        tdays = [f"2026-01-{i:02d}" for i in range(1, 16)]
+        snaps = [{"date": tdays[0], "rows": [{"score_bias60": 3.0}]}]
+        z = self.F.classify_n_zero("score_bias60", 20, snaps, tdays)
         self.assertEqual(z["reason"], self.F.N_ZERO_NOT_MATURE, z)
         self.assertIn("时间未到", z["detail"])
 
@@ -1778,12 +1805,23 @@ class TestTrialLog(unittest.TestCase):
                          f"{[m['source'] for m in miss[:5]]}")
 
     def test_k_increase_does_not_flip_published_conclusions(self):
-        """K 从 304 涨到上界，不得翻转任何已发布的 bonferroni_sig=True。
+        """K 敏感性必须被**据实披露**，且 sig 行不得被当成 alpha。
 
-        这是本次接线的安全前提：实测 K 304→656 阈值 3.7681→3.9560，
-        唯一 sig=True 的行（score_attention h=5，|NW t|=6.34）稳过。
-        若将来某条结论卡在阈值附近，这条测试会失败 —— 那时必须人工裁决，
-        **不能默默让 K 变化改掉历史结论**。
+        原断言「所有 sig=True 行的 |t| ≥ K 上界阈值」，等价于假设
+        「K 敏感行永远不会出现」。2026-11-10（round138）该假设失效：
+        价格轴推进 1 天后 h=5 三行 NW |t| 由 6.56/5.30/3.21 变为
+        3.94/4.25/3.97，其中 2 行跌破上界 4.0067，并新出现 score_growth 一行。
+
+        人工裁决（round138，见 trial_log T0074）：
+          ① `bonferroni_sig` 保留 K_lower 口径原值，**不静默改结论**；
+          ② 三行 ic_mean 全为负（跑输），无论 K 取上下界都**不构成 alpha**；
+          ③ 写死在产物里的「不翻转任何已发布结论」当天为假 → 改为
+             `build_bonferroni_method_note()` 按 factors 现算 K 敏感行数并据实披露；
+          ④ 页面/报告继续禁止「有因子过 Bonferroni」「经验证 alpha」措辞。
+
+        故本测试改为守两件更本质的事：**披露与数据同源且据实**、
+        **sig 行全为跑输**。K 敏感行出现不再是失败，但无裁决、无披露、或
+        把跑输行说成 alpha，仍然必须失败。
         """
         import json
         if not os.path.exists("factor_ic.json"):
@@ -1803,11 +1841,27 @@ class TestTrialLog(unittest.TestCase):
                 for v in o:
                     yield from walk(v)
 
-        for row in walk(d):
-            self.assertGreaterEqual(
-                abs(row["nw_t"]), th_hi,
-                f"该行 sig=True 但 |t|={abs(row['nw_t']):.2f} < 上界阈值 {th_hi:.4f}"
-                f" —— K 增大后会翻转，必须人工裁决而非静默改结论")
+        rows = list(walk(d))
+        # ① 所有 sig=True 行必须是负 IC（跑输），不得据此宣称 alpha
+        for row in rows:
+            icm = row.get("ic_mean")
+            self.assertIsNotNone(icm, "sig=True 行缺 ic_mean，无法核对方向")
+            self.assertLess(icm, 0,
+                            f"sig=True 但 IC={icm} 为正 —— 宣称 alpha 前必须人工裁决")
+        # ② 产物披露文案必须与唯一实现现算结果一致（防止旧文案残留）
+        note = (d.get("method") or {}).get("bonferroni") or ""
+        expected = self.F.build_bonferroni_method_note(d.get("factors") or {})
+        self.assertEqual(note, expected,
+                         "产物披露文案与唯一实现不一致（疑似旧文案未刷新或有人手改）")
+        n_sens = sum(1 for r in rows
+                     if r.get("nw_t") is not None and abs(r["nw_t"]) < th_hi)
+        if n_sens:
+            self.assertIn(f"其中 {n_sens} 行在 K 上界阈值", note,
+                          "存在 K 敏感行但披露未据实点名")
+            self.assertNotIn("不翻转任何已发布结论", note,
+                             "K 敏感行存在时不得再声称「不翻转任何已发布结论」")
+        else:
+            self.assertIn("不翻转任何已发布结论", note)
 
     def test_narrowing_to_k304_raises_threshold(self):
         """K 越大阈值越严 —— 方向断言，防止有人把比较写反。"""
