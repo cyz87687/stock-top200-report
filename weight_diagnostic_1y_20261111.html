@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>近1年回测权重测算诊断 · 2026-11-11</title>
+<style>
+:root{--bg:#f6f8fb;--card:#ffffff;--ink:#1e293b;--muted:#64748b;--line:#e2e8f0;
+--up:#c62828;--down:#2e7d32;--warn:#b45309;--warnbg:#fff7ed;--accent:#1d4ed8;--accentbg:#eff6ff}
+*{box-sizing:border-box}
+body{margin:0;padding:28px 20px 60px;background:var(--bg);color:var(--ink);
+ font:14px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",Segoe UI,sans-serif}
+.wrap{max-width:1180px;margin:0 auto}
+h1{font-size:26px;margin:0 0 6px;letter-spacing:.3px}
+h2{font-size:18px;margin:0 0 14px;padding-left:10px;border-left:4px solid var(--accent)}
+h3{font-size:15px;margin:18px 0 8px;color:#334155}
+.sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin:16px 0;
+ box-shadow:0 1px 3px rgba(15,23,42,.04)}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.5px}
+.b-nogo{background:#fee2e2;color:#991b1b}
+.b-ok{background:#dcfce7;color:#166534}
+.b-warn{background:#fef3c7;color:#92400e}
+.b-info{background:#dbeafe;color:#1e40af}
+.hero{background:linear-gradient(180deg,#fff,#f8fafc);border-left:5px solid var(--warn)}
+.hero .big{font-size:19px;font-weight:700;margin:10px 0 6px}
+.hero p{margin:6px 0;color:#334155}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{background:#f1f5f9;color:#334155;font-weight:600;text-align:right;position:sticky;top:0}
+th:first-child,td:first-child{text-align:left}
+tbody tr:hover{background:#f8fafc}
+tr.hl{background:#f0f7ff}
+tr.hl td{font-weight:600}
+.up{color:var(--up);font-weight:600}
+.down{color:var(--down);font-weight:600}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px}
+.note{background:var(--warnbg);border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;margin:12px 0;color:#7c2d12;font-size:13px}
+.info{background:var(--accentbg);border:1px solid #bfdbfe;border-radius:8px;padding:12px 14px;margin:12px 0;color:#1e3a8a;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:12px 0}
+.kv{background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.kv .k{font-size:12px;color:var(--muted)}
+.kv .v{font-size:19px;font-weight:700;margin-top:3px}
+.kv .d{font-size:12px;color:var(--muted);margin-top:3px}
+code{background:#f1f5f9;padding:1px 5px;border-radius:4px;font-size:12px}
+ul{margin:8px 0;padding-left:22px}li{margin:5px 0}
+.foot{color:var(--muted);font-size:12px;margin-top:26px;border-top:1px solid var(--line);padding-top:14px}
+.small{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body><div class="wrap">
+
+<h1>近 1 年回测 · 因子／策略权重测算诊断</h1>
+<div class="sub">生成时间 2026-11-11 · 项目 stock-top200-report · 权重版本 v4.19-c1-sustain-gates ·
+ <span class="badge b-nogo">NOT_ADOPTED 不落地</span> <span class="badge b-info">只读诊断</span></div>
+
+<div class="card hero">
+ <div class="big">结论先行：按合规规则用近 1 年数据测算，最终权重 = 现行先验权重，<u>不改动</u>。</div>
+ <p>近 1 年不是一段「可用于定权重」的样本：h=20 下 215 个截面只折合 <b>10.75 个有效独立观测</b>；
+    全部生效维中 Top10 头部超额的最大 NW t 仅 <b>1.1608</b>，远低于 Bonferroni 阈值 <b>3.8135</b>；
+    <b>G4 胜最强单因子 FAIL</b>、<b>G5 walk-forward FAIL（n_oos_dates=0）</b>；
+    前后半段按同一规则定出的权重 L1 漂移 <b>0.4731</b>，且两个方向的分段 OOS 结论<b>符号相反</b>。</p>
+ <p>因此按「证据充分度收缩」规则 λ=0，权重严格退回现行 v4.19 先验向量；
+    权重指纹 <code>9347d48f…</code> 全程未变，<code>factor_weights.json</code> 与八处同步点一个字节未动。</p>
+</div>
+
+<div class="grid">
+ <div class="kv"><div class="k">自然近 1 年</div><div class="v">2025-11-11 → 2026-11-11</div><div class="d">中证全指 243 个交易日</div></div>
+ <div class="kv"><div class="k">可评估截面</div><div class="v">215</div><div class="d">2025-11-11 ~ 2026-09-24，h=20 收益完整</div></div>
+ <div class="kv"><div class="k">有效独立观测</div><div class="v">10.75</div><div class="d">215 / 20，非 215 个独立证据</div></div>
+ <div class="kv"><div class="k">基准近 1 年</div><div class="v down">-11.68%</div><div class="d">MDD -25.94% / 夏普 -0.553</div></div>
+</div>
+
+<h2>一、回测时间区间</h2>
+<div class="card">
+<table>
+<thead><tr><th>口径</th><th>区间</th><th>交易日／截面</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>用户口径「近 1 年」</td><td>2025-11-11 ~ 2026-11-11</td><td>243</td><td>以基准 000985 真实交易日历界定，非自然日硬算</td></tr>
+<tr class="hl"><td>因子评估窗口</td><td>2025-11-11 ~ 2026-09-24</td><td>215 截面</td><td>需 t+20 前向收益完整可得</td></tr>
+<tr><td>组合净值窗口</td><td>2025-11-11 ~ 2026-11-11</td><td>242 个净值日 / 11 次调仓</td><td>每 20 交易日调仓，避免 h20 窗口重叠</td></tr>
+<tr><td>目标持有期</td><td>h = 20 交易日</td><td>target_horizon=20</td><td>与现行权重拟合口径一致，未改</td></tr>
+<tr><td>面板末日</td><td>2026-10-30</td><td>落后 8 个交易日</td><td>10-31 之后无法评估；生产快照仅 98 截面（6-26 起）</td></tr>
+</tbody></table>
+<div class="note"><b>区间性质必须披露：</b>这一年中证全指 <span class="down">−11.68%</span>、最大回撤 <span class="down">−25.94%</span>，
+是「深跌 + 尾部反弹」，四指数状态分歧、方向预测 12/12 组低于多数类基线。
+用它拟合权重等于把单一 regime 的噪声当成结构，正是 regime chasing。</div>
+</div>
+
+<h2>二、所用数据范围</h2>
+<div class="card">
+<table>
+<thead><tr><th>数据</th><th>范围</th><th>用途</th><th>限制</th></tr></thead>
+<tbody>
+<tr><td class="mono">data/panel_r124_mat.npz</td><td>1653 日 × 2257 码 × 9 维<br>2020-01-02 ~ 2026-10-30</td><td>因子值 + 前复权价 → h20 收益</td><td>PIT 历史重建口径，与生产 v4.19 的 G1/G2/G3 门槛不完全同源</td></tr>
+<tr><td class="mono">data/klines_long.json</td><td>2138 码 × 348 日<br>2025-06-09 ~ 2026-11-11</td><td>T+1 开盘可执行净值</td><td>覆盖近 1 年全段；覆盖率实测 100%</td></tr>
+<tr><td class="mono">data/bench/000985.json</td><td>2880 日（2015-01-05 起）</td><td>交易日历 + 基准风险指标</td><td>满仓指数，与 80% 仓位组合不可直接相减</td></tr>
+<tr><td class="mono">factor_history.json</td><td>98 截面（2026-06-26 ~ 11-11）</td><td>生产 scored 快照</td><td><b>只覆盖近 1 年后 40%</b>，且早期快照仅 7 字段 / 193 行</td></tr>
+</tbody></table>
+<div class="info"><b>盲区（硬披露）：</b>8 个生效维中 <code>score_fund</code>（权重 0.20）在两个历史矩阵中<b>整列 NaN</b>。
+唯一内核 <code>scoring_core.composite_total_matrix</code> 按既定规则「缺维填 DMAX/2 中性分、分母恒为 Σ 全部生效权重 = 1.00」处理，
+<b>不剔分母、不填 0、不自写合成分母</b>。该维<b>未被检验 ≠ 无效 ≠ 已通过</b>，生效可检验 Σ = 0.80。</div>
+<p class="small">唯一内核：<code>scoring_core.composite_total_matrix</code>（合成分）；执行内核：<code>exec_backtest.run</code>
+（T+1 开盘成交 / 双边佣金 3bp + 卖出印花 5bp + 滑点 5bp / 涨跌停拒单留痕 / 覆盖率门禁 0.80 / 毛净分别输出）。
+二者均为项目既有实现，本次未另写口径。</p>
+</div>
+
+<h2>三、评价指标与可用性判定</h2>
+<div class="card">
+<table>
+<thead><tr><th>指标</th><th>定义</th><th>本次用途</th><th>可否用于定权重</th></tr></thead>
+<tbody>
+<tr class="hl"><td>TopN 头部超额</td><td>Top10 等权 h20 收益 − 截面全样本等权 h20 收益，截面≥200 只</td><td><b>项目目标函数</b>（生产持仓 6~13 只）</td><td><span class="badge b-ok">可</span> 但须过显著性／样本量门槛</td></tr>
+<tr><td>Rank IC</td><td>Spearman(因子值_t, 收益 t→t+20)</td><td>仅作方向诊断</td><td><span class="badge b-nogo">禁</span> 实测与头部超额方向相反</td></tr>
+<tr><td>NW t</td><td>Newey-West，lag=h−1=19（重叠窗口）</td><td>显著性判据</td><td>须与 (n, lag) 白噪临界值比对</td></tr>
+<tr><td>n_eff</td><td>截面数 / h = 215/20 = 10.75</td><td>样本量充分度</td><td>≥30 才进入正式验证</td></tr>
+<tr><td>组合净值层</td><td>净/毛收益、年化、年化波动、夏普(rf=0)、MDD、Calmar</td><td>结果展示</td><td><span class="badge b-warn">不可反推权重</span> 见第五节</td></tr>
+<tr><td>成本／换手／拒单／覆盖率</td><td>总成本%、成本拖累 pp、Σ|Δw|/2、拒单数、均价覆盖率</td><td>可执行性校验</td><td>覆盖率 &lt;0.80 则拒给收益结论</td></tr>
+<tr><td>多重检验</td><td>Bonferroni 阈值随 trial K 变化</td><td>K=365 → 3.8135；登记 3 个新试验 → K=368 → 3.8156；上界 812 → 4.0067</td><td>任何新方案须先预登记 trial</td></tr>
+</tbody></table>
+<div class="note"><b>禁项：</b>禁把 TopN <b>毛</b>超额当净值；禁跨权重版本比较 <code>total</code>；禁称「经验证的 alpha」（G5 未过）；
+PBO 做不了；小样本下 NW t 的白噪 95% 分位远高于 2.0（n=10/lag=4 约 3.63），任何「显著」必查临界值。</div>
+</div>
+
+<h2>四、真实回测结果</h2>
+<div class="card">
+<h3>4.1 因子层（近 1 年，h=20，215 截面）</h3>
+<table>
+<thead><tr><th>维度</th><th>现行权重</th><th>Rank IC</th><th>IC NW t</th><th>Top10 超额</th><th>超额 NW t</th><th>胜率</th><th>前半超额</th><th>后半超额</th></tr></thead>
+<tbody>
+<tr><td>score_bias60</td><td>.05</td><td>+0.04129</td><td>0.65</td><td class="down">−4.899%</td><td>−1.89</td><td>29.3%</td><td class="down">−9.938%</td><td class="up">+0.094%</td></tr>
+<tr><td>score_rsi_rev</td><td>.05</td><td>+0.02535</td><td>0.49</td><td class="down">−0.241%</td><td>−0.15</td><td>39.5%</td><td class="down">−2.200%</td><td class="up">+1.700%</td></tr>
+<tr><td>score_lowvol20</td><td>0</td><td>+0.06387</td><td>1.04</td><td class="down">−1.217%</td><td>−0.54</td><td>40.5%</td><td class="down">−5.945%</td><td class="up">+3.468%</td></tr>
+<tr><td>score_tech_neg</td><td>0</td><td>+0.00397</td><td>0.12</td><td class="up">+0.578%</td><td>0.44</td><td>48.8%</td><td class="up">+2.410%</td><td class="down">−1.237%</td></tr>
+<tr><td>score_size_growth</td><td>.20</td><td>+0.06650</td><td>1.49</td><td class="down">−2.921%</td><td>−1.01</td><td>31.2%</td><td class="down">−8.050%</td><td class="up">+2.160%</td></tr>
+<tr><td>score_ep</td><td>.10</td><td>+0.03307</td><td>0.93</td><td class="down">−1.934%</td><td>−0.97</td><td>38.6%</td><td class="down">−4.298%</td><td class="up">+0.409%</td></tr>
+<tr><td>score_quality</td><td>.10</td><td>+0.01958</td><td>0.67</td><td class="down">−1.566%</td><td>−0.97</td><td>34.9%</td><td class="down">−0.979%</td><td class="down">−2.148%</td></tr>
+<tr class="hl"><td>score_growth</td><td>.20</td><td>+0.01413</td><td>0.56</td><td class="up">+1.660%</td><td>1.16</td><td>61.9%</td><td class="up">+4.623%</td><td class="down">−1.275%</td></tr>
+<tr><td>score_dominant</td><td>.10</td><td>−0.00028</td><td>−0.02</td><td class="down">−2.633%</td><td>−1.16</td><td>35.8%</td><td class="down">−5.197%</td><td class="down">−0.093%</td></tr>
+<tr class="hl"><td>现行合成分</td><td>Σ=1.00</td><td>+0.06735</td><td>2.478</td><td class="up">+0.171%</td><td>0.10</td><td>47.0%</td><td>—</td><td>—</td></tr>
+<tr><td>8 维等权基准</td><td>各 .125</td><td>+0.06021</td><td>1.351</td><td class="down">−0.188%</td><td>−0.10</td><td>39.5%</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="small">关键观察：IC 几乎全为正，但 Top10 头部超额几乎全为负 —— <b>IC 与头部超额方向相反再次被近 1 年数据实证</b>，
+这正是 <code>guard_ic_driven_weights</code> 禁按 IC 排序的依据。唯一正超额生效维 <code>score_growth</code>（+1.66%，NW t 1.16）
+在前半 +4.62%、后半 −1.28%，符号翻转。综合分 IC NW t 2.478 仍低于 Bonferroni 3.8135。</p>
+
+<h3>4.2 组合层可执行净值（唯一执行内核，242 净值日 / 11 次调仓）</h3>
+<table>
+<thead><tr><th>权重方案</th><th>净收益</th><th>年化</th><th>年化波动</th><th>夏普</th><th>最大回撤</th><th>Calmar</th><th>成本</th><th>换手</th><th>拒单</th></tr></thead>
+<tbody>
+<tr class="hl"><td>R0 现行先验</td><td class="down">−12.75%</td><td class="down">−13.29%</td><td>23.74%</td><td class="down">−0.560</td><td class="down">−27.95%</td><td class="down">−0.476</td><td>0.526%</td><td>4.91</td><td>3</td></tr>
+<tr><td>R1 朴素·头部超额</td><td class="down">−22.20%</td><td class="down">−23.08%</td><td>27.34%</td><td class="down">−0.844</td><td class="down">−38.52%</td><td class="down">−0.599</td><td>0.720%</td><td>6.64</td><td>2</td></tr>
+<tr><td>R2 朴素·夏普式</td><td class="down">−22.20%</td><td class="down">−23.08%</td><td>27.34%</td><td class="down">−0.844</td><td class="down">−38.52%</td><td class="down">−0.599</td><td>0.720%</td><td>6.64</td><td>2</td></tr>
+<tr><td>R3 |IC| 加权（禁用对照）</td><td class="down">−8.69%</td><td class="down">−9.07%</td><td>25.93%</td><td class="down">−0.350</td><td class="down">−25.24%</td><td class="down">−0.359</td><td>0.792%</td><td>6.94</td><td>1</td></tr>
+<tr class="hl"><td>R4 收缩（λ=0）</td><td class="down">−12.75%</td><td class="down">−13.29%</td><td>23.74%</td><td class="down">−0.560</td><td class="down">−27.95%</td><td class="down">−0.476</td><td>0.526%</td><td>4.91</td><td>3</td></tr>
+<tr><td>8 维等权</td><td class="down">−23.35%</td><td class="down">−24.28%</td><td>26.85%</td><td class="down">−0.904</td><td class="down">−36.17%</td><td class="down">−0.671</td><td>0.727%</td><td>6.83</td><td>0</td></tr>
+<tr><td>基准：中证全指（满仓）</td><td class="down">−11.68%</td><td class="down">−12.13%</td><td>21.92%</td><td class="down">−0.553</td><td class="down">−25.94%</td><td class="down">−0.468</td><td>—</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="small">组合口径：Top10 等权、<code>w_total=0.8</code>（20% 现金）、每 20 交易日调仓、T+1 开盘成交、含费用与拒单；
+价格覆盖率均值 100%、门禁全部通过。与满仓指数<b>口径不同，仅作参照不可直接相减</b>。
+现行权重近 1 年略跑输基准约 1.07pp，须如实披露；R1/R2 朴素重分配反而大幅跑输现行 9.45pp。</p>
+
+<h3>4.3 五门准入与分段稳定性</h3>
+<table>
+<thead><tr><th>门禁／检验</th><th>判据</th><th>实测</th><th>结论</th></tr></thead>
+<tbody>
+<tr><td>G1 分层严格单调 / G2 spread&gt;0</td><td>Q1&lt;…&lt;Q5 / Q5−Q1&gt;0</td><td>本次诊断未重算，需正式流程</td><td><span class="badge b-warn">未评估</span></td></tr>
+<tr><td>G3 胜等权</td><td>组合 ICIR &gt; 等权 ICIR</td><td>0.0218 &gt; −0.0234</td><td><span class="badge b-ok">PASS</span></td></tr>
+<tr class="hl"><td>G4 胜最强单因子</td><td>组合 ICIR &gt; 最强单因子 ICIR</td><td>0.0218 &lt; 0.2786（score_growth）</td><td><span class="badge b-nogo">FAIL</span></td></tr>
+<tr class="hl"><td>G5 walk-forward</td><td>6 折 ≥3 折通过</td><td><code>n_oos_dates=0</code></td><td><span class="badge b-nogo">FAIL</span></td></tr>
+<tr><td>前后半段权重漂移</td><td>同一规则两段 L1 距离</td><td>0.4731（growth 由 .20 → .062；反转维升到 .20）</td><td><span class="badge b-nogo">不稳</span></td></tr>
+<tr><td>前半定 → 后半验</td><td>样本外式</td><td>OOS <span class="down">−3.72%</span>；后半自拟合样本内 <span class="up">+9.09%</span>；现行同窗 <span class="down">−4.61%</span></td><td>样本内外差 12.8pp</td></tr>
+<tr><td>后半定 → 前半验</td><td>样本外式</td><td>OOS <span class="up">+9.77%</span>；现行同窗 <span class="up">+0.12%</span></td><td>方向与前一行相反</td></tr>
+</tbody></table>
+<div class="note"><b>不掩盖的反例：</b>两个方向的分段 OOS 结论符号相反。若权重规则真有稳定信息，两个方向都应改善；
+现在结果由「样本怎么切」决定，正说明该规则无可迁移性。另：分段窗口存在 h=20 前向收益重叠、<b>未做 purge/embargo</b>，
+调仓仅 11 次、n_eff≈6，属诊断级而非 G5 walk-forward；正式 B 档验证必须带 purge 并逐日累积 30+ 个 h20 可验 OOS 截面。</div>
+</div>
+
+<h2>五、权重计算与分配规则</h2>
+<div class="card">
+<h3>规则 A · 现行生产规则（客观陈述，未改）</h3>
+<ul>
+<li>目标函数 = <b>TopN 头部超额（h=20）</b>，不是全截面 IC；依据 <code>data/weight_p04_constrained.json</code>（1635 日、N∈{6,10,13,30,50} 全档改善）。</li>
+<li>候选是<b>约束内手工网格的 5 个方案</b>（采纳 C1），不是按收益/夏普线性映射；权重改动属产品裁决，须<b>八处同步</b> + <code>verify_weights_round36</code> PASS 才出图。</li>
+<li>约束：Σ=1.00、单因子 ≤0.20、大类 ≤0.30、<code>target_horizon=20</code>；五门准入；trial 预登记。</li>
+</ul>
+
+<h3>规则 C · 「按收益／回撤／夏普线性分配」（本次实测，<span class="down">不采用</span>）</h3>
+<p>映射：把各维近 1 年 Top10 超额（或超额均值÷标准差）取正值归一 → 带约束欧氏投影（SLSQP，
+Σ=0.80、单因子≤0.20、大类≤0.30）→ <code>score_fund</code> 盲区锁定 0.20 不臆造。</p>
+<div class="note">实测后果：7 个生效维里<b>只有 <code>score_growth</code> 一个正超额</b>，目标权重全部塌缩到该维并被 0.20 上限截断，
+剩余 0.60 由<b>约束兜底均分</b>给零证据维（均分不是数据证据）。结果近似等权，全段净值 <span class="down">−22.20%</span>，
+比现行差 9.45pp。按 |IC| 排序虽净值 −8.69% 略好，但方向与目标函数相反、属明令禁用，且样本内挑出来的结果不可采信。</div>
+
+<h3>规则 B · 建议采用：证据充分度收缩（本次给出的判断方法）</h3>
+<div class="info"><code>w = (1−λ)·w_prior + λ·w_data</code>，其中
+<code>λ = clip((t_max−2)/(thr−2), 0, 1) × clip(n_eff/30, 0, 1)</code>。<br>
+代入实测：<code>t_max=1.1608</code>、<code>thr=3.8135</code>、<code>n_eff=10.75</code> ⇒ <b>λ = 0</b> ⇒
+最终权重 = <code>w_prior</code>（现行 v4.19）。<br>
+含义：权重不是「按表现排序重分配」，而是<b>先验 + 经多重检验与样本量校正后的有限偏移</b>；
+证据不足时偏移必须归零。这既避免单年过拟合，也与「禁按 IC 排权重」「G5 未过不重测」一致。</div>
+<p class="small">完整触发顺序：补数据 → 固定权重只跑验证（不改权重）→ 仅当验证证伪现行权重 → 才在约束内重解 → 五门 + 八处同步 + 页面披露同步。</p>
+</div>
+
+<h2>六、候选权重结果（全部 NOT_ADOPTED）</h2>
+<div class="card">
+<table>
+<thead><tr><th>维度</th><th>R0 现行 / R4 最终</th><th>R1 朴素·超额</th><th>R2 朴素·夏普</th><th>R3 |IC|（禁用）</th></tr></thead>
+<tbody>
+<tr><td>score_fund（盲区）</td><td>.20</td><td>.20</td><td>.20</td><td>.20</td></tr>
+<tr><td>score_growth</td><td>.20</td><td>.20</td><td>.20</td><td>.067419</td></tr>
+<tr><td>score_size_growth</td><td>.20</td><td>.10</td><td>.10</td><td>.20</td></tr>
+<tr><td>score_quality</td><td>.10</td><td>.10</td><td>.10</td><td>.089197</td></tr>
+<tr><td>score_dominant</td><td>.10</td><td>.10</td><td>.10</td><td>.012075</td></tr>
+<tr><td>score_ep</td><td>.10</td><td>.10</td><td>.10</td><td>.143104</td></tr>
+<tr><td>score_bias60</td><td>.05</td><td>.10</td><td>.10</td><td>.175951</td></tr>
+<tr><td>score_rsi_rev</td><td>.05</td><td>.10</td><td>.10</td><td>.112254</td></tr>
+<tr class="hl"><td>Σ / 约束校验</td><td>1.00 PASS</td><td>1.00 PASS</td><td>1.00 PASS</td><td>1.00 PASS</td></tr>
+<tr><td>状态</td><td><span class="badge b-ok">现行保留</span></td><td><span class="badge b-nogo">不采用</span></td><td><span class="badge b-nogo">不采用</span></td><td><span class="badge b-nogo">明令禁用</span></td></tr>
+</tbody></table>
+<p class="small">约束校验判据与 <code>verify_weights_round36.py</code> 同源：Σ=1.00、单因子 ≤0.20、大类 ≤0.30；四组均通过。
+<b>通过约束 ≠ 通过验证</b>：四组都没有通过五门，也没有样本外证据。</p>
+</div>
+
+<h2>七、最终权重结果的输出形式</h2>
+<div class="card">
+<h3>7.1 最终结论</h3>
+<div class="info"><b>最终权重 = v4.19-c1-sustain-gates 现行先验向量，逐字节不变；状态 NOT_ADOPTED（不落地）</b>。
+<code>factor_weights.json</code> sha256 <code>9347d48ff91c41accfc6e23825ed8ec235027cba79b23a6b300f4b367a37ebc9</code>，
+八处同步点（<code>factor_eval.PRIOR_W10</code> / <code>step2._W_PRIOR_10D</code> / <code>apply_sector_momentum</code> /
+<code>enhance_scores</code> / <code>gen_report._fb</code> / <code>.rf_W_ACT</code> 等）均未改动。</div>
+
+<h3>7.2 机器可读（本文件配套产物）</h3>
+<p class="mono">data/weight_diagnostic_1y_20261111.json</p>
+<table>
+<thead><tr><th>字段</th><th>类型／内容</th></tr></thead>
+<tbody>
+<tr><td>status</td><td><code>NOT_ADOPTED | ADOPTED</code> —— 本次为 <code>NOT_ADOPTED</code></td></tr>
+<tr><td>weights</td><td><code>{dim: float}</code>，0~0.20，Σ=1.00，附 <code>candidate_constraint_check</code></td></tr>
+<tr><td>window</td><td>起止、交易日数、n_snapshots、h、n_eff、面板末日缺口</td></tr>
+<tr><td>metrics</td><td>factor_summary_1y（IC / NW t / Top10 超额 / 胜率 / 前后半段）+ portfolio_exec_backtest_1y（收益/年化/波动/夏普/MDD/Calmar/成本/换手/拒单/覆盖率）</td></tr>
+<tr><td>gates</td><td><code>gate_G3_G4_G5</code> 逐门 PASS/FAIL；G5 未过 ⇒ 禁称经验证 alpha</td></tr>
+<tr><td>shrinkage_rule</td><td>λ 公式、代入值、结论</td></tr>
+<tr><td>required_disclosures</td><td>先验权重 / G5未过 / fund盲区0.20 / 样本内 / 禁按IC排权重 / trial预登记</td></tr>
+</tbody></table>
+
+<h3>7.3 人可读</h3>
+<p>本单页 HTML（<code>weight_diagnostic_1y_20261111.html</code>）：结论先行 → 区间 → 数据 → 指标 → 结果 → 规则 → 候选 → 输出形式 → 落地条件。
+与主页 <code>index.html</code> 完全隔离，遵守「主页仅核心个股评分、过程分析独立成页」与「披露不可迁」。</p>
+</div>
+
+<h2>八、重新测算（落地）的适用条件与红线</h2>
+<div class="card">
+<table>
+<thead><tr><th>门槛</th><th>权威判据</th><th>当前实测</th><th>状态</th></tr></thead>
+<tbody>
+<tr><td>样本外截面</td><td>30+ 且 h20 收益完整（带 purge/embargo）</td><td>OOS 25 日 / h20 可验 5 截面</td><td><span class="badge b-nogo">未达</span></td></tr>
+<tr><td>G5 过拟合门</td><td>6 折 ≥3 折通过</td><td><code>n_oos_dates=0</code></td><td><span class="badge b-nogo">FAIL</span></td></tr>
+<tr><td>面板完整</td><td>末日追平 + <code>score_fund</code> PIT 历史快照</td><td>末日 10-30、缺 6 日、盲区 0.20 → 生效 Σ=0.80</td><td><span class="badge b-nogo">未达</span></td></tr>
+<tr><td>五门</td><td>G1~G5 全 PASS</td><td>G4 / G5 FAIL</td><td><span class="badge b-nogo">未达</span></td></tr>
+<tr><td>多重检验</td><td>先登记 trial，K 走 <code>trial_log.n_trials()</code></td><td>K=365 / 阈值 3.8135</td><td><span class="badge b-warn">须预登记</span></td></tr>
+<tr><td>复权源</td><td><code>verify_qfq_anchor</code> 恢复</td><td>11-11 源失效 <code>source_dead=True</code>，覆盖 6.83%</td><td><span class="badge b-nogo">未恢复</span></td></tr>
+<tr><td>权重约束</td><td>Σ=1 / 单因子≤.20 / 大类≤.30 / 八处同步 / verify PASS</td><td>当前满足</td><td><span class="badge b-ok">已满足</span></td></tr>
+</tbody></table>
+<div class="note"><b>红线：</b>禁称「经验证的 alpha」；禁按 IC 排权重；禁把 TopN 毛超额当净值；禁跨权重版本比 total；
+禁把反弹叙事当作分布外冲击（反弹段本在样本内，且降仓择时 1/4、0/16 已被证伪）；
+「反弹」只做诊断性分层披露，不做 regime-conditional 权重、不量化仓位或胜率；分层刷新策略判据尚未接入日链，属口径变更，待裁决。</div>
+</div>
+
+<div class="foot">
+数据来源：<code>factor_weights.json</code> / <code>data/panel_r124_mat.npz</code> / <code>data/klines_long.json</code> /
+<code>data/bench/000985.json</code> / <code>factor_ic.json</code> / <code>panel_audit.json</code> / <code>data/trial_log.json</code>。
+内核：<code>scoring_core.composite_total_matrix</code> + <code>exec_backtest.run</code>。
+本次为只读诊断：新增 <code>data/weight_diagnostic_1y_20261111.json</code> 与本 HTML，未修改任何权重、评分产物、日链脚本或页面；未登记 trial、未 push。
+所有收益为历史回测模拟，不构成投资建议，不证明策略有效性。
+</div>
+
+</div></body></html>

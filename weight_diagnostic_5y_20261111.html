@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>近5年回测权重验证 · 2026-11-11</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--bd:#e3e6ea;--tx:#1b2430;--mut:#6b7785;--up:#c62828;--down:#1b8a5a;--acc:#1c4e80}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px}
+h1{font-size:25px;margin:0 0 6px}h2{font-size:18px;margin:34px 0 12px;padding-left:10px;border-left:4px solid var(--acc)}
+h3{font-size:15px;margin:20px 0 8px;color:var(--acc)}
+.sub{color:var(--mut);font-size:13px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:18px 20px;margin:14px 0;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.hero{border-left:5px solid var(--up);background:#fff7f6}
+.badge{display:inline-block;padding:3px 10px;border-radius:5px;font-size:12px;font-weight:700;letter-spacing:.5px}
+.b-no{background:#fdecea;color:#b71c1c;border:1px solid #f5c6c2}
+.b-ok{background:#e8f5e9;color:#1b5e20;border:1px solid #b7dfb9}
+.b-warn{background:#fff8e1;color:#8a6d00;border:1px solid #f0dfa8}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin:8px 0}
+th,td{padding:7px 8px;border-bottom:1px solid var(--bd);text-align:right;white-space:nowrap}
+th{background:#eef2f6;color:#33465c;font-weight:600;position:sticky;top:0}
+td:first-child,th:first-child{text-align:left}
+tr:nth-child(even) td{background:#fafbfc}
+.nm{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+.up{color:var(--up)}.down{color:var(--down)}.mut{color:var(--mut)}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:10px 0}
+.kv div{background:#f8fafc;border:1px solid var(--bd);border-radius:7px;padding:9px 12px}
+.kv b{display:block;font-size:17px;margin-top:2px}
+.kv span{color:var(--mut);font-size:12px}
+ul{margin:8px 0 8px 20px;padding:0}li{margin:5px 0}
+.note{background:#fff8e1;border:1px solid #f0dfa8;border-radius:8px;padding:12px 16px;color:#6b5600;font-size:13px;margin:12px 0}
+.foot{color:var(--mut);font-size:12px;margin-top:34px;border-top:1px solid var(--bd);padding-top:14px}
+.scroll{overflow-x:auto}
+code{background:#eef2f6;padding:1px 5px;border-radius:4px;font-size:12px}
+</style></head><body><div class="wrap">
+<h1>近 5 年回测 · 是否应更改权重</h1>
+<div class="sub">生成 2026-11-11T20:39:02 ｜ 权重版本 v4.19-c1-sustain-gates ｜ 指纹 <code>9347d48f…</code> ｜ 只读诊断，未改任何权重/产物</div>
+
+<div class="card hero">
+<span class="badge b-no">NOT_ADOPTED</span> &nbsp; <span class="badge b-warn">PROXY_ONLY</span> &nbsp;
+<b style="font-size:17px">结论：不更改权重</b>
+<p style="margin:10px 0 0">不更改权重。5 年样本把 n_eff 从 10.75 提升到 59.20，全样本 IC 与分层单调性都变显著（合成组合 IC NW t19=4.51、Q1→Q5 严格单调，但 WF 折内严格单调仅 1/6），真正决定能否改权重的三道关仍未过：① G5 滚动前推折通过率仅 33.3%（阈值 50%）、G3 胜等权仅 2/6 折；② 头部超额最大 NW t19=2.0865，远低于 Bonferroni 3.8135；③ 5 年全是样本内 + 代理因子 PROXY_ONLY + score_fund 0.20 盲区。且净值对 1.44pp 的权重微调就产生 22.5pp 差异，属离散换仓噪声。最终权重严格等于现行 v4.19-c1-sustain-gates。</p>
+</div>
+
+<div class="kv">
+<div><span>评估区间</span><b>2021-11-11 ~ 2026-11-11</b></div>
+<div><span>h20 完整截面 / n_eff</span><b>1184 / 59.2</b></div>
+<div><span>五门裁决</span><b class="down">FAIL</b></div>
+<div><span>收缩系数 λ</span><b>0.0</b></div>
+<div><span>Bonferroni 阈值 (K=365)</span><b>3.8135</b></div>
+<div><span>现行权重 5 年净收益</span><b class="up">124.05%</b></div>
+</div>
+
+<h2>一、判断方法（先钉死口径再看结果）</h2>
+<div class="card">
+<p>目标函数 = <b>TopN 头部超额</b>（Top10 等权 h20 收益 − 截面等权），<b>不是全截面 IC</b>。Rank IC 只作方向诊断，
+因为项目已实测「IC 与头部超额方向相反」。</p>
+<table><thead><tr><th>环节</th><th style="text-align:left">唯一实现 / 判据</th></tr></thead><tbody>
+<tr><td>合成打分</td><td style="text-align:left"><code>scoring_core.composite_total_matrix</code>：分母恒 Σ=1.00，缺维填 DMAX/2 中性分；<code>score_fund</code> 盲区由内核补 0.20 中性权重</td></tr>
+<tr><td>五门准入</td><td style="text-align:left"><code>weight_admission_gate.evaluate / walk_forward</code>：G1 单调 / G2 spread / G3 胜等权 / G4 胜单因子 / G5 六折≥3 折通过</td></tr>
+<tr><td>执行净值</td><td style="text-align:left"><code>exec_backtest.run</code>：T+1 开盘、13bp 费用、涨跌停拒单留痕、覆盖率门禁 0.80、Top10 等权 w_total=0.80、每 20 交易日调仓</td></tr>
+<tr><td>显著性</td><td style="text-align:left">Newey-West t（lag=19，另列 lag=4）；Bonferroni 阈值按 <code>trial_log.n_trials()</code> 现算；n_eff = 截面数 / h</td></tr>
+<tr><td>权重分配</td><td style="text-align:left">按表现分归一 → <b>SLSQP 带约束欧氏投影</b>：Σ=1.00、单因子≤0.20、大类≤0.30、<code>score_fund</code> 锁 0.20；再按收缩规则 <code>w=(1−λ)w_prior+λw_data</code></td></tr>
+</tbody></table>
+<div class="note"><b>λ = clip((t_max−2)/(thr−2),0,1) × clip(n_eff/30,0,1)</b>：证据不足时偏移必须归零。
+本轮 t_max=0.7639、thr=3.8135、n_eff=59.2 ⇒ <b>λ=0.0</b>；即使把合成组合自身 t=2.0865 纳入，λ 也仅 <b>0.047698</b>。</div>
+</div>
+
+<h2>二、时间区间、数据范围与证据边界</h2>
+<div class="card scroll">
+<table><thead><tr><th>项</th><th style="text-align:left">实际值</th></tr></thead><tbody>
+<tr><td>自然 5 年</td><td style="text-align:left">2021-11-11 ~ 2026-11-11（含闰日，5 个日历年）</td></tr>
+<tr><td>面板交易日 / 评估截面</td><td style="text-align:left">1204 日（2021-11-11~2026-10-30）/ 1184 个 h20 收益完整可得截面（2021-11-11~2026-09-24）</td></tr>
+<tr><td>有效独立观测</td><td style="text-align:left">n_eff = 1184 / 20 = <b>59.2</b>（近 1 年仅 10.75）</td></tr>
+<tr><td>因子矩阵</td><td style="text-align:left">data/panel_r124_mat.npz (1653×2257×9, 2020-01-02~2026-10-30)</td></tr>
+<tr><td>执行价格</td><td style="text-align:left">data/klines_2020.npz (2257×1655×7, 2020-01-02~2026-11-03)</td></tr>
+<tr><td>可检验权重</td><td style="text-align:left"><b>Σ=0.80</b>；<code>score_fund</code> 0.20 整列无历史快照（真盲区，未覆盖≠通过）</td></tr>
+<tr><td>评估域</td><td style="text-align:left">full（pit_pool.json 仅 238 截面 2025-11-03 起，5 年区间无重建池 → 含池前视偏差）</td></tr>
+<tr><td>因子性质</td><td style="text-align:left"><b>factor_parity=False / PROXY_ONLY</b>：size_growth=流通市值分位、quality=ROE 分位、growth=归母净利同比分位，均非生产算法</td></tr>
+<tr><td>闸门与内核口径差</td><td style="text-align:left">闸门 F.composite 用缺维剔分母 + DIM_MAX 全 10；生产内核恒分母 + 5/10 混合量程，两条线不可混用</td></tr>
+<tr><td>样本内外</td><td style="text-align:left">权重 2026-11-04 基于 1635 日全历史拟合，本 5 年区间全部落在样本内</td></tr>
+</tbody></table>
+</div>
+
+<h2>三、真实回测结果</h2>
+<h3>3.1 因子层（唯一内核，5 年 / h=20）</h3>
+<div class="card scroll"><table><thead><tr>
+<th>维度</th><th>权重</th><th>Rank IC</th><th>IC NW t19</th><th>Top10 超额</th><th>超额 NW t19</th><th>前半段</th><th>后半段</th><th>胜率</th>
+</tr></thead><tbody><tr><td class='nm'>score_bias60</td><td>0.05</td><td>+0.08114</td><td><span class="up">+4.647</span></td><td><span class="down">-3.297</span></td><td><span class="down">-3.288</span></td><td><span class="down">-3.058</span></td><td><span class="down">-3.537</span></td><td>32.4%</td></tr><tr><td class='nm'>score_rsi_rev</td><td>0.05</td><td>+0.04758</td><td><span class="up">+3.602</span></td><td><span class="down">-0.714</span></td><td><span class="down">-1.448</span></td><td><span class="down">-0.124</span></td><td><span class="down">-1.304</span></td><td>41.5%</td></tr><tr><td class='nm'>score_lowvol20</td><td>0.0</td><td>+0.09514</td><td><span class="up">+4.652</span></td><td><span class="down">-0.452</span></td><td><span class="down">-0.603</span></td><td><span class="up">+0.528</span></td><td><span class="down">-1.432</span></td><td>44.6%</td></tr><tr><td class='nm'>score_tech_neg</td><td>0.0</td><td>-0.00886</td><td><span class="down">-0.700</span></td><td><span class="down">-1.019</span></td><td><span class="down">-2.608</span></td><td><span class="down">-1.287</span></td><td><span class="down">-0.751</span></td><td>39.7%</td></tr><tr><td class='nm'>score_size_growth</td><td>0.2</td><td>+0.05600</td><td><span class="up">+3.304</span></td><td><span class="up">+0.547</span></td><td><span class="up">+0.764</span></td><td><span class="up">+1.342</span></td><td><span class="down">-0.247</span></td><td>54.2%</td></tr><tr><td class='nm'>score_ep</td><td>0.1</td><td>+0.02919</td><td><span class="up">+2.296</span></td><td><span class="up">+0.080</span></td><td><span class="up">+0.117</span></td><td><span class="up">+0.930</span></td><td><span class="down">-0.770</span></td><td>50.0%</td></tr><tr><td class='nm'>score_quality</td><td>0.1</td><td>-0.00908</td><td><span class="down">-0.584</span></td><td><span class="down">-1.518</span></td><td><span class="down">-2.613</span></td><td><span class="down">-1.925</span></td><td><span class="down">-1.110</span></td><td>37.8%</td></tr><tr><td class='nm'>score_growth</td><td>0.2</td><td>+0.00015</td><td><span class="up">+0.014</span></td><td><span class="down">-0.132</span></td><td><span class="down">-0.265</span></td><td><span class="down">-0.890</span></td><td><span class="up">+0.626</span></td><td>45.4%</td></tr><tr><td class='nm'>score_dominant</td><td>0.1</td><td>+0.00006</td><td><span class="up">+0.004</span></td><td><span class="down">-0.621</span></td><td><span class="down">-0.907</span></td><td><span class="up">+0.409</span></td><td><span class="down">-1.652</span></td><td>40.3%</td></tr><tr><td class='nm'>__COMPOSITE__</td><td>合成</td><td>+0.04988</td><td><span class="up">+4.509</span></td><td><span class="up">+0.930</span></td><td><span class="up">+2.087</span></td><td><span class="up">+0.673</span></td><td><span class="up">+1.186</span></td><td>57.3%</td></tr><tr><td class='nm'>__EW__</td><td>等权</td><td>+0.05994</td><td><span class="up">+4.257</span></td><td><span class="up">+0.464</span></td><td><span class="up">+1.005</span></td><td><span class="up">+0.856</span></td><td><span class="up">+0.071</span></td><td>50.6%</td></tr></tbody></table>
+<p class="sub">IC 与头部超额方向明显背离：<code>score_bias60</code> IC +0.0811 最高，但 Top10 超额 −3.30%/20日最差；
+合成组合 IC NW t19=4.509 显著，头部超额 NW t19 仅 2.087。<b>这正是禁止按 IC 排权重的实测依据。</b></p></div>
+
+<h3>3.2 五门准入裁决（唯一判据，5 年样本）</h3>
+<div class="card scroll"><table><thead><tr><th>门禁</th><th>字段</th><th>结果</th></tr></thead><tbody><tr><td>G1 分层单调（噪声容忍）</td><td>g1_monotonic_robust</td><td class='up'>PASS</td></tr><tr><td>G2 spread&gt;0</td><td>g2_spread_positive</td><td class='up'>PASS</td></tr><tr><td>G3 胜等权</td><td>g3_beat_ew</td><td class='down'>FAIL</td></tr><tr><td>G4 胜最强单因子</td><td>g4_beat_single</td><td class='up'>PASS</td></tr><tr><td>G5 walk-forward 通过率</td><td>g5_wf_pass_rate</td><td class='down'>FAIL</td></tr></tbody></table>
+<p class="sub">全样本：IC=<span class="mut">—</span>、ICIR=<span class="mut">—</span>、NW t(lag=4)=<span class="mut">—</span>；分层 Q1..Q5 = +0.0066 / +0.0126 / +0.0146 / +0.0157 / +0.0172，spread=+0.01056（t=<span class="mut">—</span>）。
+<b>全样本统计显著，但滚动前推折通过率 33.3% &lt; 50%，G3 仅 2/6 折胜等权。</b></p>
+<h3 style="margin-top:18px">G5 六折明细</h3>
+<table><thead><tr><th>折</th><th>训练区间</th><th>验证区间</th><th>训练 ICIR</th><th>验证 ICIR</th><th>等权 ICIR</th><th>spread</th><th>判定</th></tr></thead><tbody><tr><td>1</td><td>2025-03-04~2025-08-25</td><td>2025-08-26~2025-10-28</td><td>1.181</td><td><span class="up">0.580</span></td><td>0.714</td><td><span class="up">+0.00774</span></td><td class='down'>FAIL</td></tr><tr><td>2</td><td>2025-04-30~2025-10-28</td><td>2025-10-29~2025-12-23</td><td>1.085</td><td><span class="up">0.790</span></td><td>0.665</td><td><span class="up">+0.00539</span></td><td class='up'>PASS</td></tr><tr><td>3</td><td>2025-07-01~2025-12-23</td><td>2025-12-24~2026-02-27</td><td>0.747</td><td><span class="up">2.350</span></td><td>2.350</td><td><span class="up">+0.03312</span></td><td class='down'>FAIL</td></tr><tr><td>4</td><td>2025-08-26~2026-02-27</td><td>2026-03-02~2026-04-27</td><td>1.096</td><td><span class="up">0.491</span></td><td>0.059</td><td><span class="up">+0.00168</span></td><td class='up'>PASS</td></tr><tr><td>5</td><td>2025-10-29~2026-04-27</td><td>2026-04-28~2026-06-26</td><td>1.034</td><td><span class="down">-0.081</span></td><td>1.610</td><td><span class="up">+0.00586</span></td><td class='down'>FAIL</td></tr><tr><td>6</td><td>2025-12-24~2026-06-26</td><td>2026-06-29~2026-08-21</td><td>1.383</td><td><span class="up">0.145</span></td><td>0.875</td><td><span class="up">+0.00107</span></td><td class='down'>FAIL</td></tr></tbody></table>
+<p class="sub">训练 ICIR 均值 1.088 → 验证 0.712，衰减 0.375；折内严格单调仅 1/6，单调性断点全部落在噪声区间（显著 0 个）。</p></div>
+
+<h3>3.3 组合层可执行净值（T+1 开盘 / 含成本）</h3>
+<div class="card scroll"><table><thead><tr>
+<th>方案</th><th>净收益</th><th>年化</th><th>夏普</th><th>最大回撤</th><th>Calmar</th><th>成本</th><th>拒单</th><th>覆盖门禁</th>
+</tr></thead><tbody><tr><td class='nm'>R0_current</td><td><span class="up">+124.05%</span></td><td><span class="up">+18.39%</span></td><td><span class="up">0.706</span></td><td><span class="down">-36.43%</span></td><td><span class="up">0.505</span></td><td>5.15%</td><td>255</td><td>✅</td></tr><tr><td class='nm'>R1_head_excess_5y</td><td><span class="up">+107.60%</span></td><td><span class="up">+16.52%</span></td><td><span class="up">0.618</span></td><td><span class="down">-38.63%</span></td><td><span class="up">0.428</span></td><td>5.30%</td><td>175</td><td>✅</td></tr><tr><td class='nm'>R2_icir_like_5y</td><td><span class="up">+103.24%</span></td><td><span class="up">+16.00%</span></td><td><span class="up">0.595</span></td><td><span class="down">-38.51%</span></td><td><span class="up">0.415</span></td><td>5.24%</td><td>175</td><td>✅</td></tr><tr><td class='nm'>R3_abs_ic_BANNED</td><td><span class="up">+183.82%</span></td><td><span class="up">+24.40%</span></td><td><span class="up">0.850</span></td><td><span class="down">-34.73%</span></td><td><span class="up">0.703</span></td><td>6.96%</td><td>105</td><td>✅</td></tr><tr><td class='nm'>R4_shrink</td><td><span class="up">+124.05%</span></td><td><span class="up">+18.39%</span></td><td><span class="up">0.706</span></td><td><span class="down">-36.43%</span></td><td><span class="up">0.505</span></td><td>5.15%</td><td>255</td><td>✅</td></tr><tr><td class='nm'>R4_shrink_sens_composite_t</td><td><span class="up">+146.53%</span></td><td><span class="up">+20.79%</span></td><td><span class="up">0.797</span></td><td><span class="down">-33.04%</span></td><td><span class="up">0.629</span></td><td>5.52%</td><td>255</td><td>✅</td></tr><tr><td class='nm'>EW_equal</td><td><span class="up">+103.85%</span></td><td><span class="up">+16.07%</span></td><td><span class="up">0.620</span></td><td><span class="down">-26.67%</span></td><td><span class="up">0.603</span></td><td>6.38%</td><td>83</td><td>✅</td></tr><tr><td class='nm'>SEG_first_fit</td><td><span class="up">+126.42%</span></td><td><span class="up">+18.65%</span></td><td><span class="up">0.703</span></td><td><span class="down">-36.27%</span></td><td><span class="up">0.514</span></td><td>5.85%</td><td>133</td><td>✅</td></tr><tr><td class='nm'>SEG_second_fit</td><td><span class="up">+136.80%</span></td><td><span class="up">+19.77%</span></td><td><span class="up">0.758</span></td><td><span class="down">-24.23%</span></td><td><span class="up">0.816</span></td><td>6.95%</td><td>85</td><td>✅</td></tr></tbody></table>
+<p class="sub">组合净值与满仓指数口径不同（w_total=0.80、Top10 等权、每20日调仓、基准为截面等权而非指数），且信号来自 PROXY_ONLY 代理面板，仅作同口径方案间对照，禁作为策略有效性证明。<b>R3（|IC| 加权）净值最高但属明令禁用口径</b>；R4 收缩与 R0 完全一致（λ=0）。
+R4 敏感性组仅偏移 0.014409 权重（L1），净值却差 22.47 pp ⇒ <b>净值由 Top10 离散换仓噪声主导，禁止用净值排序反推权重</b>。</p></div>
+
+<h3>3.4 基准对照（同为 5 年真实行情）</h3>
+<div class="card scroll"><table><thead><tr><th>指数</th><th>区间</th><th>收益</th><th>夏普</th><th>最大回撤</th></tr></thead><tbody><tr><td class='nm'>中证全指 000985</td><td>2021-11-11~2026-11-11</td><td><span class="down">-10.32%</span></td><td><span class="down">-0.111</span></td><td><span class="down">-39.33%</span></td></tr><tr><td class='nm'>沪深300 000300</td><td>2021-11-11~2026-11-11</td><td><span class="down">-16.80%</span></td><td><span class="down">-0.210</span></td><td><span class="down">-37.86%</span></td></tr><tr><td class='nm'>中证500 000905</td><td>2021-11-11~2026-11-11</td><td><span class="down">-5.71%</span></td><td><span class="down">-0.053</span></td><td><span class="down">-39.70%</span></td></tr><tr><td class='nm'>中证1000 000852</td><td>2021-11-11~2026-11-11</td><td><span class="down">-12.17%</span></td><td><span class="down">-0.104</span></td><td><span class="down">-46.71%</span></td></tr></tbody></table>
+<p class="sub">组合净值与满仓指数口径不同（w_total=0.80、Top10 等权、基准为截面等权），仅作参照，不构成策略有效性证明。</p></div>
+
+<h3>3.5 净值曲线核验（排除复权跳变 / 假收益）</h3>
+<div class="card"><div class="kv">
+<div><span>最大单日</span><b class="up">+9.963% <small>2024-09-30</small></b></div>
+<div><span>最小单日</span><b class="down">-12.916% <small>2025-04-07</small></b></div>
+<div><span>|日涨跌|&gt;10% 天数</span><b>1</b></div>
+<div><span>首末净值</span><b>0.99937 → 2.240545</b></div>
+</div>
+<table><thead><tr><th>年度</th><th>组合净值收益</th></tr></thead><tbody><tr><td>2021</td><td><span class="up">+6.03%</span></td></tr><tr><td>2022</td><td><span class="down">-1.51%</span></td></tr><tr><td>2023</td><td><span class="down">-5.28%</span></td></tr><tr><td>2024</td><td><span class="up">+61.49%</span></td></tr><tr><td>2025</td><td><span class="up">+48.00%</span></td></tr><tr><td>2026</td><td><span class="down">-9.84%</span></td></tr></tbody></table>
+<p class="sub">单日极值分别落在 2024-09-30（924 行情）与 2025-04-07（关税冲击），与真实行情吻合，<b>无复权跳变污染</b>；
+但收益高度集中在 2024/2025 反弹段，属状态集中而非全周期稳定。</p></div>
+
+<h3>3.6 带 purge/embargo 的双向交叉验证（诊断级补充）</h3>
+<div class="card scroll"><table><thead><tr><th>方向</th><th>验证窗口</th><th>拟合权重净值</th><th>现行先验净值</th><th>差</th><th>结论</th></tr></thead><tbody><tr><td class='nm'>train_first_test_second</td><td>2024-05-23~2026-09-24</td><td><span class="up">+116.47%</span></td><td><span class="up">+141.78%</span></td><td><span class="down">-25.31pp</span></td><td class='down'>先验权重胜</td></tr><tr><td class='nm'>train_second_test_first</td><td>2021-11-11~2024-03-20</td><td><span class="up">+32.76%</span></td><td><span class="up">+4.99%</span></td><td><span class="up">+27.77pp</span></td><td class='up'>拟合权重胜</td></tr></tbody></table>
+<p class="sub">切点两侧各剔除 20 个截面（h=20 前向收益不跨越边界）。<b>换一个切分方向，优劣结论就翻转</b> ⇒
+同一「按 5 年表现定权重」规则没有可迁移性。前后半段候选权重 L1 漂移 = 0.4。
+此检验非项目唯一判据，且仍在样本内，仅作诊断。</p></div>
+
+<h2>四、候选权重与约束校验</h2>
+<div class="card scroll"><table><thead><tr><th>方案</th><th>score_bias60</th><th>score_rsi_rev</th><th>score_quality</th><th>score_size_growth</th><th>score_dominant</th><th>score_ep</th><th>score_fund</th><th>score_growth</th><th>约束</th></tr></thead><tbody><tr><td class='nm'>R1_head_excess_5y</td><td>0.0830</td><td>0.0830</td><td>0.0830</td><td>0.2000</td><td>0.0830</td><td>0.1851</td><td>0.2000</td><td>0.0830</td><td class='up'>PASS</td></tr><tr><td class='nm'>R2_icir_like_5y</td><td>0.0819</td><td>0.0819</td><td>0.0819</td><td>0.2000</td><td>0.0819</td><td>0.1903</td><td>0.2000</td><td>0.0819</td><td class='up'>PASS</td></tr><tr><td class='nm'>R3_abs_ic_BANNED</td><td>0.2000</td><td>0.1000</td><td>0.0731</td><td>0.2000</td><td>0.0407</td><td>0.1451</td><td>0.2000</td><td>0.0411</td><td class='up'>PASS</td></tr><tr><td class='nm'>R4_shrink</td><td>0.0500</td><td>0.0500</td><td>0.1000</td><td>0.2000</td><td>0.1000</td><td>0.1000</td><td>0.2000</td><td>0.2000</td><td class='up'>PASS</td></tr><tr><td class='nm'>R0_current</td><td>0.0500</td><td>0.0500</td><td>0.1000</td><td>0.2000</td><td>0.1000</td><td>0.1000</td><td>0.2000</td><td>0.2000</td><td class='up'>PASS</td></tr><tr><td class='nm'>EW_equal</td><td>0.1250</td><td>0.1250</td><td>0.1250</td><td>0.1250</td><td>0.1250</td><td>0.1250</td><td>0.1250</td><td>0.1250</td><td class='up'>PASS</td></tr><tr><td class='nm'>R4_shrink_sens_composite_t</td><td>0.0516</td><td>0.0516</td><td>0.0992</td><td>0.2000</td><td>0.0992</td><td>0.1041</td><td>0.2000</td><td>0.1944</td><td class='up'>PASS</td></tr></tbody></table>
+<p class="sub">全部候选均通过 Σ=1.00 / 单因子≤0.20 / 大类≤0.30，<b>但没有一组通过五门</b>，全部不落地。
+<code>score_fund</code> 锁定 0.20（盲区，不臆造）。</p></div>
+
+<h2>五、为什么仍不更改权重</h2>
+<div class="card"><ol><li>五门 verdict=FAIL，未通过项=[&#x27;g5_wf_pass_rate&#x27;, &#x27;g3_beat_ew&#x27;]；G5 折通过率=0.3333（阈值 0.5）；G3 胜等权 2/6 折</li><li>生效单因子维 Top10 超额最大 NW t19=0.7639；合成组合自身=2.0865（名义&gt;2.0，但均远低于 Bonferroni 3.8135，K=365）</li><li>收缩系数 λ=0.0；即使把合成组合纳入 t_max，λ 也仅 0.047698</li><li>⚠️ 净值对微小权重变化极敏感：λ=0.047698 时权重 L1 偏移仅 0.014409，净值却从 124.0545% 变为 146.5279%（差 22.47pp） ⇒ Top10 离散换仓噪声主导，禁止用净值排序反推权重</li><li>前后半段候选权重 L1 漂移=0.4；带 purge 交叉验证两个方向结论相反（116.4708% vs prior 141.7838%；32.7567% vs prior 4.9888%）</li><li>现行权重 5 年可执行净收益=124.0545%；朴素候选中最优=R3_abs_ic_BANNED 183.8213%（R3 为禁用 |IC| 口径，非选择依据）</li><li>净值曲线已核验：最大单日 +9.963%(2024-09-30)、-12.916%(2025-04-07)，|日涨跌|&gt;10% 仅 1 天 → 无复权跳变污染；但收益高度集中在 2024/2025 反弹段（{&#x27;2021&#x27;: 6.03, &#x27;2022&#x27;: -1.51, &#x27;2023&#x27;: -5.28, &#x27;2024&#x27;: 61.49, &#x27;2025&#x27;: 48.0, &#x27;2026&#x27;: -9.84}）</li></ol></div>
+
+<h2>六、落地条件与红线</h2>
+<div class="card">
+<p><b>若将来要改权重，必须同时满足：</b>① 真样本外 h20 可验截面 ≥30 且带 purge/embargo；
+② G5 六折≥3 折通过、五门全 PASS；③ 长面板追平并补 <code>score_fund</code> 历史 PIT 快照、
+因子逐维复现生产算法（factor_parity=True）；④ trial 预登记、复权源恢复；
+⑤ 八处权重同步 + <code>verify_weights_round36</code> PASS。顺序必须是
+<b>补数据 → 固定权重只跑验证 → 仅当证伪才约束内重解</b>。</p>
+<p><b>红线：</b>禁称「经验证的 alpha」（G5 未过）；禁按 IC 排权重；禁把净值排序当权重依据；
+禁把反弹叙事当分布外冲击；禁跨权重版本比 total；NW t 小样本临界值随 n 变化（n=60≈2.00），
+报「显著」必查 (n, lag)。</p>
+</div>
+
+<h2>七、必须随结果一起披露</h2>
+<div class="card"><ul><li>PROXY_ONLY：长面板因子为历史代理（factor_parity=False），禁止用于证明生产模型有效性</li><li>score_fund 权重 0.20 为整列盲区，5 年回测只检验到 Σ=0.80</li><li>5 年全部为样本内（权重基于 1635 日全历史），不是真样本外</li><li>pit_pool 无法覆盖 5 年，全池域含池前视偏差</li><li>G5 未过 ⇒ 禁称「经验证的 alpha」</li><li>IC 与头部超额方向相反 ⇒ 禁按 IC 排权重</li><li>净值曲线已核验无复权跳变（|日涨跌|&gt;10% 仅 1 天），但收益集中在 2024/2025 反弹段，非全周期稳定收益</li><li>Top10 离散换仓使净值对 &lt;2pp 权重偏移产生 &gt;20pp 差异，禁止用净值排序反推权重</li><li>R3（|IC| 加权）净值最高但属明令禁用口径，不构成改权重依据</li><li>本次未登记 trial、未改任何权重/产物/页面、未提交</li></ul></div>
+
+<div class="foot">本报告与 <code>data/weight_diagnostic_5y_20261111.json</code> 由
+<code>weight_diagnostic_5y_20261111.py</code> 单次运行同源生成，可复现。
+本次为只读诊断：未改 factor_weights.json、未改评分产物、未改页面、未登记 trial、未提交、未 push。
+不构成投资建议。</div>
+</div></body></html>

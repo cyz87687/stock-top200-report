@@ -1,0 +1,536 @@
+{
+ "generated_at": "2026-11-11T20:10:03",
+ "purpose": "近1年诊断性权重测算 —— 只读，NOT_ADOPTED，不修改 factor_weights.json",
+ "status": "NOT_ADOPTED",
+ "window": {
+  "natural_1y": [
+   "2025-11-11",
+   "2026-11-11"
+  ],
+  "bench_trading_days_1y": 243,
+  "panel_eval_first": "2025-11-11",
+  "panel_eval_last": "2026-09-24",
+  "n_eval_snapshots": 215,
+  "horizon_h": 20,
+  "n_effective_independent_obs": 10.75,
+  "panel_last_date": "2026-10-30",
+  "note": "h=20 前向收益完整可得的截面；面板末日 2026-10-30，10-31 之后不可评估",
+  "panel_gap_trading_days": 8
+ },
+ "data_scope": {
+  "factor_matrix": "data/panel_r124_mat.npz (1653 x 2257 x 9, 2020-01-02~2026-10-30)",
+  "price_exec": "data/klines_long.json (2138 x 348, 2025-06-09~2026-11-11)",
+  "benchmark": "data/bench/000985.json (2880日, 中证全指)",
+  "dims_in_panel": [
+   "score_bias60",
+   "score_rsi_rev",
+   "score_lowvol20",
+   "score_tech_neg",
+   "score_size_growth",
+   "score_ep",
+   "score_quality",
+   "score_growth",
+   "score_dominant"
+  ],
+  "effective_weight_dims": [
+   "score_bias60",
+   "score_rsi_rev",
+   "score_quality",
+   "score_size_growth",
+   "score_dominant",
+   "score_ep",
+   "score_fund",
+   "score_growth"
+  ],
+  "blind_dim": "score_fund (权重0.20，矩阵整列NaN；唯一内核按 DMAX/2 中性填充，分母恒 Σ=1.00；未覆盖≠通过)",
+  "kernel": "scoring_core.composite_total_matrix（唯一内核，禁自写合成分母）",
+  "exec_kernel": "exec_backtest.run（T+1开盘 / 佣金3bp双边+印花5bp+滑点5bp / 涨跌停拒单留痕 / 覆盖率门禁0.80）",
+  "production_snapshot_limit": "factor_history.json 仅98截面(2026-06-26~11-11)，无法覆盖近1年全段"
+ },
+ "metrics_definition": {
+  "Rank_IC": "Spearman(因子值_t, 收益 t→t+20)，截面≥200只",
+  "TopN_head_excess": "Top10 等权 h20 收益 − 截面全样本等权 h20 收益（项目目标函数）",
+  "NW_t": "Newey-West，lag=h-1=19（重叠窗口），均值/稳健标准误",
+  "n_effective_obs": "截面数 / h = 215/20 = 10.75（非 215 个独立证据）",
+  "组合层": "净值收益/年化/年化波动/夏普(rf=0)/最大回撤/Calmar/成本/换手/拒单/覆盖率",
+  "目标函数": "TopN 头部超额，NOT 全截面 IC（实测两者方向相反）"
+ },
+ "factor_summary_1y": {
+  "score_bias60": {
+   "ic_mean": 0.04129,
+   "ic_nw_t": 0.6512,
+   "top10_excess_mean": -0.04899,
+   "top10_excess_nw_t": -1.8933,
+   "first_half_excess": -0.09938,
+   "second_half_excess": 0.00094
+  },
+  "score_rsi_rev": {
+   "ic_mean": 0.02535,
+   "ic_nw_t": 0.4865,
+   "top10_excess_mean": -0.00241,
+   "top10_excess_nw_t": -0.1507,
+   "first_half_excess": -0.022,
+   "second_half_excess": 0.017
+  },
+  "score_lowvol20": {
+   "ic_mean": 0.06387,
+   "ic_nw_t": 1.0449,
+   "top10_excess_mean": -0.01217,
+   "top10_excess_nw_t": -0.5429,
+   "first_half_excess": -0.05945,
+   "second_half_excess": 0.03468
+  },
+  "score_tech_neg": {
+   "ic_mean": 0.00397,
+   "ic_nw_t": 0.1156,
+   "top10_excess_mean": 0.00578,
+   "top10_excess_nw_t": 0.4396,
+   "first_half_excess": 0.0241,
+   "second_half_excess": -0.01237
+  },
+  "score_size_growth": {
+   "ic_mean": 0.0665,
+   "ic_nw_t": 1.4868,
+   "top10_excess_mean": -0.02921,
+   "top10_excess_nw_t": -1.0128,
+   "first_half_excess": -0.0805,
+   "second_half_excess": 0.0216
+  },
+  "score_ep": {
+   "ic_mean": 0.03307,
+   "ic_nw_t": 0.9252,
+   "top10_excess_mean": -0.01934,
+   "top10_excess_nw_t": -0.9734,
+   "first_half_excess": -0.04298,
+   "second_half_excess": 0.00409
+  },
+  "score_quality": {
+   "ic_mean": 0.01958,
+   "ic_nw_t": 0.6693,
+   "top10_excess_mean": -0.01566,
+   "top10_excess_nw_t": -0.9715,
+   "first_half_excess": -0.00979,
+   "second_half_excess": -0.02148
+  },
+  "score_growth": {
+   "ic_mean": 0.01413,
+   "ic_nw_t": 0.5644,
+   "top10_excess_mean": 0.0166,
+   "top10_excess_nw_t": 1.1608,
+   "first_half_excess": 0.04623,
+   "second_half_excess": -0.01275
+  },
+  "score_dominant": {
+   "ic_mean": -0.00028,
+   "ic_nw_t": -0.0151,
+   "top10_excess_mean": -0.02633,
+   "top10_excess_nw_t": -1.1632,
+   "first_half_excess": -0.05197,
+   "second_half_excess": -0.00093
+  }
+ },
+ "candidate_weights": {
+  "R1_naive_head_excess": {
+   "score_bias60": 0.1,
+   "score_rsi_rev": 0.1,
+   "score_size_growth": 0.1,
+   "score_ep": 0.1,
+   "score_quality": 0.1,
+   "score_growth": 0.2,
+   "score_dominant": 0.1,
+   "score_fund": 0.2
+  },
+  "R2_naive_sharpe_like": {
+   "score_bias60": 0.1,
+   "score_rsi_rev": 0.1,
+   "score_size_growth": 0.1,
+   "score_ep": 0.1,
+   "score_quality": 0.1,
+   "score_growth": 0.2,
+   "score_dominant": 0.1,
+   "score_fund": 0.2
+  },
+  "R3_abs_IC_BANNED": {
+   "score_bias60": 0.175951,
+   "score_rsi_rev": 0.112254,
+   "score_size_growth": 0.2,
+   "score_ep": 0.143104,
+   "score_quality": 0.089197,
+   "score_growth": 0.067419,
+   "score_dominant": 0.012075,
+   "score_fund": 0.2
+  },
+  "R4_shrinkage_prior": {
+   "score_bias60": 0.05,
+   "score_rsi_rev": 0.05,
+   "score_quality": 0.1,
+   "score_size_growth": 0.2,
+   "score_dominant": 0.1,
+   "score_ep": 0.1,
+   "score_fund": 0.2,
+   "score_growth": 0.2
+  }
+ },
+ "candidate_constraint_check": {
+  "R1_naive_head_excess": {
+   "sum_weights": 1.0,
+   "sum_eq_1": true,
+   "dim_cap_violations": [],
+   "group_sums": {
+    "基本面": 0.3,
+    "估值": 0.1,
+    "低波": 0.0,
+    "技术反转": 0.2,
+    "市值": 0.2,
+    "业绩动量": 0.2
+   },
+   "group_cap_violations": [],
+   "PASS": true
+  },
+  "R2_naive_sharpe_like": {
+   "sum_weights": 1.0,
+   "sum_eq_1": true,
+   "dim_cap_violations": [],
+   "group_sums": {
+    "基本面": 0.3,
+    "估值": 0.1,
+    "低波": 0.0,
+    "技术反转": 0.2,
+    "市值": 0.2,
+    "业绩动量": 0.2
+   },
+   "group_cap_violations": [],
+   "PASS": true
+  },
+  "R3_abs_IC_BANNED": {
+   "sum_weights": 1.0,
+   "sum_eq_1": true,
+   "dim_cap_violations": [],
+   "group_sums": {
+    "基本面": 0.289197,
+    "估值": 0.143104,
+    "低波": 0.0,
+    "技术反转": 0.288205,
+    "市值": 0.212075,
+    "业绩动量": 0.067419
+   },
+   "group_cap_violations": [],
+   "PASS": true
+  },
+  "R4_shrinkage_prior": {
+   "sum_weights": 1.0,
+   "sum_eq_1": true,
+   "dim_cap_violations": [],
+   "group_sums": {
+    "基本面": 0.3,
+    "估值": 0.1,
+    "低波": 0.0,
+    "技术反转": 0.1,
+    "市值": 0.3,
+    "业绩动量": 0.2
+   },
+   "group_cap_violations": [],
+   "PASS": true
+  }
+ },
+ "candidate_weights_by_half": {
+  "first": {
+   "score_bias60": 0.1,
+   "score_rsi_rev": 0.1,
+   "score_size_growth": 0.1,
+   "score_ep": 0.1,
+   "score_quality": 0.1,
+   "score_growth": 0.2,
+   "score_dominant": 0.1,
+   "score_fund": 0.2
+  },
+  "second": {
+   "score_bias60": 0.07879,
+   "score_rsi_rev": 0.2,
+   "score_size_growth": 0.2,
+   "score_ep": 0.136548,
+   "score_quality": 0.061554,
+   "score_growth": 0.061554,
+   "score_dominant": 0.061554,
+   "score_fund": 0.2
+  }
+ },
+ "candidate_half_L1_drift": 0.4731,
+ "shrinkage_rule": {
+  "formula": "w = (1-λ)·w_prior + λ·w_data；λ = clip((t_max-2)/(thr-2),0,1) × clip(n_eff/30,0,1)",
+  "t_max": 1.1608,
+  "bonferroni_thr": 3.8135,
+  "n_eff": 10.75,
+  "lambda": 0.0,
+  "outcome": "λ=0 → 候选严格等于现行先验权重（数据证据不足，依法不偏移）"
+ },
+ "gate_G3_G4_G5": {
+  "composite_icir": 0.0218,
+  "equal_weight_icir": -0.0234,
+  "best_single_icir": 0.2786,
+  "best_single_dim": "score_growth",
+  "G3_beat_equal_weight": true,
+  "G4_beat_best_single": false,
+  "G5_walkforward": "FAIL (factor_weights.json walkforward.n_oos_dates=0)"
+ },
+ "portfolio_exec_backtest_1y": {
+  "R0_current_prior": {
+   "n_rebalance_records": 11,
+   "window_end": "2026-11-11",
+   "n_days": 242,
+   "n_rebalances": 11,
+   "net_return_pct": -12.7475,
+   "gross_return_pct": -12.2904,
+   "ann_return_pct": -13.289,
+   "ann_vol_pct": 23.736,
+   "sharpe_rf0": -0.5599,
+   "mdd_pct": -27.9476,
+   "calmar": -0.4755,
+   "total_cost_pct": 0.5256,
+   "cost_drag_pp": 0.4571,
+   "turnover": 4.9125,
+   "n_rejected_trades": 3,
+   "price_coverage_mean": 1.0,
+   "coverage_gate_ok": true
+  },
+  "R1_naive_head_excess": {
+   "n_rebalance_records": 11,
+   "window_end": "2026-11-11",
+   "n_days": 242,
+   "n_rebalances": 11,
+   "net_return_pct": -22.1974,
+   "gross_return_pct": -21.6262,
+   "ann_return_pct": -23.084,
+   "ann_vol_pct": 27.344,
+   "sharpe_rf0": -0.8442,
+   "mdd_pct": -38.5208,
+   "calmar": -0.5993,
+   "total_cost_pct": 0.7199,
+   "cost_drag_pp": 0.5712,
+   "turnover": 6.6383,
+   "n_rejected_trades": 2,
+   "price_coverage_mean": 1.0,
+   "coverage_gate_ok": true
+  },
+  "R2_naive_sharpe_like": {
+   "n_rebalance_records": 11,
+   "window_end": "2026-11-11",
+   "n_days": 242,
+   "n_rebalances": 11,
+   "net_return_pct": -22.1974,
+   "gross_return_pct": -21.6262,
+   "ann_return_pct": -23.084,
+   "ann_vol_pct": 27.344,
+   "sharpe_rf0": -0.8442,
+   "mdd_pct": -38.5208,
+   "calmar": -0.5993,
+   "total_cost_pct": 0.7199,
+   "cost_drag_pp": 0.5712,
+   "turnover": 6.6383,
+   "n_rejected_trades": 2,
+   "price_coverage_mean": 1.0,
+   "coverage_gate_ok": true
+  },
+  "R3_abs_IC_BANNED": {
+   "n_rebalance_records": 11,
+   "window_end": "2026-11-11",
+   "n_days": 242,
+   "n_rebalances": 11,
+   "net_return_pct": -8.6911,
+   "gross_return_pct": -7.9993,
+   "ann_return_pct": -9.069,
+   "ann_vol_pct": 25.932,
+   "sharpe_rf0": -0.3497,
+   "mdd_pct": -25.2442,
+   "calmar": -0.3593,
+   "total_cost_pct": 0.7924,
+   "cost_drag_pp": 0.6918,
+   "turnover": 6.94,
+   "n_rejected_trades": 1,
+   "price_coverage_mean": 1.0,
+   "coverage_gate_ok": true
+  },
+  "R4_shrinkage_prior": {
+   "n_rebalance_records": 11,
+   "window_end": "2026-11-11",
+   "n_days": 242,
+   "n_rebalances": 11,
+   "net_return_pct": -12.7475,
+   "gross_return_pct": -12.2904,
+   "ann_return_pct": -13.289,
+   "ann_vol_pct": 23.736,
+   "sharpe_rf0": -0.5599,
+   "mdd_pct": -27.9476,
+   "calmar": -0.4755,
+   "total_cost_pct": 0.5256,
+   "cost_drag_pp": 0.4571,
+   "turnover": 4.9125,
+   "n_rejected_trades": 3,
+   "price_coverage_mean": 1.0,
+   "coverage_gate_ok": true
+  },
+  "EW_equal_8dim": {
+   "n_rebalance_records": 11,
+   "window_end": "2026-11-11",
+   "n_days": 242,
+   "n_rebalances": 11,
+   "net_return_pct": -23.3504,
+   "gross_return_pct": -22.7713,
+   "ann_return_pct": -24.275,
+   "ann_vol_pct": 26.845,
+   "sharpe_rf0": -0.9043,
+   "mdd_pct": -36.171,
+   "calmar": -0.6711,
+   "total_cost_pct": 0.7272,
+   "cost_drag_pp": 0.5791,
+   "turnover": 6.8317,
+   "n_rejected_trades": 0,
+   "price_coverage_mean": 1.0,
+   "coverage_gate_ok": true
+  }
+ },
+ "oos_like_half_split": {
+  "train_first_test_second": {
+   "test_window": [
+    "2026-04-22",
+    "2026-11-11"
+   ],
+   "weight_fitted_on_first_half_OOS": {
+    "n_rebalance_records": 6,
+    "window_end": "2026-11-11",
+    "n_days": 135,
+    "n_rebalances": 6,
+    "net_return_pct": -3.7249,
+    "gross_return_pct": -3.3297,
+    "ann_return_pct": -6.89,
+    "ann_vol_pct": 27.877,
+    "sharpe_rf0": -0.2472,
+    "mdd_pct": -14.7206,
+    "calmar": -0.468,
+    "total_cost_pct": 0.3942,
+    "cost_drag_pp": 0.3952,
+    "turnover": 3.9032,
+    "n_rejected_trades": 0,
+    "price_coverage_mean": 1.0,
+    "coverage_gate_ok": true
+   },
+   "weight_fitted_on_second_half_IN_SAMPLE": {
+    "n_rebalance_records": 6,
+    "window_end": "2026-11-11",
+    "n_days": 135,
+    "n_rebalances": 6,
+    "net_return_pct": 9.0938,
+    "gross_return_pct": 9.5605,
+    "ann_return_pct": 17.784,
+    "ann_vol_pct": 24.217,
+    "sharpe_rf0": 0.7344,
+    "mdd_pct": -13.1579,
+    "calmar": 1.3516,
+    "total_cost_pct": 0.4231,
+    "cost_drag_pp": 0.4667,
+    "turnover": 4.1632,
+    "n_rejected_trades": 0,
+    "price_coverage_mean": 1.0,
+    "coverage_gate_ok": true
+   },
+   "current_prior_same_window": {
+    "n_rebalance_records": 6,
+    "window_end": "2026-11-11",
+    "n_days": 135,
+    "n_rebalances": 6,
+    "net_return_pct": -4.6134,
+    "gross_return_pct": -4.3059,
+    "ann_return_pct": -8.499,
+    "ann_vol_pct": 27.005,
+    "sharpe_rf0": -0.3147,
+    "mdd_pct": -15.2496,
+    "calmar": -0.5574,
+    "total_cost_pct": 0.2953,
+    "cost_drag_pp": 0.3075,
+    "turnover": 3.1456,
+    "n_rejected_trades": 1,
+    "price_coverage_mean": 1.0,
+    "coverage_gate_ok": true
+   }
+  },
+  "train_second_test_first": {
+   "test_window": [
+    "2025-11-11",
+    "2026-05-22"
+   ],
+   "weight_fitted_on_second_half_OOS": {
+    "n_rebalance_records": 6,
+    "window_end": "2026-05-22",
+    "n_days": 126,
+    "n_rebalances": 6,
+    "net_return_pct": 9.7676,
+    "gross_return_pct": 10.2247,
+    "ann_return_pct": 20.669,
+    "ann_vol_pct": 21.24,
+    "sharpe_rf0": 0.9731,
+    "mdd_pct": -11.0544,
+    "calmar": 1.8698,
+    "total_cost_pct": 0.4589,
+    "cost_drag_pp": 0.4571,
+    "turnover": 3.9905,
+    "n_rejected_trades": 0,
+    "price_coverage_mean": 1.0,
+    "coverage_gate_ok": true
+   },
+   "current_prior_same_window": {
+    "n_rebalance_records": 6,
+    "window_end": "2026-05-22",
+    "n_days": 126,
+    "n_rebalances": 6,
+    "net_return_pct": 0.1177,
+    "gross_return_pct": 0.3684,
+    "ann_return_pct": 0.237,
+    "ann_vol_pct": 18.872,
+    "sharpe_rf0": 0.0126,
+    "mdd_pct": -13.0792,
+    "calmar": 0.0182,
+    "total_cost_pct": 0.2661,
+    "cost_drag_pp": 0.2507,
+    "turnover": 2.4467,
+    "n_rejected_trades": 0,
+    "price_coverage_mean": 1.0,
+    "coverage_gate_ok": true
+   }
+  }
+ },
+ "multi_testing": {
+  "K_now": 365,
+  "thr_now": 3.8135,
+  "K_if_3_new_trials": 368,
+  "thr_if": 3.8156,
+  "K_upper": 812,
+  "thr_upper": 4.0067
+ },
+ "output_schema": {
+  "machine_readable": "data/weight_diagnostic_1y_20261111.json（本文件）",
+  "candidate_weight_object": {
+   "weights": "{dim: float, 0~0.20, Σ=1.00}",
+   "status": "NOT_ADOPTED | ADOPTED",
+   "window": "{start,end,n_snapshots,h,n_eff}",
+   "metrics": "{TopN_head_excess, NW_t, IC, portfolio_net_return, mdd, sharpe, calmar}",
+   "constraints": "verify_weights_round36 同判据：Σ=1 / 单因子≤0.20 / 大类≤0.30 / factor_parity",
+   "gates": "G1~G5 逐门 PASS/FAIL；G5 未过 → 禁称经验证 alpha",
+   "required_disclosures": [
+    "先验权重",
+    "G5未过",
+    "fund盲区0.20/生效Σ",
+    "样本内",
+    "禁按IC排权重",
+    "trial预登记"
+   ]
+  },
+  "human_readable": "weight_diagnostic_1y_20261111.html（单页诊断报告）"
+ },
+ "verdict": "不落地。近1年数据不足以支撑改权重：n_eff=10.75、Top10超额 NW t 最大 1.1608（< Bonferroni 3.8135）、G4 FAIL、前后半段权重 L1 漂移 0.4731 且分段 OOS 方向不一致、G5 n_oos_dates=0。按收缩规则 λ=0，最终权重严格等于现行 v4.19-c1-sustain-gates 先验权重。",
+ "oos_like_interpretation": {
+  "observation": "两个方向的样本外式检验结论相反：前半段定权重→后半段 OOS -3.72%（样本内自拟合 +9.09%）；后半段定权重→前半段 OOS +9.77%（现行先验同窗 +0.12%）。",
+  "why_not_walkforward": "分段窗口存在 h=20 前向收益重叠、未做 purge/embargo；调仓仅 11 次、n_eff≈6，属诊断级而非 G5 walk-forward。",
+  "conclusion": "同一规则换一个切分方向，OOS 结论就翻转 ⇒ 权重由样本切分决定、不由稳定信号决定，不构成可迁移证据。",
+  "formal_requirement": "正式 B 档验证须带 purge/embargo、逐日累积 30+ 个 h20 收益完整可得的样本外截面，并预登记 trial。"
+ }
+}
