@@ -885,6 +885,18 @@ class TestGatedDatesConsecutive(unittest.TestCase):
            ④ 20 个日期在 snapshot_dates 中仍**严格连续** → 披露文案无需改动；
            ⑤ 同日 h=5 +1 截面、h=20 首次 +1 截面，均为同一价格轴推进所致。
            ⇒ 仍是数据覆盖推进，不是判据放宽。
+
+        ⚠️ 2026-11-11（round139）20 → 21，变化来源已逐项核对（非代码改动）：
+           ① `append_klines_latest.py --need 8` 把价格库推进到 2026-11-11
+              （2138 只 × 348 日，有效截面 311→312；新增日期恰为 11-11）；
+           ② `factor_eval.py --optimize-weights` 的价格尾部增量（3304 只、
+              17:15 写回 factor_history.json）补齐 11-10 收盘价，该日才满足
+              「有字段值 + 起止两端有收盘价」→ 进入 dates_after_gate；
+           ③ `snapshot_dates` 90 → 91（只新增 11-11 一个快照），
+              `dates_after_gate` 新增恰为 `2026-11-10`，**删除 0 个**
+              （旧 20 个全部保留），末日 11-09 → 11-10；
+           ④ 21 个日期在 snapshot_dates 中仍**严格连续** → 披露文案无需改动。
+           ⇒ 与 round138 同型：价格轴推进 1 天所致，不是判据放宽。
         """
         import json
         import cs_consecutive as C
@@ -900,12 +912,13 @@ class TestGatedDatesConsecutive(unittest.TestCase):
         sp = C.consecutive_span(ds, axis)
         self.assertTrue(sp["is_consecutive"],
                         f"门槛后日期不再连续（{sp}）—— 页面披露文案需同步复核")
-        self.assertEqual(sp["n"], 20,
+        self.assertEqual(sp["n"], 21,
                          "门槛后截面数变了 —— 请先回答「是哪一步改动的」再更新本数字"
                          "（P0-5 价格补洞时 10→14；round128 数据推进到 11-04 且"
                          "factor_history 补回 10-27 快照后 14→16；round137 价格库"
                          "11-09 增量补齐 11-04~11-06 收盘价后 16→19；round138 价格轴"
-                         "推进 1 天补入 11-09 后 19→20，见 docstring）")
+                         "推进 1 天补入 11-09 后 19→20；round139 K线增量至 11-11 +"
+                         "factor_eval 价格尾部补齐 11-10 收盘价后 20→21，见 docstring）")
         self.assertEqual(sp["n"], len(ds),
                          "连续性探针的 n 必须等于 dates_after_gate 的真实长度")
 
