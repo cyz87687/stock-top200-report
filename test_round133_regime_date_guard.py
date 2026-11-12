@@ -213,9 +213,14 @@ class TestPageArtifacts(unittest.TestCase):
           final_hi 从 11-04 的 0.5837 变成 11-06 的 0.2。原实现直接拿当前
           文件的 final_hi 当「陈旧值」，当日合法数值被误判（裸 '0.2' 在
           个股详情小数里出现上千次）。根因是**判据没绑定日期守卫**。
-          修法（不放宽断言）：① 固定历史事故值写法恒禁，与当前产物无关；
-          ② 仅当 `regime_date_guard` 判当前产物陈旧时，才追加当前 final_hi
-          的可归因写法禁令；③ 产物为当日时改验正向契约（不得残留陈旧标记）。
+          修法（不放宽断言）：① 精确事故值 `0.5837`/`58.37%` 恒禁；
+          ② 仅当 `regime_date_guard` 判当前产物陈旧时，才追加「风险预算 58%」
+          等带语境写法与当前 final_hi 的可归因写法禁令；
+          ③ 产物为当日时改验正向契约（不得残留陈旧标记，且页面写出的
+          风险预算百分比必须等于当日 budget_cap）。
+          ⚠️ 2026-11-12 修：裸「风险预算 58%」曾在当日 budget_cap=0.5846 时
+          误伤合法披露（11-11 预算 57%，故此前未暴露）；真实预算恰好回到
+          58% 时该字符串不再能唯一标识陈旧事故，见下方 ① 注释。
         """
         with open(os.path.join(HERE, 'regime_forecast.json'), encoding='utf-8') as f:
             rf = json.load(f)
@@ -225,24 +230,41 @@ class TestPageArtifacts(unittest.TestCase):
         chk = g.check_payload(rf, m.group(1))
         fh = (rf.get('combine') or {}).get('final_hi')
 
-        # ① 固定历史陈旧值（round133 事故产物 11-04 / 0.5837）恒不得出现
-        forbidden = ('0.5837', '58.37%', '风险预算 58%', '单日最大敞口 58%')
-        # ② 守卫判陈旧 → 追加当前 final_hi 的可归因写法
-        if not chk['ok'] and fh is not None:
-            pct = f"{float(fh) * 100:.0f}%"
-            forbidden = forbidden + (
-                f"风险预算 {pct}", f"单日最大敞口 {pct}",
-                f"{float(fh):.4f}".rstrip('0').rstrip('.'),
-                f"{float(fh) * 100:.2f}%".replace('.00%', '%'),
-            )
+        # ① 唯一无歧义指向 round133 事故产物（11-04 / 0.5837）的精确值恒禁。
+        #    ⚠️ 裸「风险预算 58%」不能唯一标识陈旧事故：2026-11-12 当日
+        #    budget_cap=0.5846 也会在独立页合法写出「风险预算 58%」（建议敞口
+        #    上限 20% = 情绪阶梯 20% 与预算 58% 取小）。真实预算恰好回到 58%
+        #    时原恒禁会误伤当日合法披露，故这类带语境但不带日期的写法
+        #    只在守卫判产物陈旧时禁用。
+        forbidden = ('0.5837', '58.37%')
+        stale_contextual = ('风险预算 58%', '单日最大敞口 58%')
+        # ② 守卫判陈旧 → 追加陈旧语境写法 + 当前 final_hi 的可归因写法
+        if not chk['ok']:
+            forbidden = forbidden + stale_contextual
+            if fh is not None:
+                pct = f"{float(fh) * 100:.0f}%"
+                forbidden = forbidden + (
+                    f"风险预算 {pct}", f"单日最大敞口 {pct}",
+                    f"{float(fh):.4f}".rstrip('0').rstrip('.'),
+                    f"{float(fh) * 100:.2f}%".replace('.00%', '%'),
+                )
         for page, name in ((self.main, '主页'), (self.detail, '独立页')):
             with self.subTest(page=name):
                 for w in forbidden:
                     self.assertNotIn(w, page, f'{name}仍展示陈旧预算写法 {w}')
-                # ③ 当日产物不得残留陈旧标记（正向契约）
+                # ③ 当日产物不得残留陈旧标记；且页面若写出风险预算百分比，
+                #    必须与当日 budget_cap 一致（防止陈旧预算数字混入）
                 if chk['ok']:
                     self.assertNotIn('STALE_DATE_HIDDEN', page,
                                      f'{name}当日预算仍被标为陈旧')
+                    cap = (rf.get('combine') or {}).get('budget_cap')
+                    if cap is not None:
+                        shown = set(re.findall(r'风险预算\s*(\d+)%', page))
+                        want = f'{float(cap) * 100:.0f}'
+                        self.assertTrue(
+                            all(v == want for v in shown),
+                            f'{name}出现与当日 budget_cap({want}%) 不符的风险预算写法：'
+                            f'{sorted(shown - {want})}')
 
     def test_32_placeholder_is_visible_and_anchor_survives(self):
         self.assertIn('id="sec-mf-pick"', self.detail)

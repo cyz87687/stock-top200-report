@@ -1,0 +1,295 @@
+{
+ "generated_at": "2026-11-12 16:32:28",
+ "date": "2026-11-12",
+ "verdict": "degraded",
+ "verdict_text": "1 个可降级步骤失败，产物已生成但口径不完整",
+ "skip_core": false,
+ "counts": {
+  "total_recorded": 25,
+  "failed_critical": 0,
+  "degraded": 1,
+  "not_run": 0,
+  "not_run_expected": 0
+ },
+ "failed_critical": [],
+ "degraded": [
+  "verify_qfq_anchor"
+ ],
+ "not_run": [],
+ "not_run_expected": [],
+ "unknown_steps": [],
+ "steps": [
+  {
+   "step": "fetch_top200_sina",
+   "kind": "critical",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 15:15:28",
+   "secs": "",
+   "note": "11-12 实跑(前台172s)：全A母体行情+池重建（分层频率判据未接日链，待裁决勿擅改）",
+   "why": "行情源，失败则当天无数据"
+  },
+  {
+   "step": "check_data_fresh",
+   "kind": "critical",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 15:15:29",
+   "secs": "",
+   "note": "11-12 实跑：指数日线多源取max=2026-11-12（新浪滞后11-11/腾讯11-12），价格非陈旧、池覆盖率达标",
+   "why": "数据新鲜度守卫，失败即陈旧数据"
+  },
+  {
+   "step": "step2_stockscorer",
+   "kind": "critical",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 15:34:48",
+   "secs": "484",
+   "note": "11-12 实跑(后台单步8m04s，前台10min上限SIGTERM后改后台同步等待)：top200_scored_2026-11-12.json；权重指纹9347d48f未变",
+   "why": "评分本体，失败则无 scored"
+  },
+  {
+   "step": "archive_fwd_snapshot",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 15:56:10",
+   "secs": "",
+   "note": "11-12 实跑(提前，仅依赖scored)：round142 更正文案后的 caveat 首次落地，已归档历史JSON不回填",
+   "label": "前瞻估值快照归档",
+   "impact": "fwd_pe 覆盖缺失，估值档位不可信"
+  },
+  {
+   "step": "generate_ai_assessment",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 15:56:29",
+   "secs": "",
+   "note": "11-12 实跑(LLM 429 AccountQuotaExceeded，月度配额11-14重置) → fallback=True / source=rule-fallback；页面须显示「规则引擎」徽标 + 本状态note双留痕；评分未使用真实LLM输出",
+   "label": "AI 评估",
+   "impact": "AI 加权维度缺失，总分少一维"
+  },
+  {
+   "step": "selfcheck_pipeline",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 15:57:04",
+   "secs": "",
+   "note": "11-12 实跑(纯本地，scored 十维总分一致性/未定义全局名)：退出码如实记录，未用 || echo 吞掉",
+   "label": "链路自检",
+   "impact": "自检未通过或有可疑项"
+  },
+  {
+   "step": "panel_audit",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 15:57:05",
+   "secs": "",
+   "note": "11-12 实跑(纯本地)：panel_round66 新鲜度与 score_growth 权重盲区审计披露",
+   "label": "面板审计",
+   "impact": "权重盲区未披露 → 读者误以为全部维度都验过"
+  },
+  {
+   "step": "append_klines_latest",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 16:00:49",
+   "secs": "897",
+   "note": "11-12 实跑(后台单步14m57s，前台10min上限SIGTERM后改后台)：2133只追加/新增日期2026-11-12/失败1只，价格库35.55MB；cutoff=None已纳入当日定稿K线",
+   "label": "价格库增量",
+   "impact": "archive 会用陈旧价 → fund 维覆盖率下降"
+  },
+  {
+   "step": "refresh_kline_meta",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 16:00:50",
+   "secs": "",
+   "note": "11-12 实跑：有效横截面口径在 K线写回后刷新",
+   "label": "有效截面口径刷新",
+   "impact": "建库初期无效日（36 日/截面<150 只）仍被下游当作有效截面"
+  },
+  {
+   "step": "verify_qfq_anchor",
+   "kind": "degradable",
+   "ok": false,
+   "rc": 4,
+   "at": "2026-11-12 16:01:01",
+   "secs": "",
+   "note": "11-12 实跑：前复权锚点分片轮转自检（rc=4 表示源级失效，须按 data/qfq_anchor_audit.json 判读）",
+   "label": "前复权锚点自检",
+   "impact": "检出锚点漂移 → 跨除权日收益率失真，回测收益可能偏低"
+  },
+  {
+   "step": "archive_fund_universe",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 16:02:34",
+   "secs": "1",
+   "note": "11-12 实跑(1s)：K线写回后才跑；round142 更正后的 caveat 首次落地，历史归档不回填",
+   "label": "fund 全域归档",
+   "impact": "fund 维（权重 .20）覆盖率停在旧值"
+  },
+  {
+   "step": "enhance_scores",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 16:03:34",
+   "secs": "10",
+   "note": "11-12 实跑(10s)：AI fallback 规则引擎输出，增强项写入；advice 由本步覆盖",
+   "label": "评分增强",
+   "impact": "增强项未写入，总分口径回退"
+  },
+  {
+   "step": "sector_momentum_daily",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 16:06:13",
+   "secs": "",
+   "note": "11-12 实跑：行业动量计算",
+   "label": "行业动量",
+   "impact": "行业动量未计算"
+  },
+  {
+   "step": "apply_sector_momentum",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 16:06:13",
+   "secs": "",
+   "note": "11-12 实跑：行业维并入 total（与权重声明一致），与 enhance 必须跟跑",
+   "label": "行业维合并",
+   "impact": "total 未含行业维 → 与权重声明不符"
+  },
+  {
+   "step": "long_panel_ic",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 16:06:41",
+   "secs": "",
+   "note": "11-12 实跑：ic_long_2020 年龄7.67d>=7d触发重建。⚠️日链既有bug：fetch_klines_2020.py 未定义 --skip-cached(exit2)，今日改用等价幂等命令(缓存全命中)手工补跑，三步 rc=0/0/0；h20 liq IC=+0.0492/NWt=5.6/DSR=0.9993；修脚本/日链待裁决",
+   "label": "长面板 h=20 权威 IC 重建",
+   "impact": "h=20 IC 停在上一版；页面显示的 long_panel_ic 已陈旧，不得当作当日结论"
+  },
+  {
+   "step": "pick_portfolio",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 16:08:33",
+   "secs": "",
+   "note": "11-12 重跑(先补 fetch_bench+regime_model 到11-12，消除 STALE_DATE_HIDDEN)：Top10 组合，per-sector3/per-parent2",
+   "label": "组合生成",
+   "impact": "当日无组合建议"
+  },
+  {
+   "step": "portfolio_risk",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 16:08:34",
+   "secs": "",
+   "note": "11-12 重跑：risk 块回填到日期一致后的组合",
+   "label": "组合层风险度量",
+   "impact": "组合波动/beta/回望回撤缺失 → 读者看不到持仓的固有风险，只能看到「选了什么」，看不到「这些票一起会怎么动」"
+  },
+  {
+   "step": "track_recommendations",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 16:09:50",
+   "secs": "",
+   "note": "11-12 重跑：跟踪曲线按日期一致组合刷新",
+   "label": "推荐跟踪",
+   "impact": "跟踪曲线断点"
+  },
+  {
+   "step": "portfolio_metrics",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 16:09:51",
+   "secs": "",
+   "note": "11-12 重跑：组合日频指标（依赖 track）",
+   "label": "组合日频指标",
+   "impact": "推荐组合的收益/回撤/重叠度停在上一日 → 换手率与回撤视图陈旧"
+  },
+  {
+   "step": "fetch_bench",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 16:08:16",
+   "secs": "",
+   "note": "11-12 实跑(提前到选股前)：指数基准增量，供 regime 日期门禁使用",
+   "label": "指数基准",
+   "impact": "市场状态可能基于陈旧指数而失真"
+  },
+  {
+   "step": "regime_model",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 16:08:17",
+   "secs": "",
+   "note": "11-12 实跑(提前到选股前)：exit2=日期门禁拦截；须指数日期=数据日期才写 regime_forecast.json",
+   "label": "市场状态与风险预算",
+   "impact": "报告显示管道告警占位"
+  },
+  {
+   "step": "fetch_focus_list",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 16:08:18",
+   "secs": "",
+   "note": "11-12 实跑：AI 关注池 Top40（依赖 scored）",
+   "label": "AI 关注池",
+   "impact": "关注池停在上一日"
+  },
+  {
+   "step": "orphan_scan",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 16:11:11",
+   "secs": "",
+   "note": "11-12 实跑(手工分批，日链 prune 段与11-11同口径未执行)：孤儿 json 归档（只移不删）",
+   "label": "孤儿 json 归档",
+   "impact": "根目录继续膨胀，但当日数字不受影响"
+  },
+  {
+   "step": "factor_eval",
+   "kind": "degradable",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 16:31:37",
+   "secs": "1789",
+   "note": "11-12 实跑(后台29m49s)：价格尾部3322只；权重守卫拦截拟合(v3.6-fund-led)→另存 factor_weights_optimized_20261112.json，主文件指纹9347d48f未变；factor_ic.json 21因子×3周期有效截面92(剔除陈旧7)",
+   "label": "因子 IC + 权重重估",
+   "impact": "IC/权重视图停在上一日"
+  },
+  {
+   "step": "gen_report_top200",
+   "kind": "critical",
+   "ok": true,
+   "rc": 0,
+   "at": "2026-11-12 16:32:09",
+   "secs": "",
+   "note": "11-12 实跑：SHOW_CORE_ONLY=True 主页仅核心评分；过程分析→analysis_2026-11-12.html；AI 规则引擎徽标+状态note双留痕",
+   "why": "报告生成，失败则无产物"
+  }
+ ],
+ "note": "fail-open 步骤失败不阻断主链，但会在报告里披露；「未执行」不等于「成功」——SKIP_CORE 幂等跳过计入 not_run_expected，其余缺步骤计入 not_run 并降级为 degraded。"
+}
