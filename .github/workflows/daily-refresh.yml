@@ -70,9 +70,14 @@ jobs:
           # 背景: GitHub Actions schedule 存在 4.8~8.8 小时系统性排队延迟(实测 289~528 分钟),
           #       故改为「WorkBuddy 定时任务准点触发 workflow_dispatch」为主 + 原 schedule 兜底。
           #       两条触发路径可能同日先后到达 → 用当日数据文件是否已存在做去重:
-          #       若当日 scored json 已提交(说明今日已刷新成功), 则本次直接跳过, 不再重复跑 15 分钟。
+          #       若当日 scored json 或日报 HTML 已提交(说明今日已刷新成功, 含本地日更推送的产物),
+          #       则本次直接跳过, 不再重复跑 15 分钟。
+          #   【2026-11-12 修订】守卫同时认 top200_report_<当日>.html: 本地 run_daily_local.sh
+          #       日更链只推送报告 HTML 与状态文件, 不推送 scored json(gitignore 策略)。
+          #       若只查 scored json, 本地已更新后云端会重跑同一天, 用较弱的云端数据
+          #       覆盖本地已核验的页面 —— 与「本地为权威、云端兜底」的分层相悖。
           BJ_TODAY=$(date -u -d '+8 hours' '+%Y-%m-%d')
-          if [ -f "top200_scored_${BJ_TODAY}.json" ]; then
+          if [ -f "top200_scored_${BJ_TODAY}.json" ] || [ -f "top200_report_${BJ_TODAY}.html" ]; then
             echo "=== 今日($BJ_TODAY)数据已存在, 跳过重复刷新 ===" >> $LOG
             echo "skip=already_refreshed_today" >> $GITHUB_OUTPUT
             echo "result=skip" >> $GITHUB_OUTPUT
