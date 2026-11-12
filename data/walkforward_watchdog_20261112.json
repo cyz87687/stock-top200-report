@@ -1,0 +1,82 @@
+{
+ "purpose": "常驻式 walk-forward 看门（独立脚本，未接日链）",
+ "source_artifact": "/Users/yzreal/WorkBuddy/2026-07-24-18-07-15/stock-top200-report/data/weight_diagnostic_5y_20261111.json",
+ "scope": {
+  "scope": "proxy-diagnostic",
+  "artifact_status": "PROXY_ONLY",
+  "comparable": false,
+  "factor_parity": false,
+  "kernel_id": "1b5770b7152d14a6",
+  "current_kernel_id": "1b5770b7152d14a6",
+  "reason": "因子为历史代理实现，未逐维复现生产算法",
+  "watermark": "red",
+  "weight_approval_allowed": false,
+  "disclosure": "PROXY_ONLY / 代理面板诊断：仅用于因子方向探索，不得用于权重审批，不得写作「经验证的 alpha」。",
+  "proxy_dims": {
+   "score_size_growth": "流通市值分位（小市值优先），非生产 size_growth 复合分",
+   "score_quality": "ROE 单指标分位，非生产三族质量分",
+   "score_growth": "归母净利同比分位，非生产成长存量+方式B+三门槛",
+   "score_fund": "逐日资金流无历史快照 → 全 None（真盲区）",
+   "score_dominant": "业务份额回填，未含生产门禁"
+  }
+ },
+ "checks": {
+  "five_door_verdict": "FAIL",
+  "gates": {
+   "g1_monotonic_robust": true,
+   "g2_spread_positive": true,
+   "g5_wf_pass_rate": false,
+   "g3_beat_ew": false,
+   "g4_beat_single": true
+  },
+  "failed_gates": [
+   "g5_wf_pass_rate",
+   "g3_beat_ew"
+  ],
+  "g5_folds": 6,
+  "g5_n_pass": 2,
+  "g5_pass_rate": 0.3333,
+  "g5_pass_rate_threshold": 0.5,
+  "g1_strict_in_folds": 1,
+  "purged_cross_L1_drift": 0.4,
+  "purged_cross_purge_each_side": 20,
+  "max_single_dim_head_excess_nw_t19": 0.7639,
+  "composite_head_excess_nw_t19": 2.0865,
+  "bonferroni_threshold": 3.8135,
+  "lambda": 0.0,
+  "lambda_if_composite_t": 0.047698,
+  "n_effective_obs": 59.2,
+  "negative_head_dims": 7,
+  "n_scored_dims": 9,
+  "negative_head_ratio": 0.7777777777777778,
+  "consecutive_tail_fold_failures": 2,
+  "source_reported_should_change": false,
+  "source_status": "NOT_ADOPTED"
+ },
+ "alerts": [
+  "连续 2 折失效",
+  "带 purge 双向交叉权重 L1 漂移 0.4000 > 0.25（不稳定）",
+  "头部超额持续转负：7/9 生效维为负（78%）",
+  "λ=0.0000 ≈ 0，权重变更入口锁定",
+  "数据源为 PROXY_ONLY，仅允许 proxy-diagnostic 链路"
+ ],
+ "blockers": [
+  "非 pit-valid 产物，不得进入权重审批",
+  "五门 verdict=FAIL，未过项=['g5_wf_pass_rate', 'g3_beat_ew']",
+  "G5 折通过率 0.3333 < 阈值 0.5",
+  "权重 L1 漂移超限或缺失（0.4）",
+  "λ 未达解锁条件（0.0）",
+  "生效单因子头部超额最大 NW t 0.7639 < Bonferroni 3.8135"
+ ],
+ "should_change_weights": false,
+ "requires_manual_arbitration": true,
+ "weights_modified": false,
+ "disclosures": [
+  "G5 walk-forward 现有实现训练/验证段直接相接，无 purge/embargo；本看门不改写它。",
+  "带 purge 的双向交叉验证来自 5y 诊断产物，属诊断级补充，不替代 G5 裁决。",
+  "只输出 should_change_weights，不自动改权重；任何变更仍须五门 + 八处同步 + trial 预登记 + 老大裁决。",
+  "G5 未过 ⇒ 禁称「经验证的 alpha」；IC 与头部超额方向相反 ⇒ 禁按 IC 排权重。",
+  "PROXY_ONLY / 代理面板诊断：仅用于因子方向探索，不得用于权重审批，不得写作「经验证的 alpha」。"
+ ],
+ "red_line": "即使 should_change_weights=true，也须五门 + 八处同步 + trial 预登记 + verify_weights_round36 PASS + 老大裁决后方可落地。"
+}
