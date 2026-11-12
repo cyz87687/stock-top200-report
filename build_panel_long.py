@@ -7,13 +7,20 @@
 
 维度口径（严格对齐 step2_stockscorer_v2.py，避免 round123b 那种「回填时用旧口径」）：
     score_bias60 / score_rsi_rev  → 池内分位连续（reversal_rank，DIM_MAX=5）
-    score_tech_neg               → 偏离 20 日高点 + 缺口，DIM_MAX=10
+    score_tech_neg               → 偏离 20 日高点（**反号**：越超跌分越高），DIM_MAX=10
+                                   ⚠️ 仍是代理：生产为四因子综合分反号，非单一距离指标
     score_lowvol20               → 20 日已实现波动，DIM_MAX=10
     score_size_growth            → 流通市值分位（小市值优先），DIM_MAX=10
     score_ep                     → 1/PE 分位（用流通市值/净利推），DIM_MAX=10
     score_quality / score_growth → 财务 PIT（法定披露截止日截断），DIM_MAX=10
     score_dominant               → 业务份额组内前 30% 有值，DIM_MAX=10
-    score_fund                   → 主力净流入，**历史不可回填** → 全 None（显式）
+    score_fund                   → 长面板不含此维（显式不构造）
+                                   ⚠️ 定义更正（round142）：生产 score_fund 是
+                                   「估值/基本面复合分」(step2_stockscorer_v2.py:1671,
+                                   FwdPE / PEG / 估值阶梯 / roe / gm / cagr3 / q3_info)，
+                                   **不是**「主力净流入逐日资金流」——旧注释是事实错误。
+                                   缺口成因是缺历史 fwd_pe / pe_ladder vintage 与
+                                   PIT 财务版本，不是「资金流无快照」。
 
 输出原始字段（round124 P0-B 缺口）：
     price / circ_mv / total_mv / amount / turnover_ratio / pe / pb
@@ -373,7 +380,17 @@ def main():
         s_bias = rank5(bias_raw, higher_better=False)     # 越低越好（超跌）
         s_rsi = rank5(rsi_raw, higher_better=False)       # 越低越好
         s_lowvol = rank10(lowvol_raw, higher_better=False)
-        s_techneg = rank10(techneg_raw, higher_better=True)  # 越接近高点越好
+        # ── round142（2026-11-12）P0-3：score_tech_neg 方向对齐生产口径 ──
+        # 原实现 rank10(techneg_raw, higher_better=True) = 越接近 20 日高点分越高，
+        #   是「动量/追高」方向；生产 step2_stockscorer_v2.py:5477 为
+        #   s_tech_neg = 10 − score_tech（技术面反号 = 反转/超跌优先），方向**相反**。
+        #   实证：data/proxy_vs_prod_rank_20261112.json 中 ρ = −0.5657（唯一负相关维）。
+        #   rank10 严格对称：rank10(v, False) ≡ DIM_MAX_STD − rank10(v, True)，
+        #   故只需翻 higher_better 即可等价换算，不必重建整张历史面板。
+        # ⚠️ 仍是代理：生产 score_tech 是趋势/MACD/量能/形态四因子综合分，
+        #    本面板仅用「偏离 20 日高点距离」单指标；方向对齐 ≠ 口径等价。
+        #    ρ 未达 0.70 前必须保留 PROXY_ONLY 标记与红色告警，不得据此调权重。
+        s_techneg = rank10(techneg_raw, higher_better=False)  # 越超跌分越高（对齐生产反号）
         s_sizeg = rank10(cmv, higher_better=False)        # 小市值优先
 
         # ⚠️ score_ep 必须是「盈利收益率 = 净利润/流通市值」，不是 1/流通市值（本轮血案）

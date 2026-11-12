@@ -1,0 +1,1083 @@
+{
+ "purpose": "同一交易日 代理面板值 vs 生产快照分 的 Spearman 秩相关",
+ "generated_at_note": "由 proxy_vs_prod_rank.py 实跑生成",
+ "method": {
+  "rho": "Spearman（平均秩处理 ties），n >= 20",
+  "thresholds": {
+   "equivalence": 0.85,
+   "red_alert": 0.7
+  },
+  "threshold_source": "probe_fund_calib.py:229-233 唯一判读口径"
+ },
+ "honesty_boundary": "本地无 PIT vintage 数据（0/272240 行带公告时点/修订号），本对照是「代理 vs 生产快照」，不是「代理 vs 严格 PIT」；长面板 factor_parity=False / PROXY_ONLY，结论仅用于因子对齐排期。另：生产快照存在历史字段断层，早期截面无八维因子分，故秩相关只在字段实际存在的日期上计算，不补齐、不插值。round142：rho_direction_aligned 只按 DMAX−v 做方向换算预览，既存 panel_r124_mat.npz 未重建，源码修正尚未反映到历史面板，verdict 仍以当前面板实测 rho 为准，禁把预览值当验收值。",
+ "alignment_preview": {
+  "dims": [
+   "score_tech_neg"
+  ],
+  "panel_npz_rebuilt": false,
+  "next_action": "重建长面板后重跑本脚本，用真实 rho 验收；验收未达 0.70 前保持 PROXY_ONLY 与红色告警"
+ },
+ "panel": {
+  "dims": [
+   "score_bias60",
+   "score_rsi_rev",
+   "score_lowvol20",
+   "score_tech_neg",
+   "score_size_growth",
+   "score_ep",
+   "score_quality",
+   "score_growth",
+   "score_dominant"
+  ],
+  "panel_only_dims": [
+   "score_ep"
+  ],
+  "n_dates": 1653,
+  "date_range": [
+   "2020-01-02",
+   "2026-10-30"
+  ]
+ },
+ "prod": {
+  "n_snapshots": 98,
+  "prod_only_score_dims": [
+   "score_attention",
+   "score_fund",
+   "score_news",
+   "score_overbought",
+   "score_oversold60",
+   "score_sector",
+   "score_size",
+   "score_tech",
+   "score_theme",
+   "score_theme_intrinsic",
+   "score_theme_neg",
+   "score_vol_pulse"
+  ],
+  "n_union_fields": 26,
+  "field_coverage": [
+   {
+    "date": "2026-06-26",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-06-29",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-06-30",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-01",
+    "n_fields": 7,
+    "n_rows": 192,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-02",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-03",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-06",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-07",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-08",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-09",
+    "n_fields": 7,
+    "n_rows": 192,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-10",
+    "n_fields": 7,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-13",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-14",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-15",
+    "n_fields": 7,
+    "n_rows": 192,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-16",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-17",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-20",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-21",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-22",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-23",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-24",
+    "n_fields": 7,
+    "n_rows": 192,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-27",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-28",
+    "n_fields": 7,
+    "n_rows": 192,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-29",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-30",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-07-31",
+    "n_fields": 7,
+    "n_rows": 192,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-03",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-04",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-05",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-06",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-07",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-10",
+    "n_fields": 7,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-11",
+    "n_fields": 7,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-12",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-13",
+    "n_fields": 7,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-14",
+    "n_fields": 7,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-17",
+    "n_fields": 7,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-19",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-20",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-21",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-24",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-25",
+    "n_fields": 7,
+    "n_rows": 196,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-26",
+    "n_fields": 7,
+    "n_rows": 190,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-27",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-28",
+    "n_fields": 7,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-08-31",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-01",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-02",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-03",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-04",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-07",
+    "n_fields": 7,
+    "n_rows": 193,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-08",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-09",
+    "n_fields": 7,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-10",
+    "n_fields": 7,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-11",
+    "n_fields": 7,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-14",
+    "n_fields": 7,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-15",
+    "n_fields": 7,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-16",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-17",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-18",
+    "n_fields": 7,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-21",
+    "n_fields": 8,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-22",
+    "n_fields": 8,
+    "n_rows": 196,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-23",
+    "n_fields": 8,
+    "n_rows": 197,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-24",
+    "n_fields": 8,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-25",
+    "n_fields": 8,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-28",
+    "n_fields": 8,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-29",
+    "n_fields": 8,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-09-30",
+    "n_fields": 8,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-01",
+    "n_fields": 8,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-02",
+    "n_fields": 8,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-05",
+    "n_fields": 8,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-06",
+    "n_fields": 8,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-07",
+    "n_fields": 8,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-08",
+    "n_fields": 8,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-09",
+    "n_fields": 8,
+    "n_rows": 194,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-12",
+    "n_fields": 8,
+    "n_rows": 195,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-13",
+    "n_fields": 16,
+    "n_rows": 490,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-14",
+    "n_fields": 16,
+    "n_rows": 490,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-15",
+    "n_fields": 16,
+    "n_rows": 489,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-16",
+    "n_fields": 16,
+    "n_rows": 489,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-19",
+    "n_fields": 16,
+    "n_rows": 491,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-20",
+    "n_fields": 16,
+    "n_rows": 490,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-21",
+    "n_fields": 16,
+    "n_rows": 491,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-22",
+    "n_fields": 16,
+    "n_rows": 489,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-23",
+    "n_fields": 16,
+    "n_rows": 490,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-26",
+    "n_fields": 23,
+    "n_rows": 1895,
+    "has_core_dims": true
+   },
+   {
+    "date": "2026-10-27",
+    "n_fields": 20,
+    "n_rows": 498,
+    "has_core_dims": false
+   },
+   {
+    "date": "2026-10-28",
+    "n_fields": 24,
+    "n_rows": 2696,
+    "has_core_dims": true
+   },
+   {
+    "date": "2026-10-29",
+    "n_fields": 25,
+    "n_rows": 1874,
+    "has_core_dims": true
+   },
+   {
+    "date": "2026-10-30",
+    "n_fields": 24,
+    "n_rows": 2042,
+    "has_core_dims": true
+   },
+   {
+    "date": "2026-11-02",
+    "n_fields": 24,
+    "n_rows": 2084,
+    "has_core_dims": true
+   },
+   {
+    "date": "2026-11-03",
+    "n_fields": 25,
+    "n_rows": 1921,
+    "has_core_dims": true
+   },
+   {
+    "date": "2026-11-04",
+    "n_fields": 25,
+    "n_rows": 2174,
+    "has_core_dims": true
+   },
+   {
+    "date": "2026-11-05",
+    "n_fields": 25,
+    "n_rows": 2190,
+    "has_core_dims": true
+   },
+   {
+    "date": "2026-11-06",
+    "n_fields": 25,
+    "n_rows": 1948,
+    "has_core_dims": true
+   },
+   {
+    "date": "2026-11-09",
+    "n_fields": 25,
+    "n_rows": 1830,
+    "has_core_dims": true
+   },
+   {
+    "date": "2026-11-10",
+    "n_fields": 25,
+    "n_rows": 1890,
+    "has_core_dims": true
+   },
+   {
+    "date": "2026-11-11",
+    "n_fields": 25,
+    "n_rows": 1925,
+    "has_core_dims": true
+   }
+  ],
+  "n_dates_with_core_dims": 12
+ },
+ "overlap": {
+  "n_date_matches": 84,
+  "n_dates_with_rho": 14,
+  "range": [
+   "2026-10-13",
+   "2026-10-30"
+  ],
+  "n_common_dims": 8,
+  "common_dims": [
+   "score_bias60",
+   "score_rsi_rev",
+   "score_lowvol20",
+   "score_tech_neg",
+   "score_size_growth",
+   "score_quality",
+   "score_growth",
+   "score_dominant"
+  ]
+ },
+ "by_dim": {
+  "score_bias60": {
+   "n_days": 14,
+   "rho_mean": 0.9542,
+   "rho_min": 0.9318,
+   "rho_max": 0.9675,
+   "n_below_threshold": 0,
+   "verdict": "EQUIVALENT_CANDIDATE"
+  },
+  "score_rsi_rev": {
+   "n_days": 14,
+   "rho_mean": 0.9,
+   "rho_min": 0.8516,
+   "rho_max": 0.9382,
+   "n_below_threshold": 0,
+   "verdict": "EQUIVALENT_CANDIDATE"
+  },
+  "score_lowvol20": {
+   "n_days": 4,
+   "rho_mean": 0.9872,
+   "rho_min": 0.9799,
+   "rho_max": 0.9925,
+   "n_below_threshold": 0,
+   "verdict": "EQUIVALENT_CANDIDATE"
+  },
+  "score_tech_neg": {
+   "n_days": 4,
+   "rho_mean": -0.5657,
+   "rho_min": -0.6025,
+   "rho_max": -0.5204,
+   "n_below_threshold": 4,
+   "verdict": "RED_ALERT_NOT_EQUIVALENT",
+   "alignment": {
+    "status": "SOURCE_FIXED_PANEL_STALE",
+    "issue": "面板「越接近 20 日高点分越高」= 动量；生产 s_tech_neg = 10 − score_tech = 反转，方向相反",
+    "source_fix": "build_panel_long.py:376 → rank10(..., higher_better=False)",
+    "fixed_at": "2026-11-12",
+    "panel_npz_rebuilt": false,
+    "rho_current_panel": -0.5657,
+    "rho_if_direction_aligned": 0.5657,
+    "verdict_if_aligned": "RED_ALERT_NOT_EQUIVALENT",
+    "note": "换算预览，非已落地验收；npz 未重建前不得据此解除 PROXY_ONLY 标记、不得进入权重审批链路"
+   }
+  },
+  "score_size_growth": {
+   "n_days": 3,
+   "rho_mean": 0.1442,
+   "rho_min": 0.0822,
+   "rho_max": 0.2615,
+   "n_below_threshold": 3,
+   "verdict": "RED_ALERT_NOT_EQUIVALENT"
+  },
+  "score_quality": {
+   "n_days": 4,
+   "rho_mean": 0.1888,
+   "rho_min": -0.2291,
+   "rho_max": 0.3373,
+   "n_below_threshold": 4,
+   "verdict": "RED_ALERT_NOT_EQUIVALENT"
+  },
+  "score_growth": {
+   "n_days": 4,
+   "rho_mean": 0.4373,
+   "rho_min": 0.2417,
+   "rho_max": 0.5143,
+   "n_below_threshold": 4,
+   "verdict": "RED_ALERT_NOT_EQUIVALENT"
+  },
+  "score_dominant": {
+   "n_days": 3,
+   "rho_mean": 0.4367,
+   "rho_min": 0.3819,
+   "rho_max": 0.5345,
+   "n_below_threshold": 3,
+   "verdict": "RED_ALERT_NOT_EQUIVALENT"
+  }
+ },
+ "alerts": [
+  {
+   "dim": "score_tech_neg",
+   "rho_mean": -0.5657,
+   "n_days": 4
+  },
+  {
+   "dim": "score_size_growth",
+   "rho_mean": 0.1442,
+   "n_days": 3
+  },
+  {
+   "dim": "score_quality",
+   "rho_mean": 0.1888,
+   "n_days": 4
+  },
+  {
+   "dim": "score_growth",
+   "rho_mean": 0.4373,
+   "n_days": 4
+  },
+  {
+   "dim": "score_dominant",
+   "rho_mean": 0.4367,
+   "n_days": 3
+  }
+ ],
+ "records": [
+  {
+   "date": "2026-10-13",
+   "dim": "score_bias60",
+   "rho": 0.9452,
+   "n": 476
+  },
+  {
+   "date": "2026-10-13",
+   "dim": "score_rsi_rev",
+   "rho": 0.8984,
+   "n": 481
+  },
+  {
+   "date": "2026-10-14",
+   "dim": "score_bias60",
+   "rho": 0.9382,
+   "n": 466
+  },
+  {
+   "date": "2026-10-14",
+   "dim": "score_rsi_rev",
+   "rho": 0.9144,
+   "n": 469
+  },
+  {
+   "date": "2026-10-15",
+   "dim": "score_bias60",
+   "rho": 0.9531,
+   "n": 465
+  },
+  {
+   "date": "2026-10-15",
+   "dim": "score_rsi_rev",
+   "rho": 0.9241,
+   "n": 466
+  },
+  {
+   "date": "2026-10-16",
+   "dim": "score_bias60",
+   "rho": 0.9582,
+   "n": 462
+  },
+  {
+   "date": "2026-10-16",
+   "dim": "score_rsi_rev",
+   "rho": 0.9382,
+   "n": 464
+  },
+  {
+   "date": "2026-10-19",
+   "dim": "score_bias60",
+   "rho": 0.9545,
+   "n": 465
+  },
+  {
+   "date": "2026-10-19",
+   "dim": "score_rsi_rev",
+   "rho": 0.9352,
+   "n": 469
+  },
+  {
+   "date": "2026-10-20",
+   "dim": "score_bias60",
+   "rho": 0.9568,
+   "n": 470
+  },
+  {
+   "date": "2026-10-20",
+   "dim": "score_rsi_rev",
+   "rho": 0.9285,
+   "n": 472
+  },
+  {
+   "date": "2026-10-21",
+   "dim": "score_bias60",
+   "rho": 0.9561,
+   "n": 469
+  },
+  {
+   "date": "2026-10-21",
+   "dim": "score_rsi_rev",
+   "rho": 0.8899,
+   "n": 471
+  },
+  {
+   "date": "2026-10-22",
+   "dim": "score_bias60",
+   "rho": 0.9558,
+   "n": 470
+  },
+  {
+   "date": "2026-10-22",
+   "dim": "score_rsi_rev",
+   "rho": 0.9053,
+   "n": 471
+  },
+  {
+   "date": "2026-10-23",
+   "dim": "score_bias60",
+   "rho": 0.9617,
+   "n": 474
+  },
+  {
+   "date": "2026-10-23",
+   "dim": "score_rsi_rev",
+   "rho": 0.9107,
+   "n": 476
+  },
+  {
+   "date": "2026-10-26",
+   "dim": "score_bias60",
+   "rho": 0.965,
+   "n": 1870
+  },
+  {
+   "date": "2026-10-26",
+   "dim": "score_rsi_rev",
+   "rho": 0.8956,
+   "n": 1864
+  },
+  {
+   "date": "2026-10-26",
+   "dim": "score_lowvol20",
+   "rho": 0.9799,
+   "n": 1866
+  },
+  {
+   "date": "2026-10-26",
+   "dim": "score_tech_neg",
+   "rho": -0.5846,
+   "n": 1866,
+   "rho_direction_aligned": 0.5846,
+   "alignment_basis": "DMAX − proxy_value（rank10 对称换算预览）"
+  },
+  {
+   "date": "2026-10-26",
+   "dim": "score_quality",
+   "rho": -0.2291,
+   "n": 1871
+  },
+  {
+   "date": "2026-10-26",
+   "dim": "score_growth",
+   "rho": 0.4948,
+   "n": 1872
+  },
+  {
+   "date": "2026-10-27",
+   "dim": "score_bias60",
+   "rho": 0.9577,
+   "n": 374
+  },
+  {
+   "date": "2026-10-27",
+   "dim": "score_rsi_rev",
+   "rho": 0.8623,
+   "n": 374
+  },
+  {
+   "date": "2026-10-28",
+   "dim": "score_bias60",
+   "rho": 0.9675,
+   "n": 1845
+  },
+  {
+   "date": "2026-10-28",
+   "dim": "score_rsi_rev",
+   "rho": 0.8822,
+   "n": 1843
+  },
+  {
+   "date": "2026-10-28",
+   "dim": "score_lowvol20",
+   "rho": 0.9879,
+   "n": 1846
+  },
+  {
+   "date": "2026-10-28",
+   "dim": "score_tech_neg",
+   "rho": -0.6025,
+   "n": 1846,
+   "rho_direction_aligned": 0.6025,
+   "alignment_basis": "DMAX − proxy_value（rank10 对称换算预览）"
+  },
+  {
+   "date": "2026-10-28",
+   "dim": "score_size_growth",
+   "rho": 0.0822,
+   "n": 1415
+  },
+  {
+   "date": "2026-10-28",
+   "dim": "score_quality",
+   "rho": 0.3373,
+   "n": 1851
+  },
+  {
+   "date": "2026-10-28",
+   "dim": "score_growth",
+   "rho": 0.5143,
+   "n": 1851
+  },
+  {
+   "date": "2026-10-28",
+   "dim": "score_dominant",
+   "rho": 0.5345,
+   "n": 431
+  },
+  {
+   "date": "2026-10-29",
+   "dim": "score_bias60",
+   "rho": 0.9565,
+   "n": 1642
+  },
+  {
+   "date": "2026-10-29",
+   "dim": "score_rsi_rev",
+   "rho": 0.8642,
+   "n": 1635
+  },
+  {
+   "date": "2026-10-29",
+   "dim": "score_lowvol20",
+   "rho": 0.9925,
+   "n": 1638
+  },
+  {
+   "date": "2026-10-29",
+   "dim": "score_tech_neg",
+   "rho": -0.5553,
+   "n": 1638,
+   "rho_direction_aligned": 0.5553,
+   "alignment_basis": "DMAX − proxy_value（rank10 对称换算预览）"
+  },
+  {
+   "date": "2026-10-29",
+   "dim": "score_size_growth",
+   "rho": 0.0889,
+   "n": 1180
+  },
+  {
+   "date": "2026-10-29",
+   "dim": "score_quality",
+   "rho": 0.3191,
+   "n": 1642
+  },
+  {
+   "date": "2026-10-29",
+   "dim": "score_growth",
+   "rho": 0.4984,
+   "n": 1642
+  },
+  {
+   "date": "2026-10-29",
+   "dim": "score_dominant",
+   "rho": 0.3936,
+   "n": 444
+  },
+  {
+   "date": "2026-10-30",
+   "dim": "score_bias60",
+   "rho": 0.9318,
+   "n": 1713
+  },
+  {
+   "date": "2026-10-30",
+   "dim": "score_rsi_rev",
+   "rho": 0.8516,
+   "n": 1708
+  },
+  {
+   "date": "2026-10-30",
+   "dim": "score_lowvol20",
+   "rho": 0.9887,
+   "n": 1710
+  },
+  {
+   "date": "2026-10-30",
+   "dim": "score_tech_neg",
+   "rho": -0.5204,
+   "n": 1710,
+   "rho_direction_aligned": 0.5204,
+   "alignment_basis": "DMAX − proxy_value（rank10 对称换算预览）"
+  },
+  {
+   "date": "2026-10-30",
+   "dim": "score_size_growth",
+   "rho": 0.2615,
+   "n": 1221
+  },
+  {
+   "date": "2026-10-30",
+   "dim": "score_quality",
+   "rho": 0.3277,
+   "n": 1714
+  },
+  {
+   "date": "2026-10-30",
+   "dim": "score_growth",
+   "rho": 0.2417,
+   "n": 1714
+  },
+  {
+   "date": "2026-10-30",
+   "dim": "score_dominant",
+   "rho": 0.3819,
+   "n": 481
+  }
+ ]
+}

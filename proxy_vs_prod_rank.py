@@ -11,6 +11,14 @@
 （data/pit_audit_round130.json：0 / 272240 行），因此本脚本比对的是
 「长面板代理值 vs 生产快照分」，**不是**「代理值 vs 严格 PIT 值」。
 后者须等外部多版本财务库接入后才有对照对象。
+
+round142（2026-11-12）新增「方向对齐预览」：
+  build_panel_long.py 已把 score_tech_neg 的方向翻正（动量 → 生产反号），
+  但既有 data/panel_r124_mat.npz 仍是**修改前**生成的旧值，本脚本不重建面板。
+  利用 rank10 的严格对称性 rank10(v, False) ≡ DMAX − rank10(v, True)，
+  对方向修正维额外给出 rho_direction_aligned —— 这是**换算预览**，不是已落地
+  验收结果；npz 未重建前不得据此解除 PROXY_ONLY 标记或进入权重审批。
+  round141 产物 data/proxy_vs_prod_rank_20261112.json 保留不覆盖。
 """
 from __future__ import annotations
 
@@ -23,7 +31,24 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 THRESHOLD = 0.70
 EQUIV_THRESHOLD = 0.85
 MIN_PAIRS = 20
-OUT_JSON = os.path.join(ROOT, "data", "proxy_vs_prod_rank_20261112.json")
+OUT_JSON = os.path.join(ROOT, "data", "proxy_vs_prod_rank_20261112_round142.json")
+
+# 已在源码中定位并翻正方向、但历史 npz 仍是旧值的维度。
+# dim_max 用于 DMAX − v 的等价换算（rank10 对称性），不是新阈值。
+DIRECTION_FIXED_IN_SOURCE = {
+    "score_tech_neg": {
+        "dim_max": 10.0,
+        "issue": ("面板「越接近 20 日高点分越高」= 动量；"
+                  "生产 s_tech_neg = 10 − score_tech = 反转，方向相反"),
+        "source_fix": "build_panel_long.py:376 → rank10(..., higher_better=False)",
+        "date": "2026-11-12",
+    },
+}
+
+
+def direction_aligned_rho(xs, ys, dim_max):
+    """按 DMAX − v 换算后的 Spearman；仅用于诊断预览，不改写历史面板。"""
+    return spearman([dim_max - a for a in xs], ys)
 
 
 def _ranks(a):
@@ -143,8 +168,15 @@ def build_report(root=ROOT):
                 ys.append(v)
             rho = spearman(xs, ys)
             if rho is not None:
-                records.append({"date": date, "dim": dim,
-                                "rho": round(rho, 4), "n": len(xs)})
+                rec = {"date": date, "dim": dim,
+                       "rho": round(rho, 4), "n": len(xs)}
+                fix = DIRECTION_FIXED_IN_SOURCE.get(dim)
+                if fix:
+                    rho_a = direction_aligned_rho(xs, ys, fix["dim_max"])
+                    rec["rho_direction_aligned"] = (
+                        round(rho_a, 4) if rho_a is not None else None)
+                    rec["alignment_basis"] = "DMAX − proxy_value（rank10 对称换算预览）"
+                records.append(rec)
 
     by_dim = {}
     for d in common_dims:
@@ -163,6 +195,30 @@ def build_report(root=ROOT):
                         "PROXY_ONLY" if mean < EQUIV_THRESHOLD else
                         "EQUIVALENT_CANDIDATE"),
         }
+        fix = DIRECTION_FIXED_IN_SOURCE.get(d)
+        if fix:
+            aligned = [x["rho_direction_aligned"] for x in records
+                       if x["dim"] == d
+                       and x.get("rho_direction_aligned") is not None]
+            mean_a = sum(aligned) / len(aligned) if aligned else None
+            by_dim[d]["alignment"] = {
+                "status": "SOURCE_FIXED_PANEL_STALE",
+                "issue": fix["issue"],
+                "source_fix": fix["source_fix"],
+                "fixed_at": fix["date"],
+                "panel_npz_rebuilt": False,
+                "rho_current_panel": round(mean, 4),
+                "rho_if_direction_aligned": (round(mean_a, 4)
+                                             if mean_a is not None else None),
+                "verdict_if_aligned": (
+                    "RED_ALERT_NOT_EQUIVALENT" if mean_a is not None
+                    and mean_a < THRESHOLD else
+                    "PROXY_ONLY" if mean_a is not None
+                    and mean_a < EQUIV_THRESHOLD else
+                    "EQUIVALENT_CANDIDATE" if mean_a is not None else "NO_PAIRS"),
+                "note": ("换算预览，非已落地验收；npz 未重建前不得据此解除 "
+                         "PROXY_ONLY 标记、不得进入权重审批链路"),
+            }
 
     overlap_dates = sorted({x["date"] for x in records})
     alerts = [{"dim": d, "rho_mean": v["rho_mean"], "n_days": v["n_days"]}
@@ -181,7 +237,16 @@ def build_report(root=ROOT):
             "本对照是「代理 vs 生产快照」，不是「代理 vs 严格 PIT」；"
             "长面板 factor_parity=False / PROXY_ONLY，结论仅用于因子对齐排期。"
             "另：生产快照存在历史字段断层，早期截面无八维因子分，"
-            "故秩相关只在字段实际存在的日期上计算，不补齐、不插值。"),
+            "故秩相关只在字段实际存在的日期上计算，不补齐、不插值。"
+            "round142：rho_direction_aligned 只按 DMAX−v 做方向换算预览，"
+            "既存 panel_r124_mat.npz 未重建，源码修正尚未反映到历史面板，"
+            "verdict 仍以当前面板实测 rho 为准，禁把预览值当验收值。"),
+        "alignment_preview": {
+            "dims": sorted(DIRECTION_FIXED_IN_SOURCE),
+            "panel_npz_rebuilt": False,
+            "next_action": ("重建长面板后重跑本脚本，用真实 rho 验收；"
+                            "验收未达 0.70 前保持 PROXY_ONLY 与红色告警"),
+        },
         "panel": {"dims": dims, "panel_only_dims": panel_only,
                   "n_dates": len(dates), "date_range": [dates[0], dates[-1]]},
         "prod": {"n_snapshots": len(prod),
@@ -224,6 +289,14 @@ def main():
             d, v["n_days"], v["rho_mean"], v["rho_min"], v["rho_max"],
             v["n_below_threshold"], v["verdict"]))
     print("\nRED alerts:", len(r["alerts"]))
+    print("\n方向对齐预览（换算值，非验收值；npz 未重建）:")
+    for d in sorted(DIRECTION_FIXED_IN_SOURCE):
+        a = r["by_dim"].get(d, {}).get("alignment")
+        if not a:
+            continue
+        print("  %-22s rho_current=%s  rho_if_aligned=%s  %s" % (
+            d, a["rho_current_panel"], a["rho_if_direction_aligned"],
+            a["verdict_if_aligned"]))
     print("written:", out)
 
 
