@@ -139183,6 +139183,446 @@
    "base_trade_date": "2026-11-12",
    "base_price_raw": 19.04,
    "base_price_qfq": 19.04
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "南华期货",
+   "code": "sh603093",
+   "base_price": 12.14,
+   "total": 69.27,
+   "date": "2026-11-16",
+   "pick_price": 12.14,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "rating",
+   "label": "A",
+   "name": "中远海能",
+   "code": "sh600026",
+   "base_price": 16.54,
+   "total": 67.35,
+   "date": "2026-11-16",
+   "pick_price": 16.54,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "ai_portfolio",
+   "label": "AI组合",
+   "name": "高新发展",
+   "code": "sz000628",
+   "base_price": 46.55,
+   "total": 34.5,
+   "date": "2026-11-16",
+   "pick_price": 46.55,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "ai_portfolio",
+   "label": "AI组合",
+   "name": "北鼎股份",
+   "code": "sz300824",
+   "base_price": 8.6,
+   "total": 35.3,
+   "date": "2026-11-16",
+   "pick_price": 8.6,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "ai_portfolio",
+   "label": "AI组合",
+   "name": "阿石创",
+   "code": "sz300706",
+   "base_price": 40.06,
+   "total": 41.42,
+   "date": "2026-11-16",
+   "pick_price": 40.06,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "ai_portfolio",
+   "label": "AI组合",
+   "name": "回盛生物",
+   "code": "sz300871",
+   "base_price": 18.37,
+   "total": 43.21,
+   "date": "2026-11-16",
+   "pick_price": 18.37,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "华策影视",
+   "code": "sz300133",
+   "base_price": 9.82,
+   "total": 37.73,
+   "date": "2026-11-16",
+   "pick_price": 9.82,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "金健米业",
+   "code": "sh600127",
+   "base_price": 8.9,
+   "total": 35.72,
+   "date": "2026-11-16",
+   "pick_price": 8.9,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "捷成股份",
+   "code": "sz300182",
+   "base_price": 5.71,
+   "total": 35.54,
+   "date": "2026-11-16",
+   "pick_price": 5.71,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "阳光照明",
+   "code": "sh600261",
+   "base_price": 5.18,
+   "total": 33.47,
+   "date": "2026-11-16",
+   "pick_price": 5.18,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "东方海洋",
+   "code": "sz002086",
+   "base_price": 4.34,
+   "total": 33.23,
+   "date": "2026-11-16",
+   "pick_price": 4.34,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_momentum",
+   "label": "量化·momentum",
+   "name": "海洋王",
+   "code": "sz002724",
+   "base_price": 11.71,
+   "total": 28.72,
+   "date": "2026-11-16",
+   "pick_price": 11.71,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_reversal",
+   "label": "量化·reversal",
+   "name": "宏和科技",
+   "code": "sh603256",
+   "base_price": 66.88,
+   "total": 60.57,
+   "date": "2026-11-16",
+   "pick_price": 66.88,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_reversal",
+   "label": "量化·reversal",
+   "name": "生益科技",
+   "code": "sh600183",
+   "base_price": 61.34,
+   "total": 59.82,
+   "date": "2026-11-16",
+   "pick_price": 61.34,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_reversal",
+   "label": "量化·reversal",
+   "name": "风华高科",
+   "code": "sz000636",
+   "base_price": 27.94,
+   "total": 59.73,
+   "date": "2026-11-16",
+   "pick_price": 27.94,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_reversal",
+   "label": "量化·reversal",
+   "name": "东方钽业",
+   "code": "sz000962",
+   "base_price": 33.66,
+   "total": 57.01,
+   "date": "2026-11-16",
+   "pick_price": 33.66,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_reversal",
+   "label": "量化·reversal",
+   "name": "鼎泰高科",
+   "code": "sz301377",
+   "base_price": 173.05,
+   "total": 56.3,
+   "date": "2026-11-16",
+   "pick_price": 173.05,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_reversal",
+   "label": "量化·reversal",
+   "name": "光迅科技",
+   "code": "sz002281",
+   "base_price": 85.55,
+   "total": 56.19,
+   "date": "2026-11-16",
+   "pick_price": 85.55,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_reversal",
+   "label": "量化·reversal",
+   "name": "杰瑞股份",
+   "code": "sz002353",
+   "base_price": 70.8,
+   "total": 53.26,
+   "date": "2026-11-16",
+   "pick_price": 70.8,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_reversal",
+   "label": "量化·reversal",
+   "name": "麦格米特",
+   "code": "sz002851",
+   "base_price": 64.62,
+   "total": 37.78,
+   "date": "2026-11-16",
+   "pick_price": 64.62,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_reversal",
+   "label": "量化·reversal",
+   "name": "智微智能",
+   "code": "sz001339",
+   "base_price": 56.59,
+   "total": 57.79,
+   "date": "2026-11-16",
+   "pick_price": 56.59,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
+  },
+  {
+   "kind": "quant_reversal",
+   "label": "量化·reversal",
+   "name": "联瑞新材",
+   "code": "sh688300",
+   "base_price": 73.31,
+   "total": 57.47,
+   "date": "2026-11-16",
+   "pick_price": 73.31,
+   "rets": {
+    "1": null,
+    "5": null,
+    "20": null
+   },
+   "excess": {
+    "1": null,
+    "5": null,
+    "20": null
+   }
   }
  ],
  "_meta": {
