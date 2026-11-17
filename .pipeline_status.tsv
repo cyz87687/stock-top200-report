@@ -1,30 +1,28 @@
-fetch_top200_sina	0	1		2026-11-12 15:15:28	11-12 实跑(前台172s)：全A母体行情+池重建（分层频率判据未接日链，待裁决勿擅改）
-check_data_fresh	0	1		2026-11-12 15:15:29	11-12 实跑：指数日线多源取max=2026-11-12（新浪滞后11-11/腾讯11-12），价格非陈旧、池覆盖率达标
-step2_stockscorer	0	1	484	2026-11-12 15:34:48	11-12 实跑(后台单步8m04s，前台10min上限SIGTERM后改后台同步等待)：top200_scored_2026-11-12.json；权重指纹9347d48f未变
-archive_fwd_snapshot	0	1		2026-11-12 15:56:10	11-12 实跑(提前，仅依赖scored)：round142 更正文案后的 caveat 首次落地，已归档历史JSON不回填
-generate_ai_assessment	0	1		2026-11-12 15:56:13	11-12 实跑(提前)：source ./.llm_env；fallback 判读见 ai_assessment.json，若 fallback=True 须页面徽标+状态note双留痕
-generate_ai_assessment	0	1		2026-11-12 15:56:29	11-12 实跑(LLM 429 AccountQuotaExceeded，月度配额11-14重置) → fallback=True / source=rule-fallback；页面须显示「规则引擎」徽标 + 本状态note双留痕；评分未使用真实LLM输出
-selfcheck_pipeline	0	1		2026-11-12 15:57:04	11-12 实跑(纯本地，scored 十维总分一致性/未定义全局名)：退出码如实记录，未用 || echo 吞掉
-panel_audit	0	1		2026-11-12 15:57:05	11-12 实跑(纯本地)：panel_round66 新鲜度与 score_growth 权重盲区审计披露
-append_klines_latest	0	1	897	2026-11-12 16:00:49	11-12 实跑(后台单步14m57s，前台10min上限SIGTERM后改后台)：2133只追加/新增日期2026-11-12/失败1只，价格库35.55MB；cutoff=None已纳入当日定稿K线
-refresh_kline_meta	0	1		2026-11-12 16:00:50	11-12 实跑：有效横截面口径在 K线写回后刷新
-verify_qfq_anchor	4	0		2026-11-12 16:01:01	11-12 实跑：前复权锚点分片轮转自检（rc=4 表示源级失效，须按 data/qfq_anchor_audit.json 判读）
-archive_fund_universe	0	1	1	2026-11-12 16:02:34	11-12 实跑(1s)：K线写回后才跑；round142 更正后的 caveat 首次落地，历史归档不回填
-enhance_scores	0	1	10	2026-11-12 16:03:34	11-12 实跑(10s)：AI fallback 规则引擎输出，增强项写入；advice 由本步覆盖
-sector_momentum_daily	0	1		2026-11-12 16:06:13	11-12 实跑：行业动量计算
-apply_sector_momentum	0	1		2026-11-12 16:06:13	11-12 实跑：行业维并入 total（与权重声明一致），与 enhance 必须跟跑
-long_panel_ic	0	1		2026-11-12 16:06:41	11-12 实跑：ic_long_2020 年龄7.67d>=7d触发重建。⚠️日链既有bug：fetch_klines_2020.py 未定义 --skip-cached(exit2)，今日改用等价幂等命令(缓存全命中)手工补跑，三步 rc=0/0/0；h20 liq IC=+0.0492/NWt=5.6/DSR=0.9993；修脚本/日链待裁决
-pick_portfolio	0	1		2026-11-12 16:06:41	11-12 实跑：Top10 组合，per-sector3/per-parent2
-portfolio_risk	0	1		2026-11-12 16:06:42	11-12 实跑：组合层波动/beta/回撤回填（r.get(k) 防空，append 今日已成功故 window 字段应齐）
-track_recommendations	0	1		2026-11-12 16:07:46	11-12 实跑：推荐跟踪曲线增量
-portfolio_metrics	0	1		2026-11-12 16:07:47	11-12 实跑：组合日频指标（依赖 track，顺序在其后）
-fetch_bench	0	1		2026-11-12 16:08:16	11-12 实跑(提前到选股前)：指数基准增量，供 regime 日期门禁使用
-regime_model	0	1		2026-11-12 16:08:17	11-12 实跑(提前到选股前)：exit2=日期门禁拦截；须指数日期=数据日期才写 regime_forecast.json
-fetch_focus_list	0	1		2026-11-12 16:08:18	11-12 实跑：AI 关注池 Top40（依赖 scored）
-pick_portfolio	0	1		2026-11-12 16:08:33	11-12 重跑(先补 fetch_bench+regime_model 到11-12，消除 STALE_DATE_HIDDEN)：Top10 组合，per-sector3/per-parent2
-portfolio_risk	0	1		2026-11-12 16:08:34	11-12 重跑：risk 块回填到日期一致后的组合
-track_recommendations	0	1		2026-11-12 16:09:50	11-12 重跑：跟踪曲线按日期一致组合刷新
-portfolio_metrics	0	1		2026-11-12 16:09:51	11-12 重跑：组合日频指标（依赖 track）
-orphan_scan	0	1		2026-11-12 16:11:11	11-12 实跑(手工分批，日链 prune 段与11-11同口径未执行)：孤儿 json 归档（只移不删）
-factor_eval	0	1	1789	2026-11-12 16:31:37	11-12 实跑(后台29m49s)：价格尾部3322只；权重守卫拦截拟合(v3.6-fund-led)→另存 factor_weights_optimized_20261112.json，主文件指纹9347d48f未变；factor_ic.json 21因子×3周期有效截面92(剔除陈旧7)
-gen_report_top200	0	1		2026-11-12 16:32:09	11-12 实跑：SHOW_CORE_ONLY=True 主页仅核心评分；过程分析→analysis_2026-11-12.html；AI 规则引擎徽标+状态note双留痕
+fetch_top200_sina	0	1		2026-11-16 23:49:05	11-16 手工分批实跑：主力池1829只，新浪接口；行情日期2026-11-16
+check_data_fresh	0	1		2026-11-16 23:49:06	11-16 手工分批实跑
+step2_stockscorer	0	1		2026-11-16 23:57:02	11-16 手工分批实跑：7m40s，主力池1829只，产出 top200_scored_2026-11-16.json
+append_klines_latest	0	1		2026-11-17 00:04:10	11-16 手工分批实跑
+refresh_kline_meta	0	1		2026-11-17 00:04:26	11-16 手工分批实跑
+verify_qfq_anchor	4	0		2026-11-17 00:04:36	11-16 手工分批实跑
+archive_fund_universe	0	1		2026-11-17 00:04:51	11-16 手工分批实跑
+archive_fwd_snapshot	0	1		2026-11-17 00:04:51	11-16 手工分批实跑
+generate_ai_assessment	0	1		2026-11-17 00:05:15	11-16 手工分批实跑
+enhance_scores	0	1		2026-11-17 00:05:31	11-16 手工分批实跑
+sector_momentum_daily	0	1		2026-11-17 00:07:13	11-16 手工分批实跑
+apply_sector_momentum	2	0		2026-11-17 00:07:13	11-16 手工分批实跑
+pick_portfolio	2	0		2026-11-17 00:07:14	11-16 手工分批实跑
+portfolio_risk	0	1		2026-11-17 00:07:14	11-16 手工分批实跑
+apply_sector_momentum	0	1		2026-11-17 00:07:39	11-16 手工分批实跑
+pick_portfolio	0	1		2026-11-17 00:07:39	11-16 手工分批实跑
+fetch_bench	0	1		2026-11-17 00:07:48	11-16 手工分批实跑
+regime_model	0	1		2026-11-17 00:07:48	11-16 手工分批实跑
+track_recommendations	0	1		2026-11-17 00:08:55	11-16 手工分批实跑
+portfolio_metrics	0	1		2026-11-17 00:08:55	11-16 手工分批实跑
+panel_audit	0	1		2026-11-17 00:08:56	11-16 手工分批实跑
+long_panel_ic	0	1		2026-11-17 00:24:27	11-16：ic_long_2020.json 新鲜度4d<7d阈值，按设计跳过重建（fetch_klines_2020 --skip-cached 参数bug仍在，未触发）
+selfcheck_pipeline	0	1		2026-11-17 00:24:28	11-16 手工分批实跑
+fetch_focus_list	0	1		2026-11-17 00:24:29	11-16 手工分批实跑（显式 --date 2026-11-16，系统时钟已跨午夜）
+factor_eval	0	1		2026-11-17 00:33:23	11-16 手工分批实跑
+gen_report_top200	0	1		2026-11-17 00:34:05	11-16 手工分批实跑
+gen_report_top200	0	1		2026-11-17 00:35:10	11-16 手工分批实跑：补跑多因子段后重出，组合区块正常展示
+orphan_scan	0	1		2026-11-17 00:35:26	11-16 手工分批实跑（只归档不删除）

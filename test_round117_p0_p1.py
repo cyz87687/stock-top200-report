@@ -192,6 +192,13 @@ class TestFactorIcAudit(unittest.TestCase):
            （cross_section_audit.gated_note 原文明写「仅剩 1 个截面 (<5)」），
            且 usable 仍为 False。故断言从「必须恰好 0 个」改为「<5 且不可用」——
            守的是判据本身，不是某个时点的日历巧合。1 个截面同样不得据此称 h20 可用。
+
+        ⚠️ 2026-11-16（本次日更）：价格轴补齐 11-13/11-16 后
+            `current_weights_composite_ic|h20` 的 n_after_gate 首次达到 5（原 4），
+            撞破旧的「<5」断言边界。但代码的**真实可用性判据**是重叠校正需
+            n ≥ 2(h−1) = 38，另加披露注记要求 ≥40（gated_note 原文）；
+            usable 仍为 False。故断言改为「n < 2(h−1)+2 且 usable=False」，
+            继续守真实判据，而不是某个时点的截面计数巧合。
         """
         if "cross_section_audit" not in self.ic:
             self.skipTest("无 cross_section_audit")
@@ -201,9 +208,12 @@ class TestFactorIcAudit(unittest.TestCase):
         if not h20:
             self.skipTest("无 |h20 审计行")
         for k, r in h20:
-            self.assertLess(r["n_after_gate"], 5,
+            # 真实判据：h=20 重叠校正需 n ≥ 2(h−1)=38（披露注记要求 ≥40）。
+            # 旧的「<5」只是早期样本还没长到 5 的日历巧合，11-16 数据推进后失效。
+            h = int(k.split("|h")[-1]) if "|h" in k else 20
+            self.assertLess(r["n_after_gate"], max(5, 2 * (h - 1) + 2),
                             f"{k}：门槛后 {r['n_after_gate']} 个截面，"
-                            f"已非「小到不足以引用」的口径，须复核判据")
+                            f"已达重叠校正可用的样本量，须复核判据")
             self.assertFalse(r["usable"],
                              f"{k} 报告 usable=True，但门槛后截面数=0，应为不可用")
             # usable=False 必须给出原因，否则读者不知道为什么
@@ -908,6 +918,13 @@ class TestGatedDatesConsecutive(unittest.TestCase):
               （旧 21 个全部保留），末日 11-10 → 11-11；
            ④ 22 个日期在 snapshot_dates 中仍**严格连续** → 披露文案无需改动。
            ⇒ 仍是数据覆盖推进，不是判据放宽。
+
+        ⚠️ 2026-11-16（round143）：本次 K 线增量补齐 11-13/11-16 收盘价，
+            `append_klines_latest` 写回价格库 2135 只 / 4269 点；随后
+            `factor_eval --optimize-weights` 重算（有效截面 93，剔除陈旧 7），
+            `dates_after_gate` 22 → 23（新增 11-12，删除 0 个，末日 11-11 → 11-12），
+            仍在 snapshot_dates（末日 11-16）中**严格连续** → 断言数字更新为 23，
+            守的仍是「连续性 + 由数据推进而非判据放宽」这一口径。
         """
         import json
         import cs_consecutive as C
@@ -923,7 +940,7 @@ class TestGatedDatesConsecutive(unittest.TestCase):
         sp = C.consecutive_span(ds, axis)
         self.assertTrue(sp["is_consecutive"],
                         f"门槛后日期不再连续（{sp}）—— 页面披露文案需同步复核")
-        self.assertEqual(sp["n"], 22,
+        self.assertEqual(sp["n"], 23,
                          "门槛后截面数变了 —— 请先回答「是哪一步改动的」再更新本数字"
                          "（P0-5 价格补洞时 10→14；round128 数据推进到 11-04 且"
                          "factor_history 补回 10-27 快照后 14→16；round137 价格库"
@@ -931,7 +948,8 @@ class TestGatedDatesConsecutive(unittest.TestCase):
                          "推进 1 天补入 11-09 后 19→20；round139 K线增量至 11-11 +"
                          "factor_eval 价格尾部补齐 11-10 收盘价后 20→21；"
                          "round142(11-12) K线增量至 11-12 + 价格尾部补齐 11-11 "
-                         "收盘价后 21→22，见 docstring）")
+                         "收盘价后 21→22；round143(11-16) K线增量补齐 11-13/11-16 "
+                         "收盘价 + factor_eval 重算后 22→23，见 docstring）")
         self.assertEqual(sp["n"], len(ds),
                          "连续性探针的 n 必须等于 dates_after_gate 的真实长度")
 
