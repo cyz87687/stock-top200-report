@@ -1,0 +1,694 @@
+{
+ "date": "2026-11-18",
+ "generated_at": "2026-11-18 11:19:16",
+ "method": "multifactor-v2（权重由池内实证反推，非手填；v4.3 起只选当日现价在买入区间内的个股）",
+ "top": 10,
+ "n_eligible": 1755,
+ "n_scored": 208,
+ "zone_filter": {
+  "enabled": true,
+  "rule": "现价须落在买入区间内（严格口径，容差仅吸收 2 位小数舍入：相对 0.1% 或绝对 1 分钱取大）；买区由 gen_report_top200.build_trade_plan 同源推导，多头取 ma5~ma10 回踩区、弱势取 ma10~ma20 企稳区",
+  "tolerance_pct": 0.001,
+  "tolerance_abs": 0.01,
+  "counts": {
+   "no_plan": 647,
+   "above_zone": 837,
+   "below_zone": 0,
+   "in_zone": 271
+  },
+  "note": "build_trade_plan 中 buy_hi = min(ref_hi, price)，即买区上限永不高于现价 → 「现价在买区内」的实质含义是**股价已回踩到均线带内**，而不是现价夹在区间上下限之间。price > buy_hi 即需等回踩，当日挂单成交不了。⚠️ v4.3 曾误用页面 `_mf_n_in` 的 ±2% 容差做剔除，导致现价越界 1.04% 的巨人网络被放进组合，已改为严格口径"
+ },
+ "zone_stats": {
+  "no_plan": 647,
+  "above_zone": 837,
+  "below_zone": 0,
+  "in_zone": 271
+ },
+ "weights": {
+  "score_fund": 0.6049,
+  "score_quality": 0.0,
+  "score_growth": 0.0,
+  "score_tech_neg": 0.3655,
+  "__rev__": 0.0296
+ },
+ "weight_reason": {
+  "score_fund": "t_min=2.30",
+  "score_quality": "t_min<=0 或缺失，权重记 0",
+  "score_growth": "t_min<=0 或缺失，权重记 0",
+  "score_tech_neg": "t_min=1.39",
+  "__rev__": "块内 2 维均 t_min=0.22，高相关 ρ≈0.89 → 折半"
+ },
+ "rev_parts": [
+  "score_bias60",
+  "score_rsi_rev"
+ ],
+ "ic_evidence": {
+  "score_fund": {
+   "1": {
+    "ic": 0.0347,
+    "t": 2.66,
+    "n": 94,
+    "wr": 55.3
+   },
+   "5": {
+    "ic": 0.0498,
+    "t": 2.3,
+    "n": 91,
+    "wr": 61.5
+   },
+   "20": {
+    "ic": 0.0745,
+    "t": 1.71,
+    "n": 76,
+    "wr": 65.8
+   }
+  },
+  "score_news": {
+   "1": {
+    "ic": 0.036,
+    "t": 2.55,
+    "n": 94,
+    "wr": 56.4
+   },
+   "5": {
+    "ic": 0.0202,
+    "t": 0.92,
+    "n": 91,
+    "wr": 53.8
+   },
+   "20": {
+    "ic": -0.0113,
+    "t": -0.33,
+    "n": 76,
+    "wr": 48.7
+   }
+  },
+  "score_attention": {
+   "1": {
+    "ic": -0.0419,
+    "t": -1.89,
+    "n": 25,
+    "wr": 36.0
+   },
+   "5": {
+    "ic": -0.0861,
+    "t": -2.99,
+    "n": 22,
+    "wr": 18.2
+   },
+   "20": {
+    "ic": -0.1531,
+    "t": -8.16,
+    "n": 7,
+    "wr": 0.0
+   }
+  },
+  "score_theme": {
+   "1": {
+    "ic": -0.0392,
+    "t": -2.12,
+    "n": 94,
+    "wr": 39.4
+   },
+   "5": {
+    "ic": -0.07,
+    "t": -2.06,
+    "n": 91,
+    "wr": 38.5
+   },
+   "20": {
+    "ic": -0.0861,
+    "t": -2.33,
+    "n": 76,
+    "wr": 30.3
+   }
+  },
+  "score_sector": {
+   "1": {
+    "ic": 0.0194,
+    "t": 0.83,
+    "n": 30,
+    "wr": 63.3
+   },
+   "5": {
+    "ic": -0.0151,
+    "t": -0.7,
+    "n": 27,
+    "wr": 40.7
+   },
+   "20": {
+    "ic": -0.1002,
+    "t": -1.66,
+    "n": 17,
+    "wr": 29.4
+   }
+  },
+  "score_tech": {
+   "1": {
+    "ic": -0.0376,
+    "t": -2.35,
+    "n": 94,
+    "wr": 36.2
+   },
+   "5": {
+    "ic": -0.041,
+    "t": -1.47,
+    "n": 91,
+    "wr": 35.2
+   },
+   "20": {
+    "ic": -0.026,
+    "t": -0.87,
+    "n": 76,
+    "wr": 42.1
+   }
+  }
+ },
+ "drop_rules": {
+  "score_attention": "分位 >= 80% 剔除",
+  "score_theme": "分位 >= 80% 剔除"
+ },
+ "excluded": {
+  "现价不在买入区间": 1026,
+  "关注度过高(attention 前20%)": 351,
+  "题材过热(theme 前20%)": 167,
+  "RSI>70 追高": 3
+ },
+ "eligibility_dropped": {},
+ "capped": [],
+ "picks": [
+  {
+   "name": "孚日股份",
+   "code": "sz002083",
+   "sector_l2": "纺织制造",
+   "sector_parent": "纺织服饰",
+   "price": 8.24,
+   "pct_chg": 0.24,
+   "total": 60.29,
+   "rating": "B",
+   "mf_score": 0.956,
+   "parts": {
+    "fund_pct": 99.4,
+    "rev_pct": 62.1,
+    "att_pct": 11.4,
+    "thm_pct": 33.4,
+    "growth_pct": 99.9,
+    "tech_neg_pct": 92.0
+   },
+   "plan": {
+    "buy_lo": 8.18,
+    "buy_hi": 8.24,
+    "stop": 8.03,
+    "target": 8.37,
+    "rr": 0.6190476190476119,
+    "entry_ref": 8.24,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.79,
+   "score_news": 0.0,
+   "score_theme": 1.79,
+   "score_attention": 0.58,
+   "score_sector": 2.08,
+   "rsi": 34.8,
+   "trend": "日线空头",
+   "fwd_pe": 8.3,
+   "growth": 129.1,
+   "circ_mv_yi": 77.98,
+   "mom5": -6.5,
+   "mom20": -11.2,
+   "fund_reasons": [
+    "低估值(FwdPE=8.3)+增速(+129%)",
+    "估值阶梯合理收缩(8.3→7.3→6.4),3年收缩23%",
+    "PEG=0.31(严重低估,增速远超估值)"
+   ],
+   "news_reasons": [
+    "无真实新闻/催化剂",
+    "消息时效:近7日无消息"
+   ]
+  },
+  {
+   "name": "金风科技",
+   "code": "sz002202",
+   "sector_l2": "风电设备",
+   "sector_parent": "电力设备",
+   "price": 13.68,
+   "pct_chg": 1.03,
+   "total": 43.11,
+   "rating": "C",
+   "mf_score": 0.9038,
+   "parts": {
+    "fund_pct": 86.5,
+    "rev_pct": 78.3,
+    "att_pct": 79.6,
+    "thm_pct": 64.1,
+    "growth_pct": 26.4,
+    "tech_neg_pct": 97.8
+   },
+   "plan": {
+    "buy_lo": 13.48,
+    "buy_hi": 13.68,
+    "stop": 13.34,
+    "target": 13.98,
+    "rr": 0.882352941176473,
+    "entry_ref": 13.68,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 3.81,
+   "score_news": 2.0,
+   "score_theme": 2.31,
+   "score_attention": 3.98,
+   "score_sector": 3.28,
+   "rsi": 31.8,
+   "trend": "双线空头",
+   "fwd_pe": 14.3,
+   "growth": 23.3,
+   "circ_mv_yi": 460.33,
+   "mom5": -9.0,
+   "mom20": -10.1,
+   "fund_reasons": [
+    "估值合理(FwdPE=14.3)+增速(+23%)",
+    "估值阶梯明显收缩(14.3→11.1→9.1),3年收缩36%",
+    "PEG=0.82(低估,增速覆盖估值)"
+   ],
+   "news_reasons": [
+    "风电整机龙头+海上风电",
+    "⚠️风电行业周期+招标波动"
+   ]
+  },
+  {
+   "name": "梦网科技",
+   "code": "sz002123",
+   "sector_l2": "通信服务",
+   "sector_parent": "通信",
+   "price": 7.12,
+   "pct_chg": 1.43,
+   "total": 36.42,
+   "rating": "C",
+   "mf_score": 0.8603,
+   "parts": {
+    "fund_pct": null,
+    "rev_pct": 32.4,
+    "att_pct": 5.9,
+    "thm_pct": 64.4,
+    "growth_pct": 40.4,
+    "tech_neg_pct": 90.4
+   },
+   "plan": {
+    "buy_lo": 6.99,
+    "buy_hi": 7.12,
+    "stop": 6.92,
+    "target": 7.69,
+    "rr": 2.8499999999999988,
+    "entry_ref": 7.12,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": null,
+   "score_news": 0.0,
+   "score_theme": 2.31,
+   "score_attention": 0.3,
+   "score_sector": 2.56,
+   "rsi": 42.5,
+   "trend": "日线空头",
+   "fwd_pe": null,
+   "growth": -79.6,
+   "circ_mv_yi": 51.3,
+   "mom5": -6.6,
+   "mom20": -7.2,
+   "fund_reasons": [
+    "缺估值数据(仅增速-80%),本维不计分"
+   ],
+   "news_reasons": [
+    "无真实新闻/催化剂",
+    "消息时效:近7日有公告"
+   ]
+  },
+  {
+   "name": "海能达",
+   "code": "sz002583",
+   "sector_l2": "通信设备",
+   "sector_parent": "通信",
+   "price": 7.74,
+   "pct_chg": 0.52,
+   "total": 51.53,
+   "rating": "B",
+   "mf_score": 0.8391,
+   "parts": {
+    "fund_pct": 93.6,
+    "rev_pct": 23.7,
+    "att_pct": 22.2,
+    "thm_pct": 77.8,
+    "growth_pct": 96.6,
+    "tech_neg_pct": 72.8
+   },
+   "plan": {
+    "buy_lo": 7.56,
+    "buy_hi": 7.74,
+    "stop": 7.49,
+    "target": 8.1,
+    "rr": 1.4399999999999977,
+    "entry_ref": 7.74,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.12,
+   "score_news": 0.0,
+   "score_theme": 2.63,
+   "score_attention": 1.12,
+   "score_sector": 3.28,
+   "rsi": 44.2,
+   "trend": "偏空",
+   "fwd_pe": 46.0,
+   "growth": 92.6,
+   "circ_mv_yi": 99.31,
+   "mom5": -6.0,
+   "mom20": -6.1,
+   "fund_reasons": [
+    "估值偏高(FwdPE=46.0)+增速(+93%)",
+    "估值阶梯明显收缩(46.0→35.3→28.0),3年收缩39%,高PE起始,阶梯加分受限",
+    "PEG=0.88(低估,增速覆盖估值)"
+   ],
+   "news_reasons": [
+    "无真实新闻/催化剂",
+    "消息时效:近7日无消息"
+   ]
+  },
+  {
+   "name": "图南股份",
+   "code": "sz300855",
+   "sector_l2": "金属新材料",
+   "sector_parent": "有色金属",
+   "price": 27.0,
+   "pct_chg": -1.96,
+   "total": 48.58,
+   "rating": "B",
+   "mf_score": 0.8156,
+   "parts": {
+    "fund_pct": 94.6,
+    "rev_pct": 69.3,
+    "att_pct": 30.8,
+    "thm_pct": 22.9,
+    "growth_pct": 53.5,
+    "tech_neg_pct": 61.1
+   },
+   "plan": {
+    "buy_lo": 26.5,
+    "buy_hi": 27.0,
+    "stop": 26.23,
+    "target": 28.38,
+    "rr": 1.792207792207792,
+    "entry_ref": 27.0,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.19,
+   "score_news": 0.0,
+   "score_theme": 1.64,
+   "score_attention": 1.55,
+   "score_sector": 3.28,
+   "rsi": 34.5,
+   "trend": "偏空",
+   "fwd_pe": 23.8,
+   "growth": 222.8,
+   "circ_mv_yi": 79.1,
+   "mom5": -10.9,
+   "mom20": -13.4,
+   "fund_reasons": [
+    "估值合理(FwdPE=23.8)+增速(+223%)",
+    "估值阶梯明显收缩(23.8→18.7→15.0),3年收缩37%",
+    "PEG=0.92(低估,增速覆盖估值)"
+   ],
+   "news_reasons": [
+    "无真实新闻/催化剂",
+    "消息时效:近7日无消息"
+   ]
+  },
+  {
+   "name": "闰土股份",
+   "code": "sz002440",
+   "sector_l2": "化学制品",
+   "sector_parent": "基础化工",
+   "price": 10.07,
+   "pct_chg": -1.37,
+   "total": 48.35,
+   "rating": "B",
+   "mf_score": 0.8079,
+   "parts": {
+    "fund_pct": 97.8,
+    "rev_pct": 53.0,
+    "att_pct": 18.0,
+    "thm_pct": 37.5,
+    "growth_pct": 54.0,
+    "tech_neg_pct": 55.0
+   },
+   "plan": {
+    "buy_lo": 9.83,
+    "buy_hi": 10.07,
+    "stop": 9.73,
+    "target": 10.96,
+    "rr": 2.617647058823532,
+    "entry_ref": 10.07,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.5,
+   "score_news": 0.0,
+   "score_theme": 1.85,
+   "score_attention": 0.91,
+   "score_sector": 3.36,
+   "rsi": 38.7,
+   "trend": "偏空",
+   "fwd_pe": 9.0,
+   "growth": 346.6,
+   "circ_mv_yi": 95.3,
+   "mom5": -5.4,
+   "mom20": -6.7,
+   "fund_reasons": [
+    "低估值(FwdPE=9.0)+增速(+347%)",
+    "估值阶梯合理收缩(9.0→7.8→6.7),3年收缩26%",
+    "PEG=1.65(轻度高估)"
+   ],
+   "news_reasons": [
+    "无真实新闻/催化剂",
+    "消息时效:近7日无消息"
+   ]
+  },
+  {
+   "name": "理工能科",
+   "code": "sz002322",
+   "sector_l2": "软件开发",
+   "sector_parent": "计算机",
+   "price": 12.73,
+   "pct_chg": 2.0,
+   "total": 51.66,
+   "rating": "B",
+   "mf_score": 0.7983,
+   "parts": {
+    "fund_pct": 96.6,
+    "rev_pct": 13.6,
+    "att_pct": 9.0,
+    "thm_pct": 62.8,
+    "growth_pct": 97.3,
+    "tech_neg_pct": 57.5
+   },
+   "plan": {
+    "buy_lo": 12.46,
+    "buy_hi": 12.73,
+    "stop": 12.33,
+    "target": 13.67,
+    "rr": 2.3499999999999965,
+    "entry_ref": 12.73,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 4.36,
+   "score_news": 0.0,
+   "score_theme": 2.28,
+   "score_attention": 0.46,
+   "score_sector": 3.28,
+   "rsi": 49.2,
+   "trend": "日线空头",
+   "fwd_pe": 17.4,
+   "growth": 54.9,
+   "circ_mv_yi": 44.73,
+   "mom5": -1.7,
+   "mom20": -1.8,
+   "fund_reasons": [
+    "合理估值(FwdPE=17.4)+增速(+55%)",
+    "估值阶梯明显收缩(17.4→14.1→11.7),3年收缩33%",
+    "PEG=1.33(合理估值)"
+   ],
+   "news_reasons": [
+    "无真实新闻/催化剂",
+    "消息时效:近7日无消息"
+   ]
+  },
+  {
+   "name": "翔丰华",
+   "code": "sz300890",
+   "sector_l2": "电池",
+   "sector_parent": "电力设备",
+   "price": 24.25,
+   "pct_chg": -2.14,
+   "total": 43.12,
+   "rating": "C",
+   "mf_score": 0.7871,
+   "parts": {
+    "fund_pct": 75.1,
+    "rev_pct": 45.4,
+    "att_pct": 0.6,
+    "thm_pct": 28.1,
+    "growth_pct": 63.4,
+    "tech_neg_pct": 87.3
+   },
+   "plan": {
+    "buy_lo": 23.99,
+    "buy_hi": 24.25,
+    "stop": 23.64,
+    "target": 25.18,
+    "rr": 1.5245901639344273,
+    "entry_ref": 24.25,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 3.37,
+   "score_news": 0.0,
+   "score_theme": 1.71,
+   "score_attention": 0.04,
+   "score_sector": 3.28,
+   "rsi": 37.6,
+   "trend": "偏空",
+   "fwd_pe": 23.8,
+   "growth": 370.0,
+   "circ_mv_yi": 26.5,
+   "mom5": -10.1,
+   "mom20": -3.5,
+   "fund_reasons": [
+    "低基数失真修正: 单点增速1275%→370%(超出三年CAGR=-39.8%可支持上限,已饱和)",
+    "估值合理(FwdPE=23.8)+增速(+370%)",
+    "PEG不适用(可持续增速-39.8%≤0)"
+   ],
+   "news_reasons": [
+    "无真实新闻/催化剂",
+    "消息时效:近7日无消息"
+   ]
+  },
+  {
+   "name": "大有能源",
+   "code": "sh600403",
+   "sector_l2": "煤炭开采",
+   "sector_parent": "煤炭",
+   "price": 5.28,
+   "pct_chg": 0,
+   "total": 50.34,
+   "rating": "B",
+   "mf_score": 0.7867,
+   "parts": {
+    "fund_pct": null,
+    "rev_pct": 74.4,
+    "att_pct": 41.0,
+    "thm_pct": 31.7,
+    "growth_pct": 30.4,
+    "tech_neg_pct": 79.0
+   },
+   "plan": {
+    "buy_lo": 5.22,
+    "buy_hi": 5.28,
+    "stop": 5.15,
+    "target": 5.54,
+    "rr": 2.0,
+    "entry_ref": 5.28,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": null,
+   "score_news": 0.0,
+   "score_theme": 1.76,
+   "score_attention": 2.06,
+   "score_sector": 2.4,
+   "rsi": 34.7,
+   "trend": "日线空头",
+   "fwd_pe": null,
+   "growth": 12.9,
+   "circ_mv_yi": 126.23,
+   "mom5": -11.0,
+   "mom20": -15.8,
+   "fund_reasons": [
+    "缺估值数据(仅增速+13%),本维不计分"
+   ],
+   "news_reasons": [
+    "无真实新闻/催化剂",
+    "消息时效:近7日有公告"
+   ]
+  },
+  {
+   "name": "敦煌种业",
+   "code": "sh600354",
+   "sector_l2": "种植业",
+   "sector_parent": "农林牧渔",
+   "price": 6.43,
+   "pct_chg": -0.62,
+   "total": 44.81,
+   "rating": "C",
+   "mf_score": 0.7751,
+   "parts": {
+    "fund_pct": 77.2,
+    "rev_pct": 82.6,
+    "att_pct": 35.2,
+    "thm_pct": 26.8,
+    "growth_pct": 31.1,
+    "tech_neg_pct": 77.6
+   },
+   "plan": {
+    "buy_lo": 6.3,
+    "buy_hi": 6.43,
+    "stop": 6.24,
+    "target": 6.77,
+    "rr": 1.7894736842105303,
+    "entry_ref": 6.43,
+    "tgt_basis": "阻力位",
+    "overbought": false,
+    "flags": []
+   },
+   "score_fund": 3.45,
+   "score_news": 0.0,
+   "score_theme": 1.69,
+   "score_attention": 1.77,
+   "score_sector": 3.28,
+   "rsi": 33.1,
+   "trend": "偏空",
+   "fwd_pe": 26.4,
+   "growth": 276.4,
+   "circ_mv_yi": 33.94,
+   "mom5": -11.8,
+   "mom20": -20.9,
+   "fund_reasons": [
+    "估值合理(FwdPE=26.4)+增速(+276%)",
+    "PEG不适用(无存续/前瞻增速锚)",
+    "周期股持续性中性,基本面分封顶4.5"
+   ],
+   "news_reasons": [
+    "无真实新闻/催化剂",
+    "消息时效:近7日无消息"
+   ]
+  }
+ ],
+ "boundaries": [
+  "反转块仅 8 个截面 → 弱先验，不是已验证因子",
+  "score_sector 池内 IC 全周期不显著（T+1 t=0.29 / T+5 t=-1.20）→ 未作为选股轴",
+  "池内头组净收益历史上为负 → 组合≠赚钱，须配合仓位纪律与止损",
+  "组合仅表达「相对排序」，不构成个股推荐",
+  "v4.3 买区过滤的收益代价在噪声内（audit_round16 配对检验 |NW t| 最大 1.54 < 2），但把可执行性从「10 只中约 4 只可当日成交」提升到「全部可当日成交」"
+ ]
+}
