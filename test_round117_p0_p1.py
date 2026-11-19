@@ -931,6 +931,12 @@ class TestGatedDatesConsecutive(unittest.TestCase):
             `dates_after_gate` 23 → 24（新增 11-16，删除 0 个，末日 11-12 → 11-16），
             仍在 snapshot_dates（末日 11-17）中**严格连续** → 断言数字更新为 24。
             纯数据推进，判据（连续性 + h20 usable=False）未放宽。
+
+        ⚠️ 2026-11-18（round145）：K 线增量补齐 11-18 收盘价（2133 只 / 2133 点，
+            源级失败 2 只），`factor_eval --optimize-weights` 重算（有效截面 95，
+            剔除陈旧 7），`dates_after_gate` 24 → 25（新增 11-17，删除 0 个，
+            末日 11-16 → 11-17），仍在 snapshot_dates（末日 11-18）中**严格连续**
+            → 断言数字更新为 25。纯数据推进，判据（连续性 + h20 usable=False）未放宽。
         """
         import json
         import cs_consecutive as C
@@ -946,7 +952,7 @@ class TestGatedDatesConsecutive(unittest.TestCase):
         sp = C.consecutive_span(ds, axis)
         self.assertTrue(sp["is_consecutive"],
                         f"门槛后日期不再连续（{sp}）—— 页面披露文案需同步复核")
-        self.assertEqual(sp["n"], 24,
+        self.assertEqual(sp["n"], 25,
                          "门槛后截面数变了 —— 请先回答「是哪一步改动的」再更新本数字"
                          "（P0-5 价格补洞时 10→14；round128 数据推进到 11-04 且"
                          "factor_history 补回 10-27 快照后 14→16；round137 价格库"
@@ -956,8 +962,9 @@ class TestGatedDatesConsecutive(unittest.TestCase):
                          "round142(11-12) K线增量至 11-12 + 价格尾部补齐 11-11 "
                          "收盘价后 21→22；round143(11-16) K线增量补齐 11-13/11-16 "
                          "收盘价 + factor_eval 重算后 22→23；round144(11-17) K线增量"
-                         "补齐 11-17 + factor_eval 价格尾部补齐 11-16 收盘价后 23→24，"
-                         "见 docstring）")
+                         "补齐 11-17 + factor_eval 价格尾部补齐 11-16 收盘价后 23→24；"
+                         "round145(11-18) K线增量补齐 11-18 + factor_eval 价格尾部"
+                         "补齐 11-17 收盘价后 24→25，见 docstring）")
         self.assertEqual(sp["n"], len(ds),
                          "连续性探针的 n 必须等于 dates_after_gate 的真实长度")
 
