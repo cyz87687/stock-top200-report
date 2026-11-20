@@ -1,28 +1,29 @@
-fetch_top200_sina	0	1		2026-11-19 17:29:51	11-19 行情+池重建
-check_data_fresh	0	1		2026-11-19 17:29:52	11-19 新鲜度守卫
-step2_stockscorer	0	1		2026-11-19 17:37:09	11-19 评分本体
-archive_fwd_snapshot	0	1		2026-11-19 18:49:16	11-19 前瞻快照归档
-generate_ai_assessment	0	1		2026-11-19 18:49:16	11-19 AI 评估
-enhance_scores	0	1		2026-11-19 18:53:18	11-19 评分增强写回
-sector_momentum_daily	0	1		2026-11-19 18:54:39	11-19 行业动量
-apply_sector_momentum	0	1		2026-11-19 18:54:40	11-19 行业维并入
-pick_portfolio	0	1		2026-11-19 18:54:40	11-19 组合选取
-portfolio_risk	0	1		2026-11-19 18:54:40	11-19 组合风险度量
-fetch_bench	0	1		2026-11-19 18:54:57	11-19 指数基准增量
-regime_model	0	1		2026-11-19 18:54:57	11-19 市场状态与风险预算
-pick_portfolio	0	1		2026-11-19 18:55:01	11-19 组合选取（regime 前置后重跑）
-portfolio_risk	0	1		2026-11-19 18:55:02	11-19 组合风险度量（重跑）
-track_recommendations	0	1		2026-11-19 18:55:54	11-19 推荐跟踪
-portfolio_metrics	0	1		2026-11-19 18:55:54	11-19 组合日频指标
-panel_audit	0	1		2026-11-19 18:56:09	11-19 面板新鲜度与权重盲区审计
-append_klines_latest	0	1		2026-11-19 19:06:30	11-19 价格库增量（后台补跑成功）
-refresh_kline_meta	0	1		2026-11-19 19:06:30	11-19 有效截面口径刷新
-verify_qfq_anchor	4	0		2026-11-19 19:06:45	11-19 前复权锚点自检
-archive_fund_universe	0	1		2026-11-19 19:07:02	11-19 fund 全域归档
-selfcheck_pipeline	0	1		2026-11-19 19:17:22	11-19 总分一致性自检
-long_panel_ic	1	0		2026-11-19 19:17:31	长 IC 已 7 天达重建阈值；--skip-cached 参数 bug 待裁决，未重建，页面须标注陈旧
-fetch_focus_list	0	1		2026-11-19 19:17:48	11-19 AI 焦点池（机器源 40 只）
-factor_eval	1	0		2026-11-19 19:28:11	因子评估卡死超 20 分钟（东财代理失效/网络阻塞），已终止；IC 与权重视图停在上一日，页面须标注陈旧
-factor_eval	143	0		2026-11-19 19:28:24	因子评估卡死超 20 分钟（东财代理失效/网络阻塞），SIGTERM 终止；IC/权重视图停在上一日
-gen_report_top200	0	1		2026-11-19 19:28:45	11-19 主报告生成
-orphan_scan	0	1		2026-11-19 19:29:57	11-19 孤儿 json 归档
+fetch_top200_sina	0	1		2026-11-20 16:27:01	11-20 行情+池重建，母体5383/选池1820
+check_data_fresh	0	1		2026-11-20 16:27:01	
+step2_stockscorer	0	1		2026-11-20 16:36:13	step2 生成 11-20 scored
+append_klines_latest	0	1		2026-11-20 16:49:22	2135只追加11-20,失败0
+refresh_kline_meta	0	1		2026-11-20 16:49:23	
+verify_qfq_anchor	0	1		2026-11-20 16:49:36	前复权锚点自检
+archive_fund_universe	0	1		2026-11-20 16:49:54	fund全域归档
+archive_fwd_snapshot	0	1		2026-11-20 16:50:04	前瞻估值快照归档
+archive_fund_universe	0	1		2026-11-20 16:50:16	fund全域归档2112只,重跑补当日fwd_pe 62.7%
+generate_ai_assessment	0	1		2026-11-20 16:50:25	AI评估
+generate_ai_assessment	0	1		2026-11-20 16:50:31	AI评估fallback=True(火山引擎订阅过期400,非LLM研判)
+enhance_scores	0	1		2026-11-20 16:50:47	评分增强
+sector_momentum_daily	0	1		2026-11-20 16:53:20	行业动量
+apply_sector_momentum	0	1		2026-11-20 16:53:27	行业维合并
+fetch_bench	0	1		2026-11-20 16:53:32	指数基准
+regime_model	0	1		2026-11-20 16:53:37	市场状态与风险预算
+pick_portfolio	0	1		2026-11-20 16:53:41	组合生成
+portfolio_risk	2	0		2026-11-20 16:53:45	组合层风险度量
+track_recommendations	2	0		2026-11-20 16:53:45	推荐跟踪
+portfolio_metrics	0	1		2026-11-20 16:53:46	组合日频指标
+portfolio_risk	0	1		2026-11-20 16:53:50	组合层风险度量
+track_recommendations	0	1		2026-11-20 16:55:09	推荐跟踪
+panel_audit	0	1		2026-11-20 16:55:22	面板审计
+selfcheck_pipeline	0	1		2026-11-20 16:55:31	链路自检
+fetch_focus_list	0	1		2026-11-20 16:55:32	AI关注池
+factor_eval	143	0		2026-11-20 17:02:59	因子IC+权重重估:3378只价格尾部增量耗时>7min,进程终止;IC/权重视图停上一日
+long_panel_ic	1	0		2026-11-20 17:03:04	ic_long age=8d超7d阈值,但fetch_klines_2020 --skip-cached已知bug+待裁决,未重建
+orphan_scan	0	1		2026-11-20 17:03:56	孤儿json归档
+gen_report_top200	0	1		2026-11-20 17:04:20	11-20报告生成
