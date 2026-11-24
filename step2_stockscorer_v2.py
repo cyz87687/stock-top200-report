@@ -4760,6 +4760,11 @@ def main():
                          if isinstance(r.get("score_size_comb"), (int, float))}
         _esi_size_src = {r["code"][-6:]: r.get("size_comb_src") for r in _esi_rows
                          if r.get("size_comb_src")}
+        # 2026-11-25 裁决：市值一致性校验只打标记、不打折（唯一判据在 ep_size_ind）
+        _dom_mc_fail_map = {r["code"][-6:]: bool(r.get("dom_mc_consistency_fail"))
+                            for r in _esi_rows if r.get("score_dominant") is not None}
+        _dom_syn_raw_map = {r["code"][-6:]: r.get("dom_syn_raw") for r in _esi_rows
+                            if isinstance(r.get("dom_syn_raw"), (int, float))}
         _missing_reason_map = {r["code"][-6:]: dict(r.get("missing_reason") or {})
                                 for r in _esi_rows if r.get("missing_reason")}
         print(f"   🧮 EP 评分表: {len(_ep_rank)}/{len(stocks)} 只"
@@ -5733,6 +5738,9 @@ def main():
             #   score_size 保留字段（全市场口径，供对照，见本 dict 上方）；score_size_ind 已退役，不再写盘。
             "score_size_growth": (round(s_size_growth, 2) if s_size_growth is not None else None),
             "score_dominant": (round(s_dominant, 2) if s_dominant is not None else None),
+            # 2026-11-25 裁决：市值一致性只标记不打折；dom_syn_raw=未打折的原始份额分
+            "dom_mc_consistency_fail": _dom_mc_fail_map.get(_c6),
+            "dom_syn_raw": _dom_syn_raw_map.get(_c6),
             "score_sustain": round(sustain_info["score"], 2),
             "sustain_note": sustain_info["note"],
             "is_cyclic": sustain_info["is_cyclic"],

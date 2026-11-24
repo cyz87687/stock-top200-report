@@ -84,13 +84,30 @@ LIQ_PENALTY = 0.5    # 流动性惩罚系数
 # ⚠️ 以下两处为本次重构的**解读性参数**，已在最终汇报中明确标注待老大确认：
 #   · MC_SMALL_CAP：模块A 小票门槛（明确，按 spec）。
 #   · DOM_MC_CONSIST / DOM_DISCOUNT：模块B「市值校验 mc_pct<0.8 打折」的语义解读——
-#      我的实现：业务份额未被市值充分确认（mc_pct < 0.8 × max(rev_share, profit_share)）则龙头分打折。
-#      （spec 原文「mc_pct<0.8 打折」未明确定义 mc_pct 的比较基准，故此为我的可辩护重构，待裁。）
+#      原实现：业务份额未被市值充分确认（mc_pct < 0.8 × max(rev_share, profit_share)）则龙头分打折。
+#      （spec 原文「mc_pct<0.8 打折」未明确定义 mc_pct 的比较基准，故此为我的可辩护重构。）
+#   ⚠️ 2026-11-25 老大裁决（选项1）：**取消折扣，只打标记**。
+#      起因：生益科技利润份额组内第1（合成份额分 9.83），仅因 mc 0.0929 < 门槛 0.0974
+#      擦线 0.0045 被 ×0.70 → 龙头分 6.88，反低于三环 8.79，榜首结论系于一条存疑解读参数。
+#      新口径：判据仍用于标记（dom_mc_consistency_fail），但**不改变分数**；
+#      DOM_DISCOUNT 保留为 1.0 仅供历史脚本兼容，禁再赋 <1 的折扣值。
 MC_SMALL_CAP = 0.30   # 模块A 小票门槛：个股市值占申万二级行业比 ≤ 0.30 → 走小盘成长溢价
 DOM_REV_W = 0.5       # 模块B 业务份额合成：营收份额权重
 DOM_PROFIT_W = 0.5    # 模块B 业务份额合成：利润份额权重
-DOM_MC_CONSIST = 0.80 # 模块B 市值一致性：mc_pct < 0.80 × 业务份额 → 龙头分打折（解读参数，待确认）
-DOM_DISCOUNT = 0.70   # 市值一致性不达标时的龙头分折扣
+DOM_MC_CONSIST = 0.80 # 模块B 市值一致性：mc_pct < 0.80 × 业务份额 → **仅打标记，不打折**（2026-11-25 裁决）
+DOM_DISCOUNT = 1.00   # 已废弃折扣：2026-11-25 起恒为 1.0（只标记不打折）；保留常量兼容历史审计脚本
+
+
+def mc_consistency_flag(mc_pct, biz):
+    """市值一致性校验的**唯一判据**（2026-11-25 裁决后：只标记、不打折）。
+
+    biz = max(营收份额, 利润份额)；mc_pct = 个股市值占申万二级本池合计比。
+    返回 True 表示「业务份额未被市值确认」——仅用于留痕字段
+    dom_mc_consistency_fail，禁止在此函数或调用处对分数做任何乘性折扣。
+    """
+    return (biz > 0 and isinstance(mc_pct, (int, float))
+            and not isinstance(mc_pct, bool) and mc_pct == mc_pct
+            and mc_pct < DOM_MC_CONSIST * biz)
 DOM_NEUTRAL = 5.0     # 申万二级行业组内 <2 只（无法 rank）时给中性分，避免微行业误评
 DOM_LEADER_THR = 7.0  # 模块B 龙头门槛：业务份额合成 rank ≥ 7（组内前 30%）即为行业龙头
                       # ⚠️ 老大 2026-10-28 裁决：原文 mc_pct>0.3 门槛在真实分布下仅覆盖 4.1%（77只）形同虚设，
@@ -599,12 +616,14 @@ def score_rows(rows, as_of, em=None, price_key="price", mv_key="circ_mv",
         其余进 score_size_growth(A)。
       · score_size_growth（小盘成长溢价）= 原 v4.12 成长条件交互分（行业内市值分×成长门限×
         流动性惩罚），对非龙头股票生效（**分区不变**）。
-      · score_dominant（龙头壁垒溢价）= 业务份额合成 rank，再做市值一致性
-        校验（DOM_MC_CONSIST，解读参数）与流动性惩罚，clip[0,10]。
+      · score_dominant（龙头壁垒溢价）= 业务份额合成 rank + 流动性惩罚，clip[0,10]。
+        市值一致性校验（DOM_MC_CONSIST）**自 2026-11-25 起只打标记、不再打折**：
+        不达标写 dom_mc_consistency_fail=True 与未打折的 dom_syn_raw，分数不变。
         **P0-3 起默认对全池生效**；"leader" 模式下仅组内前 30% 生效（旧口径）。
     ⚠️ 原文 mc_pct>0.3 门槛在真实分布下仅覆盖 4.1%（77只）形同虚设，已弃用；mc_pct 仅作
       留痕与模块B 一致性校验输入。
-    留痕字段：mc_pct / rev_share / profit_share / score_mc_raw / w_mc / dominant_scope。
+    留痕字段：mc_pct / rev_share / profit_share / score_mc_raw / w_mc / dominant_scope /
+      dom_mc_consistency_fail / dom_syn_raw。
     """
     if dominant_scope not in ("pool", "leader"):
         raise ValueError(f"dominant_scope 只能是 'pool' / 'leader'，收到 {dominant_scope!r}")
@@ -704,8 +723,14 @@ def score_rows(rows, as_of, em=None, price_key="price", mv_key="circ_mv",
                 dom = _syn_v
                 biz = max(rev_share if isinstance(rev_share, (int, float)) else 0.0,
                           profit_share if isinstance(profit_share, (int, float)) else 0.0)
-                if biz > 0 and isinstance(mc_pct, (int, float)) and mc_pct < DOM_MC_CONSIST * biz:
-                    dom *= DOM_DISCOUNT   # 市值一致性校验（解读参数，待确认）
+                # 2026-11-25 裁决（选项1）：市值一致性校验**只打标记、不打折**。
+                #   原 ×0.70 会让「利润份额组内第1但市值占比擦线不足」的真龙头被误伤
+                #   （生益科技案例：9.83→6.88，榜首结论系于 0.0045 擦线）。
+                #   判据仍保留（mc_consistency_flag），但不再乘性改变分数。
+                r["dom_mc_consistency_fail"] = False
+                r["dom_syn_raw"] = round(_syn_v, 2)
+                if mc_consistency_flag(mc_pct, biz):
+                    r["dom_mc_consistency_fail"] = True
                 amt = r.get(amt_key)
                 if isinstance(amt, (int, float)) and amt == amt and amt < LIQ_THRESHOLD:
                     dom *= LIQ_PENALTY

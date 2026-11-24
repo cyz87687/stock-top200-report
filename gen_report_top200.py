@@ -10864,9 +10864,26 @@ try:
 except Exception as _ce:
     _conc_disclose = ""
 
+# ⑥ 市值一致性校验口径变更披露（2026-11-25 老大裁决：只标记、不打折）
+#   原 ×0.70 折扣把「利润份额组内第1但市值占比擦线不足」的真龙头误伤
+#   （生益科技 9.83→6.88）。现判据仅写 dom_mc_consistency_fail 标记，分数不变。
+_dom_flag_disclose = ""
+try:
+    _dom_flag_n = sum(1 for r in results if r.get("dom_mc_consistency_fail") is True)
+    if _dom_flag_n:
+        _dom_flag_disclose = (
+            '<div style="margin:14px 0;padding:10px 14px;background:rgba(59,130,246,0.08);'
+            'border-left:3px solid #3b82f6;border-radius:6px;font-size:11px;color:#93c5fd;">'
+            'ℹ️ <b>市值一致性校验口径（2026-11-25 裁决）</b>：已取消原 ×0.70 折扣，改为'
+            f'<b>只打标记、不打折扣</b>。当前 <b>{_dom_flag_n}/{len(results)}</b> 只带 '
+            '<code>dom_mc_consistency_fail=True</code> 标记（<code>dom_syn_raw</code> 为未打折原始份额分），'
+            '分数不受影响；此前擦线被误伤的龙头已按业务份额全额计分。</div>')
+except Exception:
+    _dom_flag_disclose = ""
+
 html_parts.append(_ps_banner + _panel_disclose + _cs_disclose
                   + _kl_disclose + _bt_disclose + _es_disclose
-                  + _ic_stale_banner + _conc_disclose)
+                  + _ic_stale_banner + _dom_flag_disclose + _conc_disclose)
 
 html_parts.append('''
             </tbody>

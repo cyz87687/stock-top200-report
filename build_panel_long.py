@@ -149,10 +149,10 @@ def _build_shares_for_day(day_rows, asof, em, sw_map, mv_key="circ_mv"):
         biz = max(shares[c6].get("rev_share") or 0.0,
                   shares[c6].get("profit_share") or 0.0)
         mc = shares[c6].get("mc_pct")
-        _cons = getattr(EP, "DOM_MC_CONSIST", None)
+        # 2026-11-25 裁决：判据走 ep_size_ind 唯一实现，且**只标记不打折**
+        #   （DOM_DISCOUNT 恒 1.0，保留乘号仅为兼容历史结构，不再改变分数）。
         _disc = getattr(EP, "DOM_DISCOUNT", 1.0)
-        if _cons is not None and biz > 0 and isinstance(mc, (int, float)) \
-                and mc < _cons * biz:
+        if EP.mc_consistency_flag(mc, biz):
             dom *= _disc
         out[c6] = round(max(0.0, min(10.0, dom)), 2)
     return out
