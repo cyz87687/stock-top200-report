@@ -122,8 +122,19 @@ def main():
                 f"<td class='mono'>{p.get('score_news')}/{p.get('score_tech')}/{p.get('score_fund')}/{p.get('score_theme')}/{p.get('score_sector')}</td></tr>")
         return "\n".join(out)
 
-    pm = pf['portfolios']['momentum']
-    pr = pf['portfolios']['reversal']
+    # 2026-11-24 P0-5：组合产物在风险预算故障/无可实施标的时，portfolios 为
+    #   []（空列表）或缺 momentum/reversal 键，硬取会 KeyError 中断整份报告。
+    #   降级为空占位并留痕，不让组合模块拖垮主报告生成。
+    _pf_portfolios = pf.get('portfolios') or {}
+    if not isinstance(_pf_portfolios, dict):
+        _pf_portfolios = {}
+    _empty_pf = {'picks': [], 'sectors': [], 'n_candidates': 0,
+                 'level_used': '不可实施（组合产物缺失）', 'target_rule': '—'}
+    pm = _pf_portfolios.get('momentum') or dict(_empty_pf)
+    pr = _pf_portfolios.get('reversal') or dict(_empty_pf)
+    if 'momentum' not in _pf_portfolios or 'reversal' not in _pf_portfolios:
+        print(f"⚠️ 组合产物 {os.path.basename(pf_path)} 缺 momentum/reversal 路线"
+              f"（预算故障或无合格标的）；组合区块降级为空占位。")
 
     # ---------- 回测表 ----------
     r60b = ref.get('r60_bins', {})

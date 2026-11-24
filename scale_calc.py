@@ -69,6 +69,36 @@ def sum_all_weights(weights):
     return sum(float(w) for w in (weights or {}).values() if is_num(w) and w > 0)
 
 
+# ══════════════════════════════════════════════════════════════════════
+# 2026-11-24 P0-6 §2 / P1-2：ES 覆盖不足时的有效权重（单一实现）
+# ══════════════════════════════════════════════════════════════════════
+ES_COVERAGE_MIN = 0.30   # 低于此覆盖率 → ES 维权重归零、按比例分给其余维
+
+
+def effective_weights_es_gate(weights, es_coverage):
+    """按 ES 实际覆盖率决定是否把 score_es 权重按比例让渡给其余生效维。
+
+    背景：ES 全池覆盖仅 3.67%，按「缺维按 0 + 固定分母」等价于给 96.3% 标的
+      隐式扣 0.5 分 → 高基本面公司被系统性压低（有 ES 组均分 77.17 vs 无 ES
+      组 73.88）。覆盖率 <30% 时该维无判别力，权重归零并按原比例分配给其余维。
+
+    ⚠️ 这是**运行时有效权重**，不改 factor_weights.json（那是名义权重主表，
+       八处同步仍以名义表为准）。返回 (eff_weights: dict, adjusted: bool)。
+       score_es 缺列/零权重时原样返回，不重复归一。
+    """
+    w = {k: float(v) for k, v in (weights or {}).items() if is_num(v) and v > 0}
+    es_w = w.get("score_es", 0.0)
+    if es_w <= 0 or not is_num(es_coverage) or es_coverage >= ES_COVERAGE_MIN:
+        return w, False
+    rest = {k: v for k, v in w.items() if k != "score_es"}
+    rest_sum = sum(rest.values())
+    if rest_sum <= 0:
+        return w, False
+    scale = 1.0 + es_w / rest_sum
+    eff = {k: round(v * scale, 6) for k, v in rest.items()}
+    return eff, True
+
+
 def composite_total(parts, dim_max, sum_all=None, weights=None,
                     neutral_ratio=NEUTRAL_FILL_RATIO, missing_out=None,
                     missing_rule="neutral", missing_reason=None):

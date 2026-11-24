@@ -322,6 +322,12 @@ def main():
             #   没装（2026-11-05 实测踩中，growth 保持旧值 9.69）。单一实现
             #   growth_factor_b.anchor_gate，与 step2 消费点同源。
             _sg, _g1n = _gfb_mod.anchor_gate(_sg, r.get("cagr3"))
+            # 2026-11-24 P1-1：低基数二次封顶 8.0（与 step2 消费点同源，单一实现）
+            _sg, _lb_note = _gfb_mod.lowbase_growth_cap(
+                _sg, bool(r.get("growth_capped")),
+                ocfg=r.get("ocfg"), roe=r.get("roe"))
+            if _lb_note and not _g1n:
+                _g1n = _lb_note
             r["score_growth"] = (round(float(_sg), 2) if isinstance(_sg, (int, float)) else None)
             if _g1n and not r.get("growth_anchor_note"):
                 r["growth_anchor_note"] = _g1n

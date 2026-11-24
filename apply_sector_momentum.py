@@ -43,6 +43,8 @@ import argparse
 
 # v4.10（2026-10-27 P0-4）：复合分量尺唯一实现来源（分母恒定 + 缺维中性填充）
 import scale_calc
+# 2026-11-24 P1-3：周期股成长/ep 对称封顶（单一实现 growth_factor_b）
+import growth_factor_b as _gfb_mod
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SECTOR_DIR = os.path.join(HERE, 'sector')
@@ -206,6 +208,14 @@ def main():
 
     data = json.load(open(scored, encoding='utf-8'))
     results = data.get('results', [])
+    # 2026-11-24 P0-6 §2：算 ES 实际覆盖率（有 score_es 有效值 / 全池），供有效权重门使用。
+    _es_valid = sum(1 for r in results if isinstance(r.get("score_es"), (int, float))
+                    and not isinstance(r.get("score_es"), bool))
+    _ES_COVERAGE = (_es_valid / len(results)) if results else 0.0
+    if _FW.get("score_es", 0) > 0 and _ES_COVERAGE < scale_calc.ES_COVERAGE_MIN:
+        print(f"⚠️ ES 覆盖 {_es_valid}/{len(results)}={_ES_COVERAGE:.2%} < "
+              f"{scale_calc.ES_COVERAGE_MIN:.0%} → score_es 权重归零并按比例让渡其余维"
+              f"（P0-6 §2 / P1-2）")
     print(f"scored: {os.path.basename(scored)} | 板块动量日期: {mom_date} | 板块数: {len(sec_info)} | mode: {args.mode}")
     # v3.2 fix: 原打印引用十维重构时已删除的旧变量(W_NEWS/W_TECH/W_FUND/W_THEME_OLD/W_THEME_NEW/W_SECTOR)
     #   → 运行即 NameError（py_compile 查不出名字问题）。改为从 _FW 十维权重推导展示。
@@ -273,14 +283,30 @@ def main():
                 #   （实测放大 1.00~1.33 倍，最高虚高 16.33 分）。
                 #   ⚠️ 本步包含 score_sector（板块动量），其权重也计入统一分母。
                 _parts = []
-                for _k, _wt in _FW.items():
+                # ══ 2026-11-24 P0-6 §2 / P1-2：ES 覆盖不足 → 有效权重归零让渡 ══
+                #   ES 全池覆盖仅 3.67%，固定分母按缺维中性填充分配 0.05 权重 →
+                #   有 ES 组均分 77.17 vs 无 ES 组 73.88（差 +3.28），系统性压低高基本面票。
+                #   覆盖 <30% 时用 scale_calc 单一实现把 score_es 权重按比例让渡给其余维。
+                _FW_eff, _fw_es_adjusted = scale_calc.effective_weights_es_gate(
+                    _FW, _ES_COVERAGE)
+                # ══ 2026-11-24 P1-3：周期股成长/ep 对称封顶（fund 4.5 已有）══
+                #   单一实现 growth_factor_b.cyclic_caps，周期判定沿用 step2 落盘的
+                #   is_cyclic（cycle_industry.json 正面清单），禁逐股硬编码。
+                _g_cap, _ep_cap, _cyc_note = _gfb_mod.cyclic_caps(
+                    r.get("score_growth"), r.get("score_ep"),
+                    bool(r.get("is_cyclic")), fwd_pe=r.get("fwd_pe"))
+                if _cyc_note:
+                    r["score_growth"] = _g_cap
+                    r["score_ep"] = _ep_cap
+                    r["cyclic_cap_note"] = _cyc_note
+                for _k, _wt in _FW_eff.items():
                     if _wt <= 0:
                         continue
                     if _k == "score_sector":
                         continue          # 板块动量本步才有，下面单独加
                     _parts.append((_k, r.get(_k), _wt))
                 # 板块动量本步才有，恒可用（同样按量程归一）
-                _parts.append(("score_sector", score_sector, _FW["score_sector"]))
+                _parts.append(("score_sector", score_sector, _FW_eff.get("score_sector", 0)))
                 _miss_s = []
                 # v5.0（2026-11-23）：缺维分层 —— 结构性不适用剔分母、真缺数据按 0。
                 #   missing_reason 由 ep_size_ind.score_rows 给出（唯一实现来源），
@@ -288,13 +314,17 @@ def main():
                 _mr_r = r.get("missing_reason") or {}
                 total, _ms = scale_calc.composite_total(
                     _parts, _DIM_MAX,
-                    weights={k: v for k, v in _FW.items() if v > 0},
+                    weights={k: v for k, v in _FW_eff.items() if v > 0},
                     missing_out=_miss_s,
                     missing_rule=MISSING_RULE,
                     missing_reason=_mr_r)
                 # 逐只留痕「哪些维是中性填充」，供页面披露（禁让读者误当实测值）
                 r["neutral_filled"] = list(_ms)
                 r["composite_scale"] = "uniform_v1"
+                # P0-6 §2：ES 权重让渡留痕（页面据此披露有效口径）
+                r["es_weight_adjusted"] = bool(_fw_es_adjusted)
+                if _fw_es_adjusted:
+                    r["es_coverage"] = round(_ES_COVERAGE, 4)
             else:
                 # 旧五维回退路径（历史 scored 无 score_oversold60 字段）。
                 # ⚠️ 2026-10-26 P0：原实现用原值加权再 ×10，同样受量程不统一影响

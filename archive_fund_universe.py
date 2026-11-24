@@ -61,14 +61,25 @@
 ⇒ 正确处置不是「填历史」，而是「**从现在起把域补全 + 明确披露历史区间口径不可比**」。
 
 用法
-  python archive_fund_universe.py                     # 归档今天
+  python archive_fund_universe.py                     # 归档今天（全量，默认路径不变）
   python archive_fund_universe.py --date 2026-10-28   # 归档指定交易日（补数）
   python archive_fund_universe.py --date 2026-10-28 --dry-run
+
+  # 2026-11-24 P1-7：长步骤分片（automation 会话中断时的前台分批路径）
+  python archive_fund_universe.py --start 0 --end 700
+  python archive_fund_universe.py --start 700 --end 1400
+  python archive_fund_universe.py --start 1400 --end 999999
+  python archive_fund_universe.py --merge-shards     # 三片齐全后合成当日主档
+
+  ⚠️ 分片只写 `<date>.shard<start>_<end>.json`，**绝不覆盖主档**；
+     只有 --merge-shards 在全部片齐全且代码无重复冲突时才写 `<date>.json`。
+     -shard 的 start/end 是「当日归档域排序后的下标」，不是股票代码。
 """
 import os
 import sys
 import json
 import math
+import glob
 import argparse
 import datetime as dt
 from collections import defaultdict
@@ -170,11 +181,89 @@ def load_fwd_snapshot(date):
     return out
 
 
+def merge_shards(date, now_iso):
+    """把同一天的分片合成主档。缺片 / 区间重叠 / 代码冲突 → 拒绝写主档。"""
+    files = sorted(glob.glob(os.path.join(OUTDIR, f"{date}.shard*.json")))
+    if not files:
+        raise SystemExit(f"⛔ {date} 无 .shard*.json 分片，拒绝合成（主档保持原样）")
+    parts = []
+    for f in files:
+        try:
+            d = json.load(open(f, encoding="utf-8"))
+        except Exception as e:
+            raise SystemExit(f"⛔ 分片读取失败 {f}: {e}")
+        sh = d.get("shard") or {}
+        try:
+            start, end = int(sh.get("start", -1)), int(sh.get("end", -1))
+        except (TypeError, ValueError):
+            start = end = -1
+        if d.get("date") != date or start < 0 or end <= start:
+            raise SystemExit(f"⛔ 分片元数据异常 {f}: date={d.get('date')} shard={sh}")
+        parts.append((start, end, f, d))
+    parts.sort(key=lambda x: x[0])
+    cursor = 0
+    _expected = max([int((d.get("shard") or {}).get("domain_full") or 0)
+                     for _, _, _, d in parts] + [max(x[1] for x in parts)])
+    for start, end, f, _ in parts:
+        if start != cursor:
+            raise SystemExit(f"⛔ 分片不连续：{f} start={start}，期望 {cursor}（拒绝合成）")
+        cursor = end
+    if cursor < _expected:
+        raise SystemExit(f"⛔ 分片只覆盖 [0,{cursor})，全域 {_expected}：缺尾部，"
+                         "拒绝合成（避免用部分域污染历史归档）")
+    rows, conflicts = {}, []
+    for _, _, f, d in parts:
+        for c, r in (d.get("rows") or {}).items():
+            if c in rows and rows[c] != r:
+                conflicts.append(c)
+            rows[c] = r
+    if conflicts:
+        raise SystemExit(f"⛔ 分片代码冲突 {len(conflicts)} 只（例：{conflicts[:5]}），拒绝合成")
+    stat = defaultdict(int)
+    for r in rows.values():
+        for k in ("pe", "fwd_pe", "growth", "roe", "gross_margin", "cagr3"):
+            if r.get(k) is not None:
+                stat[k] += 1
+    payload = {
+        "schema": SCHEMA,
+        "date": date,
+        "generated_at": now_iso,
+        "domain_size": len(rows),
+        "price_source": "klines_long",
+        "coverage": {k: stat[k] for k in ("pe", "fwd_pe", "growth", "roe",
+                                          "gross_margin", "cagr3")},
+        "caveat": (parts[0][3].get("caveat") or ""),
+        "merged_from": [os.path.basename(f) for _, _, f, _ in parts],
+        "rows": rows,
+    }
+    os.makedirs(OUTDIR, exist_ok=True)
+    out = os.path.join(OUTDIR, f"{date}.json")
+    tmp = out + ".merging"
+    with open(tmp, "w", encoding="utf-8") as fh:
+        json.dump(payload, fh, ensure_ascii=False)
+    os.replace(tmp, out)
+    print(f"✅ 合成 {out}（{len(parts)} 片 / {len(rows)} 只 / {os.path.getsize(out)/1e6:.2f} MB）")
+    print("   分片文件全部保留作复核证据，未删除。")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--date", default="")
     ap.add_argument("--dry-run", action="store_true")
+    # P1-7：分片参数（不传 = 老全量行为；传了只写 .shard* 文件）
+    ap.add_argument("--start", type=int, default=None)
+    ap.add_argument("--end", type=int, default=None)
+    ap.add_argument("--merge-shards", action="store_true",
+                    help="把当日所有 .shard*.json 合成主档；缺片或代码冲突则拒绝写")
     args = ap.parse_args()
+    if (args.start is None) != (args.end is None):
+        ap.error("--start 与 --end 必须同时给出")
+    if args.start is not None and args.start < 0:
+        ap.error("--start 不能为负")
+    if args.end is not None and args.end <= args.start:
+        ap.error("--end 必须大于 --start")
+    if args.merge_shards and (args.start is not None or args.dry_run):
+        ap.error("--merge-shards 不能与 --start/--end/--dry-run 同用")
 
     # ⚠️ 2026-10-29 P0（时区 bug）：原实现 `dt.datetime.now() + timedelta(hours=8)`
     #   假设宿主机时区是 UTC。但本机已是 CST+0800（`date +%Z` → CST），
@@ -192,6 +281,10 @@ def main():
     print("=" * 100)
     print(f"archive_fund_universe · 目标日期 {date}")
     print("=" * 100)
+
+    if args.merge_shards:
+        merge_shards(date, _bj_now().isoformat(timespec="seconds"))
+        return
 
     px = load_prices()
     print(f"价格库：{len(px)} 只")
@@ -214,6 +307,12 @@ def main():
     # 域：有价 ∩ EM财务 ∩ 申万 —— 刻意不要求「在池内」，这正是本次修复的核心
     DOM = sorted(have_px & set(em) & (set(l1) | set(l2)))
     print(f"归档域（有价 ∩ EM ∩ 申万）= {len(DOM)} 只")
+    _shard = args.start is not None
+    _dom_full = len(DOM)
+    if _shard:
+        DOM = DOM[args.start:args.end]
+        print(f"🧩 分片模式 [{args.start}, {args.end}) → 本片 {len(DOM)} / 全域 {_dom_full} 只"
+              "（只写 .shard*.json，不覆盖主档）")
 
     rows = {}
     stat = defaultdict(int)
@@ -292,6 +391,9 @@ def main():
                    "本目录不含 score_fund 分数本身，避免把当期规则永久固化。"),
         "rows": rows,
     }
+    if _shard:
+        payload["shard"] = {"start": args.start, "end": args.end,
+                            "domain_full": _dom_full, "n_rows": n}
 
     if args.dry_run:
         print()
@@ -301,7 +403,8 @@ def main():
         return
 
     os.makedirs(OUTDIR, exist_ok=True)
-    out = os.path.join(OUTDIR, f"{date}.json")
+    _suffix = f".shard{args.start}_{args.end}" if _shard else ""
+    out = os.path.join(OUTDIR, f"{date}{_suffix}.json")
     with open(out, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False)
     sz = os.path.getsize(out) / 1e6

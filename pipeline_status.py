@@ -68,13 +68,16 @@ DEGRADABLE = {
     "sector_momentum_daily": ("行业动量", "行业动量未计算"),
     "apply_sector_momentum": ("行业维合并", "total 未含行业维 → 与权重声明不符"),
     "pick_portfolio": ("组合生成", "当日无组合建议"),
+    # 2026-11-24 P0-5 #3：组合报告此前挂在 pick_portfolio 的 if 分支里，
+    # 失败只 echo 不 _rec → 状态机把它当「没跑」，报告也无法披露降级。
+    "gen_portfolio_report": ("组合报告生成", "组合模块 HTML 未更新/生成失败"),
     "portfolio_risk": ("组合层风险度量",
                        "组合波动/beta/回望回撤缺失 → 读者看不到持仓的固有风险，"
                        "只能看到「选了什么」，看不到「这些票一起会怎么动」"),
     "portfolio_metrics": ("组合日频指标",
                           "推荐组合的收益/回撤/重叠度停在上一日 → 换手率与回撤视图陈旧"),
     "track_recommendations": ("推荐跟踪", "跟踪曲线断点"),
-    "factor_eval": ("因子 IC + 权重重估", "IC/权重视图停在上一日"),
+    "factor_eval": ("因子 IC（权重不随日链变）", "IC 视图停在上一日；报告侧 >3 天降级占位"),
     # ── round125 补注册（上一轮遗漏）─────────────────────────────────────
     # 血案：round124 在 run_daily_local.sh 新增 Step 3.965 并调用 `_rec long_panel_ic`，
     #   但**没有把 "long_panel_ic" 加进本表** → finalize 会把它判成 kind="unknown"。

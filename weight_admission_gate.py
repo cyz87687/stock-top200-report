@@ -882,11 +882,28 @@ def walk_forward(X, M, Y, RY, dates, pool, pool_mask, used_idx,
 # ═══════════════ 主裁决 ═══════════════
 
 def evaluate(wmap, X, M, Y, RY, dates, pool_mask, used_idx,
-             pool=None, skip_wf=False, wf_kwargs=None, verbose=True):
-    """对给定权重做完整裁决，返回 dict（含 verdict: PASS/FAIL/UNKNOWN）。"""
+             pool=None, skip_wf=False, wf_kwargs=None, verbose=True,
+             scope_meta=None):
+    """对给定权重做完整裁决，返回 dict（含 verdict: PASS/FAIL/UNKNOWN/PROXY_ONLY）。
+
+    ⚠️ 2026-11-24 P0-4：新增 scope_meta（产物元数据）。若其 factor_parity=False
+       （代理面板：3 个生效维合计权重 0.40 无列），即便五门全过，也**禁止产出
+       可上线结论** —— verdict 强制降级为 PROXY_ONLY。判据复用 artifact_scope
+       唯一实现（weight_approval_allowed），禁在本函数另写一套 parity 逻辑。
+       旧调用方不传 scope_meta → 行为不变（向后兼容历史审计脚本）。
+    """
     pool = pool or STABLE_DIMS + ["score_ep", "score_lowvol20",
                                   "score_rsi_rev", "score_tech_neg"]
     wf_kwargs = wf_kwargs or {}
+    _scope = None
+    if scope_meta is not None:
+        try:
+            import artifact_scope as _as
+            _scope = _as.classify_scope(scope_meta)
+        except Exception as _se:
+            _scope = {"weight_approval_allowed": False,
+                      "artifact_status": f"SCOPE_CHECK_ERROR:{type(_se).__name__}",
+                      "reason": str(_se)}
 
     if verbose:
         print("\n" + "=" * 78)
@@ -964,6 +981,19 @@ def evaluate(wmap, X, M, Y, RY, dates, pool_mask, used_idx,
         failed = [k for k, v in gates.items() if not v]
         reason = "未通过门禁: " + ", ".join(failed)
 
+    # ── P0-4：代理面板硬门禁（factor_parity=False → 禁上线）──
+    _scope_block = False
+    if _scope is not None and not _scope.get("weight_approval_allowed", False):
+        if verdict == "PASS":
+            verdict = "PROXY_ONLY"
+            _scope_block = True
+            reason = (f"{reason}；但产物为 {_scope.get('artifact_status')}（factor_parity="
+                      f"{_scope.get('factor_parity')}，代理面板缺列维合计权重 0.40），"
+                      f"硬门禁降级为 PROXY_ONLY，禁止据此上线/称经验证 alpha。{_scope.get('reason','')}")
+        elif verbose:
+            print(f"\n  ⚠️ 代理面板产物（{_scope.get('artifact_status')}）：裁决 {verdict} 本就不是 PASS，"
+                  f"无需再降级。")
+
     if verbose:
         print("\n  " + "=" * 78)
         print(f"  裁决: {verdict}  —— {reason}")
@@ -979,6 +1009,8 @@ def evaluate(wmap, X, M, Y, RY, dates, pool_mask, used_idx,
         "verdict": verdict,
         "reason": reason,
         "gates": gates,
+        "scope_blocked": _scope_block,
+        "artifact_scope": _scope,
         "weights": {k: round(v, 6) for k, v in wmap.items()},
         "flip_total": round(sum(wmap.get(d, 0.0) for d in FLIP_DIMS), 6),
         "stable_total": round(sum(wmap.get(d, 0.0) for d in STABLE_DIMS), 6),
@@ -1052,8 +1084,16 @@ def main():
     print(f"权重来源: {args.weights or WEIGHTS}")
 
     pool = [x.strip() for x in args.pool.split(",") if x.strip()]
+    # 2026-11-24 P0-4：把长面板元数据作为 scope_meta 传入裁决 —— 未绑定 kernel_id /
+    #   factor_parity=False 的代理面板即使五门全过也只能得 PROXY_ONLY，禁上线。
+    try:
+        with open(PANEL, encoding="utf-8") as _pf:
+            _scope_meta = (json.load(_pf) or {}).get("meta") or {}
+    except Exception:
+        _scope_meta = None
     res = evaluate(wmap, X, M, Y, RY, dates, pool_mask, used_idx,
                    pool=pool, skip_wf=args.skip_wf,
+                   scope_meta=_scope_meta,
                    wf_kwargs={"folds": args.folds, "train": args.train,
                               "val": args.val, "step": args.step,
                               "pass_rate_thr": args.pass_rate})

@@ -264,8 +264,30 @@ fi
 # Step 3.9: Portfolio
 echo "[$(date '+%H:%M:%S')] Running pick_portfolio.py ..." >> "$LOG"
 if $PY pick_portfolio.py "$SCORED_JSON" --top 10 --per-sector 3 --per-parent 2 >> "$LOG" 2>&1; then
-  echo "[$(date '+%H:%M:%S')] ✅ Portfolio generated" >> "$LOG"; _rec pick_portfolio 0
-  $PY gen_portfolio_report.py >> "$LOG" 2>&1 || echo "⚠️ Portfolio report failed" >> "$LOG"
+  # 2026-11-24 P0-5 #2：上游日期自检。报告层已有「日期不一致不展示」守卫，
+  # 但那要等出图时才发现；这里第一时间把「产物日期≠数据日期」记账为降级。
+  PF_JSON="sector/portfolio_${BJ_TODAY}.json"
+  PF_DATE=$($PY - "$PF_JSON" <<'PYEOF' 2>/dev/null
+import json, sys
+try:
+    print(json.load(open(sys.argv[1], encoding="utf-8")).get("date") or "")
+except Exception:
+    pass
+PYEOF
+)
+  if [ "$PF_DATE" = "$BJ_TODAY" ]; then
+    echo "[$(date '+%H:%M:%S')] ✅ Portfolio generated ($PF_DATE)" >> "$LOG"; _rec pick_portfolio 0
+  else
+    echo "[$(date '+%H:%M:%S')] ⛔ Portfolio date mismatch: ${PF_DATE:-<missing>} != $BJ_TODAY" >> "$LOG"
+    _rec pick_portfolio 1 "组合产物日期 ${PF_DATE:-缺失} ≠ 数据日期 $BJ_TODAY → 报告层守卫将阻断组合区块"
+  fi
+  # 2026-11-24 P0-5 #3：组合报告独立记账，失败不再被 if 分支吞掉。
+  if $PY gen_portfolio_report.py >> "$LOG" 2>&1; then
+    echo "[$(date '+%H:%M:%S')] ✅ Portfolio report generated" >> "$LOG"; _rec gen_portfolio_report 0
+  else
+    echo "[$(date '+%H:%M:%S')] ⚠️ Portfolio report failed" >> "$LOG"
+    _rec gen_portfolio_report 1 "组合模块 HTML 未更新（可能是空 portfolios 或产物日期不一致）"
+  fi
 else
   echo "[$(date '+%H:%M:%S')] ⚠️ Portfolio generation failed" >> "$LOG"
   _rec pick_portfolio 1 "当日无组合建议"
@@ -331,12 +353,15 @@ fi
 #   排障时看日志会误判成「factor_eval 没进日链」。
 #   实测证据：factor_ic.json 是 02:58 手工产物、日链日志 grep 'Factor IC' 为 0。
 #   拆成两行后日志恢复，且与前后步骤格式统一。
-echo "[$(date '+%H:%M:%S')] Running factor_eval.py (Rank IC + daily weight re-estimation) ..." >> "$LOG"
-if $PY factor_eval.py --optimize-weights >> "$LOG" 2>&1; then
-  echo "[$(date '+%H:%M:%S')] ✅ Factor IC + weight re-estimation updated" >> "$LOG"; _rec factor_eval 0
+# 2026-11-24 P0-3：日链只算截面 IC 落盘，**不再每日 --optimize-weights**。
+#   权重优化本质是研究动作（v3.6 拟合 + 走步验证单步 >400s 会 SIGTERM），
+#   每日跑既超时又静默陈旧；权重变更改走独立流程 + 五门 + 八处同步。
+echo "[$(date '+%H:%M:%S')] Running factor_eval.py (Rank IC only; weights are managed) ..." >> "$LOG"
+if $PY factor_eval.py >> "$LOG" 2>&1; then
+  echo "[$(date '+%H:%M:%S')] ✅ Factor IC updated (weights untouched)" >> "$LOG"; _rec factor_eval 0
 else
   echo "[$(date '+%H:%M:%S')] ⚠️ Factor IC evaluation failed" >> "$LOG"
-  _rec factor_eval 1 "IC/权重视图停在上一日"
+  _rec factor_eval 1 "IC 视图停在上一日（报告侧 >3 天降级占位）"
 fi
 
 # ══════════════════════════════════════════════════════════════════════════

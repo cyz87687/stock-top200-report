@@ -441,6 +441,66 @@ def anchor_gate(score, cagr3):
     return score, note
 
 
+# ---- 2026-11-24 P1-1：低基数二次封顶 8.0（与 audit_v51_recalc 口径统一）----
+LOWBASE_CAP = 8.0
+
+
+def lowbase_growth_cap(score, growth_capped, ocfg=None, roe=None):
+    """单点增速被低基数饱和压缩且盈利质量差 → 成长分二次封顶 8.0。
+
+    实证（docs/潜在问题全面梳理 P1-1）：13 只 growth_raw>500% 经低基数修正后
+    仍拿 8.48~9.98（源杰 cagr3=22% 却 9.74）。v5.1 审计已用此规则但生产未装。
+    口径与 audit_v51_recalc.py:292-299 完全一致：
+      growth_capped=True 且 (OCF/NI<0 或 ROE<10) → score≤8.0。
+    ⚠️ 单一实现：step2 与 enhance 两处回写点都调本函数（同 anchor_gate 纪律）。
+       返回 (score_after, note_or_None)；缺值不误触发（无证据不扣）。
+    """
+    if not isinstance(score, (int, float)) or isinstance(score, bool) or score != score:
+        return score, None
+    if not growth_capped:
+        return score, None
+    _ocf_bad = isinstance(ocfg, (int, float)) and not isinstance(ocfg, bool) \
+        and ocfg == ocfg and ocfg < 0
+    _roe_bad = isinstance(roe, (int, float)) and not isinstance(roe, bool) \
+        and roe == roe and roe < 10
+    if not (_ocf_bad or _roe_bad):
+        return score, None
+    if score <= LOWBASE_CAP:
+        return score, None
+    return LOWBASE_CAP, f"低基数二次封顶{LOWBASE_CAP:.1f}(OCF/NI<0或ROE<10)"
+
+
+# ---- 2026-11-24 P1-3：周期股成长/ep 对称封顶 ----
+CYCLIC_GROWTH_CAP = 8.0
+CYCLIC_FWDPE_MAX = 30.0
+CYCLIC_EP_CAP = 5.0
+
+
+def cyclic_caps(score_growth, score_ep, is_cyclic, fwd_pe=None):
+    """周期股：成长封顶 8.0、fwdPE>30 时 ep 封顶 5.0（与 fund 4.5 对称）。
+
+    实证（docs/潜在问题全面梳理 P1-3）：宏和科技 周期股 + PE73/fwdPE51.6 +
+    growth 9.98（全池最高）—— fund 维已封顶 4.5，但成长/ep 不受约束。
+    ⚠️ 单一实现：在最终总分出口（apply_sector_momentum）调用一次，
+       周期判定沿用 step2 落盘的 is_cyclic（cycle_industry.json 正面清单单一来源）。
+       返回 (g_after, ep_after, note_or_None)。
+    """
+    if not is_cyclic:
+        return score_growth, score_ep, None
+    notes = []
+    g, ep = score_growth, score_ep
+    if isinstance(g, (int, float)) and not isinstance(g, bool) and g > CYCLIC_GROWTH_CAP:
+        g = CYCLIC_GROWTH_CAP
+        notes.append(f"周期股成长封顶{CYCLIC_GROWTH_CAP:.1f}")
+    _fwd_bad = (isinstance(fwd_pe, (int, float)) and not isinstance(fwd_pe, bool)
+                and fwd_pe == fwd_pe and fwd_pe > CYCLIC_FWDPE_MAX)
+    if _fwd_bad and isinstance(ep, (int, float)) and not isinstance(ep, bool) \
+            and ep > CYCLIC_EP_CAP:
+        ep = CYCLIC_EP_CAP
+        notes.append(f"周期股fwdPE>{CYCLIC_FWDPE_MAX:.0f}→ep封顶{CYCLIC_EP_CAP:.1f}")
+    return g, ep, ("；".join(notes) if notes else None)
+
+
 def compute_growth(rows, style="steady", em_all=None, as_of=None, pit_grace=0):
     """方式B 成长因子截面计算（round106 口径）。
 

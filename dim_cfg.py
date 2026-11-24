@@ -60,6 +60,11 @@ _SAFETY_DEFAULT = {
     "score_size_ind": 10.0,
     "score_size_growth": 10.0,
     "score_dominant": 10.0,
+    # v5.0（2026-11-23）：新增两维必须同步登记，否则配置不可读时按 10.0
+    # 兜底（虽恰好同为 10.0，但 test_dim_cfg_single_source.T1 会判定
+    # 「新增维度未登记」→ 单一来源铁律被破坏）。
+    "score_size_comb": 10.0,
+    "score_es": 10.0,
 }
 
 _CACHE = None

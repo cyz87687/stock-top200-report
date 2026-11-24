@@ -63,6 +63,47 @@ OUT_PATH = os.path.join(HERE, "factor_ic.json")
 TRACK_PATH = os.path.join(HERE, "recommendation_track.json")
 WEIGHTS_PATH = os.path.join(HERE, "factor_weights.json")
 
+# ── 2026-11-24 P0-2：权重整份覆盖守卫（判据单一实现）────────────────────
+# 事故背景：原判据 `startswith("v4.") or 含 weight_constraints`：
+#   v5.0-audit-revg-es 恰好因含该字段才「侥幸」被拦；一旦字段改名/移除 →
+#   日链 Step 3.96 每天静默把 v5 权重整份覆盖成 v3.6 拟合结果。
+# 修：① 白名单前缀 ("v4.","v5.") 抗改名；② 内容断言（缺 dim_max / weights≠1）
+#   无论版本名一律拒写；③ 覆盖前 .snap 留证。判据集中于此函数，单测直接调用。
+MANAGED_WEIGHT_PREFIXES = ("v4.", "v5.")
+
+
+def weight_overwrite_guard(cur, new, force=False):
+    """权重整份覆盖守卫。返回 (allowed: bool, reason: str)。
+
+    cur/new: factor_weights.json 结构的 dict（读失败传 None）。
+    force: --force-overwrite-weights，仅绕过「版本守卫」，**不绕过内容断言**。
+    """
+    cur = cur if isinstance(cur, dict) else {}
+    new = new if isinstance(new, dict) else {}
+    cur_ver = str(cur.get("version") or "")
+    new_ver = str(new.get("version") or "")
+    managed = (cur_ver.startswith(MANAGED_WEIGHT_PREFIXES)
+               or bool(cur.get("weight_constraints")))
+    if managed and not force:
+        return False, (
+            f"现存权重 {cur_ver or '(无版本号)'} 为受管版本"
+            f"（前缀 {MANAGED_WEIGHT_PREFIXES} / 含 weight_constraints），"
+            f"禁止被 {new_ver or '研究拟合结果'} 整份覆盖。")
+    # 内容断言（force 也不能绕过）：拟合结果缺量纲元信息或权重不合 1 → 拒写主表
+    w = new.get("weights")
+    dim_max = new.get("dim_max")
+    if not isinstance(w, dict) or not w:
+        return False, "新结果缺 weights 字段，拒写主权重表。"
+    if not isinstance(dim_max, dict) or not dim_max:
+        return False, "新结果缺 dim_max（量纲口径元信息），拒写主权重表。"
+    try:
+        s = sum(float(v) for v in w.values())
+    except (TypeError, ValueError):
+        return False, "新结果 weights 含非数值，拒写主权重表。"
+    if abs(s - 1.0) > 1e-6:
+        return False, f"新结果 weights 合计={s:.6f}≠1.0，拒写主权重表。"
+    return True, "OK"
+
 # ── round124 P0-1：长面板是**唯一权威 IC 数据源** ────────────────────────
 # 血案（本轮实测，三个链路给出三个互不相同的 h=20 答案）：
 #   链路 A factor_eval.py ← factor_history.json（91 快照，76 个 rows<200、
@@ -359,7 +400,12 @@ ALL_W_DIMS = OPT_DIMS + ["score_theme_neg", "score_size", "score_sector",
                         "score_quality", "score_growth", "score_tech_neg",
                         "score_lowvol20", "score_ep", "score_size_ind",
                         # v4.13-size2d：市值双维度（score_size_ind 权重归零留档）
-                        "score_size_growth", "score_dominant"]
+                        "score_size_growth", "score_dominant",
+                        # v5.0（2026-11-23）：市值合并维 + 业绩超预期维。
+                        # ⚠️ 漏加这两维时 load_weights 只算到 0.75 → 判「权重非法」
+                        #    → current_weights_composite_ic / tradable_w 静默跳过且无告警，
+                        #    页面只剩单因子 IC，无法回答「加权是否有增量」。
+                        "score_size_comb", "score_es"]
 # v4.4-fund-split 先验（与 factor_weights.json 一致；运行时会优先读该文件 prior_weights）。
 # 依据：round18 theme=行业代理/news仅短线；round19 外部47因子排名；round20 反转块回填
 # 重测；round21/22 质量成长PIT实证+样本内外分层+fund敏感性（0.25~0.40全lag过，单调）。
@@ -380,6 +426,8 @@ PRIOR_W10 = {
     "score_size": 0.000000,
     "score_size_comb": 0.200000,
     "score_size_ind": 0.000000,
+    "score_size_growth": 0.000000,
+    "score_dominant": 0.000000,
     "score_tech_neg": 0.000000,
     "score_theme_intrinsic": 0.000000,
     "score_theme_neg": 0.000000,
@@ -2226,6 +2274,48 @@ def _composite_ic(snapshots, w4, h, tdays, px, max_base_idx=None, dates_only=Non
     return _agg_stats(ics, spreads, dates, h, sizes=sizes)
 
 
+def proxy_observable_weights(weights, observed_dims, dims=None):
+    """代理面板专用：整窗无列的生效维从评估目标中剔除，其余维重新归一。
+
+    背景（2026-11-24 问题梳理 P0-4 第 3 条）：历史快照面板缺
+    score_size_comb / score_es 两列（合计名义权重 0.25）。旧实现把它们
+    当「个股缺值」送进 scale_calc(..., missing_rule="zero")：分母照算、
+    分子记 0，读者容易误读为「该因子实测为 0」而不是「面板根本没有这列」。
+
+    ⚠️ 这里只改**评估用的权重集合**，不改生产量尺：
+       · 整窗无列 → 从目标函数剔除 + 剩余权重归一（本函数）；
+       · 有列但个股缺值 → 仍按 zero 档固定分母计 0，与生产一致；
+       · 不返回/不写回 factor_weights.json，名义权重表保持不动。
+
+    返回 (effective_weights, dropped, note)。observed_dims 为空时不做剔除，
+    避免构造期数据缺失反而把全部权重抹掉。
+    """
+    _dims = list(dims) if dims else list(ALL_W_DIMS)
+    _obs = set(observed_dims or ())
+    _nominal = {}
+    for k in _dims:
+        v = (weights or {}).get(k)
+        if isinstance(v, (int, float)) and not isinstance(v, bool) and float(v) > 0:
+            _nominal[k] = float(v)
+    if not _obs or not _nominal:
+        return _nominal, {}, "观测集合为空，保留名义权重（不出具代理面板结论）"
+    _dropped = {k: v for k, v in _nominal.items() if k not in _obs}
+    _kept = {k: v for k, v in _nominal.items() if k in _obs}
+    _s = sum(_kept.values())
+    if _s <= 0:
+        return _nominal, {}, "无可用观测维，保留名义权重（不出具代理面板结论）"
+    _eff = {k: round(v / _s, 6) for k, v in _kept.items()}
+    _diff = round(1.0 - sum(_eff.values()), 6)
+    if abs(_diff) > 1e-9 and _eff:
+        _kmax = max(_eff, key=_eff.get)
+        _eff[_kmax] = round(_eff[_kmax] + _diff, 6)
+    _drop_w = sum(_dropped.values())
+    _note = (f"代理面板整窗无列维 {', '.join(sorted(_dropped))} 的名义权重合计 "
+             f"{_drop_w:.2f} 已从评估目标剔除并在剩余 {len(_eff)} 维重新归一；"
+             "有列但个股缺值仍按 zero 档固定分母计 0（生产量尺不变）。")
+    return _eff, _dropped, _note
+
+
 def _fit_ic_weights(ic_map, lam, prior_norm, floor=W_FLOOR):
     """IC 驱动权重：正 IC 按比例分配 + 地板 + 向先验收缩。"""
     pos = {k: max(float(ic_map.get(k) or 0.0), 0.0) for k in OPT_DIMS}
@@ -2433,6 +2523,20 @@ def load_weights():
         return None, None
 
 
+# v5.0：提升至模块级常量，让 verify_weights_round36.py 能真正校验这份回退表。
+# 之前写在 _load_dim_max_eval() 内部，校验脚本只能输出「无 _DIM_MAX_DEFAULT（跳过）」。
+_DIM_MAX_DEFAULT = {
+    "score_fund": 5.0, "score_news": 5.0, "score_theme_neg": 10.0,
+    "score_size": 10.0, "score_sector": 5.0, "score_quality": 10.0,
+    "score_growth": 10.0, "score_tech_neg": 10.0, "score_oversold60": 5.0,
+    "score_bias60": 5.0, "score_rsi_rev": 5.0, "score_vol_pulse": 5.0,
+    "score_overbought": 5.0, "score_theme_intrinsic": 5.0, "score_attention": 5.0,
+    "score_lowvol20": 10.0, "score_ep": 10.0, "score_size_ind": 10.0,
+    "score_size_growth": 10.0, "score_dominant": 10.0,
+    "score_size_comb": 10.0, "score_es": 10.0,
+}
+
+
 def _load_dim_max_eval():
     """读 factor_weights.json 的 dim_max（各维满分量程）；失败回退内置默认。
 
@@ -2440,26 +2544,17 @@ def _load_dim_max_eval():
     回退默认值必须与 factor_weights.json 的 dim_max 严格一致 —— 不一致会
     静默改变中性填充值（DMAX/2）与归一化分母，使审计 IC 与生产口径脱钩。
     """
-    _DEF = {
-        "score_fund": 5.0, "score_news": 5.0, "score_theme_neg": 10.0,
-        "score_size": 10.0, "score_sector": 5.0, "score_quality": 10.0,
-        "score_growth": 10.0, "score_tech_neg": 10.0, "score_oversold60": 5.0,
-        "score_bias60": 5.0, "score_rsi_rev": 5.0, "score_vol_pulse": 5.0,
-        "score_overbought": 5.0, "score_theme_intrinsic": 5.0, "score_attention": 5.0,
-        "score_lowvol20": 10.0, "score_ep": 10.0, "score_size_ind": 10.0,
-        "score_size_growth": 10.0, "score_dominant": 10.0,
-    }
     try:
         with open(WEIGHTS_PATH, encoding="utf-8") as f:
             dm = (json.load(f) or {}).get("dim_max") or {}
-        out = dict(_DEF)
-        for k in _DEF:
+        out = dict(_DIM_MAX_DEFAULT)
+        for k in _DIM_MAX_DEFAULT:
             v = dm.get(k)
             if isinstance(v, (int, float)) and v > 0:
                 out[k] = float(v)
         return out
     except Exception:
-        return dict(_DEF)
+        return dict(_DIM_MAX_DEFAULT)
 
 
 # ---------------------------------------------------------------- 主流程
@@ -2666,22 +2761,38 @@ def main():
             #   这会让「加权 vs fund 单维」的对比结论只反映 70% 权重，结论不可用。
             #   改用全量维度 + 派生维（score_size 缺市值的截面自动不参与归一）。
             _wkeys = [k for k in ALL_W_DIMS if k != "score_sector"]
-            _wr = {k: float(_wfw.get(k) or 0.0) for k in _wkeys}
-            _ws = sum(_wr.values()) or 1.0
-            _wr = {k: v / _ws for k, v in _wr.items()}
-            _wr_snaps = []
+            _wr_nominal = {k: float(_wfw.get(k) or 0.0) for k in _wkeys}
+            _ws = sum(_wr_nominal.values()) or 1.0
+            _wr = {k: v / _ws for k, v in _wr_nominal.items()}
             # v4.10（P0-4）：量尺必须与生产线一致 —— 分母恒定 Σ全部生效权重，
-            #   缺维按中性分 DMAX/2 填充（详见 scale_calc.py 模块头）。
+            #   缺维按 zero 档记 0（详见 scale_calc.py 模块头）。
             #   修复前是「逐行可用维度归一」→ 缺维多的行分数被抬高，
             #   与 step2/enhance/apply 的真实口径不一致，重复了 round24d 的口径血案。
             _dmx = _load_dim_max_eval()
+            # v5.0-P0-4 #3：先派生一次并统计整窗有列的维，再把「整窗无列」的
+            #   名义权重从评估目标剔除、剩余维重新归一（proxy_observable_weights）。
+            #   ⚠️ 名义权重表不动；只影响这段代理面板诊断的评估目标。
+            _derived_snaps = [
+                (_s, _derive_dims(_s["rows"], _s.get("date"), tdays, px))
+                for _s in aligned
+            ]
+            _observed = set()
+            for _s0, _rows0 in _derived_snaps:
+                for _r0 in _rows0:
+                    for _f0 in _wkeys:
+                        if isinstance(_r0.get(_f0), (int, float)) \
+                                and not isinstance(_r0.get(_f0), bool):
+                            _observed.add(_f0)
+            _wr, _wr_dropped, _wr_proxy_note = proxy_observable_weights(
+                _wr, _observed, _wkeys)
             _SUM_W = scale_calc.sum_all_weights(_wr) or 1.0
-            for _s in aligned:
+            _wr_snaps = []
+            for _s, _derived_rows in _derived_snaps:
                 _rows = []
                 # v4.9：必须传 date/tdays/px —— 否则 lowvol20 无法重建（需 21 根收盘价），
                 #   EP/SIZE_IND 也无法算，复合分只反映 ~74% 权重却当成全部。
-                for _r in _derive_dims(_s["rows"], _s.get("date"), tdays, px):
-                    _av = [f for f in _wkeys if isinstance(_r.get(f), (int, float))]
+                for _r in _derived_rows:
+                    _av = [f for f in _wr if isinstance(_r.get(f), (int, float))]
                     # ⚠️ 保留原判据「必须有 score_fund 且至少 2 维有值」不变。
                     #   理由：改量尺与改样本必须分开评估，否则 IC 变化无法归因。
                     #   （「有 fund 值」等价「曾入池」，本身带 −0.1492 的入池指示效应，
@@ -2693,11 +2804,10 @@ def main():
                     #   （铁律：历史/回测禁自写合成分）。此前此处自写一份「缺维填 5.0」
                     #   的合成，与生产口径各走各的 → 口径漂移风险。
                     #   ⚠️ 该路径跑的是**历史代理面板**（factor_parity=False）：
-                    #   面板无 score_size_comb / score_es 两列（新增维度未回填），
-                    #   故这两维按缺维处理（zero 档 → 0 分计入，分母不变）。
+                    #   整窗无列的两维已从 _wr 剔除；有列但个股缺值按 zero 档计 0。
                     #   结论只能作**代理面板诊断**，禁止用于证明生产模型有效性。
                     _t2, _ = scale_calc.composite_total(
-                        [(_f2, _r.get(_f2), _wr[_f2]) for _f2 in _wkeys],
+                        [(_f2, _r.get(_f2), _wr[_f2]) for _f2 in _wr],
                         _dmx, weights=_wr, missing_rule="zero")
                     _rows.append({"code": _r["code"], "total": _t2})
                 if _rows:
@@ -2706,9 +2816,13 @@ def main():
                                         cost_bps=TRADABLE_COST_BPS)
             _wv3, _wc3, _wn3 = _overall_verdict(_wr_net)
             tradable_w = {
-                "base": "按 factor_weights.json 当前权重、逐行可用维度归一后重算的复合分",
+                "base": "按 factor_weights.json 当前权重、逐行可用维度归一后重算的复合分（代理面板）",
                 "cost_bps_roundtrip": TRADABLE_COST_BPS,
+                "weights_nominal": {k: round(v, 4) for k, v in _wr_nominal.items()
+                                    if v > 0},
                 "weights_used": {k: round(v, 4) for k, v in _wr.items()},
+                "proxy_dropped_dims": {k: round(v, 4) for k, v in _wr_dropped.items()},
+                "proxy_note": _wr_proxy_note,
                 "horizons": _wr_net,
                 "verdict": _wv3, "verdict_color": _wc3, "verdict_note": _wn3,
                 "verdict_selection": _verdict_selection(_wr_net),
@@ -3130,30 +3244,22 @@ def main():
             print(f"   🛡️ IC 驱动护栏：该拟合结果为 DIAGNOSTIC_ONLY，"
                   f"禁直接上线（目标函数应为 TopN 头部超额）")
             # ══════════════════════════════════════════════════════════════
-            # 🛑 权重覆盖守卫（2026-10-29 新增，P0 级）
-            # ──────────────────────────────────────────────────────────────
-            # 事故背景：本函数产出的 result["version"] 硬编码为 "v3.6-fund-led"
-            #   （见上方 result 组装），且**整份 dict 覆盖写** WEIGHTS_PATH。
-            #   而线上当前是 v4.15-constraint-cap（含 weight_constraints 元信息、
-            #   九维约束化权重）。日常链路 run_daily_local.sh 的 Step 3.96 会带
-            #   --optimize-weights 调用本脚本 → **一次运行就会把 v4.15 静默替换成
-            #   v3.6 并丢掉 weight_constraints**，此后 verify_weights_round36.py
-            #   的约束校验会退化为默认口径且无告警，页面权重条也会变。
-            #
-            # 处置：检测到现存权重是「受约束管理的版本」（有 weight_constraints
-            #   或 version 以 v4. 开头）时，**不覆盖主文件**，改写旁路文件并告警。
-            #   要强制覆盖必须显式传 --force-overwrite-weights。
+            # 🛑 权重覆盖守卫（2026-10-29 新增 / 11-24 P0-2 加固）
+            #   判据唯一实现：weight_overwrite_guard()（本文件顶部）
+            #   白名单 v4./v5. + 内容断言（dim_max / weights 合计=1）
+            #   + 覆盖前 .snap 留证。force 只绕版本守卫，不绕内容断言。
             # ══════════════════════════════════════════════════════════════
-            cur_ver, cur_managed = None, False
+            _cur = None
             try:
                 with open(WEIGHTS_PATH, encoding="utf-8") as f:
                     _cur = json.load(f)
-                cur_ver = _cur.get("version")
-                cur_managed = bool(_cur.get("weight_constraints")) or str(cur_ver or "").startswith("v4.")
             except Exception:
                 pass
+            cur_ver = (_cur or {}).get("version")
+            _allowed, _guard_reason = weight_overwrite_guard(
+                _cur, result, force=force_overwrite)
 
-            if cur_managed and not force_overwrite:
+            if not _allowed:
                 side = os.path.join(
                     HERE, f"factor_weights_optimized_{datetime.now().strftime('%Y%m%d')}.json")
                 with open(side, "w", encoding="utf-8") as f:
@@ -3163,15 +3269,21 @@ def main():
                     "current_version": cur_ver,
                     "attempted_version": result.get("version"),
                     "written_to": os.path.basename(side),
-                    "reason": "现存权重为受约束管理版本（含 weight_constraints 或 v4.x），"
-                              "禁止被 v3.6 拟合结果整份覆盖。"
-                              "如需强制覆盖请加 --force-overwrite-weights。",
+                    "reason": _guard_reason,
                 }
-                print(f"\n🛑 权重覆盖已拦截：现版本 {cur_ver} 为受约束管理版本，"
-                      f"拟合结果（{result.get('version')}）未写入主文件。")
+                print(f"\n🛑 权重覆盖已拦截：{_guard_reason}")
                 print(f"   → 已另存 {os.path.basename(side)}")
                 print(f"   → 主文件 {os.path.basename(WEIGHTS_PATH)} 保持不变")
             else:
+                # 留证：覆盖前把现权重快照落盘（铁律「留证改 .snap_*」）
+                _snap = os.path.join(
+                    HERE, f".snap_factor_weights_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
+                try:
+                    with open(_snap, "w", encoding="utf-8") as f:
+                        json.dump(_cur, f, ensure_ascii=False, indent=1)
+                    out["weights_snapshot"] = os.path.basename(_snap)
+                except Exception as _se:
+                    out["weights_snapshot_error"] = f"{type(_se).__name__}: {_se}"
                 with open(WEIGHTS_PATH, "w", encoding="utf-8") as f:
                     json.dump(result, f, ensure_ascii=False, indent=1)
                 out["weight_optimization"] = result

@@ -5539,6 +5539,14 @@ def main():
         #    ~OCFG 仅 0.03），南亚新材 OCF/NI=−0.07、应计 −13.7 仍拿 8.28。
         #    仅对实测红旗扣分；缺值不扣（缺维≠红旗）。
         s_growth, _g1n_a = _gfb_mod.anchor_gate(s_growth, cagr3_input)
+        # 2026-11-24 P1-1：低基数二次封顶 8.0（与 audit_v51_recalc 口径统一，
+        #   单一实现 growth_factor_b.lowbase_growth_cap；enhance 回写点同装）。
+        _gfb_sustain = sustain_info if isinstance(sustain_info, dict) else {}
+        s_growth, _lb_note = _gfb_mod.lowbase_growth_cap(
+            s_growth, bool(_gfb_sustain.get("growth_capped")),
+            ocfg=_ths_ex.get("ocfg"), roe=roe_input)
+        if _lb_note and not _g1n_a:
+            _g1n_a = _lb_note
         s_size_growth, _g1n_b = _gfb_mod.anchor_gate(s_size_growth, cagr3_input)
         # v5.0：合并维也过同一道成长存量门槛（它含 size_growth 成分）
         s_size_comb, _g1n_c = _gfb_mod.anchor_gate(s_size_comb, cagr3_input)
@@ -5553,6 +5561,20 @@ def main():
             if isinstance(_accr, (int, float)) and _accr == _accr and _accr < -10:
                 _q_pen += 1.5
                 quality_cash_flags.append("accruals<-10")
+            # ══ 2026-11-24 P0-1：ROE 绝对下限护栏 ══
+            # 实证（docs/潜在问题全面梳理_2026-11-24.md P0-1）：quality 是池内分位，
+            #   ROE 只作扣分项、无绝对下限 → 郑州煤电 ROE −65.86% 仍拿 9.82 分，
+            #   与紫竹高科 +451% 同分。负 ROE 必须扣分，与现金红旗同处一次 clamp。
+            # 量纲：负 ROE 必来自 ths（百分数，iFinD parse_fin_text 只收 0.01~2）；
+            #   符号与量纲无关，直接判 <0 / <−30，不经过 _roe_to_decimal（它对 ≤0 返回 None）。
+            _roe_raw = _ths_ex.get("roe")
+            if isinstance(_roe_raw, (int, float)) and not isinstance(_roe_raw, bool) \
+                    and _roe_raw == _roe_raw and _roe_raw < 0:
+                _q_pen += 1.5
+                quality_cash_flags.append("roe<0")
+                if _roe_raw < -30:
+                    _q_pen += 1.0
+                    quality_cash_flags.append("roe<-30")
             if _q_pen > 0:
                 s_quality = max(0.0, s_quality - _q_pen)
         # 缺失市值/质量/成长时不参与（权重按可用维度归一），不臆造中位分

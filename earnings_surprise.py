@@ -207,6 +207,24 @@ def judge_growth_surprise(fwd, act):
         band = (fwd_mid - POINT_BAND_PP, fwd_mid + POINT_BAND_PP)
         method = "point_band"
 
+    # ══ 2026-11-24 P0-6 §3：同源极端失真门槛 ══
+    # 实证：普冉股份 ES「超预期」依据是实际 +3875.6% vs 预测中枢 +3612.6%
+    #   —— 实际与预测同侧且都 >300%，是两个失真值比大小，不具判别力。
+    # 处置：实际与预测中枢同号且都落在极端区（>300% 或 <-50%）→ 判「无法判定」，
+    #   按缺维处理（不进入 score_es），并留痕 flag=extreme_same_side。
+    _extreme_pos = act_yoy > 300.0 and fwd_mid > 300.0
+    _extreme_neg = act_yoy < -50.0 and fwd_mid < -50.0
+    if _extreme_pos or _extreme_neg:
+        out.update({
+            "method": "extreme_same_side",
+            "flags": flags + ["extreme_same_side"],
+            "delta_pp": _round(act_yoy - fwd_mid, 1),
+            "fwd_mid": _round(fwd_mid, 1),
+            "note": (f"实际 {act_yoy:+.1f}% 与预测中枢 {fwd_mid:+.1f}% 同侧且均处极端区"
+                     f"（>{'300' if _extreme_pos else '-50'}%），判定不具判别力 → 无法判定（按缺维）"),
+        })
+        return out
+
     delta_pp = act_yoy - fwd_mid
     if act_yoy > band[1]:
         tier = "超预期"

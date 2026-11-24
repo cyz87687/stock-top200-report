@@ -20,6 +20,7 @@ from datetime import datetime
 
 from regime_date_guard import (check_artifact_date, check_payload,
                                budget_source_stale, hidden_notice)
+import scale_calc   # ES 覆盖让渡门控的单一来源（ES_COVERAGE_MIN）
 
 # 输入输出配置
 inp = sys.argv[1] if len(sys.argv) > 1 else f"top200_scored_{datetime.now().strftime('%Y-%m-%d')}.json"
@@ -607,6 +608,65 @@ RATING_FULL = {"S": "当日最强 · 重点关注", "A": "相对强势 · 可跟
 RATING_CUTS = [(0.05, "S"), (0.15, "A"), (0.50, "B"), (0.88, "C"), (1.01, "D")]
 
 
+# ---- 2026-11-24 P1-4：头部细分档 + 池内名次/分位（单一实现）----
+# 实证：前 50 分数 70.70~84.90、评级全部 A（旧分位档 5%~15% 同档）→ 无区分度。
+# 处置：头部前 5% 用 absolute rank 再细分为 S+/S/S−；同时给每行写入确切名次与
+#   池内分位。base rating（S/A/B/C/D 双口径之一）保留不动，细分档另存 rating_fine。
+HEAD_SUBGRADES = ((0.02, "S+"), (0.035, "S"), (0.05, "S-"))  # 头部 5% 三档分位上界
+
+
+def _head_fine_grades(items):
+    """返回 {code: (fine_grade, rank, percentile)}；仅头部 5% 有细分档，其余为 None。"""
+    rows = [x for x in items if x.get("total") is not None]
+    if not rows:
+        return {}
+    srt = sorted(rows, key=lambda x: -float(x.get("total") or 0))
+    n = len(srt)
+    out = {}
+    for i, it in enumerate(srt):
+        q = (i + 0.5) / n
+        rank = i + 1
+        fine = None
+        for hi, gr in HEAD_SUBGRADES:
+            if q < hi:
+                fine = gr
+                break
+        out[it["code"]] = (fine, rank, round(q * 100, 2))
+    return out
+
+
+def _differentiated_advice(r):
+    """P1-6：按总分档 + 关键短板生成差异化建议（规则兜底，AI 不可用时也有区分度）。"""
+    t = float(r.get("total") or 0)
+    if t >= 85:
+        base = "优先买入，可重仓"
+    elif t >= 65:
+        base = "逢低加仓，重点关注"
+    elif t >= 45:
+        base = "波段操作，轻仓参与"
+    elif t >= 25:
+        base = "观望，不新开仓"
+    else:
+        base = "坚决回避，立即卖出"
+    # 短板：找生效维里分数最低的一个（0-10 归一后），给出针对性提示
+    _dims = {"估值": "score_ep", "成长": "score_growth", "质量": "score_quality",
+             "基本面": "score_fund", "市值": "score_size_comb", "技术反转": "score_bias60"}
+    weak = None
+    wv = 11.0
+    for label, k in _dims.items():
+        v = r.get(k)
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            if v < wv:
+                wv, weak = v, label
+    if weak is None:
+        return base
+    if wv < 3:
+        return f"{base}；但{weak}分位靠后({wv:.1f})，需等该维改善"
+    if wv < 5:
+        return f"{base}；{weak}偏弱({wv:.1f})，控制仓位"
+    return f"{base}；{weak}中性偏强({wv:.1f})，关注持续性"
+
+
 def _quantile_ratings(items):
     """按 total 降序, 依分位给评级。items=[{code,total}, ...] → {code: rating}"""
     rows = [x for x in items if x.get("total") is not None]
@@ -682,9 +742,19 @@ def _dim_composites(r):
 _rating_abs_orig = {r["code"]: r["rating"] for r in results}
 _new_rating = _quantile_ratings(results)
 _rating_shift = sum(1 for r in results if _rating_abs_orig.get(r["code"]) != _new_rating.get(r["code"]))
+# 2026-11-24 P1-4/P1-6：头部细分档 + 确切名次/分位 + 差异化建议
+_head_fine = _head_fine_grades(results)
 for r in results:
     r["_rating_abs"] = _rating_abs_orig.get(r["code"], r["rating"])
     r["rating"] = _new_rating.get(r["code"], r["rating"])
+    _fine, _rank, _pct = _head_fine.get(r["code"], (None, None, None))
+    r["rating_fine"] = _fine
+    r["rank"] = _rank
+    r["percentile"] = _pct
+    # P1-6：仅在 advice 为规则兜底（无区分度）时覆盖为差异化文案；
+    #   本地复盘/AI 生成的 advice 保留（禁覆盖人工级结论）。
+    if not r.get("advice") or r.get("advice") == "逢低加仓，重点关注":
+        r["advice"] = _differentiated_advice(r)
 
 # 同步评级分布(页头统计卡片)
 from collections import Counter as _Counter
@@ -792,6 +862,29 @@ _conc_sum3 = sum(p for _, _, p in _conc_top_pct)
 _conc_txt = " · ".join(f"{nm} {cnt}只({p:.0f}%)" for nm, cnt, p in _conc_top_pct)
 _conc_warn = _conc_max_pct > 15
 _conc_color = "#dc2626" if _conc_max_pct > 25 else ("#f59e0b" if _conc_warn else "#22c55e")
+
+# ===== 2026-11-24 P1-5：头部行业集中度 + 按行业上限约束的 TopN 视图 =====
+# 实证：Top50 半导体10+元件9+通信设备4=23只(46%)，逐股独立打分无行业相关性约束。
+# 处置：在报告层额外给出「申万二级每行业≤3 只」约束后的 TopN（与 pick_portfolio
+#   的 --per-sector 3 同口径），让读者看到「分散化后的头部」而非仅集中版 Top50。
+# ⚠️ 只做展示层视图，不改评分/名次（因子层行业中性化属模型口径变更，待裁决）。
+TOP_SECTOR_CAP = 3
+
+
+def _sector_capped_top(items, n=50, cap=TOP_SECTOR_CAP):
+    """按 total 降序贪心选取，每个申万二级行业最多 cap 只。返回选中列表。"""
+    srt = sorted([x for x in items if x.get("total") is not None],
+                 key=lambda x: -float(x.get("total") or 0))
+    cnt, picked = {}, []
+    for x in srt:
+        sec = x.get("sector_l2") or x.get("sector_parent") or x.get("sector") or "—"
+        if cnt.get(sec, 0) >= cap:
+            continue
+        cnt[sec] = cnt.get(sec, 0) + 1
+        picked.append(x)
+        if len(picked) >= n:
+            break
+    return picked
 
 # ===== v2.41 P0-2 市场状态 → 仓位纪律 =====
 # 修复"顶部建议空仓 vs 个股逢低加仓"的矛盾: 由赚钱效应分统一决定当日总仓位上限,
@@ -1030,7 +1123,11 @@ def advice_with_market(r):
         if _rating == "A":
             return "市场冰点·暂不加仓，等企稳信号"
         return "市场冰点·观望为主"
-    return base
+    # 2026-11-24 P1-6：在评级语义后追加个股短板提示，破除「同评级同文案」。
+    #   短板由 _differentiated_advice 生成（规则兜底，可复现）；仅取分号后差异段。
+    _diff = _differentiated_advice(r)
+    _suffix = _diff.split("；", 1)[1] if "；" in _diff else ""
+    return f"{base} · {_suffix}" if _suffix else base
 
 
 # ===== v4.17（2026-10-31，audit_round90 趋势诊断）：趋势状态判定 =====
@@ -1927,6 +2024,24 @@ try:
             _ic = json.load(_f)
 except Exception as _e:
     print(f"⚠️ 读取 factor_ic.json 失败: {_e}")
+
+# 2026-11-24 P0-3：IC 陈旧度硬门禁。factor_eval 单步超时导致 factor_ic.json
+#   mtime 停更时，页面旧数字仍在展示、读者无法识别陈旧。以数据日期为基准，
+#   文件 mtime 落后 >3 天 → 主 IC 区块整体降级为占位（不展示旧数字）。
+_ic_stale_days = None
+_ic_stale = False
+try:
+    if os.path.exists(_ic_path):
+        from datetime import date as _stale_date, datetime as _stale_dt
+        _ic_file_day = _stale_dt.fromtimestamp(os.path.getmtime(_ic_path)).date()
+        _ic_base_day = _stale_date.fromisoformat(_data_date)
+        _ic_stale_days = (_ic_base_day - _ic_file_day).days
+        _ic_stale = _ic_stale_days > 3
+        if _ic_stale:
+            print(f"⚠️ factor_ic.json 陈旧 {_ic_stale_days} 天（文件 {_ic_file_day} / 数据 {_ic_base_day}）"
+                  f"→ Rank IC 区块降级为占位")
+except Exception as _se:
+    print(f"⚠️ IC 陈旧度检查失败: {_se}")
 
 # ===== v4.18（round117 P0-2）步级状态（降级披露）=====
 # ⚠️ 加载逻辑在「股票表之后、分析切片之前」的那一段（搜索 P0-1/2/4 三块披露）——
@@ -9127,7 +9242,7 @@ for idx, r in enumerate(top20):
                      'border-radius:3px;background:#dcfce7;color:#15803d;margin-left:6px;cursor:help;">'
                      '📈Q3景气 +' + f"{_qb:.1f}" + '</span>')
 
-    # ===== 业绩预期差三档徽标（earnings_surprise，权重0不进总分）=====
+    # ===== 业绩预期差三档徽标（earnings_surprise，v5.0 名义权重5%、覆盖<30%时让渡）=====
     # 判定：预测增速 vs 实际单季同比（超预期/符合预期/低于预期），规则见页尾披露⑤。
     # 无法判定不渲染徽标（缺数据不编造）；配色沿用 Q3 徽标语义（好=绿/差=红/中性=灰蓝）。
     # ⚠️ 本段变量一律 _es_* 唯一前缀（round57 教训：_ic/_t/_d 等模块级名会覆盖下游全局）。
@@ -9143,7 +9258,7 @@ for idx, r in enumerate(top20):
         _es_sts = "·强" if _es_row.get("strength") == "strong" else ""
         _es_tip = (f"业绩预期差三档：{_es_tier}{_es_sts}；{_es_row.get('note','')}"
                    f"（预测源 {_es_row.get('source') or '—'}·口径{'扣非' if _es_row.get('caliber')=='kf' else '归母'}"
-                   f"·方法 {_es_row.get('method')}）；权重 0 不进总分")
+                   f"·方法 {_es_row.get('method')}）；名义权重5%，覆盖率<30%时不计入（见口径披露）")
         _es_badge = ('<span title="' + _es_tip.replace('"', "'") + '" '
                      'style="font-size:11px;font-weight:700;padding:1px 6px;'
                      f'border-radius:3px;background:{_es_bg};color:{_es_fg};margin-left:6px;cursor:help;">'
@@ -9529,7 +9644,7 @@ html_parts.append('''
 
     <!-- 完整表格 -->
     <div class="section-title" id="sec-list">📋 完整排名 (可排序/筛选/分页)</div>
-    <div style="font-size:10.5px;color:#64748b;padding:4px 0 8px;">ℹ️ 本表为全池完整排名，可用上方筛选控件按需过滤（评级/板块/路线/成交额/每页条数等）；S/A 深度分析区仅展示综合得分 ≥ 75 分的标的。Q3 列角标 🔺/➖/🔻 = 业绩预期差三档（超预期/符合预期/低于预期：预测增速 vs 实际单季同比，点值带 ±10pp、|Δ|≥25pp 标强，权重 0 不进总分），悬停 Q3 格可看判定依据。S/A 卡趋势徽标 📉空头排列/弱势/企稳中/多头排列（tech 均线数据驱动，权重 0）——空头排列=超跌反弹候选、需等企稳信号，<b>高分 ≠ 立即买入</b>（audit_round90）。</div>
+    <div style="font-size:10.5px;color:#64748b;padding:4px 0 8px;">ℹ️ 本表为全池完整排名，可用上方筛选控件按需过滤（评级/板块/路线/成交额/每页条数等）；S/A 深度分析区仅展示综合得分 ≥ 75 分的标的。Q3 列角标 🔺/➖/🔻 = 业绩预期差三档（超预期/符合预期/低于预期：预测增速 vs 实际单季同比，点值带 ±10pp、|Δ|≥25pp 标强，名义权重5%、覆盖率<30%时让渡），悬停 Q3 格可看判定依据。S/A 卡趋势徽标 📉空头排列/弱势/企稳中/多头排列（tech 均线数据驱动，权重 0）——空头排列=超跌反弹候选、需等企稳信号，<b>高分 ≠ 立即买入</b>（audit_round90）。</div>
 ''')
 
 # ⚠️ 2026-10-27 修：上一段是**普通字符串**（非 f-string），把 `{_neutral_banner}`
@@ -10218,7 +10333,7 @@ for idx, r in enumerate(results):
                     <td class="s-mom col-mom">{mom_html}</td>
                     <td class="s-scores col-scores">{scores_html}</td>
                     <td class="s-total col-total sticky-col col-total-sticky" data-value="{r['total']}" style="color:{RATING_COLORS[rating]}">{r['total']:.2f}</td>
-                    <td class="s-rating col-rating" style="background:{RATING_BG[rating]};color:{RATING_COLORS[rating]}" data-value="{rating}">{rating}</td>
+                    <td class="s-rating col-rating" style="background:{RATING_BG[rating]};color:{RATING_COLORS[rating]}" data-value="{rating}" title="{f'池内第 {r['rank']} 名 / 前 {r['percentile']}%' + (f' · 头部细分 {r['rating_fine']}' if r.get('rating_fine') else '') if r.get('rank') else '评级'}">{rating}{f'<sup style="font-size:8px;margin-left:1px;">{r["rating_fine"]}</sup>' if r.get('rating_fine') else ''}</td>
                     <td class="s-pe col-pe" data-value="{r.get('pe',0)}">{pe}/{fwd} {ladder_t} {growth}{_lb_mark}</td>
                     <td class="s-q3 col-q3">{_q3_cell}</td>
                     <td class="s-sector col-sub">{sub_theme_t if sub_theme_t else '-'}</td>
@@ -10678,7 +10793,80 @@ except Exception as _bte:
         'border-left:3px solid #ef4444;border-radius:6px;font-size:11px;color:#fca5a5;">'
         f'⚠️ 回测口径披露渲染失败：{html_mod.escape(str(_bte)[:200])}</div>')
 
-html_parts.append(_ps_banner + _panel_disclose + _cs_disclose + _kl_disclose + _bt_disclose)
+# ④ ES 覆盖 / fallback 披露（2026-11-24 P0-6 §4 + P1-2）────────────
+#   ES 覆盖不足时有效权重已让渡（apply_sector_momentum 单一实现），
+#   AI 评估 fallback=True 时须双留痕。二者都属「可信度元信息」，留主页。
+_es_disclose = ""
+try:
+    _es_have = sum(1 for r in results if isinstance(r.get("score_es"), (int, float))
+                   and not isinstance(r.get("score_es"), bool))
+    _es_cov = (_es_have / len(results)) if results else 0.0
+    # 判据单一实现：门槛只读 scale_calc.ES_COVERAGE_MIN，不再依赖 scored 里
+    # 可选的 es_weight_adjusted 标记（老产物没有该字段时会把 3.7% 误写成「≥30%」）。
+    _es_gate = _es_cov < scale_calc.ES_COVERAGE_MIN
+    _es_adjusted = any(r.get("es_weight_adjusted") for r in results)
+    _ai_fb = bool((ai_review or {}).get("fallback"))
+    if _es_gate or _ai_fb:
+        _es_notes = []
+        if _es_gate:
+            if _es_adjusted:
+                _es_notes.append(
+                    f"ES 维实际覆盖 <b>{_es_have}/{len(results)} = {_es_cov:.1%}</b> "
+                    f"&lt; {scale_calc.ES_COVERAGE_MIN:.0%}，其 5% 权重已按比例让渡给"
+                    "其余生效维（有效口径，名义权重表不变）")
+            else:
+                _es_notes.append(
+                    f"ES 维实际覆盖 <b>{_es_have}/{len(results)} = {_es_cov:.1%}</b> "
+                    f"&lt; {scale_calc.ES_COVERAGE_MIN:.0%}，按现行口径其 5% 权重应让渡；"
+                    f"当前 scored 产物无让渡标记 → 分数尚未按该口径重算（需重跑"
+                    " apply_sector_momentum），本页仅披露口径不冒充已重算")
+        else:
+            _es_notes.append(
+                f"ES 维覆盖 <b>{_es_cov:.1%}</b>（≥{scale_calc.ES_COVERAGE_MIN:.0%}，权重保留）")
+        if _ai_fb:
+            _es_notes.append("AI 评估当前为 <b>规则兜底(fallback=True)</b>，非在线大模型生成")
+        _es_disclose = (
+            '<div style="margin:14px 0;padding:10px 14px;background:rgba(245,158,11,0.08);'
+            'border-left:3px solid #f59e0b;border-radius:6px;font-size:11px;color:#fbbf24;">'
+            '⚠️ <b>ES 维 / AI 评估口径披露</b>：' + "；".join(_es_notes) + '</div>')
+except Exception as _ese2:
+    _es_disclose = ""
+
+# ⑤ IC 陈旧横幅（P0-3，披露不可迁：必须留主页，不能只在分析页）
+_ic_stale_banner = ""
+if _ic_stale:
+    _ic_stale_banner = (
+        '<div style="margin:14px 0;padding:10px 14px;background:rgba(239,68,68,0.08);'
+        'border-left:3px solid #ef4444;border-radius:6px;font-size:11px;color:#fca5a5;">'
+        f'⛔ <b>Rank IC 视图已陈旧 {_ic_stale_days} 天</b>（factor_ic.json 未随日链更新）'
+        f' → 因子有效性区块已降级占位、旧数字不展示；此为数据降级，非因子结论变更。</div>')
+
+# ⑥ Top50 行业集中度 + 约束视图（P1-5，主页披露）
+_conc_disclose = ""
+try:
+    _top50 = sorted([x for x in results if x.get("total") is not None],
+                    key=lambda x: -float(x.get("total") or 0))[:50]
+    _c50 = _Counter((x.get("sector_l2") or x.get("sector_parent") or x.get("sector") or "—")
+                    for x in _top50)
+    _top3 = _c50.most_common(3)
+    _top3_pct = sum(v for _, v in _top3) / max(1, len(_top50)) * 100
+    _capped = _sector_capped_top(results, n=50, cap=TOP_SECTOR_CAP)
+    _capped_names = "、".join(x.get("name", "?") for x in _capped[:10])
+    _conc_disclose = (
+        '<div style="margin:14px 0;padding:10px 14px;background:rgba(59,130,246,0.07);'
+        'border-left:3px solid #3b82f6;border-radius:6px;font-size:11px;color:#93c5fd;">'
+        f'ℹ️ <b>头部行业集中度</b>：Top50 前三行业 '
+        + " · ".join(f"{nm} {v}只" for nm, v in _top3)
+        + f' 合计 {_top3_pct:.0f}%'
+        + f'，存在同链集中风险。按<b>申万二级每行业≤{TOP_SECTOR_CAP}只</b>约束后的分散版前10：'
+        + html_mod.escape(_capped_names)
+        + '（仅展示视图，不改评分名次；因子层行业中性化待裁决）</div>')
+except Exception as _ce:
+    _conc_disclose = ""
+
+html_parts.append(_ps_banner + _panel_disclose + _cs_disclose
+                  + _kl_disclose + _bt_disclose + _es_disclose
+                  + _ic_stale_banner + _conc_disclose)
 
 html_parts.append('''
             </tbody>
@@ -11691,7 +11879,7 @@ try:
 except Exception as _fme:
     _factor_map_html = ""
 
-if _ic and _ic.get("factors"):
+if _ic and _ic.get("factors") and not _ic_stale:
     _IC_LINE_COLORS = ["#38bdf8", "#f472b6", "#fbbf24", "#a3e635", "#c084fc", "#fb923c"]
 
     def _ic_cell(a):
@@ -12605,6 +12793,19 @@ if _ic and _ic.get("factors"):
         </div>
         <div style="font-size:10px;color:#475569;margin-top:8px;">数据说明：{html_mod.escape(_ic_notes[:400])}</div>
     </div>''')
+elif _ic_stale:
+    # 2026-11-24 P0-3：IC 陈旧 >3 天 → 整体降级占位，禁展示旧数字误导读者。
+    html_parts.append(f'''
+    <div class="card" style="border-left:4px solid #ef4444;background:#fff7ed;">
+      <h3>📐 因子有效性评估（Rank IC）— <span style="color:#dc2626;">已降级</span></h3>
+      <div style="padding:12px 16px;color:#9a3412;line-height:1.8;">
+        ⚠️ <b>IC 视图已陈旧 {_ic_stale_days} 天</b>（factor_ic.json 生成于
+        {_stale_dt.fromtimestamp(os.path.getmtime(_ic_path)).date() if os.path.exists(_ic_path) else '未知'}，
+        数据日期 {_data_date}）。因因子评估单步超时未更新，按 P0-3 硬门禁
+        <b>本区块旧数字整体不展示</b>，待 IC 重算后自动恢复。此为数据降级，非因子结论变更。
+      </div>
+    </div>''')
+    print(f"   🚫 Rank IC 主区块已降级为空占位（陈旧 {_ic_stale_days} 天）")
 
 # ===== v3.2 P1-1 因子数据覆盖率区块（H3）=====
 # 数据来自 scored json 的 stats.factor_coverage（每维非兜底比例）。
@@ -12682,7 +12883,7 @@ try:
     for _esx in _es_judged:
         _es_tier_cnt[_esx["es"]["tier"]] = _es_tier_cnt.get(_esx["es"]["tier"], 0) + 1
     _es_disc = (
-        f'⑤ <b>业绩预期差三档</b>（2026-10-31 起，详情卡 ▣ 徽标，<b>权重 0 不进总分</b>）：'
+        f'⑤ <b>业绩预期差三档</b>（2026-10-31 起，详情卡 ▣ 徽标，<b>名义权重5%、覆盖&lt;30%时让渡</b>）：'
         f'比对<b>机构预测增速</b>（Q3 手工汇总表，A/B 双机构，PIT 2026-10-14）与'
         f'<b>实际单季同比</b>（fin_cache_em 定期报告累计值自拆单季，口径对齐扣非/归母）。'
         f'判定带：区间预测用原始端点 [lo, hi]，点值预测用 ±{_ES_BAND:.0f}pp 等效带'

@@ -58,6 +58,11 @@ GROW_SUBS = ["npg", "cagr3", "revg", "qoq", "accel"]
 Q_GROUPS = {"资本回报": ["roe", "roic", "roa"],
             "现金流与盈余质量": ["ocf_ni", "sales_cash", "accruals", "ocfg"],
             "稳健与风控": ["profit_vol", "gm_vol", "debt", "gw"]}
+# 2026-11-24 P0-1：质量组内权重显式化（原三组等权 → ROE/现金流 0.4、风控 0.2）。
+#   根因：原等权把资本回报组的 ROE 极端值「洗」进现金流/风控两组，实测
+#   郑州煤电 ROE −65.86% 仍拿 quality 9.82。提高资本回报与现金流组的表达力，
+#   配合下方 winsor_bounds 的 1%~99% 截面截断，避免单因子极值主导。
+Q_G_W = {"资本回报": 0.4, "现金流与盈余质量": 0.4, "稳健与风控": 0.2}
 G_GROUPS = {"历史增速": ["npg", "cagr3", "revg"], "边际改善": ["qoq", "accel"]}
 G_W = {"历史增速": 0.6, "边际改善": 0.4}
 
@@ -341,25 +346,56 @@ def sub_factors_pit(ind, P):
     return out
 
 
-def family_scores(sub):
+def winsor_bounds(subs, keys, lo=1.0, hi=99.0):
+    """截面 winsorize 边界（单一实现）：对每个子因子取 lo%~hi% 分位。
+
+    ⚠️ 2026-11-24 P0-1：必须在**整池**上算分位（不能在单行上），否则
+       极值无参照、截断无从谈起。返回 {key: (lower, upper)}，缺值组不上限。
+    """
+    out = {}
+    for k in keys:
+        vals = sorted(float(s[k]) for s in subs if k in s and _is_num(s[k]))
+        n = len(vals)
+        if n < 5:
+            continue
+        # 线性插值分位（与 growth_factor_b._winsorize_bounds 同口径）
+        def _q(p):
+            pos = (n - 1) * p / 100.0
+            i = int(pos)
+            j = min(i + 1, n - 1)
+            return vals[i] + (vals[j] - vals[i]) * (pos - i)
+        out[k] = (_q(lo), _q(hi))
+    return out
+
+
+def family_scores(sub, bounds=None):
     """子因子 dict -> (quality, growth) 族得分（原始尺度）。缺组整组剔除。
 
     ⚠️ 2026-10-28 修复：原过滤条件 `isinstance(v,(int,float))` 放行 NaN
        （NaN 是 float），组均值被污染成 NaN，进而击穿下游 rank_pct。
        改用 _is_num（同时排除 NaN/inf/bool）。
+    ⚠️ 2026-11-24 P0-1：bounds 为 winsor_bounds() 的截面分位，逐子因子
+       clip 后再等权平均；质量三组的组内权重改为 Q_G_W（默认 0.4/0.4/0.2）。
     """
     def fam(groups, ws=None):
         num, den = 0.0, 0.0
         for g, members in groups.items():
-            vs = [sub.get(m) for m in members]
-            vs = [v for v in vs if _is_num(v)]
+            vs = []
+            for m in members:
+                v = sub.get(m)
+                if not _is_num(v):
+                    continue
+                if bounds and m in bounds:
+                    lo, hi = bounds[m]
+                    v = max(lo, min(hi, float(v)))
+                vs.append(v)
             if not vs:
                 continue
             w = (ws or {}).get(g, 1.0)
             num += w * (sum(vs) / len(vs))
             den += w
         return num / den if den > 0 else None
-    return fam(Q_GROUPS), fam(G_GROUPS, G_W)
+    return fam(Q_GROUPS, Q_G_W), fam(G_GROUPS, G_W)
 
 
 def rank_pct(vals):
@@ -420,11 +456,13 @@ def score_rows(rows, as_of, em=None, min_present=5, pit_mode="auto"):
     """
     if em is None:
         em = load_em_cache()
-    q_raw, g_raw, idx_map = [], [], []
+    # 2026-11-24 P0-1：先按行收集子因子 dict（None=该行缺维），整池算 1%~99%
+    #   winsor 边界后逐行 clip 评分。分位必须整池算（与 rank_pct 同口径）。
+    sub_q_by_row, sub_g_by_row = [], []
     for i, r in enumerate(rows):
         code = (r.get("code") or "").replace("sh", "").replace("sz", "").replace("bj", "")
-        q = g = None
         ind = em.get(code)
+        _sq = _sg = None
         if ind:
             periods_desc = sorted({p for dd in ind.values() for p in dd}, reverse=True)
             P = pit_period(periods_desc, as_of)
@@ -433,35 +471,30 @@ def score_rows(rows, as_of, em=None, min_present=5, pit_mode="auto"):
             if pit_mode == "actual_ok":
                 P_g = _pit_period_actual(periods_desc, as_of) or P
             if P:
-                _sub_q = sub_factors_pit(ind, P)
-                q_raw.append(family_scores(_sub_q)[0])
+                _sq = sub_factors_pit(ind, P)
                 # round129 G2（2026-11-05）：现金红旗子因子透传给上游（additive）。
                 #   score_quality 语义不变（audit_round21/22 口径不受影响），
                 #   上游 step2 在消费点据 ocf_ni/accruals 扣分并留痕。
-                #   ⚠️ 必须写 r（=rows[i]，enumerate 当前行）——idx_map.append(i)
-                #      在循环末尾才执行，此处用 rows[idx_map[i]] 会 IndexError
-                #      （2026-11-05 实测：首版改动即踩中，score_rows 整体炸掉、
-                #       quality 全池 0/2174 静默缺失，step2 fail-open 不报错）。
-                r["q_ocf_ni"] = _sub_q.get("ocf_ni")
-                r["q_accruals"] = _sub_q.get("accruals")
-            else:
-                q_raw.append(None)
+                #   ⚠️ 必须写 r（=rows[i]，enumerate 当前行）——下标一致，禁止错位。
+                r["q_ocf_ni"] = _sq.get("ocf_ni")
+                r["q_accruals"] = _sq.get("accruals")
             if P_g:
-                g_raw.append(family_scores(sub_factors_pit(ind, P_g))[1])
-            else:
-                g_raw.append(None)
-        else:
-            q_raw.append(None)
-            g_raw.append(None)
-        idx_map.append(i)
+                _sg = sub_factors_pit(ind, P_g)
+        sub_q_by_row.append(_sq)
+        sub_g_by_row.append(_sg)
 
-    # 截面内分位 → 0-10
+    q_bounds = winsor_bounds([s for s in sub_q_by_row if s], QUAL_SUBS)
+    g_bounds = winsor_bounds([s for s in sub_g_by_row if s], GROW_SUBS)
+    q_raw = [family_scores(s, q_bounds)[0] if s else None for s in sub_q_by_row]
+    g_raw = [family_scores(s, g_bounds)[1] if s else None for s in sub_g_by_row]
+
+    # 截面内分位 → 0-10（idx_map 恒等：行序未变）
     for raw, field in ((q_raw, "score_quality"), (g_raw, "score_growth")):
         present = [i for i, v in enumerate(raw) if _is_num(v)]
         if len(present) < min_present:
             continue
         rp = rank_pct([raw[i] for i in present])
         for k, i in enumerate(present):
-            rows[idx_map[i]][field] = round(rp[k] * 10.0, 2)
+            rows[i][field] = round(rp[k] * 10.0, 2)
     return (sum(1 for v in q_raw if _is_num(v)),
             sum(1 for v in g_raw if _is_num(v)))
