@@ -108,3 +108,6 @@ data/klines_long_meta.json
 zmxlky3r
 z8h61j_5
 ywd73zn8
+
+# 前50合理性审计台账（可复现证据）
+!data/top50_audit_2026-11-24.json
