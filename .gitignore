@@ -37,6 +37,9 @@ __pycache__/
 !audit_round130_total_t1.json
 !data/audit_round131_random20.json
 !data/fwd_2026_refresh_2026-11-06.json
+# v5.1 fwd 年报一致预期核验链（输入快照 + 审计留档，保证口径可复现）
+!data/fwd_annual_consensus_2026-11-23_wind.json
+!data/fwd_annual_audit_2026-11-23.json
 # 多重检验台账（K 的唯一硬输入，决定 Bonferroni 阈值；缺失则阈值不可审计）
 !data/trial_log.json
 update_rating.py

@@ -1,0 +1,2737 @@
+{
+ "generated_at": "2026-11-24T13:21+08:00",
+ "wind_source": "Wind 金融终端 get_financial_data（最新机构一致预测，年报口径）",
+ "wind_as_of": "2026-11-23",
+ "caliber": "FY2026E/FY2027E/FY2028E 归母净利润一致预测（亿元）与各年度一致预测PE；非单季、非TTM、非NTM滚动口径",
+ "fwd_audit": [
+  {
+   "code": "sh600183",
+   "name": "生益科技",
+   "old_fwd_pe": 18.5,
+   "new_fwd_pe": 18.1,
+   "old_implied_consensus_yi": 79.7632,
+   "wind_consensus_yi": 81.6262,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": "2026-07-17",
+   "ytd_yi": 67.2739,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 4.55,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  },
+  {
+   "code": "sz300408",
+   "name": "三环集团",
+   "old_fwd_pe": 25.5,
+   "new_fwd_pe": 24.1,
+   "old_implied_consensus_yi": 51.1708,
+   "wind_consensus_yi": 54.0555,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": "2026-07-08",
+   "ytd_yi": 38.652,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 4.5,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  },
+  {
+   "code": "sz002463",
+   "name": "沪电股份",
+   "old_fwd_pe": 22.1,
+   "new_fwd_pe": 21.5,
+   "old_implied_consensus_yi": 72.3883,
+   "wind_consensus_yi": 74.4276,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": "2026-07-16",
+   "ytd_yi": 56.2194,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 4.41,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  },
+  {
+   "code": "sh688002",
+   "name": "睿创微纳",
+   "old_fwd_pe": 18.9,
+   "new_fwd_pe": 17.7,
+   "old_implied_consensus_yi": 29.7385,
+   "wind_consensus_yi": 31.7474,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": "2025-11-03",
+   "ytd_yi": 22.9969,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 3.66,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  },
+  {
+   "code": "sh688766",
+   "name": "普冉股份",
+   "old_fwd_pe": 11.6,
+   "new_fwd_pe": 11.6,
+   "old_implied_consensus_yi": 24.4105,
+   "wind_consensus_yi": 24.4633,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": null,
+   "ytd_yi": 15.549,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 3.21,
+   "recon_old_score_fund": 4.5,
+   "recon_new_score_fund": 4.5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0.0,
+   "note": ""
+  },
+  {
+   "code": "sz000833",
+   "name": "粤桂股份",
+   "old_fwd_pe": 8.3,
+   "new_fwd_pe": 8.3,
+   "old_implied_consensus_yi": 15.2376,
+   "wind_consensus_yi": 15.2,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": null,
+   "ytd_yi": 11.6078,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 3.4,
+   "recon_old_score_fund": 4.0,
+   "recon_new_score_fund": 4.0,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0.0,
+   "note": ""
+  },
+  {
+   "code": "sz300308",
+   "name": "中际旭创",
+   "old_fwd_pe": 14.5,
+   "new_fwd_pe": 14.2,
+   "old_implied_consensus_yi": 338.913,
+   "wind_consensus_yi": 346.0404,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": "2025-05-21",
+   "ytd_yi": 222.3794,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 3.83,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  },
+  {
+   "code": "sz002083",
+   "name": "孚日股份",
+   "old_fwd_pe": 7.5,
+   "new_fwd_pe": 7.5,
+   "old_implied_consensus_yi": 9.7819,
+   "wind_consensus_yi": 9.745,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": null,
+   "ytd_yi": 6.9573,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 4.74,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  },
+  {
+   "code": "sz300857",
+   "name": "协创数据",
+   "old_fwd_pe": 12.4,
+   "new_fwd_pe": 12.4,
+   "old_implied_consensus_yi": 48.9008,
+   "wind_consensus_yi": 48.9675,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": null,
+   "ytd_yi": 30.6235,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 3.96,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  },
+  {
+   "code": "sz002916",
+   "name": "深南电路",
+   "old_fwd_pe": 23.5,
+   "new_fwd_pe": 23.3,
+   "old_implied_consensus_yi": 60.3166,
+   "wind_consensus_yi": 60.929,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": "2026-07-24",
+   "ytd_yi": 41.2918,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 4.08,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  },
+  {
+   "code": "sh600105",
+   "name": "永鼎股份",
+   "old_fwd_pe": 26.2,
+   "new_fwd_pe": 26.2,
+   "old_implied_consensus_yi": 11.2161,
+   "wind_consensus_yi": 11.21,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": null,
+   "ytd_yi": 7.4293,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 4.24,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  },
+  {
+   "code": "sz300153",
+   "name": "科泰电源",
+   "old_fwd_pe": 18.2,
+   "new_fwd_pe": 24.1,
+   "old_implied_consensus_yi": 3.3969,
+   "wind_consensus_yi": 2.56,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": null,
+   "ytd_yi": 1.4857,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 4.91,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  },
+  {
+   "code": "sh600487",
+   "name": "亨通光电",
+   "old_fwd_pe": 11.1,
+   "new_fwd_pe": 10.7,
+   "old_implied_consensus_yi": 82.2131,
+   "wind_consensus_yi": 84.9957,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": null,
+   "ytd_yi": 61.6326,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 4.77,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  },
+  {
+   "code": "sh688008",
+   "name": "澜起科技",
+   "old_fwd_pe": 39.5,
+   "new_fwd_pe": 40.2,
+   "old_implied_consensus_yi": 40.8494,
+   "wind_consensus_yi": 40.1114,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": null,
+   "ytd_yi": 32.3712,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 4.41,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  },
+  {
+   "code": "sz000811",
+   "name": "冰轮环境",
+   "old_fwd_pe": 22.6,
+   "new_fwd_pe": 22.5,
+   "old_implied_consensus_yi": 8.6469,
+   "wind_consensus_yi": 8.6806,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": "2026-08-27",
+   "ytd_yi": 6.1887,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 4.69,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  },
+  {
+   "code": "sz300972",
+   "name": "万辰集团",
+   "old_fwd_pe": 10.3,
+   "new_fwd_pe": 10.7,
+   "old_implied_consensus_yi": 26.3086,
+   "wind_consensus_yi": 25.3796,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": null,
+   "ytd_yi": 18.381,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 4.02,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  },
+  {
+   "code": "sz301345",
+   "name": "涛涛车业",
+   "old_fwd_pe": 10.5,
+   "new_fwd_pe": 10.6,
+   "old_implied_consensus_yi": 11.152,
+   "wind_consensus_yi": 11.0874,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": null,
+   "ytd_yi": 8.1069,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 3.54,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  },
+  {
+   "code": "sh603186",
+   "name": "华正新材",
+   "old_fwd_pe": 18.8,
+   "new_fwd_pe": 18.8,
+   "old_implied_consensus_yi": 10.6901,
+   "wind_consensus_yi": 6.4176,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": "2026-04-03",
+   "ytd_yi": 7.9996,
+   "ytd_period": "20260930",
+   "stale": true,
+   "soft": false,
+   "src": "wind_consensus_stale_anchor_run_rate_anchor_9m_x4_3",
+   "old_score_fund": 3.86,
+   "recon_old_score_fund": 3.2,
+   "recon_new_score_fund": 3.2,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0.0,
+   "note": "⚠️卖方FY2026预测陈旧: 一致预期6.42亿<已实现前三季归母8.00亿(20260930)，非'预期下修'；估值已按确定性年化锚定10.67亿(FwdPE=18.8)"
+  },
+  {
+   "code": "sz002517",
+   "name": "恺英网络",
+   "old_fwd_pe": 10.9,
+   "new_fwd_pe": 10.9,
+   "old_implied_consensus_yi": 26.8133,
+   "wind_consensus_yi": 26.7946,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": "2025-09-25",
+   "ytd_yi": 20.6947,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 3.06,
+   "recon_old_score_fund": 3.2,
+   "recon_new_score_fund": 3.2,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0.0,
+   "note": ""
+  },
+  {
+   "code": "sz300623",
+   "name": "捷捷微电",
+   "old_fwd_pe": 24.3,
+   "new_fwd_pe": 22.7,
+   "old_implied_consensus_yi": 8.4639,
+   "wind_consensus_yi": 9.0546,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": null,
+   "ytd_yi": 5.9239,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 4.45,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  },
+  {
+   "code": "sh603507",
+   "name": "振江股份",
+   "old_fwd_pe": 13.6,
+   "new_fwd_pe": 13.6,
+   "old_implied_consensus_yi": 3.0517,
+   "wind_consensus_yi": 3.05,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": null,
+   "ytd_yi": 2.0357,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 4.34,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  },
+  {
+   "code": "sz301696",
+   "name": "三瑞智能",
+   "old_fwd_pe": 43.9,
+   "new_fwd_pe": 43.9,
+   "old_implied_consensus_yi": 6.4065,
+   "wind_consensus_yi": 6.4,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": null,
+   "ytd_yi": 4.5941,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 3.99,
+   "recon_old_score_fund": 4.7,
+   "recon_new_score_fund": 4.7,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0.0,
+   "note": ""
+  },
+  {
+   "code": "sz001389",
+   "name": "广合科技",
+   "old_fwd_pe": 17.0,
+   "new_fwd_pe": 17.0,
+   "old_implied_consensus_yi": 22.9471,
+   "wind_consensus_yi": 22.8948,
+   "wind_as_of": "2026-11-23",
+   "latest_forecast_date": null,
+   "ytd_yi": 14.8809,
+   "ytd_period": "20260930",
+   "stale": false,
+   "soft": false,
+   "src": "wind_consensus_fy_annual",
+   "old_score_fund": 3.72,
+   "recon_old_score_fund": 5,
+   "recon_new_score_fund": 5,
+   "score_fund_unchanged": true,
+   "recon_delta_diagnostic_only": 0,
+   "note": ""
+  }
+ ],
+ "cap_audit": [
+  {
+   "code": "sh688766",
+   "name": "普冉股份",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)"
+   ],
+   "old_growth": 9.91,
+   "new_growth": 8.0,
+   "old_quality": 8.46,
+   "new_quality": 8.46
+  },
+  {
+   "code": "sz000833",
+   "name": "粤桂股份",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)",
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 9.99,
+   "new_growth": 8.0,
+   "old_quality": 9.36,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600105",
+   "name": "永鼎股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 8.37,
+   "new_growth": 8.37,
+   "old_quality": 9.91,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300153",
+   "name": "科泰电源",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)",
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 9.54,
+   "new_growth": 8.0,
+   "old_quality": 9.18,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz000811",
+   "name": "冰轮环境",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 6.52,
+   "new_growth": 6.52,
+   "old_quality": 9.82,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz301345",
+   "name": "涛涛车业",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 9.26,
+   "new_growth": 8.0,
+   "old_quality": 9.0,
+   "new_quality": 9.0
+  },
+  {
+   "code": "sz002517",
+   "name": "恺英网络",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 9.74,
+   "new_growth": 8.0,
+   "old_quality": 8.98,
+   "new_quality": 8.98
+  },
+  {
+   "code": "sz002636",
+   "name": "金安国纪",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)"
+   ],
+   "old_growth": 9.07,
+   "new_growth": 8.0,
+   "old_quality": 8.89,
+   "new_quality": 8.89
+  },
+  {
+   "code": "sz300483",
+   "name": "首华燃气",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)"
+   ],
+   "old_growth": 9.17,
+   "new_growth": 8.0,
+   "old_quality": 6.53,
+   "new_quality": 6.53
+  },
+  {
+   "code": "sh601579",
+   "name": "会稽山",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 6.15,
+   "new_growth": 6.15,
+   "old_quality": 9.74,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz000636",
+   "name": "风华高科",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 6.89,
+   "new_growth": 6.89,
+   "old_quality": 9.23,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002448",
+   "name": "中原内配",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.21,
+   "new_growth": 8.0,
+   "old_quality": 9.21,
+   "new_quality": 9.21
+  },
+  {
+   "code": "sz000880",
+   "name": "潍柴重机",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)",
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 8.82,
+   "new_growth": 8.0,
+   "old_quality": 9.31,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600595",
+   "name": "中孚实业",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.64,
+   "new_growth": 4.64,
+   "old_quality": 9.66,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600354",
+   "name": "敦煌种业",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)"
+   ],
+   "old_growth": 8.6,
+   "new_growth": 8.0,
+   "old_quality": 8.31,
+   "new_quality": 8.31
+  },
+  {
+   "code": "sz300604",
+   "name": "长川科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 7.89,
+   "new_growth": 7.89,
+   "old_quality": 9.88,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603986",
+   "name": "兆易创新",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.75,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002558",
+   "name": "巨人网络",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 9.78,
+   "new_growth": 8.0,
+   "old_quality": 9.13,
+   "new_quality": 9.13
+  },
+  {
+   "code": "sz300475",
+   "name": "香农芯创",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 9.65,
+   "new_growth": 9.65,
+   "old_quality": 9.13,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603067",
+   "name": "振华股份",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)",
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 8.35,
+   "new_growth": 8.0,
+   "old_quality": 9.78,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688379",
+   "name": "华光新材",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 9.63,
+   "new_growth": 8.0,
+   "old_quality": 4.51,
+   "new_quality": 4.51
+  },
+  {
+   "code": "sz300497",
+   "name": "富祥股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.72,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz301600",
+   "name": "慧翰股份",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.18,
+   "new_growth": 8.0,
+   "old_quality": 8.56,
+   "new_quality": 8.56
+  },
+  {
+   "code": "sh605118",
+   "name": "力鼎光电",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.59,
+   "new_growth": 8.0,
+   "old_quality": 8.7,
+   "new_quality": 8.7
+  },
+  {
+   "code": "sz000657",
+   "name": "中钨高新",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)"
+   ],
+   "old_growth": 9.04,
+   "new_growth": 8.0,
+   "old_quality": 3.74,
+   "new_quality": 3.74
+  },
+  {
+   "code": "sh688758",
+   "name": "赛分科技",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)",
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 8.78,
+   "new_growth": 8.0,
+   "old_quality": 9.32,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688498",
+   "name": "源杰科技",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)",
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 9.76,
+   "new_growth": 8.0,
+   "old_quality": 9.85,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688825",
+   "name": "长鑫科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.4,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603259",
+   "name": "药明康德",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.68,
+   "new_growth": 8.0,
+   "old_quality": 9.06,
+   "new_quality": 9.06
+  },
+  {
+   "code": "sz301077",
+   "name": "星华新材",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 9.38,
+   "new_growth": 8.0,
+   "old_quality": 6.56,
+   "new_quality": 6.56
+  },
+  {
+   "code": "sz300502",
+   "name": "新易盛",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 9.58,
+   "new_growth": 8.0,
+   "old_quality": 6.58,
+   "new_quality": 6.58
+  },
+  {
+   "code": "sh688531",
+   "name": "日联科技",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.57,
+   "new_growth": 8.0,
+   "old_quality": 7.41,
+   "new_quality": 7.41
+  },
+  {
+   "code": "sz300223",
+   "name": "君正股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.59,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600522",
+   "name": "中天科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.67,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688110",
+   "name": "东芯股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.05,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz301190",
+   "name": "善水科技",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.89,
+   "new_growth": 8.0,
+   "old_quality": 7.69,
+   "new_quality": 7.69
+  },
+  {
+   "code": "sh688301",
+   "name": "奕瑞科技",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 9.23,
+   "new_growth": 8.0,
+   "old_quality": 4.34,
+   "new_quality": 4.34
+  },
+  {
+   "code": "sz002709",
+   "name": "天赐材料",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.71,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600378",
+   "name": "昊华科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 6.84,
+   "new_growth": 6.84,
+   "old_quality": 9.24,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603083",
+   "name": "剑桥科技",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)"
+   ],
+   "old_growth": 8.22,
+   "new_growth": 8.0,
+   "old_quality": 2.94,
+   "new_quality": 2.94
+  },
+  {
+   "code": "sz002756",
+   "name": "永兴材料",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.09,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz001287",
+   "name": "中电港",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)"
+   ],
+   "old_growth": 9.63,
+   "new_growth": 8.0,
+   "old_quality": 0.0,
+   "new_quality": 0.0
+  },
+  {
+   "code": "sh688808",
+   "name": "联讯仪器",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.38,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600490",
+   "name": "鹏欣资源",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.02,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002283",
+   "name": "天润工业",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.57,
+   "new_growth": 8.0,
+   "old_quality": 5.68,
+   "new_quality": 5.68
+  },
+  {
+   "code": "sz000973",
+   "name": "佛塑科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.28,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688239",
+   "name": "航宇科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 6.0,
+   "new_growth": 6.0,
+   "old_quality": 9.39,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002028",
+   "name": "思源电气",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.92,
+   "new_growth": 5.92,
+   "old_quality": 9.15,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688131",
+   "name": "皓元医药",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 8.23,
+   "new_growth": 8.23,
+   "old_quality": 9.41,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002803",
+   "name": "吉宏股份",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)",
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 8.28,
+   "new_growth": 8.0,
+   "old_quality": 9.31,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603444",
+   "name": "吉比特",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.79,
+   "new_growth": 8.0,
+   "old_quality": 8.91,
+   "new_quality": 8.91
+  },
+  {
+   "code": "sh688536",
+   "name": "思瑞浦",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.63,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002264",
+   "name": "新 华 都",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.23,
+   "new_growth": 8.0,
+   "old_quality": 6.66,
+   "new_quality": 6.66
+  },
+  {
+   "code": "sz300666",
+   "name": "江丰电子",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 6.13,
+   "new_growth": 6.13,
+   "old_quality": 9.1,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh601869",
+   "name": "长飞光纤",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.43,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300454",
+   "name": "深信服",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)",
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 8.49,
+   "new_growth": 8.0,
+   "old_quality": 9.99,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688525",
+   "name": "佰维存储",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)"
+   ],
+   "old_growth": 9.64,
+   "new_growth": 8.0,
+   "old_quality": 5.15,
+   "new_quality": 5.15
+  },
+  {
+   "code": "sz301183",
+   "name": "东田微",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.49,
+   "new_growth": 5.49,
+   "old_quality": 9.57,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz301606",
+   "name": "绿联科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 7.06,
+   "new_growth": 7.06,
+   "old_quality": 9.98,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh605133",
+   "name": "嵘泰股份",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.76,
+   "new_growth": 8.0,
+   "old_quality": 5.88,
+   "new_quality": 5.88
+  },
+  {
+   "code": "sz300390",
+   "name": "天华新能",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.35,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688208",
+   "name": "道通科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 6.07,
+   "new_growth": 6.07,
+   "old_quality": 9.59,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002606",
+   "name": "大连电瓷",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 6.0,
+   "new_growth": 6.0,
+   "old_quality": 9.29,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300843",
+   "name": "胜蓝股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 7.23,
+   "new_growth": 7.23,
+   "old_quality": 9.3,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688689",
+   "name": "银河微电",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.56,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002841",
+   "name": "视源股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.17,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300457",
+   "name": "赢合科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.24,
+   "new_growth": 5.24,
+   "old_quality": 9.48,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688700",
+   "name": "东威科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.71,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300432",
+   "name": "富临精工",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.8,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002326",
+   "name": "永太科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.03,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002815",
+   "name": "崇达技术",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.33,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603039",
+   "name": "泛微网络",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.1,
+   "new_growth": 4.1,
+   "old_quality": 9.46,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002407",
+   "name": "多氟多",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.64,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300191",
+   "name": "潜能恒信",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 6.0,
+   "new_growth": 6.0,
+   "old_quality": 9.49,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688559",
+   "name": "海目星",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.66,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688392",
+   "name": "骄成超声",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 6.0,
+   "new_growth": 6.0,
+   "old_quality": 9.25,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603588",
+   "name": "高能时代",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.93,
+   "new_growth": 8.0,
+   "old_quality": 0.0,
+   "new_quality": 0.0
+  },
+  {
+   "code": "sz002192",
+   "name": "融捷股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.61,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz301219",
+   "name": "腾远钴业",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.15,
+   "new_growth": 8.0,
+   "old_quality": 3.17,
+   "new_quality": 3.17
+  },
+  {
+   "code": "sz301489",
+   "name": "思泉新材",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.26,
+   "new_growth": 5.26,
+   "old_quality": 9.85,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688073",
+   "name": "毕得医药",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.93,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz301128",
+   "name": "强瑞技术",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.97,
+   "new_growth": 8.0,
+   "old_quality": 1.81,
+   "new_quality": 1.81
+  },
+  {
+   "code": "sz301500",
+   "name": "飞南资源",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)"
+   ],
+   "old_growth": 8.62,
+   "new_growth": 8.0,
+   "old_quality": 0.0,
+   "new_quality": 0.0
+  },
+  {
+   "code": "sh603115",
+   "name": "海星股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.42,
+   "new_growth": 4.42,
+   "old_quality": 9.01,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz301630",
+   "name": "同宇新材",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.93,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002466",
+   "name": "天齐锂业",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.11,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002583",
+   "name": "海能达",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 3.0,
+   "new_growth": 3.0,
+   "old_quality": 9.68,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300283",
+   "name": "温州宏丰",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)"
+   ],
+   "old_growth": 8.74,
+   "new_growth": 8.0,
+   "old_quality": 0.0,
+   "new_quality": 0.0
+  },
+  {
+   "code": "sh600362",
+   "name": "江西铜业",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 1.58,
+   "new_growth": 1.58,
+   "old_quality": 9.06,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603045",
+   "name": "福达合金",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.81,
+   "new_growth": 8.0,
+   "old_quality": 2.0,
+   "new_quality": 2.0
+  },
+  {
+   "code": "sh688257",
+   "name": "新锐股份",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)"
+   ],
+   "old_growth": 9.4,
+   "new_growth": 8.0,
+   "old_quality": 0.0,
+   "new_quality": 0.0
+  },
+  {
+   "code": "sz300002",
+   "name": "神州泰岳",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.47,
+   "new_growth": 8.0,
+   "old_quality": 7.79,
+   "new_quality": 7.79
+  },
+  {
+   "code": "sh600366",
+   "name": "宁波韵升",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.47,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002885",
+   "name": "京泉华",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 3.85,
+   "new_growth": 3.85,
+   "old_quality": 9.55,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688569",
+   "name": "铁科轨道",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.36,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600316",
+   "name": "洪都航空",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)",
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 8.12,
+   "new_growth": 8.0,
+   "old_quality": 9.46,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603127",
+   "name": "昭衍新药",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.52,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300661",
+   "name": "圣邦股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.28,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300758",
+   "name": "七彩化学",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.55,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002832",
+   "name": "比音勒芬",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.03,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603991",
+   "name": "领先股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.84,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002335",
+   "name": "科华数据",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 3.06,
+   "new_growth": 3.06,
+   "old_quality": 9.22,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688103",
+   "name": "国力电子",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.95,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002746",
+   "name": "仙坛股份",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.02,
+   "new_growth": 8.0,
+   "old_quality": 2.33,
+   "new_quality": 2.33
+  },
+  {
+   "code": "sz002748",
+   "name": "世龙实业",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.87,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603155",
+   "name": "新亚强",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.22,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688409",
+   "name": "富创精密",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.47,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002345",
+   "name": "潮宏基",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 2.07,
+   "new_growth": 2.07,
+   "old_quality": 9.45,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz301396",
+   "name": "宏景科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.97,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002297",
+   "name": "博云新材",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)"
+   ],
+   "old_growth": 8.72,
+   "new_growth": 8.0,
+   "old_quality": 0.0,
+   "new_quality": 0.0
+  },
+  {
+   "code": "sh600933",
+   "name": "爱柯迪",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.37,
+   "new_growth": 8.0,
+   "old_quality": 4.51,
+   "new_quality": 4.51
+  },
+  {
+   "code": "sz300861",
+   "name": "美畅股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.19,
+   "new_growth": 4.19,
+   "old_quality": 9.51,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600285",
+   "name": "羚锐制药",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.11,
+   "new_growth": 4.11,
+   "old_quality": 9.21,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz301510",
+   "name": "固高科技",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)"
+   ],
+   "old_growth": 9.27,
+   "new_growth": 8.0,
+   "old_quality": 6.6,
+   "new_quality": 6.6
+  },
+  {
+   "code": "sz301132",
+   "name": "满坤科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 6.23,
+   "new_growth": 6.23,
+   "old_quality": 9.57,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh601086",
+   "name": "国芳集团",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 7.16,
+   "new_growth": 7.16,
+   "old_quality": 9.44,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603130",
+   "name": "云中马",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.98,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600459",
+   "name": "贵研铂业",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 0.16,
+   "new_growth": 0.16,
+   "old_quality": 9.8,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688003",
+   "name": "天准科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.34,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh601218",
+   "name": "吉鑫科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.39,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002154",
+   "name": "报 喜 鸟",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.43,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300209",
+   "name": "行云科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.94,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688690",
+   "name": "纳微科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.67,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300277",
+   "name": "汽轮科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.51,
+   "new_growth": 4.51,
+   "old_quality": 9.41,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688095",
+   "name": "福昕软件",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 10.0,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603928",
+   "name": "兴业股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.14,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600521",
+   "name": "华海药业",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.12,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002807",
+   "name": "江阴银行",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 8.61,
+   "new_growth": 8.0,
+   "old_quality": 3.24,
+   "new_quality": 3.24
+  },
+  {
+   "code": "sz002378",
+   "name": "章源钨业",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)"
+   ],
+   "old_growth": 9.05,
+   "new_growth": 8.0,
+   "old_quality": 0.0,
+   "new_quality": 0.0
+  },
+  {
+   "code": "sz002580",
+   "name": "圣阳股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.35,
+   "new_growth": 5.35,
+   "old_quality": 9.63,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz301389",
+   "name": "隆扬电子",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.62,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002522",
+   "name": "浙江众成",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 3.31,
+   "new_growth": 3.31,
+   "old_quality": 9.11,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300757",
+   "name": "罗博特科",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.77,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz301160",
+   "name": "翔楼新材",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 2.45,
+   "new_growth": 2.45,
+   "old_quality": 9.33,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688385",
+   "name": "复旦微电",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 3.8,
+   "new_growth": 3.8,
+   "old_quality": 9.04,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688710",
+   "name": "益诺思",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.89,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300976",
+   "name": "达瑞电子",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.1,
+   "new_growth": 4.1,
+   "old_quality": 9.18,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688646",
+   "name": "逸飞激光",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.26,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688046",
+   "name": "药康生物",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 6.0,
+   "new_growth": 6.0,
+   "old_quality": 9.16,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300547",
+   "name": "川环科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 1.6,
+   "new_growth": 1.6,
+   "old_quality": 9.84,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688001",
+   "name": "华兴源创",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.07,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz001326",
+   "name": "联域股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.03,
+   "new_growth": 4.03,
+   "old_quality": 9.97,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300046",
+   "name": "台基股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 6.72,
+   "new_growth": 6.72,
+   "old_quality": 9.64,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300850",
+   "name": "新强联",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 1.33,
+   "new_growth": 1.33,
+   "old_quality": 9.76,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300776",
+   "name": "帝尔激光",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 1.18,
+   "new_growth": 1.18,
+   "old_quality": 9.96,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002332",
+   "name": "仙琚制药",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.48,
+   "new_growth": 4.48,
+   "old_quality": 9.68,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688202",
+   "name": "美迪西",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.49,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688469",
+   "name": "芯联集成",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.42,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688203",
+   "name": "海正生材",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.74,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz000762",
+   "name": "西藏矿业",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.6,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603665",
+   "name": "康隆达",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.14,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600865",
+   "name": "百大集团",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.0,
+   "new_growth": 4.0,
+   "old_quality": 9.51,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600592",
+   "name": "龙溪股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 0.76,
+   "new_growth": 0.76,
+   "old_quality": 9.69,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300620",
+   "name": "光库科技",
+   "notes": [
+    "低基数二次封顶8.0(OCF<0或ROE<10)"
+   ],
+   "old_growth": 9.55,
+   "new_growth": 8.0,
+   "old_quality": 0.0,
+   "new_quality": 0.0
+  },
+  {
+   "code": "sz002891",
+   "name": "中宠股份",
+   "notes": [
+    "成长与当期增速背离封顶8.0(g_q<1%且deriv1<1%)"
+   ],
+   "old_growth": 9.22,
+   "new_growth": 8.0,
+   "old_quality": 0.0,
+   "new_quality": 0.0
+  },
+  {
+   "code": "sz300733",
+   "name": "西菱动力",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.49,
+   "new_growth": 4.49,
+   "old_quality": 9.86,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz003032",
+   "name": "传智教育",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.25,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002745",
+   "name": "木林森",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.38,
+   "new_growth": 4.38,
+   "old_quality": 9.4,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002897",
+   "name": "意华股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 1.22,
+   "new_growth": 1.22,
+   "old_quality": 9.9,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300566",
+   "name": "激智科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 1.37,
+   "new_growth": 1.37,
+   "old_quality": 9.34,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz301321",
+   "name": "翰博高新",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.16,
+   "new_growth": 4.16,
+   "old_quality": 9.87,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603926",
+   "name": "铁流股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 2.23,
+   "new_growth": 2.23,
+   "old_quality": 9.44,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz000831",
+   "name": "中国稀土",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 1.17,
+   "new_growth": 1.17,
+   "old_quality": 9.73,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz301513",
+   "name": "尚水智能",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.61,
+   "new_growth": 5.61,
+   "old_quality": 9.24,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002106",
+   "name": "莱宝高科",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 0.58,
+   "new_growth": 0.58,
+   "old_quality": 9.29,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688711",
+   "name": "宏微科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.03,
+   "new_growth": 4.03,
+   "old_quality": 9.72,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300382",
+   "name": "斯莱克",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.27,
+   "new_growth": 4.27,
+   "old_quality": 9.26,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600644",
+   "name": "乐山电力",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.38,
+   "new_growth": 4.38,
+   "old_quality": 9.62,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603706",
+   "name": "东方环宇",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 3.05,
+   "new_growth": 3.05,
+   "old_quality": 9.17,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002141",
+   "name": "贤丰控股",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 3.12,
+   "new_growth": 3.12,
+   "old_quality": 9.83,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600488",
+   "name": "津药药业",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 0.91,
+   "new_growth": 0.91,
+   "old_quality": 9.82,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300691",
+   "name": "联合光电",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.76,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603978",
+   "name": "深圳新星",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.86,
+   "new_growth": 4.86,
+   "old_quality": 9.15,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz301560",
+   "name": "众捷股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.04,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002317",
+   "name": "众生药业",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 0.53,
+   "new_growth": 0.53,
+   "old_quality": 9.6,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300943",
+   "name": "春晖智控",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 2.18,
+   "new_growth": 2.18,
+   "old_quality": 9.61,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz301618",
+   "name": "长联科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.7,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002962",
+   "name": "五方光电",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 1.77,
+   "new_growth": 1.77,
+   "old_quality": 9.7,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600371",
+   "name": "万向德农",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.18,
+   "new_growth": 4.18,
+   "old_quality": 9.89,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz301391",
+   "name": "卡莱特",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.69,
+   "new_growth": 4.69,
+   "old_quality": 9.37,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688306",
+   "name": "均普智能",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 5.0,
+   "new_growth": 5.0,
+   "old_quality": 9.79,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300369",
+   "name": "绿盟科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 3.59,
+   "new_growth": 3.59,
+   "old_quality": 9.53,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002009",
+   "name": "天奇股份",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.55,
+   "new_growth": 4.55,
+   "old_quality": 9.86,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh603668",
+   "name": "天马科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 3.83,
+   "new_growth": 3.83,
+   "old_quality": 9.94,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002354",
+   "name": "天娱数科",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.93,
+   "new_growth": 4.93,
+   "old_quality": 9.58,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300079",
+   "name": "数码视讯",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 2.96,
+   "new_growth": 2.96,
+   "old_quality": 9.2,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300142",
+   "name": "沃森生物",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 0.15,
+   "new_growth": 0.15,
+   "old_quality": 9.65,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300945",
+   "name": "曼卡龙",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 0.02,
+   "new_growth": 0.02,
+   "old_quality": 9.5,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600722",
+   "name": "金牛化工",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 2.38,
+   "new_growth": 2.38,
+   "old_quality": 9.01,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300098",
+   "name": "高新兴",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 4.17,
+   "new_growth": 4.17,
+   "old_quality": 9.37,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600977",
+   "name": "中国电影",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 2.73,
+   "new_growth": 2.73,
+   "old_quality": 9.92,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh688721",
+   "name": "龙图光罩",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 3.17,
+   "new_growth": 3.17,
+   "old_quality": 9.48,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300429",
+   "name": "强力新材",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 2.8,
+   "new_growth": 2.8,
+   "old_quality": 9.79,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002058",
+   "name": "紫竹高科",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 1.94,
+   "new_growth": 1.94,
+   "old_quality": 9.81,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002785",
+   "name": "万里石",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 1.32,
+   "new_growth": 1.32,
+   "old_quality": 9.75,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh605068",
+   "name": "明新旭腾",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 1.79,
+   "new_growth": 1.79,
+   "old_quality": 9.38,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300959",
+   "name": "线上线下",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 0.11,
+   "new_growth": 0.11,
+   "old_quality": 9.91,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz001212",
+   "name": "中旗新材",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 0.64,
+   "new_growth": 0.64,
+   "old_quality": 9.45,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002238",
+   "name": "天威视讯",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 1.81,
+   "new_growth": 1.81,
+   "old_quality": 9.83,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz002021",
+   "name": "中捷资源",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 1.44,
+   "new_growth": 1.44,
+   "old_quality": 9.95,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sz300920",
+   "name": "润阳科技",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 0.47,
+   "new_growth": 0.47,
+   "old_quality": 9.69,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600715",
+   "name": "文投控股",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 1.18,
+   "new_growth": 1.18,
+   "old_quality": 9.56,
+   "new_quality": 8.5
+  },
+  {
+   "code": "sh600121",
+   "name": "郑州煤电",
+   "notes": [
+    "质量硬约束封顶8.5(ROE<10或OCF缺失/为负)"
+   ],
+   "old_growth": 0.18,
+   "new_growth": 0.18,
+   "old_quality": 9.81,
+   "new_quality": 8.5
+  }
+ ],
+ "unverified_note": "非 Top20 的 1895 只未逐只从 Wind 重拉；沿用 11-23 THS 年报一致预期缓存并打 unverified 标签，待下一轮全池刷新。",
+ "reconstruction_note": "score_fund 本轮不据 fwd 变化调分（data_only_no_rescore）：old/new 同参重建残差最大 1.46 分，且 old/new 大面积同档封顶，无法可靠复现生产链；生产 score_fund 原值保留，重建差值仅作诊断字段 recon_delta_diagnostic_only 留痕。待 score_fund 输入链可完整复现生产分后再逐分重算。"
+}
