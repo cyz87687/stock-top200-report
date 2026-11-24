@@ -50,7 +50,28 @@ WEIGHTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "factor_
 # 情绪因子、量价候选与反转块共线）、round20（反转块入库事故+回填重测）、round21/22
 # （质量/成长 PIT 回填实证 + 样本内外分层 + fund 敏感性）。详见 factor_weights.json
 # → regime_switch。回退先验必须与之同步，否则 load_factor_weights 失败时会静默退回旧口径。
-_W_PRIOR_10D = {"score_fund": 0.200000, "score_news": 0.000000, "score_theme_neg": 0.000000, "score_size": 0.000000, "score_sector": 0.000000, "score_quality": 0.100000, "score_growth": 0.200000, "score_tech_neg": 0.000000, "score_oversold60": 0.000000, "score_bias60": 0.050000, "score_rsi_rev": 0.050000, "score_vol_pulse": 0.000000, "score_overbought": 0.000000, "score_theme_intrinsic": 0.000000, "score_attention": 0.000000, "score_lowvol20": 0.000000, "score_ep": 0.100000, "score_size_ind": 0.000000, "score_size_growth": 0.200000, "score_dominant": 0.100000}  # v4.14-evidence-aligned：quality 0.212→0.12（实证 h20 IC −0.147 负），fund 0.12→0.242（消融 t=+4.41 唯一>4），# tech_neg 0.06→0.03（σ 贡献仅 2.1% 近乎常数）；Σ=1.0
+_W_PRIOR_10D = {
+    "score_attention": 0.000000,
+    "score_bias60": 0.050000,
+    "score_ep": 0.150000,
+    "score_es": 0.050000,
+    "score_fund": 0.150000,
+    "score_growth": 0.200000,
+    "score_lowvol20": 0.000000,
+    "score_news": 0.000000,
+    "score_overbought": 0.000000,
+    "score_oversold60": 0.000000,
+    "score_quality": 0.150000,
+    "score_rsi_rev": 0.050000,
+    "score_sector": 0.000000,
+    "score_size": 0.000000,
+    "score_size_comb": 0.200000,
+    "score_size_ind": 0.000000,
+    "score_tech_neg": 0.000000,
+    "score_theme_intrinsic": 0.000000,
+    "score_theme_neg": 0.000000,
+    "score_vol_pulse": 0.000000,
+}  # v4.14-evidence-aligned：quality 0.212→0.12（实证 h20 IC −0.147 负），fund 0.12→0.242（消融 t=+4.41 唯一>4），# tech_neg 0.06→0.03（σ 贡献仅 2.1% 近乎常数）；Σ=1.0
 _W_MAP_FROM_5D = {
     "score_fund": [("score_fund", 1.0)],
     "score_news": [("score_news", 1.0)],
@@ -118,17 +139,28 @@ def load_dim_max():
 
 # 各维满分量程默认值（与 factor_weights.json 的 dim_max 同源，禁单方面修改）
 _DIM_MAX_DEFAULT = {
-    "score_fund": 5.0, "score_news": 5.0, "score_theme_neg": 10.0,
-    "score_size": 10.0, "score_sector": 5.0, "score_quality": 10.0,
-    "score_growth": 10.0, "score_tech_neg": 10.0, "score_oversold60": 5.0,
-    "score_bias60": 5.0, "score_rsi_rev": 5.0, "score_vol_pulse": 5.0,
-    "score_overbought": 5.0, "score_theme_intrinsic": 5.0, "score_attention": 5.0,
-    # v4.8：低波20。池内分位分，量程 0-10（与其他池内分位族一致）
+    "score_attention": 5.0,
+    "score_bias60": 5.0,
+    "score_dominant": 10.0,
+    "score_ep": 10.0,
+    "score_es": 10.0,
+    "score_fund": 5.0,
+    "score_growth": 10.0,
     "score_lowvol20": 10.0,
-    # v4.9：EP 与 SIZE_IND_NEUT 均为池内 rank 分位分，量程 0-10
-    "score_ep": 10.0, "score_size_ind": 10.0,
-    # v4.13-size2d：市值双维度拆分（A 小盘成长 / B 业务份额龙头），量程 0-10
-    "score_size_growth": 10.0, "score_dominant": 10.0,
+    "score_news": 5.0,
+    "score_overbought": 5.0,
+    "score_oversold60": 5.0,
+    "score_quality": 10.0,
+    "score_rsi_rev": 5.0,
+    "score_sector": 5.0,
+    "score_size": 10.0,
+    "score_size_comb": 10.0,
+    "score_size_growth": 10.0,
+    "score_size_ind": 10.0,
+    "score_tech_neg": 10.0,
+    "score_theme_intrinsic": 5.0,
+    "score_theme_neg": 10.0,
+    "score_vol_pulse": 5.0,
 }
 DIM_MAX = load_dim_max()
 
@@ -183,6 +215,13 @@ W_SIZE_IND = FW.get("score_size_ind", 0.0)   # v4.13：已拆为下两维，权�
 #   差额 0.04 由 score_quality(0.252→0.212) 回吐，Σ=1.0 不变。
 W_SIZE_GROWTH = FW.get("score_size_growth", 0.0)
 W_DOMINANT = FW.get("score_dominant", 0.0)
+# ══ v5.0（2026-11-23）：市值双维合并取高 + 缺维分层 ══
+#   score_size_comb = max(score_size_growth, score_dominant)，唯一实现见
+#   ep_size_ind.score_rows。旧的 size_growth / dominant 权重归零 → 不再重复计分。
+W_SIZE_COMB = FW.get("score_size_comb", 0.0)
+#   缺维处理规则：结构性不适用（龙头无 size_growth）剔分母，真缺数据按 0。
+#   ⚠️ 口径依据：审计认定中性填 5.0 是白送分（全池 1275 分 ≈ 128 只满分红）。
+MISSING_RULE = "structural"
 SCORER_VER = FW_META.get("version", "v3.0-10dim") if FW_META else "v3.0-10dim"
 
 SECTOR = {
@@ -4716,6 +4755,13 @@ def main():
                     if isinstance(r.get("score_size_growth"), (int, float))}
         _dom_rank = {r["code"][-6:]: r["score_dominant"] for r in _esi_rows
                      if isinstance(r.get("score_dominant"), (int, float))}
+        # v5.0：市值双维合并维 + 缺维原因（唯一实现来源 = ep_size_ind.score_rows）
+        _sg_comb_rank = {r["code"][-6:]: r["score_size_comb"] for r in _esi_rows
+                         if isinstance(r.get("score_size_comb"), (int, float))}
+        _esi_size_src = {r["code"][-6:]: r.get("size_comb_src") for r in _esi_rows
+                         if r.get("size_comb_src")}
+        _missing_reason_map = {r["code"][-6:]: dict(r.get("missing_reason") or {})
+                                for r in _esi_rows if r.get("missing_reason")}
         print(f"   🧮 EP 评分表: {len(_ep_rank)}/{len(stocks)} 只"
               f"（扣非净利润TTM/总市值，池内分位取正）")
         print(f"   🧮 市值双维度: 小盘成长 {len(_sg_rank)}/{len(stocks)} 只"
@@ -5474,6 +5520,13 @@ def main():
                     _EP_CAP_LOG.append(f"{name}({code})")
         s_size_growth = _sg_rank.get(_c6)
         s_dominant = _dom_rank.get(_c6)
+        # ══ v5.0（2026-11-23）：市值双维**合并取高** ══
+        #   审计发现 P0-3 后非龙头同时拿 size_growth(.20)+dominant(.10)=0.30，
+        #   同一「市值事实」被算两次分。ep_size_ind.score_rows 已实现合并维
+        #   score_size_comb = max(size_growth, dominant)（唯一实现），此处直接取用。
+        #   ⚠️ 龙头（size_growth 结构性不适用）取 dominant 值，并在 missing_reason
+        #   标记 structural → 下游按「结构不适用剔分母」处理，不白送分也不扣分。
+        s_size_comb = _sg_comb_rank.get(_c6)
         s_tech_neg = max(0.0, min(10.0, 10.0 - float(ts_adj)))
         # ══ round129（2026-11-05，老大「按建议修改权重」）可持续性门槛 ══
         # G1 成长存量门槛：cagr3 缺失/≤0 → 成长族（score_growth / score_size_growth）
@@ -5487,7 +5540,9 @@ def main():
         #    仅对实测红旗扣分；缺值不扣（缺维≠红旗）。
         s_growth, _g1n_a = _gfb_mod.anchor_gate(s_growth, cagr3_input)
         s_size_growth, _g1n_b = _gfb_mod.anchor_gate(s_size_growth, cagr3_input)
-        growth_anchor_note = _g1n_a or _g1n_b
+        # v5.0：合并维也过同一道成长存量门槛（它含 size_growth 成分）
+        s_size_comb, _g1n_c = _gfb_mod.anchor_gate(s_size_comb, cagr3_input)
+        growth_anchor_note = _g1n_a or _g1n_b or _g1n_c
         quality_cash_flags = []
         if isinstance(s_quality, (int, float)):
             _ocf_ni, _accr = _quality_cash.get(code) or (None, None)
@@ -5537,6 +5592,11 @@ def main():
         #   ⚠️ score_size 权重已归零 → s_size 仍进 _parts 但 w=0，不影响 total，仅留档对照。
         if s_ep is not None:
             _parts.append(("score_ep", s_ep, W_EP))
+        # v5.0（2026-11-23）：市值双维**合并取高**（score_size_comb 唯一实现见
+        #   ep_size_ind.score_rows）。旧的 score_size_growth / score_dominant
+        #   权重均已归零 → 仍进 _parts 保留字段供展示/审计，但不再参与计分。
+        if s_size_comb is not None:
+            _parts.append(("score_size_comb", s_size_comb, W_SIZE_COMB))
         if s_size_growth is not None:
             _parts.append(("score_size_growth", s_size_growth, W_SIZE_GROWTH))
         if s_dominant is not None:
@@ -5565,14 +5625,23 @@ def main():
             ("score_rsi_rev", s_rsi_rev, W_RSI_REV),
             ("score_lowvol20", s_lowvol20, W_LOWVOL20),
             ("score_ep", s_ep, W_EP),
+            ("score_size_comb", s_size_comb, W_SIZE_COMB),
             ("score_size_growth", s_size_growth, W_SIZE_GROWTH),
             ("score_dominant", s_dominant, W_DOMINANT),
         ]
         _neutral_filled = []
+        # v5.0（2026-11-23）：缺维分层 —— 结构性不适用剔分母、真缺数据按 0。
+        #   missing_reason 由 ep_size_ind.score_rows 给出（唯一实现来源）。
+        _mr = _missing_reason_map.get(_c6) or {}
+        _mr_all = dict(_mr)
+        if s_size_comb is None:
+            _mr_all.setdefault("score_size_comb", "data")
         total, _missing = scale_calc.composite_total(
             _parts_all, DIM_MAX,
             weights={k: v for k, v in FW.items() if v > 0},
-            missing_out=_neutral_filled)
+            missing_out=_neutral_filled,
+            missing_rule=MISSING_RULE,
+            missing_reason=_mr_all)
         # step2 阶段无板块动量维度；最终分由 apply_sector_momentum.py 按同一量尺重算。
         # v4.4 标度修复（P0）：×20 → ×10。×20 是五维时代遗产（每维 0-5 量纲），
         #   十维以后每维 0-10，加权平均 ×10 才是百分制。
@@ -5633,6 +5702,11 @@ def main():
             #   ⚠️ score_size 权重已归零但字段保留（供页面/审计对照「全市场口径 vs 行业内口径」）
             "score_ep": (round(s_ep, 2) if s_ep is not None else None),
             "ep_capped": _cap5,   # round105 P1-5：增速恶化 ep 封顶留痕（True=9.85→6 类）
+            # v5.0（2026-11-23）：市值双维**合并取高** score_size_comb（唯一实现
+            #   ep_size_ind.score_rows）。旧两维字段保留供展示/审计，但权重已归零。
+            "score_size_comb": (round(s_size_comb, 2) if s_size_comb is not None else None),
+            "size_comb_src": _esi_size_src.get(_c6),
+            "missing_reason": _mr_all,
             # v4.13-size2d：市值双维度（互斥；龙头进 dominant，其余进 size_growth）。
             #   score_size 保留字段（全市场口径，供对照，见本 dict 上方）；score_size_ind 已退役，不再写盘。
             "score_size_growth": (round(s_size_growth, 2) if s_size_growth is not None else None),

@@ -142,6 +142,16 @@ RULE1_DED = 0.10            # 规则1 扣成长合成分 10%
 RULE2_DED = 0.15            # 规则2 扣 15%（round108e 单独 lift 1.59 > 规则1 的 1.38）
 RULE_DED_CAP = 0.25         # 叠加上限 25%（P&A 联合 lift 1.82，但不清零）
 
+# ---- v5.0（2026-11-23）新增：成长维接入营收增速 + G1 门槛中间档 ----
+# 审计发现：score_growth 全程只看扣非净利的单季脉冲（G_q / QoQ / ΔG_q），
+#   **完全不看营收**（revg 在 fund_split.py:330 已算出但本模块不消费），
+#   导致「营收连年下滑、利润靠费用优化修复」的票拿到接近满分成长溢价
+#   （亚宝营收 -2.67% 却成长 8.96；圣晖营收 -13.05% 却成长 9.44）。
+# 修法：把 revg（营业总收入增长率）按**申万一级行业内百分位**混入成长分。
+REVG_MIX = 0.30            # revg 混入比例 α（0.2/0.3/0.4 沙盘结论一致，取中值）
+ANCHOR_WEAK_CAGR3 = 5.0     # G1 中间档阈值：0 < cagr3 ≤ 5% → 弱存量锚
+ANCHOR_WEAK_CAP = 6.0       # 弱存量锚档的成长分封顶
+
 
 # ---------------------------------------------------------------- PIT 截断
 # ⚠️ round123（2026-11-03）P0-1 数据层改造：修复 **假 PIT**
@@ -402,12 +412,28 @@ def anchor_gate(score, cagr3):
        等于没装（2026-11-05 实测踩中，growth 保持旧值 9.69）。
        两处各写一份实现必然漂移且不报错（round17 教训）。
 
+    **v5.0（2026-11-23）新增中间档**：
+      审计发现原门槛「cagr3 ≤0 才封顶」形同虚设 —— 航宇科技 cagr3=0.4%
+      （三年几乎零增长）照样拿成长 7.58 排 TOP12。
+      新增 `0 < cagr3 ≤ ANCHOR_WEAK_CAGR3`（默认 5.0）→ 封顶 **6.0**
+      「弱存量锚」档：精准打击「三年近零增长仍吃成长溢价」，且不误伤
+      正常成长股（生益 cagr3=30.5% / 亚宝 38.5% / 圣晖 10.9% 均不受影响）。
+      沙盘实测（2026-11-23，α=0.3 + 分层缺维 + 市值合并）：命中 1372 只
+      （较原门槛 +97 只），航宇名次 14 → 41 正确下沉。
+    ⚠️ 5% 阈值目前**仅有单面板证据**，属先验产品裁决，待 20 日观察期复核。
+
     返回 (score_after, note_or_None)；score 非数值时原样返回（缺维不补）。
     """
     def _is_num(v):
         return isinstance(v, (int, float)) and not isinstance(v, bool) and v == v
-    if _is_num(cagr3) and cagr3 > 0:
+    if _is_num(cagr3) and cagr3 > ANCHOR_WEAK_CAGR3:
         return score, None
+    if _is_num(cagr3) and cagr3 > 0:
+        # 弱存量锚档：0 < cagr3 ≤ 阈值 → 封顶 6.0
+        if _is_num(score):
+            score = min(float(score), ANCHOR_WEAK_CAP)
+        return score, (f"cagr3={cagr3:.1f}%≤{ANCHOR_WEAK_CAGR3:.1f}%"
+                       f"→成长族封顶{ANCHOR_WEAK_CAP:.1f}(弱存量锚)")
     anc = f"cagr3={cagr3:.1f}%" if _is_num(cagr3) else "cagr3缺失"
     note = f"{anc}→成长族封顶5.0(无存续锚)"
     if _is_num(score):
@@ -711,6 +737,52 @@ def compute_growth(rows, style="steady", em_all=None, as_of=None, pit_grace=0):
         })
 
     # ---- 5) 全池百分位 rank → [0,100]（no_data 股已固定 0，不进 rank 池）----
+    # ⚠️ v5.0（2026-11-23）：**在 rank 之前**把营收增速 revg 混入 composite。
+    #   为什么在 rank 之前：score_growth 是 composite 的**全池百分位**，
+    #   若在 rank 之后混合，会变成「百分位 + 百分位」的二次非线性，破坏可解释性。
+    #   在 composite 层面混合 = 成长分本来就由「利润脉冲 + 营收增长」共同决定。
+    #   口径：revg 取**同一报告期**的营业总收入增长率，按申万一级行业内
+    #   百分位归一到 [0,1]×10，再与原 composite 按 REVG_MIX 加权。
+    n_revg_mix = 0
+    if REVG_MIX > 0:
+        # 5a) 取各股当期 revg
+        _revg_raw = {}
+        for code, v in recs.items():
+            if not v.get("in_rank_pool"):
+                continue
+            _ind = em_all.get(code) or {}
+            _per = v.get("period")
+            if not _per:
+                continue
+            _rg = (_ind.get("营业总收入增长率") or {}).get(_per)
+            if isinstance(_rg, (int, float)) and _rg == _rg:
+                _revg_raw[code] = float(_rg)
+        # 5b) 申万一级行业内百分位（与 composite 的 rank 同族口径）
+        _grp_rg = {}
+        for code, val in _revg_raw.items():
+            _grp_rg.setdefault(recs[code].get("sw_l1") or "__POOL__",
+                               []).append((code, val))
+        _rank_rg = {}
+        for _gname, _arr in _grp_rg.items():
+            _arr.sort(key=lambda x: x[1])
+            _n = len(_arr)
+            for _i, (_c, _v) in enumerate(_arr):
+                _rank_rg[_c] = (_i / (_n - 1)) if _n > 1 else 0.5
+        # 5c) 混入 composite（原始 composite 是 0-100 量纲，rank 前）
+        for code, v in recs.items():
+            if code not in _rank_rg:
+                continue
+            _c_old = v.get("composite")
+            if not (isinstance(_c_old, (int, float)) and _c_old == _c_old):
+                continue
+            _rg_score = _rank_rg[code] * 100.0        # 0-100 量纲
+            v["composite"] = round((1.0 - REVG_MIX) * float(_c_old)
+                                   + REVG_MIX * _rg_score, 4)
+            v["revg"] = _revg_raw.get(code)
+            v["revg_rank_score"] = round(_rg_score, 2)
+            v["revg_mix"] = REVG_MIX
+            n_revg_mix += 1
+
     pool_vals = [(c, v["composite"]) for c, v in recs.items()
                  if v.get("in_rank_pool")]
     fin = _mid_rank_pct(pool_vals)
@@ -720,6 +792,9 @@ def compute_growth(rows, style="steady", em_all=None, as_of=None, pit_grace=0):
         s100 = fin.get(code, 0.0) * 100.0
         v["score_growth_100"] = round(s100, 2)
         v["score_growth"] = round(s100 / 10.0, 2)   # 0-10 量程（DIM_MAX=10）
+    if REVG_MIX > 0:
+        print(f"   📈 [v5 营收接入] 成长分混入 revg（α={REVG_MIX}，申万一级行业内百分位），"
+              f"命中 {n_revg_mix} 只")
 
     # ---- 元信息 ----
     n_valid = sum(1 for v in recs.values() if v.get("in_rank_pool"))

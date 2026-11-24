@@ -36,6 +36,10 @@ if HERE not in sys.path:
 #   自检脚本必须复用生产实现，而不是照抄一份。
 import scale_calc
 
+# v5.0（2026-11-23）：缺维分层规则，必须与生产（step2/enhance/apply）同口径。
+#   结构性不适用（龙头无 size_growth）剔分母；其余缺维按 0。
+MISSING_RULE = "structural"
+
 # 关键链路上「每日必跑」的脚本
 CRITICAL = [
     "fetch_top200_sina.py", "step2_stockscorer_v2.py", "generate_ai_assessment.py",
@@ -151,12 +155,19 @@ def check_ten_dim_applied(scored_path):
         口径要点（见 scale_calc.py 模块头）：
           · 分子：Σ min(v,DMAX)/DMAX×10×w，缺维填中性分 DMAX/2 → 归一后恒 5.0
           · 分母：Σ 全部生效权重（不随该股缺几维变化）
+        **v5.0（2026-11-23）**：生产缺维规则改为**分层**
+        （结构性不适用剔分母、真缺数据按 0），自检必须用**同一规则**复算，
+        否则会系统性误报（实测 20 只抽样中 12 只偏离 >0.5）。
+        missing_reason 由 ep_size_ind.score_rows 给出，经 step2 落盘到 r 上。
         返回 None 表示无法评估（权重表为空）。
         """
         if not _W_POS:
             return None
         _parts = [(k, r.get(k), w) for k, w in _W_POS.items()]
-        _t, _ = scale_calc.composite_total(_parts, DIM_MAX, weights=_W_POS)
+        _t, _ = scale_calc.composite_total(
+            _parts, DIM_MAX, weights=_W_POS,
+            missing_rule=MISSING_RULE,
+            missing_reason=r.get("missing_reason") or {})
         return _t
 
     def expected(r):

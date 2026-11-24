@@ -98,16 +98,24 @@ def kernel_fingerprint(base_dir=None):
 
 
 def composite_total_matrix(S, dims, weights, dim_max,
-                           neutral_ratio=NEUTRAL_FILL_RATIO):
+                           neutral_ratio=NEUTRAL_FILL_RATIO,
+                           missing_rule="neutral", missing_mask=None):
     """`scale_calc.composite_total` 的向量化等价实现（百分制 0-100）。
 
     S : ndarray, 最后一轴长度 = len(dims)；NaN 表示缺维，其余维可为任意形状
         （历史面板是 (日期, 股票, 维)，也支持 (股票, 维)）。
     weights / dim_max : 与生产同一份配置（**必须传全量**，不能只传矩阵里有的列）。
+    missing_rule : 与 `scale_calc.composite_total` 同名参数同义
+        （"neutral" 旧口径 / "zero" 缺维按0 / "structural" 结构性不适用剔分母）。
+    missing_mask : dict | None
+        形如 {"score_size_growth": bool 矩阵}，仅 missing_rule="structural" 用：
+        True = 该 (行,列) 属**结构性不适用** → 从分子分母同时剔除。
+        ⚠️ 判据来源必须是产生该维的模块（唯一实现原则）。
 
-    与生产严格一致的两条规则：
-      ① 分母恒为 Σ「全部生效权重」`sum_all_weights(weights)`，不随缺维变化；
-      ② 缺维（含 W 中生效但矩阵**整列缺失**的维）在分子填 `DMAX/2` 中性分。
+    与生产的规则：
+      ① 分母恒为 Σ「全部生效权重」`sum_all_weights(weights)`（"zero" 档）；
+         "structural" 档只对结构性不适用者逐行剔除该维权重；
+      ② 缺维在分子按 missing_rule 处理（"neutral" 填 DMAX/2 / 其余填 0）。
 
     返回 (total, meta)。total 与标量版在浮点误差内逐股相等（见 selfcheck）。
     """
@@ -122,6 +130,7 @@ def composite_total_matrix(S, dims, weights, dim_max,
         raise ValueError("生效权重之和必须 > 0")
 
     num = np.zeros(S.shape[:-1], dtype=np.float64)
+    den_arr = np.full(S.shape[:-1], den, dtype=np.float64)
     present_w = 0.0
     for i, d in enumerate(dims):
         w = active.get(d, 0.0)
@@ -133,26 +142,37 @@ def composite_total_matrix(S, dims, weights, dim_max,
         v = S[..., i]
         mask = ~np.isnan(v)                       # inf 不算缺维：clip 后等价于满分/零分
         clean = np.where(mask, v, 0.0)
-        norm = np.where(mask, np.clip(clean, 0.0, mx) / mx * 10.0,
-                        neutral_ratio * 10.0)
+        if missing_rule == "neutral":
+            norm = np.where(mask, np.clip(clean, 0.0, mx) / mx * 10.0,
+                            neutral_ratio * 10.0)
+        else:
+            norm = np.where(mask, np.clip(clean, 0.0, mx) / mx * 10.0, 0.0)
         num = num + norm * w
+        if missing_rule == "structural" and missing_mask and d in missing_mask:
+            sm = np.asarray(missing_mask[d], dtype=bool)
+            # 结构性不适用 → 分子分母同时剔除
+            num = np.where(sm, num - norm * w, num)
+            den_arr = np.where(sm, den_arr - w, den_arr)
         present_w += w
 
     blind_w = den - present_w
-    if blind_w > 1e-12:                          # 生效但矩阵无列 → 整列中性填充
-        num = num + neutral_ratio * 10.0 * blind_w
-    total = num / den * 10.0
+    if blind_w > 1e-12 and missing_rule == "neutral":
+        num = num + neutral_ratio * 10.0 * blind_w   # 生效但矩阵无列 → 整列中性填充
+    den_arr = np.where(den_arr <= 1e-12, den, den_arr)
+    total = num / den_arr * 10.0
     return total, {
         "denominator": den,
         "present_weight": round(present_w, 10),
         "blind_weight": round(max(0.0, blind_w), 10),
         "neutral_fill_ratio": neutral_ratio,
+        "missing_rule": missing_rule,
         "scale": "percent_0_100",
     }
 
 
 def scalar_total(parts_values, dims, weights, dim_max,
-                 neutral_ratio=NEUTRAL_FILL_RATIO):
+                 neutral_ratio=NEUTRAL_FILL_RATIO,
+                 missing_rule="neutral", missing_reason=None):
     """用生产标量函数算单股总分（供一致性自检与测试调用）。
 
     ⚠️ 生产调用方的 `parts` 含**全部生效维**，缺值以 None 传入；历史矩阵
@@ -167,10 +187,13 @@ def scalar_total(parts_values, dims, weights, dim_max,
         if d not in present and is_num(float(w or 0)) and float(w) > 0:
             parts.append((d, None, float(w)))
     return composite_total(parts, dim_max or {}, sum_all=None,
-                           weights=weights, neutral_ratio=neutral_ratio)[0]
+                           weights=weights, neutral_ratio=neutral_ratio,
+                           missing_rule=missing_rule,
+                           missing_reason=missing_reason)[0]
 
 
-def selfcheck(S, dims, weights, dim_max, sample=256, tol=5.1e-3):
+def selfcheck(S, dims, weights, dim_max, sample=256, tol=5.1e-3,
+              missing_rule="neutral", missing_reason=None):
     """真实数据一致性自检：逐股比较向量化版与生产标量版。
 
     这是 P0-1 验收标准「同一输入、同一时点，逐股逐维及总分一致」的可执行证据。
@@ -182,13 +205,16 @@ def selfcheck(S, dims, weights, dim_max, sample=256, tol=5.1e-3):
     """
     S = np.asarray(S, dtype=np.float64)
     flat = S.reshape(-1, S.shape[-1])
-    vec, meta = composite_total_matrix(flat, dims, weights, dim_max)
+    vec, meta = composite_total_matrix(flat, dims, weights, dim_max,
+                                       missing_rule=missing_rule)
     idx = np.linspace(0, len(flat) - 1, min(sample, len(flat)), dtype=int)
     worst, worst_i = 0.0, -1
     for i in idx:
         row = flat[i]
         vals = [None if np.isnan(v) else float(v) for v in row]
-        ref = scalar_total(vals, dims, weights, dim_max)
+        ref = scalar_total(vals, dims, weights, dim_max,
+                           missing_rule=missing_rule,
+                           missing_reason=missing_reason)
         diff = abs(float(vec[i]) - ref)
         if diff > worst:
             worst, worst_i = diff, int(i)

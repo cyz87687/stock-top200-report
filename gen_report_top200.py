@@ -242,7 +242,28 @@ def _load_dim_weights():
     #   fund 0.12→0.242（8 维里唯一消融 t>4：+4.41/+4.32，最硬）；
     #   tech_neg 0.06→0.030（10−score_tech 方差过小，σ 贡献仅 2.1%、近乎常数）。
     #   释放的 9.2pp 全部给 fund，Σ=1.0 不变。
-    _fb = {"score_fund": 0.200000, "score_news": 0.000000, "score_theme_neg": 0.000000, "score_size": 0.000000, "score_sector": 0.000000, "score_quality": 0.100000, "score_growth": 0.200000, "score_tech_neg": 0.000000, "score_oversold60": 0.000000, "score_bias60": 0.050000, "score_rsi_rev": 0.050000, "score_vol_pulse": 0.000000, "score_overbought": 0.000000, "score_theme_intrinsic": 0.000000, "score_attention": 0.000000, "score_lowvol20": 0.000000, "score_ep": 0.100000, "score_size_ind": 0.000000, "score_size_growth": 0.200000, "score_dominant": 0.100000}
+    _fb = {
+    "score_attention": 0.000000,
+    "score_bias60": 0.050000,
+    "score_ep": 0.150000,
+    "score_es": 0.050000,
+    "score_fund": 0.150000,
+    "score_growth": 0.200000,
+    "score_lowvol20": 0.000000,
+    "score_news": 0.000000,
+    "score_overbought": 0.000000,
+    "score_oversold60": 0.000000,
+    "score_quality": 0.150000,
+    "score_rsi_rev": 0.050000,
+    "score_sector": 0.000000,
+    "score_size": 0.000000,
+    "score_size_comb": 0.200000,
+    "score_size_ind": 0.000000,
+    "score_tech_neg": 0.000000,
+    "score_theme_intrinsic": 0.000000,
+    "score_theme_neg": 0.000000,
+    "score_vol_pulse": 0.000000,
+}
     try:
         _p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "factor_weights.json")
         with open(_p, encoding="utf-8") as _f:
@@ -347,9 +368,16 @@ _DIM_DEFS = [
     #     合成 rank 前 30% 即行业龙头，做市值一致性校验后取分。
     #   ⚠️ 原文 mc_pct>0.3 门槛在真实分布下仅覆盖 4.1%（77只）形同虚设，已按老大裁决
     #     改用「业务份额前30%」分区；两维 Spearman≈0.33，真正互补、天然互斥。
-    ("小盘成长溢价", "score_size_growth", _DIM_W["score_size_growth"], False),
-    ("行业龙头壁垒", "score_dominant", _DIM_W["score_dominant"], False),
-    ("小市值", "score_size", _DIM_W["score_size"], True),
+    # ── v5.0（2026-11-23）：两维**合并取高**为 score_size_comb（0.20）──
+    #   审计发现 P0-3 后非龙头同时拿两维（.20+.10=.30），同一市值事实算两次分。
+    #   合并维 = max(size_growth, dominant)，唯一实现见 ep_size_ind.score_rows。
+    #   旧两维权重已归零 → 仍列在下方（权重 0 → 页面不展示为生效维），字段保留供对照。
+    ("市值(合并取高)", "score_size_comb", _DIM_W["score_size_comb"], False),
+    # v5.0：业绩超预期（es 权重 0.05）。超预期10 / 符合5 / 低于2；无数据=缺维（不计分）。
+    ("业绩超预期", "score_es", _DIM_W["score_es"], False),
+    ("小盘成长溢价", "score_size_growth", _DIM_W.get("score_size_growth", 0.0), False),
+    ("行业龙头壁垒", "score_dominant", _DIM_W.get("score_dominant", 0.0), False),
+    ("小市值", "score_size", _DIM_W.get("score_size", 0.0), True),
 ]
 
 
@@ -373,7 +401,9 @@ def _load_dim_max_map():
            # v4.9：EP / SIZE_IND_NEUT 均为池内 rank 分位分，量程 0-10
            "score_ep": 10.0, "score_size_ind": 10.0,
            # v4.13-size2d：市值双维度（同为 0-10 池内分位/交互分）
-           "score_size_growth": 10.0, "score_dominant": 10.0}
+           "score_size_growth": 10.0, "score_dominant": 10.0,
+           # v5.0：市值合并维 + 业绩超预期维（均 0-10 制）
+           "score_size_comb": 10.0, "score_es": 10.0}
     _raw = dict(_fb)
     try:
         _p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "factor_weights.json")
@@ -429,6 +459,8 @@ _DIM_LABEL_SHORT = {
     "score_fund": "估值锚", "score_quality": "质量", "score_growth": "成长",
     "score_tech_neg": "技反", "score_bias60": "乖离", "score_rsi_rev": "RSI反",
     "score_size": "小市值", "score_lowvol20": "低波",
+    # v5.0：市值合并维 + 业绩超预期维
+    "score_size_comb": "市值合并", "score_es": "超预期",
     # v4.9
     "score_ep": "EP", "score_size_ind": "行业内市值",
     # v4.13-size2d：市值双维度短标签
@@ -4257,7 +4289,28 @@ try:
             _rf51_cmp = _rf51.get("compare_factor_ic") or {}
             _rf51_miss_w = 0.0          # 证据不足（n<20 或无记录）的名义权重合计
             _rf51_miss_dims = []
-            _rf_W_ACT = {"score_fund": 0.200000, "score_quality": 0.100000, "score_growth": 0.200000, "score_ep": 0.100000, "score_size_growth": 0.200000, "score_bias60": 0.050000, "score_rsi_rev": 0.050000, "score_dominant": 0.100000, "score_tech_neg": 0.000000}
+            _rf_W_ACT = {
+    "score_attention": 0.000000,
+    "score_bias60": 0.050000,
+    "score_ep": 0.150000,
+    "score_es": 0.050000,
+    "score_fund": 0.150000,
+    "score_growth": 0.200000,
+    "score_lowvol20": 0.000000,
+    "score_news": 0.000000,
+    "score_overbought": 0.000000,
+    "score_oversold60": 0.000000,
+    "score_quality": 0.150000,
+    "score_rsi_rev": 0.050000,
+    "score_sector": 0.000000,
+    "score_size": 0.000000,
+    "score_size_comb": 0.200000,
+    "score_size_ind": 0.000000,
+    "score_tech_neg": 0.000000,
+    "score_theme_intrinsic": 0.000000,
+    "score_theme_neg": 0.000000,
+    "score_vol_pulse": 0.000000,
+}
             _rf51_seen = set()
             for _dk, _dv in _rf51_cmp.items():
                 if not isinstance(_dv, dict):
@@ -6173,23 +6226,189 @@ else:
                    f'background:#0f172a;border-left:3px solid #3b82f6;padding:12px 14px;border-radius:8px;margin:10px 0;">'
                    f'{html_mod.escape(mr_text)}</div>')
 
-_detail_append(f'''
-    <!-- 复盘点评 (v2.22 AI生成优先; v2.42 A5 长文折叠) -->
+# ===== v3.1 每日复盘中心：四层结构（L0 基准行 → L1① 情绪 → L1①-2 仓位纪律 → L1② 消息研报）=====
+# 数据纪律（2026-11-21 裁决）：每个字段必须有可验证数据源；无源字段显示"未接入"占位，绝不编造数值。
+#   L0/L1① 数据源 = step2 生成的 market_review（indices/amount/up/down/zt/dt/money_score/money_phase）
+#   L1①-2 敞口 = regime_forecast.json combine.final_hi（已过 check_payload 日期守卫，单一口径与 Hero 一致）
+#   L1② 关注方向 = ai_assessment.watch_directions（来源三态徽标保留）；研报/外盘/两融 = 无源 → 未接入
+# 注：hot 与 weak 实测可能同组（当日仅3组题材且全负），并列展示会自相矛盾，故本层不展示该对字段，
+#     仅在下方折叠的 review_body 中保留 step2 原始 text（同源如实呈现）。
+_no_src_badge = ('<span title="当前评分模型无该数据源接入，按数据纪律不展示数值" '
+                 'style="display:inline-block;margin:3px 4px 3px 0;padding:4px 9px;'
+                 'background:#0f172a;border:0.5px dashed #475569;border-radius:6px;'
+                 'font-size:11px;color:#64748b;">{lbl} · 未接入</span>')
+
+# ===== 2026-11-21 手工快照接入（裁决：可每日手动更新）=====
+# 四类字段在 MCP 会话可实测取真实值，但日链脚本无法直接调 MCP → 走手工快照。
+# 判据单一实现在 review_context.py：load_context(日期守卫) + field_available(字段级)。
+# 快照日期≠报告日期 或 字段 available≠true → 回退"未接入"，禁编造。
+import review_context as _rc
+_ctx_ok, _rctx, _ctx_reasons = _rc.load_context(date_str)
+
+def _src_tag(source, as_of):
+    return (f'<span style="color:#64748b;font-size:10px;">　（源：{html_mod.escape(str(source))} · '
+            f'数据日 {html_mod.escape(str(as_of))}）</span>')
+
+def _overseas_html():
+    if not _rc.field_available(_rctx, "overseas"):
+        return _no_src_badge.format(lbl="隔夜外盘")
+    f = _rctx["fields"]["overseas"]
+    chips = []
+    for ix in f.get("indices", []):
+        try:
+            pct = float(ix.get("chg_pct"))
+            clr = "#ef4444" if pct > 0 else ("#22c55e" if pct < 0 else "#94a3b8")
+            sign = "+" if pct > 0 else ""
+            chips.append(f'<span style="display:inline-block;margin:3px 6px 3px 0;font-size:11px;color:#cbd5e1;">'
+                         f'{html_mod.escape(str(ix.get("name")))} <b style="color:{clr};">{sign}{pct:.2f}%</b>'
+                         f'<span style="color:#64748b;"> ({float(ix.get("close")):.2f})</span></span>')
+        except (TypeError, ValueError):
+            continue
+    note = html_mod.escape(str(f.get("as_of_note", "")))
+    return (f'<div style="margin:6px 0;font-size:12px;color:#cbd5e1;line-height:1.8;">'
+            f'🌍 <b>隔夜外盘</b>（{' / '.join(chips) if chips else '无数据'}）'
+            f'{_src_tag(f["source"], f["as_of"])}'
+            f'{f"<div style=\"color:#64748b;font-size:10px;\">{note}</div>" if note else ""}</div>')
+
+def _research_html():
+    if not _rc.field_available(_rctx, "research"):
+        return _no_src_badge.format(lbl="研报拆解")
+    f = _rctx["fields"]["research"]
+    items = []
+    for it in (f.get("items") or [])[:3]:
+        items.append(f'<div style="margin:3px 0;font-size:11px;color:#cbd5e1;">'
+                     f'· <b>{html_mod.escape(str(it.get("org")))}</b> {html_mod.escape(str(it.get("date")))}：'
+                     f'{html_mod.escape(str(it.get("title")))}'
+                     f'<div style="color:#94a3b8;font-size:10px;line-height:1.6;">{html_mod.escape(str(it.get("key", "")))}</div></div>')
+    note = html_mod.escape(str(f.get("as_of_note", "")))
+    return (f'<div style="margin:6px 0;padding:8px 10px;background:#0f172a;border-radius:6px;">'
+            f'📑 <b>研报拆解</b>（标的 {html_mod.escape(str(f.get("subject", "")))}）'
+            f'{"".join(items)}{_src_tag(f["source"], f["as_of"])}'
+            f'{f"<div style=\"color:#64748b;font-size:10px;\">{note}</div>" if note else ""}</div>')
+
+def _limitup_html():
+    if not _rc.field_available(_rctx, "limitup"):
+        return _no_src_badge.format(lbl="连板梯队")
+    f = _rctx["fields"]["limitup"]
+    chips = " / ".join(
+        f'{html_mod.escape(str(s.get("name")))}({s.get("streak")}板)'
+        for s in (f.get("stocks") or [])[:6])
+    note = html_mod.escape(str(f.get("as_of_note", "")))
+    return (f'<div style="margin:6px 0;font-size:12px;color:#cbd5e1;line-height:1.8;">'
+            f'🔥 <b>连板梯队</b>：最高 {f.get("max_streak")} 板 / 共 {f.get("count")} 只　{chips}'
+            f'（晋级率无现成字段，未自算则不填）{_src_tag(f["source"], f["as_of"])}'
+            f'{f"<div style=\"color:#64748b;font-size:10px;\">{note}</div>" if note else ""}</div>')
+
+def _margin_html():
+    if not _rc.field_available(_rctx, "margin"):
+        return _no_src_badge.format(lbl="两融余额")
+    f = _rctx["fields"]["margin"]
+    try:
+        fin = float(f["finance_value_yuan"]) / 1e8
+        sec = float(f["security_value_yuan"]) / 1e8
+        tot = float(f["trading_value_yuan"]) / 1e8
+        val = f'融资 <b>{fin:.2f}亿</b> / 融券 <b>{sec:.2f}亿</b> / 两融 <b>{tot:.2f}亿</b>'
+    except (TypeError, ValueError, KeyError):
+        return _no_src_badge.format(lbl="两融余额")
+    note = html_mod.escape(str(f.get("as_of_note", "")))
+    return (f'<div style="margin:6px 0;font-size:12px;color:#cbd5e1;line-height:1.8;">'
+            f'💰 <b>两融余额</b>（{html_mod.escape(str(f.get("subject", "")))}）：{val}'
+            f'{_src_tag(f["source"], f["as_of"])}'
+            f'{f"<div style=\"color:#64748b;font-size:10px;\">{note}</div>" if note else ""}</div>')
+
+_overseas_badge = _overseas_html()
+_news_badge = _research_html()
+_extra_badge = _limitup_html()
+_margin_badge = _margin_html()
+# 基准行合并徽标：有任一快照字段则用简短标注，否则保留"未接入"
+if _ctx_ok and any(_rc.field_available(_rctx, k) for k in _rc.FIELD_LABELS):
+    _base_badge = ('<span style="background:#1e293b;padding:6px 10px;border-radius:6px;'
+                   'color:#38bdf8;">外盘/两融/研报/连板：手工快照有源</span>')
+else:
+    _base_badge = ('<span style="background:#1e293b;padding:6px 10px;border-radius:6px;color:#64748b;">'
+                   '两融/外盘：未接入</span>')
+
+# 情绪结论句（A 类有源：money_score + money_phase，前置加粗）
+_emotion_clr = "#22c55e" if (mr_score is not None and mr_score >= 60) else ("#f59e0b" if (mr_score is not None and mr_score >= 40) else "#ef4444")
+_emotion_line = (f'<div style="margin:10px 0;padding:10px 14px;background:#0f172a;'
+                 f'border-left:3px solid {_emotion_clr};border-radius:8px;font-size:13px;color:#e2e8f0;">'
+                 f'🎯 <b style="color:{_emotion_clr};font-size:15px;">{html_mod.escape(str(mr_phase))}</b>'
+                 f'　赚钱效应 <b>{mr_score}</b> 分'
+                 f'<span style="color:#64748b;font-size:11px;">　（源：step2 market_review · {date_str}）</span></div>') if mr_score is not None else ""
+
+# 内盘证据（A 类有源：up/down/zt/dt + hw_ratio 硬件偏好）
+_hw = market_review.get("hw_ratio")
+_hw_txt = (f'结构性偏好：硬件制造占优（S/A 样本硬件占比 {float(_hw)*100:.0f}%）'
+           if _hw is not None and isinstance(_hw, (int, float)) else "结构性偏好：样本不足，不做判断")
+_inner_evidence = (f'<div style="margin:6px 0;font-size:12px;color:#cbd5e1;line-height:1.9;">'
+                   f'· <b>市场广度</b>：上涨 {mr_up} 家 / 下跌 {mr_down} 家 · 涨停 {mr_zt} / 跌停 {mr_dt}<br>'
+                   f'· <b>资金结构</b>：{html_mod.escape(_hw_txt)}'
+                   f'<span style="color:#64748b;">　（源：step2 market_review）</span></div>') if mr_up is not None else ""
+
+# 仓位与纪律（A 类有源：regime final_hi 已过日期守卫；三条纪律为模型实证结论，非行情数据）
+_expo_line = ""
+try:
+    _comb = (_regime_fc.get("combine") or {}) if isinstance(_regime_fc, dict) else {}
+    _fin = _comb.get("final_hi")
+    if _fin is not None:
+        _expo_line = (f'<div style="margin:10px 0;padding:10px 14px;background:rgba(245,158,11,0.08);'
+                      f'border-left:3px solid #f59e0b;border-radius:8px;font-size:13px;color:#e2e8f0;">'
+                      f'📐 <b style="color:#f59e0b;">当日敞口上限 {float(_fin)*100:.0f}%</b>'
+                      f'（情绪阶梯与风险预算双约束取小，与首屏同口径）'
+                      f'<span style="color:#64748b;font-size:11px;">　（源：regime_model · {date_str}）</span></div>')
+except Exception:
+    _expo_line = ""
+_discipline_html = ('<div style="margin:6px 0;font-size:12px;color:#cbd5e1;line-height:1.9;">'
+                    '· <b>非买入信号</b>：评分是横截面相对排序，不构成个股择时建议<br>'
+                    '· <b>方向不可预测</b>：regime 方向层实测低于多数类基线，不据此押注涨跌<br>'
+                    '· <b>T+1 / T0 不可实盘</b>：相关路径已实证关死，禁用于仓位与胜率量化</div>')
+
+_review_card_html = f'''
+    <!-- 每日复盘中心 v3.1：四层结构；无源字段标注"未接入"，不编造数值 -->
     <div class="core-conclusion review-card" id="sec-summary">
         <h2>{review_title}</h2>
+        <!-- v5.0（2026-11-23）：口径变更横幅 —— 评分口径已修订，total 与 v4.19 及以前不可比。
+             置顶首页是「披露不可迁」铁律的要求：禁称经验证 alpha / 先验权重 / 缺口横幅必须留主页。 -->
+        <div style="margin:8px 0 2px;padding:9px 12px;background:#1a1408;border-left:3px solid #d97706;border-radius:6px;font-size:11.5px;color:#fcd34d;line-height:1.75;">
+            <b>⚠️ 评分口径 v5.0（2026-11-23 审计修订）—— 本页分数与 v4.19 及以前不可比</b><br>
+            ① 市值双维<b>合并取高</b>（消除同一市值事实算两次分）；② 成长维<b>接入营收增速</b>（惩罚营收萎缩的利润修复）；
+            ③ 新增<b>业绩超预期</b>维；④ <b>缺维分层</b>（结构性不适用剔分母、真缺数据按 0，不再一律填中性 5.0）；
+            ⑤ G1 成长门槛新增中间档（cagr3≤5% 封顶 6.0）。<br>
+            <b>权重为先验配置（非 IC 背书），准入闸门 G5 未过、新增维度未进历史面板 → 禁称「经验证的 alpha」。</b>
+        </div>
+        <!-- L0 基准行：全部来自 step2 market_review（有源），日期守卫生效 -->
         <div class="review-metrics" style="display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 4px;font-size:12px;color:#cbd5e1;">
+            <span style="background:#1e293b;padding:6px 10px;border-radius:6px;"><b style="color:#94a3b8;">数据日</b> {date_str}</span>
             <span style="background:#1e293b;padding:6px 10px;border-radius:6px;"><b style="color:#94a3b8;">指数</b> {idx_chips}</span>
             <span style="background:#1e293b;padding:6px 10px;border-radius:6px;"><b style="color:#94a3b8;">成交</b> {amt_disp}</span>
             <span style="background:#1e293b;padding:6px 10px;border-radius:6px;"><b style="color:#94a3b8;">涨跌</b> {breadth_disp}</span>
             <span style="background:#1e293b;padding:6px 10px;border-radius:6px;"><b style="color:#94a3b8;">赚钱效应</b> {me_disp}</span>
+            {_base_badge}
         </div>
+        <!-- L1① 情绪定调（事实→解释） -->
+        {_emotion_line}
+        {_inner_evidence}
+        <!-- L1①-2 仓位与纪律（解释→动作） -->
+        {_expo_line}
+        {_discipline_html}
         <div class="main-line">{main_line}{change_text}</div>
+        <!-- L1② 消息与研报：有源=关注方向；无源=未接入占位，不填数 -->
+        <div style="margin:10px 0;padding:8px 12px;background:#0f172a;border:0.5px solid #1e293b;border-radius:8px;">
+            <div style="font-size:12px;color:#94a3b8;margin-bottom:5px;">📰 消息与研报（有源字段展示，无源字段留空）</div>
+            {_margin_badge}{_overseas_badge}{_news_badge}{_extra_badge}
+        </div>
         <details style="margin-top:6px;">
             <summary style="cursor:pointer;font-size:12px;color:#38bdf8;padding:8px 0;">📖 展开完整盘面复盘与关注方向</summary>
             {review_body}
         </details>
     </div>
-''')
+'''
+# 2026-11-21 裁决：复盘点评属「每日决策解读」，历史上一直在主页 Hero 之后。
+#   round132 迁移时误归入 _detail_append（分析页）→ 主页 index 无复盘模块。
+#   现同时输出到主页（html_parts，位于 Hero 之后、完整排名之前）与分析页存档（_DETAIL_PARTS）。
+#   位置：此处(len(html_parts))远早于 _ANALYSIS_SLICE_START(10576)，不会被 SHOW_ANALYSIS 切片删除。
+html_parts.append(_review_card_html)
+_detail_append(_review_card_html)
 
 # ===== round109 市场状态与风险预算卡片（紧接复盘点评，属"每日解读"层）=====
 # 位置理由：复盘点评讲"今天发生了什么"（后视），本卡片讲"当前风险刻度与可执行的敞口上限"，
@@ -7377,17 +7596,16 @@ try:
                     '<div style="font-size:10.5px;color:#94a3b8;padding:7px 10px;'
                     'background:rgba(148,163,184,0.06);border:1px solid rgba(148,163,184,0.25);'
                     'border-radius:6px;margin-bottom:10px;line-height:1.7;">'
-                    f'ℹ️ <b>中性填充 {_nf_cnt} 只（{_nf_pct:.1f}%）</b>：' + _nf_items
-                    + '在当前数据里无值，已按<b>量程中点（DMAX/2）</b>参与总分 —— '
-                    '这些格子标 <span style="background:' + NEUTRAL_FILL_BG + ';padding:0 4px;'
-                    'border:1px dashed #94a3b8;">5.0<span style="font-size:8px;">*</span></span>'
-                    ' 并带 <b>*</b>。<br>'
-                    '<b>这不是实测分，也不是 0 分</b>：填 0 等于把「没数据」当「最差」，'
-                    '实测会使复合 IC 从 h5 +0.15 崩到 +0.09（配对 t −5.8）→ 故采用无信息中性值。'
+                    f'ℹ️ <b>缺维按 0 计 {_nf_cnt} 只（{_nf_pct:.1f}%）</b>：' + _nf_items
+                    + '在当前数据里无值，已按 <b>0 分</b>参与总分（'
+                    '分母不变）—— <b>没有的数据不按中性分计</b>。'
+                    '<br>其中<b>结构性不适用</b>（如行业龙头无「小盘成长溢价」项）'
+                    '已<b>从分母剔除</b>（既不扣分也不白送分）；'
+                    '其余为<b>真实数据缺失</b>，按 0 分计入并在此披露。'
                     '<br>⚠️ 与「权重未落地」告警的区别：本提示是<b>个股级</b>缺维的正常处置，'
                     '上面那条才是<b>整列</b>缺值的数据管道故障。</div>')
         except Exception as _nfe:
-            print(f"⚠️ 中性填充披露生成失败（不影响主表）: {type(_nfe).__name__}: {_nfe}")
+            print(f"⚠️ 缺维披露生成失败（不影响主表）: {type(_nfe).__name__}: {_nfe}")
             _neutral_banner = ""
 
         # ---- v4.10（2026-10-27 T0-1）：排名精度披露条 ----
@@ -9886,13 +10104,14 @@ for idx, r in enumerate(results):
         _cells = []
         for _k, _v, _tip in zip(_eff_keys, _eff_vals, _score_tips):
             if _k in _nf_set:
-                _fill_v = (_DIM_MAX_MAP.get(_k) or 10.0) / 2.0
+                # v5.0（2026-11-23）：缺维按 0 分计入总分（分母不变），
+                #   **不再显示量程中点 5.0**（那是 v4.x 中性填充口径，已废止）。
+                #   结构性不适用者已从分母剔除，不在本集合内（其值取自另一维）。
                 _cells.append(
-                    f'<div class="s-score" style="background:{NEUTRAL_FILL_BG};'
-                    f'border:1px dashed #94a3b8;color:#cbd5e1;" '
-                    f'title="{_tip} —— ⚠️ 该维当日无数据，按量程中点({_fill_v:.1f})'
-                    f'中性填充参与总分，非实测值、也非 0 分">'
-                    f'{_fill_v:.1f}<span style="font-size:8px;">*</span></div>')
+                    f'<div class="s-score" style="background:rgba(148,163,184,0.10);'
+                    f'border:1px dashed #94a3b8;color:#94a3b8;" '
+                    f'title="{_tip} —— ⚠️ 该维当日无数据，<b>按 0 分</b>计入总分（分母不变），'
+                    f'非实测值">0.0<span style="font-size:8px;">*</span></div>')
             elif _v is None:
                 _cells.append(f'<div class="s-score" style="background:#334155" title="{_tip}">—</div>')
             else:
@@ -12736,20 +12955,24 @@ html_parts.append('''
         <p>🗒️ 点评来源：''' + _ai_src_label + '''（''' + html_mod.escape(_ai_src_tip) + '''）</p>
         <p>⚠️ 免责声明: 本报告由AI基于stock-scorer极简评分模型自动生成,仅供参考,不构成投资建议。投资有风险,入市需谨慎。</p>
         <p>评分模型 (''' + _SCORER_VER + '''): '''
-        + ('（round36 质量维NaN修复 + round37 权重再平衡 + v4.13 市值双维拆分）— 基本面估值锚' + f'{_DIM_W["score_fund"]:.0%}'
+        + ('（v5.0 评分审计修订）— 基本面估值锚' + f'{_DIM_W["score_fund"]:.0%}'
            + ' + 质量' + f'{_DIM_W["score_quality"]:.0%}'
-           + ' + 低波20' + f'{_DIM_W["score_lowvol20"]:.0%}'
-           + ' + 技术面反号' + f'{_DIM_W["score_tech_neg"]:.0%}'
+           + ' + 成长(接入营收增速)' + f'{_DIM_W["score_growth"]:.0%}'
+           + ' + EP估值' + f'{_DIM_W["score_ep"]:.0%}'
+           + ' + 市值(双维合并取高)' + f'{_DIM_W["score_size_comb"]:.0%}'
+           + ' + 业绩超预期' + f'{_DIM_W["score_es"]:.0%}'
            + ' + 乖离低位' + f'{_DIM_W["score_bias60"]:.1%}'
            + ' + RSI反转' + f'{_DIM_W["score_rsi_rev"]:.1%}'
-           + ' + EP估值' + f'{_DIM_W["score_ep"]:.0%}'
-           + ' + 小盘成长溢价' + f'{_DIM_W["score_size_growth"]:.0%}'
-           + ' + 行业龙头壁垒' + f'{_DIM_W["score_dominant"]:.0%}'
-           + '。<b>2026-10-28 v4.13-size2d 市值维度拆分</b>：'
-           + '单一 score_size_ind(10%) 拆为 A 小盘成长溢价(8%，行业内市值×成长门限) 与 '
-           + 'B 行业龙头壁垒(6%，业务份额组内前30%)，市值合计 14%；'
-           + '差额 4% 由质量回吐（25.2%→21.2%），Σ=1.0 不变。'
-           + '⚠️ <b>B 维尚无本池单维 IC 实证</b>，属先验配置（承认龙头有壁垒溢价），须补实证。'
+           + '。<b>2026-11-23 v5.0 评分审计修订</b>：'
+           + '① 市值双维合并取高 score_size_comb=max(小盘成长, 行业龙头)，'
+           + '消除「同一市值事实算两次分」（原非龙头同时拿 20%+10%）；'
+           + '② 成长维接入营收增速 revg（α=0.30，申万一级行业内百分位），'
+           + '惩罚「营收萎缩、利润靠费用优化修复」的伪成长；'
+           + '③ 新增业绩超预期维（超预期10/符合5/低于2，无数据不计分）；'
+           + '④ 缺维分层：结构性不适用剔分母、真缺数据按 0（不再一律填中性 5.0）；'
+           + '⑤ G1 成长门槛新增中间档（0&lt;cagr3≤5% 封顶 6.0）。'
+           + '⚠️ 全部为<b>先验产品裁决</b>，G5 未闭合、fund 门控覆盖 0%、'
+           + '新增维度未进历史面板 → <b>禁称经验证的 alpha</b>；total 跨版本禁比。'
            + '（<b>2026-10-28 round37 权重再平衡</b>：行业内市值由 16% 封顶至 10%，'
            + '释放的 6% 全给质量 → 质量升至 25%（全池最大权重）。'
            + '⚠️ 与 round35 实证冲突：修复后质量残差 IC 为 h20 −0.0796(t−4.42)、h40 −0.2033(t−22.67)，显著为负，'
@@ -13183,8 +13406,18 @@ if SHOW_CORE_ONLY:
             '其中 IC 数字均为样本内 / PROXY_ONLY。</div>'
             + _fh.group(2) + '</div>')
         html = (html[:_fh.start(2)]
-                + ('权重为<b>先验配置</b>（非 IC 背书），准入闸门 G5 未过、'
+                + ('<b>v5.0 评分审计修订（2026-11-23）</b>：'
+                   '① 市值双维<b>合并取高</b> score_size_comb=max(小盘成长, 行业龙头)，'
+                   '消除「同一市值事实算两次分」；'
+                   '② 成长维<b>接入营收增速</b> revg（α=0.30，申万一级行业内百分位），'
+                   '惩罚「营收萎缩、利润靠费用优化修复」的伪成长；'
+                   '③ 新增<b>业绩超预期</b>维（超预期10/符合5/低于2，无数据不计分）；'
+                   '④ <b>缺维分层</b>：结构性不适用剔分母、真缺数据按 0'
+                   '（不再一律填中性 5.0）；'
+                   '⑤ G1 成长门槛新增中间档（0&lt;cagr3≤5% 封顶 6.0）。'
+                   '权重为<b>先验配置</b>（非 IC 背书），准入闸门 G5 未过、'
                    'walk-forward 前视验证未完成，<b>禁称「经验证的 alpha」</b>；'
+                   '新增维度未进历史面板、fund 门控覆盖 0%，'
                    f'完整口径变更沿革见 '
                    f'<a href="analysis_{_data_date}.html#sec-model-history">'
                    '独立分析页</a>。')

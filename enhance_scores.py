@@ -27,7 +27,31 @@ W_NEWS, W_TECH, W_FUND, W_THEME = 0.20, 0.20, 0.30, 0.30
 # 计算 total 必须走十维公式，禁止再用旧的四维 0-20 量纲公式——
 # 否则单独重跑本脚本会把 total 打回 20 分制，与 apply_sector_momentum 的
 # 百分制十维口径冲突（历史事故：页面出现 11~18 与 28~93 两套量纲并存）。
-_W_PRIOR_10D = {"score_fund": 0.200000, "score_news": 0.000000, "score_theme_neg": 0.000000, "score_size": 0.000000, "score_sector": 0.000000, "score_quality": 0.100000, "score_growth": 0.200000, "score_tech_neg": 0.000000, "score_oversold60": 0.000000, "score_bias60": 0.050000, "score_rsi_rev": 0.050000, "score_vol_pulse": 0.000000, "score_overbought": 0.000000, "score_theme_intrinsic": 0.000000, "score_attention": 0.000000, "score_lowvol20": 0.000000, "score_ep": 0.100000, "score_size_ind": 0.000000, "score_size_growth": 0.200000, "score_dominant": 0.100000}  # v4.14-evidence-aligned：quality 0.212→0.12（实证 h20 IC −0.147 负），fund 0.12→0.242（消融 t=+4.41 唯一>4），# tech_neg 0.06→0.03（σ 贡献仅 2.1% 近乎常数）；Σ=1.0
+_W_PRIOR_10D = {
+    "score_attention": 0.000000,
+    "score_bias60": 0.050000,
+    "score_ep": 0.150000,
+    "score_es": 0.050000,
+    "score_fund": 0.150000,
+    "score_growth": 0.200000,
+    "score_lowvol20": 0.000000,
+    "score_news": 0.000000,
+    "score_overbought": 0.000000,
+    "score_oversold60": 0.000000,
+    "score_quality": 0.150000,
+    "score_rsi_rev": 0.050000,
+    "score_sector": 0.000000,
+    "score_size": 0.000000,
+    "score_size_comb": 0.200000,
+    "score_size_ind": 0.000000,
+    "score_tech_neg": 0.000000,
+    "score_theme_intrinsic": 0.000000,
+    "score_theme_neg": 0.000000,
+    "score_vol_pulse": 0.000000,
+}  # v4.14-evidence-aligned：quality 0.212→0.12（实证 h20 IC −0.147 负），fund 0.12→0.242（消融 t=+4.41 唯一>4），# tech_neg 0.06→0.03（σ 贡献仅 2.1% 近乎常数）；Σ=1.0
+# v5.0（2026-11-23）：缺维分层规则（与 step2 / apply 同口径，单一事实源）。
+MISSING_RULE = "structural"
+
 def _load_w10():
     """读 factor_weights.json 的 weights（十维）；失败回退兜底先验。"""
     try:
@@ -98,8 +122,12 @@ def _calc_total_10d(r):
     dm = _load_dim_max()
     parts = [(k, r.get(k), v) for k, v in w.items() if v > 0]
     _miss = []
+    # v5.0（2026-11-23）：缺维分层 —— 结构性不适用剔分母、真缺数据按 0。
+    #   missing_reason 由 ep_size_ind.score_rows 给出（唯一实现来源），经 step2 落盘。
     total, _m = scale_calc.composite_total(
-        parts, dm, weights={k: v for k, v in w.items() if v > 0}, missing_out=_miss)
+        parts, dm, weights={k: v for k, v in w.items() if v > 0},
+        missing_out=_miss, missing_rule=MISSING_RULE,
+        missing_reason=r.get("missing_reason") or {})
     if _m:
         r["neutral_filled"] = list(_m)
         r["composite_scale"] = "uniform_v1"
@@ -350,7 +378,10 @@ def main():
 
     # ---- 业绩预期差三档（超预期/符合预期/低于预期，2026-10-31 老大指令）----
     #   earnings_surprise 唯一实现：预测增速 vs 实际单季同比（口径对齐扣非/归母）。
-    #   权重 0 不进总分；只写 r["es"] 字段。失败必须大声告警，禁静默降级。
+    #   **v5.0（2026-11-23）**：es 权重由 0 → 0.05，正式进总分。
+    #   分值映射走 earnings_surprise.tier_to_score（唯一实现，禁两处各写一套）。
+    #   无数据 → score_es=None（缺维，非 0 分）—— 否则惩罚 96.6% 无覆盖的股票。
+    #   失败必须大声告警，禁静默降级。
     try:
         import earnings_surprise as _es_mod
         _es_map = _es_mod.compute_es_map({x.get("name"): x.get("code") for x in results})
@@ -363,6 +394,8 @@ def main():
                     "strength", "method", "caliber", "period", "source", "flags",
                     "dev_ratio", "note")}
                 _es_n += 1
+                # v5.0：写 0-10 评分（无数据/无法判定 → None 缺维）
+                r["score_es"] = _es_mod.tier_to_score(_e.get("tier"))
         print(f"🎯 业绩预期差三档: {_es_n}/{len(results)} 只标注"
               f"（超预期 {sum(1 for r in results if (r.get('es') or {}).get('tier') == '超预期')} / "
               f"符合 {sum(1 for r in results if (r.get('es') or {}).get('tier') == '符合预期')} / "

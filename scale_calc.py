@@ -70,7 +70,8 @@ def sum_all_weights(weights):
 
 
 def composite_total(parts, dim_max, sum_all=None, weights=None,
-                    neutral_ratio=NEUTRAL_FILL_RATIO, missing_out=None):
+                    neutral_ratio=NEUTRAL_FILL_RATIO, missing_out=None,
+                    missing_rule="neutral", missing_reason=None):
     """按统一量尺算百分制复合分。
 
     参数
@@ -88,6 +89,21 @@ def composite_total(parts, dim_max, sum_all=None, weights=None,
         缺维填充比例，默认 0.5（量程中点）。
     missing_out : list | None
         传入则把缺失维 key 追加进去，供调用方写 reasons / 页面标记。
+    missing_rule : str
+        **v5.0（2026-11-23）新增 —— 缺维处理规则。** 三档：
+          "neutral" (默认，旧口径)：缺维在分子填 `neutral_ratio*10`（=5.0 中性分）。
+              ⚠️ 这是审计认定的「白送分」来源：全池 1275 分 ≈ 128 只满分红。
+          "zero"：**固定分母**（恒 = Σ全部生效权重），缺维在分子按 **0 分**计
+              ——「没有的数据不能算中性」。分母不随缺维变化 ⇒ 全池同一把尺
+              （保住 P0-4 的可比性铁律），缺数据股被明确扣分而非白拿中性分。
+          "structural"：结构性不适用的维（`missing_reason[dim] == "structural"`）
+              从分子**与分母同时剔除**（不计分也不白送），其余缺维按 zero 处理。
+              ⚠️ 仅当某维对**部分股票**结构性不适用时才有意义；若该维对全池都
+              不适用，剔分母会整体放大分数（尺度漂移），此时应改用 zero。
+        missing_reason : dict | None
+        形如 {"score_size_growth": "structural"|"data"}，标注每个缺维的**原因**。
+        ⚠️ 判据只能由**产生该维的模块**给出（唯一实现原则），本函数不自行推断。
+        未提供时 "structural" 退化为与 "zero" 等价。
 
     返回
     ----
@@ -104,6 +120,7 @@ def composite_total(parts, dim_max, sum_all=None, weights=None,
         return 0.0, missing
 
     num = 0.0
+    den = sum_all          # 分母恒为 Σ全部生效权重（zero/structural 档不随缺维变化）
     for key, val, w in parts:
         if not is_num(w) or w <= 0:
             continue                      # 权重 0 / 非法权重 → 不参与
@@ -111,14 +128,32 @@ def composite_total(parts, dim_max, sum_all=None, weights=None,
         if mx <= 0:
             mx = 10.0
         if is_num(val):
-            num += min(float(val), mx) / mx * 10.0 * w
-        else:
+            # ⚠️ v5.0 修正：clip 必须**双向**。原实现只有上界 min(val, mx)，
+            #   负值（如越界的因子分）会直接进分子 → 与向量版
+            #   scoring_core.composite_total_matrix 的 np.clip(clean, 0, mx) 不一致，
+            #   实测同一输入两把尺子差 4.64 分（2026-11-23 回归 T3 抓到）。
+            #   下界 0 与「负分无意义」一致，且与向量版逐股等价。
+            num += max(0.0, min(float(val), mx)) / mx * 10.0 * w
+            continue
+        # ---- 缺维 ----
+        missing.append(key)
+        if missing_out is not None:
+            missing_out.append(key)
+        if missing_rule == "neutral":
             num += neutral_ratio * 10.0 * w        # 中性填充：DMAX/2 → 归一后恒 5.0
-            missing.append(key)
-            if missing_out is not None:
-                missing_out.append(key)
+        elif missing_rule == "structural":
+            reason = (missing_reason or {}).get(key)
+            if reason == "structural":
+                # 结构性不适用 → 分子分母同时剔除（不计分、不白送）
+                den -= float(w)
+                continue
+            num += 0.0 * w                          # 真缺数据 → 按 0
+        else:  # "zero"
+            num += 0.0 * w                          # 缺维按 0 分计入（分母不变）
+    if den <= 0:
+        den = sum_all
     # 归一化后的量纲是 0-10，加权平均仍是 0-10 → ×10 得百分制（勿漏乘）
-    return round(num / sum_all * 10.0, 2), missing
+    return round(num / den * 10.0, 2), missing
 
 
 def missing_note(missing, dim_max=None, labels=None):
@@ -127,7 +162,9 @@ def missing_note(missing, dim_max=None, labels=None):
         return ""
     labels = labels or {}
     names = [labels.get(k, k.replace("score_", "")) for k in missing]
-    return "中性填充(非实测)：" + "/".join(names)
+    # v5.0（2026-11-23）：缺维改为按 0 分计入（结构性不适用者已剔分母），
+    #   旧文案「中性填充(非实测)」已与实际口径不符 → 改为「缺维按0(非实测)」。
+    return "缺维按0(非实测)：" + "/".join(names)
 
 
 def load_weights_and_dim_max(base_dir=None):

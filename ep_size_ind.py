@@ -787,6 +787,47 @@ def score_rows(rows, as_of, em=None, price_key="price", mv_key="circ_mv",
         print(f"      ⚠️ 暴露不对称：非龙头同时拿 size_growth(.20)+dominant(.10)=0.30，"
               f"龙头仅 dominant(.10) → 市值大类单股暴露差 3 倍（须在页面/报告披露）")
 
+    # ---- v5.0（2026-11-23）：市值双维合并取高 + 缺维原因标记 ----
+    # 审计发现（评分审计_TOP20_2026-11-23）：P0-3 把 dominant_scope 改成 pool 后，
+    #   非龙头同时拿 size_growth(.20)+dominant(.10)=0.30 —— 同一「市值事实」被算两次分。
+    # 本处为**市值双维的唯一合并实现**：score_size_comb = max(size_growth, dominant)。
+    #   · 两者都有值 → 取高（互斥取高，不是相加）
+    #   · 龙头（size_growth 结构性不适用）→ 取 dominant
+    #   · 非龙头只有 size_growth → 取 size_growth
+    #   · 都无 → 该维真缺数据
+    # ⚠️ 缺维必须带**原因**，否则下游无法区分「结构性不适用」与「真缺数据」，
+    #   只能一律填 5.0 中性分 —— 那正是审计认定的白送分来源（全池 1275 分 ≈ 128 只满分红）。
+    #   原因写入 r['missing_reason']，供 scale_calc.composite_total 分层处理。
+    n_comb = n_comb_missing = 0
+    for r in rows:
+        sg = r.get("score_size_growth")
+        dm = r.get("score_dominant")
+        _sg_ok = isinstance(sg, (int, float)) and sg == sg
+        _dm_ok = isinstance(dm, (int, float)) and dm == dm
+        if _sg_ok and _dm_ok:
+            r["score_size_comb"] = round(max(float(sg), float(dm)), 2)
+            r["size_comb_src"] = "both"
+        elif _sg_ok:
+            r["score_size_comb"] = round(float(sg), 2)
+            r["size_comb_src"] = "size_growth"
+        elif _dm_ok:
+            # 龙头：size_growth 结构性不适用 → 取 dominant，但**标记为结构性缺维**
+            r["score_size_comb"] = round(float(dm), 2)
+            r["size_comb_src"] = "dominant"
+            mr = r.setdefault("missing_reason", {})
+            mr["score_size_growth"] = "structural"
+        else:
+            r["score_size_comb"] = None
+            r["size_comb_src"] = "none"
+            mr = r.setdefault("missing_reason", {})
+            mr["score_size_growth"] = "data"
+            mr["score_size_comb"] = "data"
+        n_comb += 1
+        if not _sg_ok and not _dm_ok:
+            n_comb_missing += 1
+    print(f"   🔀 [v5 市值双维合并] score_size_comb 落分 {n_comb - n_comb_missing} 只，"
+          f"缺 {n_comb_missing} 只（max(size_growth, dominant)，互斥取高）")
+
     n_ep = 0
     for r in rows:
         code = (r.get("code") or "").strip().lower()

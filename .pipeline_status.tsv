@@ -1,29 +1,25 @@
-fetch_top200_sina	0	1		2026-11-20 16:27:01	11-20 行情+池重建，母体5383/选池1820
-check_data_fresh	0	1		2026-11-20 16:27:01	
-step2_stockscorer	0	1		2026-11-20 16:36:13	step2 生成 11-20 scored
-append_klines_latest	0	1		2026-11-20 16:49:22	2135只追加11-20,失败0
-refresh_kline_meta	0	1		2026-11-20 16:49:23	
-verify_qfq_anchor	0	1		2026-11-20 16:49:36	前复权锚点自检
-archive_fund_universe	0	1		2026-11-20 16:49:54	fund全域归档
-archive_fwd_snapshot	0	1		2026-11-20 16:50:04	前瞻估值快照归档
-archive_fund_universe	0	1		2026-11-20 16:50:16	fund全域归档2112只,重跑补当日fwd_pe 62.7%
-generate_ai_assessment	0	1		2026-11-20 16:50:25	AI评估
-generate_ai_assessment	0	1		2026-11-20 16:50:31	AI评估fallback=True(火山引擎订阅过期400,非LLM研判)
-enhance_scores	0	1		2026-11-20 16:50:47	评分增强
-sector_momentum_daily	0	1		2026-11-20 16:53:20	行业动量
-apply_sector_momentum	0	1		2026-11-20 16:53:27	行业维合并
-fetch_bench	0	1		2026-11-20 16:53:32	指数基准
-regime_model	0	1		2026-11-20 16:53:37	市场状态与风险预算
-pick_portfolio	0	1		2026-11-20 16:53:41	组合生成
-portfolio_risk	2	0		2026-11-20 16:53:45	组合层风险度量
-track_recommendations	2	0		2026-11-20 16:53:45	推荐跟踪
-portfolio_metrics	0	1		2026-11-20 16:53:46	组合日频指标
-portfolio_risk	0	1		2026-11-20 16:53:50	组合层风险度量
-track_recommendations	0	1		2026-11-20 16:55:09	推荐跟踪
-panel_audit	0	1		2026-11-20 16:55:22	面板审计
-selfcheck_pipeline	0	1		2026-11-20 16:55:31	链路自检
-fetch_focus_list	0	1		2026-11-20 16:55:32	AI关注池
-factor_eval	143	0		2026-11-20 17:02:59	因子IC+权重重估:3378只价格尾部增量耗时>7min,进程终止;IC/权重视图停上一日
-long_panel_ic	1	0		2026-11-20 17:03:04	ic_long age=8d超7d阈值,但fetch_klines_2020 --skip-cached已知bug+待裁决,未重建
-orphan_scan	0	1		2026-11-20 17:03:56	孤儿json归档
-gen_report_top200	0	1		2026-11-20 17:04:20	11-20报告生成
+fetch_top200_sina	0	1		2026-11-24 00:24:23	
+check_data_fresh	0	1		2026-11-24 00:24:23	
+step2_stockscorer	0	1		2026-11-24 00:24:23	
+append_klines_latest	0	1		2026-11-24 00:24:23	
+refresh_kline_meta	0	1		2026-11-24 00:24:24	
+verify_qfq_anchor	0	1		2026-11-24 00:24:24	
+archive_fund_universe	0	1		2026-11-24 00:24:24	
+archive_fwd_snapshot	0	1		2026-11-24 00:24:24	
+generate_ai_assessment	0	1		2026-11-24 00:24:24	
+enhance_scores	0	1		2026-11-24 00:24:24	
+sector_momentum_daily	0	1		2026-11-24 00:24:24	
+apply_sector_momentum	0	1		2026-11-24 00:24:24	
+fetch_bench	0	1		2026-11-24 00:24:24	
+regime_model	0	1		2026-11-24 00:24:24	
+pick_portfolio	0	1		2026-11-24 00:24:24	
+portfolio_risk	0	1		2026-11-24 00:24:24	
+track_recommendations	0	1		2026-11-24 00:24:24	
+portfolio_metrics	0	1		2026-11-24 00:24:24	
+panel_audit	0	1		2026-11-24 00:24:24	
+selfcheck_pipeline	0	1		2026-11-24 00:24:24	
+gen_report_top200	0	1		2026-11-24 00:24:24	
+factor_eval	124	0		2026-11-24 00:24:24	v5 新增维度(score_size_comb/score_es)未进历史面板，该步仍做重尾增量，240s 上限内未完成
+long_panel_ic	1	0		2026-11-24 00:24:24	面板末日 2026-10-30，缺 score_size_comb/score_es 两列，新维度不可评估
+fetch_focus_list	0	1		2026-11-24 00:24:30	
+orphan_scan	0	1		2026-11-24 00:24:31	

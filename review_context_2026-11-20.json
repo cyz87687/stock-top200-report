@@ -1,0 +1,77 @@
+{
+  "schema": "review_context_v1",
+  "trade_date": "2026-11-20",
+  "captured_at": "2026-11-21T21:07:54+08:00",
+  "capture_mode": "manual_mcp_snapshot",
+  "note": "手工MCP快照：每日由助手在会话内调用已挂载MCP取数后写入。trade_date=A股交易日；字段as_of=数据真实时点，二者可不同，页面须同时显示as_of。无源字段保持available=false，禁编造。",
+  "fields": {
+    "overseas": {
+      "available": true,
+      "source": "Wind MCP get_index_kline",
+      "as_of": "2026-11-19",
+      "as_of_note": "美股11-19收盘=A股11-20盘前可见信息，符合PIT；未采用11-20美股收盘（对11-20属未来信息）",
+      "captured_at": "2026-11-21T21:07:54+08:00",
+      "indices": [
+        {"name": "道琼斯", "windcode": "DJI.GI", "close": 49097.06, "prev": 50198.17, "chg_pct": -2.19},
+        {"name": "标普500", "windcode": "SPX.GI", "close": 7175.83, "prev": 7323.63, "chg_pct": -2.02},
+        {"name": "纳斯达克", "windcode": "IXIC.GI", "close": 23879.20, "prev": 24429.88, "chg_pct": -2.25}
+      ]
+    },
+    "research": {
+      "available": true,
+      "source": "通达信 MCP wenda_report_query",
+      "as_of": "2026-11-15",
+      "as_of_note": "下列为取数时最近可得的个股卖方研报（标的=中际旭创300308，用户核心关注），最新一篇11-15；非11-20当日新研报",
+      "captured_at": "2026-11-21T21:07:54+08:00",
+      "subject": "中际旭创(300308)",
+      "items": [
+        {
+          "title": "中际旭创2026年三季报点评：高速光模块持续放量，1.6T及硅光产品驱动业绩增长",
+          "org": "国联民生",
+          "date": "2026-11-07",
+          "key": "前三季营收695.47亿(+178.13%)、归母222.38亿(+211.81%)；1.6T放量；预测26/27/28归母336.94/736.57/1010.18亿，PE16/7/5，维持推荐"
+        },
+        {
+          "title": "中际旭创公司信息更新报告：Q3业绩高增长，回购注销增强信心",
+          "org": "开源证券",
+          "date": "2026-11-01",
+          "key": "Q3归母85.87亿(+173.74%)；50亿回购拟全部注销；预测2026-2028归母358/726/1069亿，PE18.2/9/6.1，维持买入"
+        },
+        {
+          "title": "AI算力行业2026三季报总结：关注国产算力与海外算力",
+          "org": "国海证券",
+          "date": "2026-11-15",
+          "key": "中际旭创主要客户订单(确定性PO)基本覆盖2027全年，部分客户给出2028需求指引；行业维持推荐"
+        }
+      ]
+    },
+    "limitup": {
+      "available": true,
+      "source": "通达信 MCP tdx_screener (message=连续涨停连板)",
+      "as_of": "2026-11-20",
+      "as_of_note": "A股11-20收盘连板梯队；晋级率无现成字段且需跨日自算，本次未计算故不填数",
+      "captured_at": "2026-11-21T21:07:54+08:00",
+      "max_streak": 4,
+      "count": 4,
+      "stocks": [
+        {"code": "002771", "name": "真视通", "streak": 4, "theme": "华为算力/AI医疗"},
+        {"code": "603324", "name": "盛剑科技", "streak": 4, "theme": "环保设备/芯片"},
+        {"code": "002579", "name": "中京电子", "streak": 2, "theme": "PCB/人形机器人/CPO"},
+        {"code": "000838", "name": "*ST发展", "streak": 2, "theme": "ST板块/电商"}
+      ]
+    },
+    "margin": {
+      "available": true,
+      "source": "westock MCP data_fund_margin",
+      "as_of": "2026-11-19",
+      "as_of_note": "两融T+1披露，最新为11-19；个券样本(东方财富300059)非全市场汇总，禁外推为市场级两融余额",
+      "captured_at": "2026-11-21T21:07:54+08:00",
+      "subject": "东方财富(300059)",
+      "finance_value_yuan": 19965121987,
+      "security_value_yuan": 45197989,
+      "trading_value_yuan": 20010319976,
+      "finance_buy_yuan": 207742873,
+      "change_pct": -0.05
+    }
+  }
+}

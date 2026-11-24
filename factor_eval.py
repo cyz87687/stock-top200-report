@@ -363,7 +363,28 @@ ALL_W_DIMS = OPT_DIMS + ["score_theme_neg", "score_size", "score_sector",
 # v4.4-fund-split 先验（与 factor_weights.json 一致；运行时会优先读该文件 prior_weights）。
 # 依据：round18 theme=行业代理/news仅短线；round19 外部47因子排名；round20 反转块回填
 # 重测；round21/22 质量成长PIT实证+样本内外分层+fund敏感性（0.25~0.40全lag过，单调）。
-PRIOR_W10 = {"score_fund": 0.200000, "score_news": 0.000000, "score_theme_neg": 0.000000, "score_size": 0.000000, "score_sector": 0.000000, "score_quality": 0.100000, "score_growth": 0.200000, "score_tech_neg": 0.000000, "score_oversold60": 0.000000, "score_bias60": 0.050000, "score_rsi_rev": 0.050000, "score_vol_pulse": 0.000000, "score_overbought": 0.000000, "score_theme_intrinsic": 0.000000, "score_attention": 0.000000, "score_lowvol20": 0.000000, "score_ep": 0.100000, "score_size_ind": 0.000000, "score_size_growth": 0.200000, "score_dominant": 0.100000}  # v4.14-evidence-aligned：quality 0.212→0.12（实证 h20 IC −0.147 负），fund 0.12→0.242（消融 t=+4.41 唯一>4），# tech_neg 0.06→0.03（σ 贡献仅 2.1% 近乎常数）；Σ=1.0
+PRIOR_W10 = {
+    "score_attention": 0.000000,
+    "score_bias60": 0.050000,
+    "score_ep": 0.150000,
+    "score_es": 0.050000,
+    "score_fund": 0.150000,
+    "score_growth": 0.200000,
+    "score_lowvol20": 0.000000,
+    "score_news": 0.000000,
+    "score_overbought": 0.000000,
+    "score_oversold60": 0.000000,
+    "score_quality": 0.150000,
+    "score_rsi_rev": 0.050000,
+    "score_sector": 0.000000,
+    "score_size": 0.000000,
+    "score_size_comb": 0.200000,
+    "score_size_ind": 0.000000,
+    "score_tech_neg": 0.000000,
+    "score_theme_intrinsic": 0.000000,
+    "score_theme_neg": 0.000000,
+    "score_vol_pulse": 0.000000,
+}  # v4.14-evidence-aligned：quality 0.212→0.12（实证 h20 IC −0.147 负），fund 0.12→0.242（消融 t=+4.41 唯一>4），# tech_neg 0.06→0.03（σ 贡献仅 2.1% 近乎常数）；Σ=1.0
 W_SECTOR_FIXED = 0.10              # score_sector 固定权重（样本积累中）
 W_FLOOR = 0.03                     # 单维度地板（十维下保持维度意义；3%≈旧五维5%量纲）
 TARGET_H = 1                       # 权重优化目标周期
@@ -2668,14 +2689,17 @@ def main():
                     if "score_fund" not in _av or len(_av) < 2:
                         continue
                     _num = 0.0
-                    for _f2 in _wkeys:
-                        _mx2 = float(_dmx.get(_f2) or 10.0)
-                        _v2 = _r.get(_f2)
-                        if isinstance(_v2, (int, float)) and not isinstance(_v2, bool):
-                            _num += min(float(_v2), _mx2) / _mx2 * 10.0 * _wr[_f2]
-                        else:
-                            _num += 0.5 * 10.0 * _wr[_f2]     # 中性填充 DMAX/2 → 归一后 5.0
-                    _rows.append({"code": _r["code"], "total": _num / _SUM_W})
+                    # v5.0（2026-11-23）：**改调唯一内核 scale_calc.composite_total**
+                    #   （铁律：历史/回测禁自写合成分）。此前此处自写一份「缺维填 5.0」
+                    #   的合成，与生产口径各走各的 → 口径漂移风险。
+                    #   ⚠️ 该路径跑的是**历史代理面板**（factor_parity=False）：
+                    #   面板无 score_size_comb / score_es 两列（新增维度未回填），
+                    #   故这两维按缺维处理（zero 档 → 0 分计入，分母不变）。
+                    #   结论只能作**代理面板诊断**，禁止用于证明生产模型有效性。
+                    _t2, _ = scale_calc.composite_total(
+                        [(_f2, _r.get(_f2), _wr[_f2]) for _f2 in _wkeys],
+                        _dmx, weights=_wr, missing_rule="zero")
+                    _rows.append({"code": _r["code"], "total": _t2})
                 if _rows:
                     _wr_snaps.append({"date": _s["date"], "rows": _rows})
             _wr_net = _eval_tradable_ic(_wr_snaps, list(HORIZONS), tdays, px, opens,

@@ -16,6 +16,8 @@ __pycache__/
 !pool_pe_history.json
 !recommendation_track.json
 !ai_assessment.json
+# 每日复盘手工快照：review_context.py/gen_report_top200.py 直接读取，缺了四类字段回退"未接入"
+!review_context_*.json
 !sector/cycle_industry.json
 !sector/backtest_ref.json
 !sector/mf_latest.json

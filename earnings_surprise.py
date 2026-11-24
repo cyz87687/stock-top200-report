@@ -115,6 +115,22 @@ DEV_RATIO_MIN = 5.0    # |fwd_mid|<5% 时 dev_ratio=None（增速接近 0 时相
 
 TIERS = ("超预期", "符合预期", "低于预期", "无法判定")
 
+# ---- v5.0（2026-11-23）：业绩超预期 → 0-10 评分映射（唯一实现）----
+# 审计发现：es 此前**权重 0，不进总分**（enhance_scores.py:353 原文
+#   「权重 0 不进总分；只写 r['es'] 字段」），导致生益科技（es=超预期
+#   Δ13.8pp、q3yoy=+186.2%）对总分零直接贡献。
+# 映射口径：超预期 10 / 符合预期 5 / 低于预期 2 / 无法判定或无数据 → None（缺维）。
+# ⚠️ 无数据**不是 0 分**（那会惩罚 96.6% 无预测覆盖的股票），而是缺维，
+#    由下游按 missing_rule 处理；本维权重仅 0.05 且覆盖极稀疏。
+TIER_SCORE = {"超预期": 10.0, "符合预期": 5.0, "低于预期": 2.0}
+
+
+def tier_to_score(tier):
+    """业绩超预期档位 → 0-10 分（唯一实现）。无法判定/未知 → None（缺维）。"""
+    if not isinstance(tier, str):
+        return None
+    return TIER_SCORE.get(tier)
+
 
 def _is_num(x):
     return isinstance(x, (int, float)) and not isinstance(x, bool)
