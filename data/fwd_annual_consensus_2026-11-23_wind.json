@@ -4,7 +4,7 @@
  "retrieved_at": "2026-11-24T13:11+08:00",
  "caliber": "FY2026E/FY2027E/FY2028E 归母净利润一致预测（亿元）与各年度一致预测PE；非单季、非TTM、非NTM滚动口径",
  "unit": "净利润=亿元；PE=倍",
- "note": "2026-11-24 批量查询 Wind，数据日期 2026-11-23（单券明细查询明确返回『日期=2026-11-23』）。latest_forecast_date 为空表示接口未披露具体机构最新预测日；数值仍为 as_of 当日一致预测截面。 2026-11-24 补入前20新进榜的振江/三瑞/广合三只（Wind年报一致预期，as_of沿用11-23）。",
+ "note": "2026-11-24 批量查询 Wind，数据日期 2026-11-23（单券明细查询明确返回『日期=2026-11-23』）。latest_forecast_date 为空表示接口未披露具体机构最新预测日；数值仍为 as_of 当日一致预测截面。 2026-11-24 补入前20新进榜的振江/三瑞/广合三只（Wind年报一致预期，as_of沿用11-23）。 【2026-11-24核实】latest_forecast_date 字段不可靠：同一标的(中际300308)三次查询分别返回2025-05-21/2025-12-31/2026-02-26，系Wind机构覆盖不全时吐出的单条研报元数据，不能代表fwd数据期间；已统一置空并将原值移入 latest_forecast_date_raw 追溯。fwd数值期间以 caliber=FY2026/27/28 年报一致预期为准。中际数值经Wind批量复现(346.0404/PE14.20)+WeStock交叉验证(338.20/PE14.52)确认为当期最新，非2025年数据。 Wind单只查询曾返回194.63/PE34.84脏快照，已弃用。",
  "rows": [
   {
    "code": "sh600183",
@@ -16,7 +16,9 @@
    "pe2026": 18.0777,
    "pe2027": 11.8671,
    "pe2028": 8.9738,
-   "latest_forecast_date": "2026-07-17"
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": "2026-07-17",
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sz300408",
@@ -28,7 +30,9 @@
    "pe2026": 24.1411,
    "pe2027": 15.5148,
    "pe2028": 13.0645,
-   "latest_forecast_date": "2026-07-08"
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": "2026-07-08",
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sz002463",
@@ -40,7 +44,9 @@
    "pe2026": 21.4945,
    "pe2027": 13.0805,
    "pe2028": 9.2142,
-   "latest_forecast_date": "2026-07-16"
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": "2026-07-16",
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sh688002",
@@ -52,7 +58,9 @@
    "pe2026": 17.7127,
    "pe2027": 12.5519,
    "pe2028": 9.5356,
-   "latest_forecast_date": "2025-11-03"
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": "2025-11-03",
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sh688766",
@@ -64,7 +72,9 @@
    "pe2026": 11.5749,
    "pe2027": 7.6703,
    "pe2028": 6.5928,
-   "latest_forecast_date": null
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": null,
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sz000833",
@@ -76,7 +86,9 @@
    "pe2026": 8.3207,
    "pe2027": 7.7638,
    "pe2028": 7.2936,
-   "latest_forecast_date": null
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": null,
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sz300308",
@@ -88,7 +100,9 @@
    "pe2026": 14.2013,
    "pe2027": 6.8062,
    "pe2028": 4.6961,
-   "latest_forecast_date": "2025-05-21"
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": "2025-05-21",
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sz002083",
@@ -100,7 +114,9 @@
    "pe2026": 7.5316,
    "pe2027": 6.9864,
    "pe2028": 6.2015,
-   "latest_forecast_date": null
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": null,
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sz300857",
@@ -112,7 +128,9 @@
    "pe2026": 12.3831,
    "pe2027": 6.872,
    "pe2028": 5.1576,
-   "latest_forecast_date": null
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": null,
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sz002916",
@@ -124,7 +142,9 @@
    "pe2026": 23.2639,
    "pe2027": 15.1535,
    "pe2028": 11.2531,
-   "latest_forecast_date": "2026-07-24"
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": "2026-07-24",
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sh600105",
@@ -136,7 +156,9 @@
    "pe2026": 26.2128,
    "pe2027": 11.764,
    "pe2028": 8.8453,
-   "latest_forecast_date": null
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": null,
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sz300153",
@@ -148,7 +170,9 @@
    "pe2026": 24.15,
    "pe2027": 15.1529,
    "pe2028": 12.6167,
-   "latest_forecast_date": null
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": null,
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sh600487",
@@ -160,7 +184,9 @@
    "pe2026": 10.7365,
    "pe2027": 8.7018,
    "pe2028": 7.5638,
-   "latest_forecast_date": null
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": null,
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sh688008",
@@ -172,7 +198,9 @@
    "pe2026": 40.2374,
    "pe2027": 29.6506,
    "pe2028": 22.1611,
-   "latest_forecast_date": null
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": null,
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sz000811",
@@ -184,7 +212,9 @@
    "pe2026": 22.5131,
    "pe2027": 12.294,
    "pe2028": 9.1217,
-   "latest_forecast_date": "2026-08-27"
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": "2026-08-27",
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sz300972",
@@ -196,7 +226,9 @@
    "pe2026": 10.677,
    "pe2027": 7.9821,
    "pe2028": 6.936,
-   "latest_forecast_date": null
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": null,
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sz301345",
@@ -208,7 +240,9 @@
    "pe2026": 10.5612,
    "pe2027": 7.3318,
    "pe2028": 5.5127,
-   "latest_forecast_date": null
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": null,
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sh603186",
@@ -220,7 +254,9 @@
    "pe2026": 31.3161,
    "pe2027": 21.0059,
    "pe2028": 17.4143,
-   "latest_forecast_date": "2026-04-03"
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": "2026-04-03",
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sz002517",
@@ -232,7 +268,9 @@
    "pe2026": 10.9074,
    "pe2027": 9.6115,
    "pe2028": 8.6271,
-   "latest_forecast_date": "2025-09-25"
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": "2025-09-25",
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sz300623",
@@ -244,7 +282,9 @@
    "pe2026": 22.7167,
    "pe2027": 16.8788,
    "pe2028": 12.8903,
-   "latest_forecast_date": null
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": null,
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sh603507",
@@ -256,7 +296,9 @@
    "pe2026": 13.6107,
    "pe2027": 7.7597,
    "pe2028": 5.9138,
-   "latest_forecast_date": null
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": null,
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sz001389",
@@ -268,7 +310,9 @@
    "pe2026": 17.0443,
    "pe2027": 9.7675,
    "pe2028": 6.3368,
-   "latest_forecast_date": null
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": null,
+   "latest_forecast_date_unreliable": true
   },
   {
    "code": "sz301696",
@@ -280,7 +324,9 @@
    "pe2026": 43.9437,
    "pe2027": 30.5377,
    "pe2028": 22.4999,
-   "latest_forecast_date": null
+   "latest_forecast_date": null,
+   "latest_forecast_date_raw": null,
+   "latest_forecast_date_unreliable": true
   }
  ],
  "refreshed_at": "2026-11-24T13:52+08:00",

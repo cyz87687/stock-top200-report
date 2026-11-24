@@ -240,7 +240,9 @@ def main():
             nr["fwd_2026_src"] = fwd_src
             nr["fwd_caliber"] = "FY2026E/FY2027E/FY2028E 归母净利润一致预期（年报）"
             nr["fwd_wind_as_of"] = wind.get("as_of")
-            nr["fwd_latest_forecast_date"] = w.get("latest_forecast_date")
+            nr["fwd_latest_forecast_date"] = w.get("latest_forecast_date")  # 不可靠字段已统一置空，见 _raw
+            nr["fwd_latest_forecast_date_unreliable"] = bool(w.get("latest_forecast_date_unreliable"))
+            nr["fwd_latest_forecast_date_raw"] = w.get("latest_forecast_date_raw")
             nr["fwd_2026_ytd"] = ytd_yi
             nr["fwd_2026_period"] = ytd_period
             nr["fwd_2026_anchor"] = anchor
