@@ -172,6 +172,10 @@ def main():
     ap.add_argument("--need", type=int, default=8)
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--start", type=int, default=0,
+                    help="分片起始下标（含），配合 --end 使用；默认 0 不影响现有调用")
+    ap.add_argument("--end", type=int, default=0,
+                    help="分片结束下标（不含）；0=到末尾。用于长任务分片前台跑，避免单条超时被 SIGTERM")
     ap.add_argument("--until", default="",
                     help="日期硬上限 YYYY-MM-DD，晚于该日的 bar 一律丢弃（盘中补跑必用）")
     args = ap.parse_args()
@@ -188,9 +192,17 @@ def main():
 
     raw = json.load(open(KLONG, encoding="utf-8"))
     codes = sorted({str(c)[-6:] for c in raw if str(c)[-6:].isdigit()})
+    total_codes = len(codes)
     if args.limit:
         codes = codes[:args.limit]
-    print(f"价格库：{len(raw)} 键 → {len(codes)} 个 6 位代码")
+    elif args.end:
+        # 分片：codes[start:end]。已有日期绝不覆盖，每片写回都累积，故分片等价于全量。
+        codes = codes[args.start:args.end]
+    elif args.start:
+        codes = codes[args.start:]
+    print(f"价格库：{len(raw)} 键 → {len(codes)} 个 6 位代码"
+          + (f"（分片 {args.start}:{args.end or total_codes} / 共 {total_codes}）"
+             if (args.start or args.end) else ""))
 
     # 现有最新日期
     alld = set()

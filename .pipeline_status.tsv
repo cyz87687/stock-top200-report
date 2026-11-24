@@ -1,25 +1,25 @@
-fetch_top200_sina	0	1		2026-11-24 00:24:23	
-check_data_fresh	0	1		2026-11-24 00:24:23	
-step2_stockscorer	0	1		2026-11-24 00:24:23	
-append_klines_latest	0	1		2026-11-24 00:24:23	
-refresh_kline_meta	0	1		2026-11-24 00:24:24	
-verify_qfq_anchor	0	1		2026-11-24 00:24:24	
-archive_fund_universe	0	1		2026-11-24 00:24:24	
-archive_fwd_snapshot	0	1		2026-11-24 00:24:24	
-generate_ai_assessment	0	1		2026-11-24 00:24:24	
-enhance_scores	0	1		2026-11-24 00:24:24	
-sector_momentum_daily	0	1		2026-11-24 00:24:24	
-apply_sector_momentum	0	1		2026-11-24 00:24:24	
-fetch_bench	0	1		2026-11-24 00:24:24	
-regime_model	0	1		2026-11-24 00:24:24	
-pick_portfolio	0	1		2026-11-24 00:24:24	
-portfolio_risk	0	1		2026-11-24 00:24:24	
-track_recommendations	0	1		2026-11-24 00:24:24	
-portfolio_metrics	0	1		2026-11-24 00:24:24	
-panel_audit	0	1		2026-11-24 00:24:24	
-selfcheck_pipeline	0	1		2026-11-24 00:24:24	
-gen_report_top200	0	1		2026-11-24 00:24:24	
-factor_eval	124	0		2026-11-24 00:24:24	v5 新增维度(score_size_comb/score_es)未进历史面板，该步仍做重尾增量，240s 上限内未完成
-long_panel_ic	1	0		2026-11-24 00:24:24	面板末日 2026-10-30，缺 score_size_comb/score_es 两列，新维度不可评估
-fetch_focus_list	0	1		2026-11-24 00:24:30	
-orphan_scan	0	1		2026-11-24 00:24:31	
+fetch_top200_sina	0	1		2026-11-24 15:33:32	
+check_data_fresh	0	1		2026-11-24 15:33:32	
+step2_stockscorer	0	1		2026-11-24 15:41:03	
+append_klines_latest	0	1	1600	2026-11-24 16:22:38	分片3段前台补跑(0:700/700:1400/1400:end)，2137只追加11-24收盘价
+refresh_kline_meta	0	1		2026-11-24 16:22:52	
+verify_qfq_anchor	4	0		2026-11-24 16:23:06	
+archive_fund_universe	0	1		2026-11-24 16:23:26	
+archive_fwd_snapshot	0	1		2026-11-24 16:23:30	
+generate_ai_assessment	0	1		2026-11-24 16:23:41	
+enhance_scores	0	1		2026-11-24 16:24:05	
+sector_momentum_daily	0	1		2026-11-24 16:26:09	
+apply_sector_momentum	0	1		2026-11-24 16:26:16	
+pick_portfolio	0	1		2026-11-24 16:26:21	
+portfolio_risk	0	1		2026-11-24 16:26:28	
+track_recommendations	0	1		2026-11-24 16:27:41	
+portfolio_metrics	0	1		2026-11-24 16:27:41	
+panel_audit	0	1		2026-11-24 16:28:01	
+factor_eval	1	0		2026-11-24 16:34:55	单步>400s被SIGTERM；IC/权重视图沿用上一版，页面须标注陈旧
+long_panel_ic	1	0		2026-11-24 16:34:59	IC已12天>7天阈值，但三步链分钟级单步会被SIGTERM；沿用上一版，页面须标注陈旧
+selfcheck_pipeline	0	1		2026-11-24 16:35:00	
+fetch_focus_list	0	1		2026-11-24 16:35:05	
+fetch_bench	0	1		2026-11-24 16:35:14	
+regime_model	0	1		2026-11-24 16:35:19	
+gen_report_top200	0	1		2026-11-24 16:35:49	
+orphan_scan	0	1		2026-11-24 16:36:03	
