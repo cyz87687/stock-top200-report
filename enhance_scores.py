@@ -30,8 +30,8 @@ W_NEWS, W_TECH, W_FUND, W_THEME = 0.20, 0.20, 0.30, 0.30
 _W_PRIOR_10D = {
     "score_attention": 0.000000,
     "score_bias60": 0.050000,
-    "score_ep": 0.150000,
-    "score_es": 0.050000,
+    "score_ep": 0.200000,
+    "score_es": 0.000000,
     "score_fund": 0.150000,
     "score_growth": 0.200000,
     "score_lowvol20": 0.000000,
@@ -392,6 +392,7 @@ def main():
         import earnings_surprise as _es_mod
         _es_map = _es_mod.compute_es_map({x.get("name"): x.get("code") for x in results})
         _es_n = 0
+        _es_struct = 0
         for r in results:
             _e = _es_map.get(r.get("name"))
             if _e:
@@ -402,10 +403,26 @@ def main():
                 _es_n += 1
                 # v5.0：写 0-10 评分（无数据/无法判定 → None 缺维）
                 r["score_es"] = _es_mod.tier_to_score(_e.get("tier"))
+                # ⚠️ v5.1（2026-11-25 老大裁决「负基数归 structural」）：
+                #   缺维归类由 earnings_surprise 唯一给出（判据只能由产生该维的模块给），
+                #   这里只做透传：写进 scored 的 missing_reason["score_es"]。
+                #   "structural" = 负基数（增速无定义，≠业绩差）→ 未来 ES 重新启用时
+                #                   分子分母同剔；"data" = 真缺数据 → 按 zero。
+                #   ⚠️ 当前 ES 权重为 0（pending 研究项，不进总分），本标记是为
+                #      ES 重新启用预埋，避免届时 515 只负基数股被按 0 分系统性压低。
+                _mr = _e.get("missing_reason")
+                if _mr in ("structural", "data"):
+                    _mrr = dict(r.get("missing_reason") or {})
+                    _mrr["score_es"] = _mr
+                    r["missing_reason"] = _mrr
+                    if _mr == "structural":
+                        _es_struct += 1
         print(f"🎯 业绩预期差三档: {_es_n}/{len(results)} 只标注"
               f"（超预期 {sum(1 for r in results if (r.get('es') or {}).get('tier') == '超预期')} / "
               f"符合 {sum(1 for r in results if (r.get('es') or {}).get('tier') == '符合预期')} / "
-              f"低于 {sum(1 for r in results if (r.get('es') or {}).get('tier') == '低于预期')}）")
+              f"低于 {sum(1 for r in results if (r.get('es') or {}).get('tier') == '低于预期')}）；"
+              f"缺维归类 structural(负基数增速无定义)={_es_struct} 只 → "
+              f"missing_reason['score_es']（ES 权重 0，暂不进总分）")
     except Exception as _ese:
         # 🚨 禁静默降级：es 缺失时页面该徽标消失即可，但必须留可见痕迹
         print(f"🚨 业绩预期差模块失败（本批不写 es 字段）: {_ese!r}")

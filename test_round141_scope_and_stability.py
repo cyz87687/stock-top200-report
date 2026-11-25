@@ -283,9 +283,32 @@ class TestRankMonitorAndRealFacts(unittest.TestCase):
         with open(os.path.join(HERE, "factor_weights.json"),
                   encoding="utf-8") as f:
             fw = json.load(f)
-        self.assertEqual(fw["version"], "v4.19-c1-sustain-gates")
+        # ⚠️ 2026-11-25：原实现硬编码断言 version == "v4.19-c1-sustain-gates"，
+        #   而权重表已多次演进（v5.0 → v5.1-es-pending-ep-reclaim）→ 该断言自 v5.0 起
+        #   就是**必然失败**的僵尸断言（每次换权重都失效，无人维护）。
+        #   改为校验**不变量**而非具体版本号：版本号非空、target_horizon=20、
+        #   Σw=1.0、权重表=生效权重（无「名义/实际」两套口径）。
+        self.assertTrue(str(fw.get("version") or "").strip(),
+                        "权重表必须登记 version（禁空）")
         self.assertEqual(fw["fitted_at"][:10], "2026-11-04")
         self.assertEqual(fw["target_horizon"], 20)
+        _w = fw.get("weights") or {}
+        self.assertAlmostEqual(sum(float(v) for v in _w.values()), 1.0, places=6,
+                               msg="权重合计必须为 1.0")
+        # 生效维 = 权重表中 >0 的键（v5.1 起 score_es 归零转 pending_dims）
+        _eff = {k for k, v in _w.items() if float(v or 0) > 0}
+        self.assertNotIn("score_es", _eff,
+                         "score_es 已转 pending_dims，不应在生效维")
+        self.assertAlmostEqual(float(_w.get("score_ep") or 0), 0.20, places=6,
+                               msg="v5.1 起 score_ep = 0.20（回收 ES 的 5pp）")
+        # 权重表须与 prior_weights 逐键相等（verify_weights_round36 之外再加一道）
+        _pw = fw.get("prior_weights") or {}
+        self.assertEqual(_pw, _w, "prior_weights 必须与 weights 逐键相等")
+        # pending_dims 登记 ES 的重新启用门槛
+        _pd = (fw.get("pending_dims") or {}).get("score_es")
+        self.assertIsNotNone(_pd, "score_es 必须在 pending_dims 登记（研究项留档）")
+        self.assertTrue(len(_pd.get("reactivation_thresholds") or []) >= 6,
+                        "pending_dims 须登记 ES 重新启用的六条门槛")
 
 
 class TestWalkforwardWatchdog(unittest.TestCase):

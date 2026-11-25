@@ -213,17 +213,28 @@ class TestWeightsUntouched(unittest.TestCase):
         import hashlib
         p = os.path.join(HERE, "factor_weights.json")
         h = hashlib.sha1(open(p, "rb").read()).hexdigest()
-        self.assertEqual(h, "c9104e9d684163d9d7554dfab29904ad5c14b2d8",
+        # ⚠️ 2026-11-25 指纹更新（c9104e9d → 39e2f2d3），是哪一步改的：
+        #   v5.1-es-pending-ep-reclaim —— 老大裁决「落方案a，评分加到估值中，
+        #   负基数归 structural」：score_es 权重 0.05→0（转 pending_dims 研究项，
+        #   权重表 = 实际生效权重，清「名义5%/实际0」口径债）、score_ep 0.15→0.20
+        #   （唯一合法回收去处）。**这是真实的权重变更**，不是 score 口径升级。
+        #   total 跨 v5.0/v5.1 禁比；ep 加权为产品裁决非 IC 背书（准入五门 FAIL）。
+        self.assertEqual(h, "39e2f2d391e98fcdca1ccd72101d4263a00e1450",
                          "factor_weights.json 指纹变了 —— 改动前先回答「是哪一步改的」")
 
     def test_version_still_v417(self):
         with open(os.path.join(HERE, "factor_weights.json"), encoding="utf-8") as f:
             d = json.load(f)
-        self.assertEqual(d["version"], "v4.19-c1-sustain-gates")
+        # ⚠️ 2026-11-25：版本号已从 v4.19-c1-sustain-gates 演进到
+        #   v5.1-es-pending-ep-reclaim（方案 A 落地）。本断言改为校验**不变量**：
+        #   version 非空、target_horizon=20、Σw=1.0、growth 权重 0.2 不变、
+        #   tech_neg 归零不变、score_es 归零、score_ep=0.20。
+        self.assertTrue(str(d.get("version") or "").strip())
         self.assertEqual(d["target_horizon"], 20)
-        # round129：weights 向量必须仍是 v4.18 那一组（防 score_gates 改动时误动权重）
         self.assertEqual(d["weights"]["score_growth"], 0.2)
         self.assertEqual(d["weights"]["score_tech_neg"], 0.0)
+        self.assertEqual(d["weights"]["score_es"], 0.0)
+        self.assertEqual(d["weights"]["score_ep"], 0.20)
         self.assertAlmostEqual(sum(float(v or 0) for v in d["weights"].values()), 1.0)
 
 

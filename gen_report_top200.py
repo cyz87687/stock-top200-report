@@ -246,8 +246,8 @@ def _load_dim_weights():
     _fb = {
     "score_attention": 0.000000,
     "score_bias60": 0.050000,
-    "score_ep": 0.150000,
-    "score_es": 0.050000,
+    "score_ep": 0.200000,
+    "score_es": 0.000000,
     "score_fund": 0.150000,
     "score_growth": 0.200000,
     "score_lowvol20": 0.000000,
@@ -4407,8 +4407,8 @@ try:
             _rf_W_ACT = {
     "score_attention": 0.000000,
     "score_bias60": 0.050000,
-    "score_ep": 0.150000,
-    "score_es": 0.050000,
+    "score_ep": 0.200000,
+    "score_es": 0.000000,
     "score_fund": 0.150000,
     "score_growth": 0.200000,
     "score_lowvol20": 0.000000,
@@ -9242,7 +9242,7 @@ for idx, r in enumerate(top20):
                      'border-radius:3px;background:#dcfce7;color:#15803d;margin-left:6px;cursor:help;">'
                      '📈Q3景气 +' + f"{_qb:.1f}" + '</span>')
 
-    # ===== 业绩预期差三档徽标（earnings_surprise，v5.0 名义权重5%、覆盖<30%时让渡）=====
+    # ===== 业绩预期差三档徽标（earnings_surprise，v5.1 起权重 0 → 研究项，不进总分）=====
     # 判定：预测增速 vs 实际单季同比（超预期/符合预期/低于预期），规则见页尾披露⑤。
     # 无法判定不渲染徽标（缺数据不编造）；配色沿用 Q3 徽标语义（好=绿/差=红/中性=灰蓝）。
     # ⚠️ 本段变量一律 _es_* 唯一前缀（round57 教训：_ic/_t/_d 等模块级名会覆盖下游全局）。
@@ -9256,9 +9256,13 @@ for idx, r in enumerate(top20):
             ("#fee2e2", "#b91c1c") if _es_tier == "低于预期" else ("#e2e8f0", "#475569"))
         _es_ic = "🔺" if _es_tier == "超预期" else ("🔻" if _es_tier == "低于预期" else "➖")
         _es_sts = "·强" if _es_row.get("strength") == "strong" else ""
+        # v5.1：权重现算（禁写死「名义5%」——权重表已改，徽标 tooltip 必须同步）
+        _es_w_lbl = (f"权重 {_DIM_W.get('score_es', 0.0):.0%}（研究项，不进总分）"
+                     if float(_DIM_W.get("score_es") or 0.0) <= 0 else
+                     f"权重 {_DIM_W.get('score_es', 0.0):.0%}，覆盖率<30%时不计入")
         _es_tip = (f"业绩预期差三档：{_es_tier}{_es_sts}；{_es_row.get('note','')}"
                    f"（预测源 {_es_row.get('source') or '—'}·口径{'扣非' if _es_row.get('caliber')=='kf' else '归母'}"
-                   f"·方法 {_es_row.get('method')}）；名义权重5%，覆盖率<30%时不计入（见口径披露）")
+                   f"·方法 {_es_row.get('method')}）；{_es_w_lbl}（见口径披露）")
         _es_badge = ('<span title="' + _es_tip.replace('"', "'") + '" '
                      'style="font-size:11px;font-weight:700;padding:1px 6px;'
                      f'border-radius:3px;background:{_es_bg};color:{_es_fg};margin-left:6px;cursor:help;">'
@@ -9644,7 +9648,7 @@ html_parts.append('''
 
     <!-- 完整表格 -->
     <div class="section-title" id="sec-list">📋 完整排名 (可排序/筛选/分页)</div>
-    <div style="font-size:10.5px;color:#64748b;padding:4px 0 8px;">ℹ️ 本表为全池完整排名，可用上方筛选控件按需过滤（评级/板块/路线/成交额/每页条数等）；S/A 深度分析区仅展示综合得分 ≥ 75 分的标的。Q3 列角标 🔺/➖/🔻 = 业绩预期差三档（超预期/符合预期/低于预期：预测增速 vs 实际单季同比，点值带 ±10pp、|Δ|≥25pp 标强，名义权重5%、覆盖率<30%时让渡），悬停 Q3 格可看判定依据。S/A 卡趋势徽标 📉空头排列/弱势/企稳中/多头排列（tech 均线数据驱动，权重 0）——空头排列=超跌反弹候选、需等企稳信号，<b>高分 ≠ 立即买入</b>（audit_round90）。</div>
+    <div style="font-size:10.5px;color:#64748b;padding:4px 0 8px;">ℹ️ 本表为全池完整排名，可用上方筛选控件按需过滤（评级/板块/路线/成交额/每页条数等）；S/A 深度分析区仅展示综合得分 ≥ 75 分的标的。Q3 列角标 🔺/➖/🔻 = 业绩预期差三档（超预期/符合预期/低于预期：预测增速 vs 实际单季同比，点值带 ±10pp、|Δ|≥25pp 标强，<b>该维当前权重 0 → 研究项，不进总分</b>），悬停 Q3 格可看判定依据。S/A 卡趋势徽标 📉空头排列/弱势/企稳中/多头排列（tech 均线数据驱动，权重 0）——空头排列=超跌反弹候选、需等企稳信号，<b>高分 ≠ 立即买入</b>（audit_round90）。</div>
 ''')
 
 # ⚠️ 2026-10-27 修：上一段是**普通字符串**（非 f-string），把 `{_neutral_banner}`
@@ -10793,7 +10797,12 @@ except Exception as _bte:
         'border-left:3px solid #ef4444;border-radius:6px;font-size:11px;color:#fca5a5;">'
         f'⚠️ 回测口径披露渲染失败：{html_mod.escape(str(_bte)[:200])}</div>')
 
-# ④ ES 覆盖 / fallback 披露（2026-11-24 P0-6 §4 + P1-2）────────────
+# ④ ES 覆盖 / fallback 披露（2026-11-24 P0-6 §4 + P1-2；2026-11-25 v5.1 改写）──
+#   ⚠️ v5.1（2026-11-25，老大裁决「落方案a」）：score_es 权重 0.05 → **0**，
+#   转 pending_dims 研究项 → 披露口径从「名义5%、覆盖<30%让渡」改为
+#   「**未启用（研究项，不进总分）+ 启用门槛**」。
+#   ⚠️ 判据必须现算：权重从 factor_weights.json 读（禁写死「名义5%」——
+#   权重表已改，页面再写 5% 就是口径债复发）。
 #   ES 覆盖不足时有效权重已让渡（apply_sector_momentum 单一实现），
 #   AI 评估 fallback=True 时须双留痕。二者都属「可信度元信息」，留主页。
 _es_disclose = ""
@@ -10805,19 +10814,33 @@ try:
     # 可选的 es_weight_adjusted 标记（老产物没有该字段时会把 3.7% 误写成「≥30%」）。
     _es_gate = _es_cov < scale_calc.ES_COVERAGE_MIN
     _es_adjusted = any(r.get("es_weight_adjusted") for r in results)
+    # v5.1：ES 当前生效权重（现算，禁写死）—— 0 表示该维已退出总分。
+    _es_w_now = float(_DIM_W.get("score_es") or 0.0)
+    _es_pending = _es_w_now <= 0.0
     _ai_fb = bool((ai_review or {}).get("fallback"))
-    if _es_gate or _ai_fb:
+    if _es_pending or _es_gate or _ai_fb:
         _es_notes = []
-        if _es_gate:
+        if _es_pending:
+            # v5.1 主口径：未启用（研究项）
+            _es_notes.append(
+                f"<b>业绩超预期(ES)维当前权重 = 0 → 未启用（研究项，不进总分）</b>；"
+                f"其分档与徽标仍照常展示供跟踪。启用门槛（六条全过才可进模型）："
+                f"①有效覆盖 ≥{scale_calc.ES_COVERAGE_MIN:.0%}（现 "
+                f"{_es_have}/{len(results)} = {_es_cov:.1%}）"
+                f"②n≥194 截面、<b>h=20</b> IC 显著为正（现原口径 h=5 IC +0.0036、"
+                f"置换检验 p=0.938 纯随机）③G5 walkforward 样本外闭合（现 n_oos=0）"
+                f"④与他维秩相关&lt;0.4 ⑤单因子≤0.20/大类≤0.30 "
+                f"⑥低基数饱和门槛（&gt;300% 极端票 112 只/8.7%）")
+        elif _es_gate:
             if _es_adjusted:
                 _es_notes.append(
                     f"ES 维实际覆盖 <b>{_es_have}/{len(results)} = {_es_cov:.1%}</b> "
-                    f"&lt; {scale_calc.ES_COVERAGE_MIN:.0%}，其 5% 权重已按比例让渡给"
+                    f"&lt; {scale_calc.ES_COVERAGE_MIN:.0%}，其 {_es_w_now:.0%} 权重已按比例让渡给"
                     "其余生效维（有效口径，名义权重表不变）")
             else:
                 _es_notes.append(
                     f"ES 维实际覆盖 <b>{_es_have}/{len(results)} = {_es_cov:.1%}</b> "
-                    f"&lt; {scale_calc.ES_COVERAGE_MIN:.0%}，按现行口径其 5% 权重应让渡；"
+                    f"&lt; {scale_calc.ES_COVERAGE_MIN:.0%}，按现行口径其 {_es_w_now:.0%} 权重应让渡；"
                     f"当前 scored 产物无让渡标记 → 分数尚未按该口径重算（需重跑"
                     " apply_sector_momentum），本页仅披露口径不冒充已重算")
         else:
@@ -10840,6 +10863,44 @@ if _ic_stale:
         'border-left:3px solid #ef4444;border-radius:6px;font-size:11px;color:#fca5a5;">'
         f'⛔ <b>Rank IC 视图已陈旧 {_ic_stale_days} 天</b>（factor_ic.json 未随日链更新）'
         f' → 因子有效性区块已降级占位、旧数字不展示；此为数据降级，非因子结论变更。</div>')
+
+# ⑤b 权重版本变更公告（v5.1，2026-11-25）—— 跨权重版本 total 禁比（披露不可迁：留主页）
+_weight_ver_banner = ""
+try:
+    _wv = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                      "factor_weights.json"), encoding="utf-8")) or {}
+    _wv_ver = str(_wv.get("version") or "")
+    _wv_ep = float((_wv.get("weights") or {}).get("score_ep") or 0.0)
+    _wv_es = float((_wv.get("weights") or {}).get("score_es") or 0.0)
+    if _wv_ver.startswith("v5.1"):
+        # 准入裁决现读 weight_gate_result.json（禁写死 verdict —— 会随样本变）
+        _gate_txt = ""
+        try:
+            _gp = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                               "weight_gate_result.json")
+            _gj = json.load(open(_gp, encoding="utf-8")) or {}
+            _g_v = str(_gj.get("verdict") or "?")
+            _g_gates = _gj.get("gates") or {}
+            _g_fail = [k for k, v in _g_gates.items() if not v]
+            _gate_txt = (f'准入裁决（weight_admission_gate 五门）现算结果 <b>{_g_v}</b>'
+                         + (f'（未过：{"、".join(_g_fail)}）' if _g_fail else '')
+                         + ' → <b>本次 ep 加权属产品裁决，非 IC 背书</b>；'
+                           'G5 样本外从未闭合，禁称「经验证的 alpha」。')
+        except Exception as _gve:
+            _gate_txt = ("准入裁决结果文件不可读 → 未能现读门禁状态；"
+                         "本次 ep 加权仍属产品裁决，非 IC 背书。")
+        _weight_ver_banner = (
+            '<div style="margin:14px 0;padding:10px 14px;background:rgba(168,85,247,0.08);'
+            'border-left:3px solid #a855f7;border-radius:6px;font-size:11px;color:#d8b4fe;">'
+            f'🔄 <b>权重版本变更公告（{_wv_ver}）</b>：业绩超预期(ES)维权重 '
+            f'<b>已归零 → {_wv_es:.0%}（转研究项，不进总分）</b>，回收的权重给 '
+            f'<b>EP估值 {_wv_ep:.0%}</b>。'
+            f'<b style="color:#fca5a5;">total 跨 v5.0/v5.1 禁比</b> —— '
+            f'本页分数与历史分数不可直接比较（评级分布变化主要来自权重变更，非市场变化）。'
+            f'{_gate_txt}</div>')
+except Exception as _wve:
+    _weight_ver_banner = ""
+    print(f"⚠️ 权重版本公告渲染失败: {_wve!r}")
 
 # ⑥ Top50 行业集中度 + 约束视图（P1-5，主页披露）
 _conc_disclose = ""
@@ -10883,6 +10944,7 @@ except Exception:
 
 html_parts.append(_ps_banner + _panel_disclose + _cs_disclose
                   + _kl_disclose + _bt_disclose + _es_disclose
+                  + _weight_ver_banner
                   + _ic_stale_banner + _dom_flag_disclose + _conc_disclose)
 
 html_parts.append('''
@@ -12899,8 +12961,16 @@ try:
     _es_tier_cnt = {"超预期": 0, "符合预期": 0, "低于预期": 0}
     for _esx in _es_judged:
         _es_tier_cnt[_esx["es"]["tier"]] = _es_tier_cnt.get(_esx["es"]["tier"], 0) + 1
+    _es_w_now = float(_DIM_W.get("score_es") or 0.0)
+    # 覆盖现算（禁写死数字；此处独立算一次，勿依赖上方 try 块内变量）
+    _es_have_pct = (sum(1 for x in results if isinstance(x.get("score_es"), (int, float))
+                        and not isinstance(x.get("score_es"), bool)) / len(results)
+                    if results else 0.0)
+    _es_w_lbl = (f'<b>当前权重 {_es_w_now:.0%} → 未启用（研究项，不进总分）</b>'
+                 if _es_w_now <= 0 else
+                 f'<b>名义权重 {_es_w_now:.0%}、覆盖&lt;30%时让渡</b>')
     _es_disc = (
-        f'⑤ <b>业绩预期差三档</b>（2026-10-31 起，详情卡 ▣ 徽标，<b>名义权重5%、覆盖&lt;30%时让渡</b>）：'
+        f'⑤ <b>业绩预期差三档</b>（2026-10-31 起，详情卡 ▣ 徽标，{_es_w_lbl}）：'
         f'比对<b>机构预测增速</b>（Q3 手工汇总表，A/B 双机构，PIT 2026-10-14）与'
         f'<b>实际单季同比</b>（fin_cache_em 定期报告累计值自拆单季，口径对齐扣非/归母）。'
         f'判定带：区间预测用原始端点 [lo, hi]，点值预测用 ±{_ES_BAND:.0f}pp 等效带'
@@ -12910,7 +12980,14 @@ try:
         f'<b style="color:#f87171;">低于预期</b>=破带下沿；'
         f'|Δ|≥{_ES_STRONG:.0f}pp 标「强」。扭亏预测按方向兑现判（不设超预期档）。'
         f'本池标注 {len(_es_rows)} 只、可判定 {len(_es_judged)} 只：'
-        f'超预期 {_es_tier_cnt["超预期"]} / 符合 {_es_tier_cnt["符合预期"]} / 低于 {_es_tier_cnt["低于预期"]}。')
+        f'超预期 {_es_tier_cnt["超预期"]} / 符合 {_es_tier_cnt["符合预期"]} / 低于 {_es_tier_cnt["低于预期"]}。'
+        + (f'<b style="color:#fbbf24;">⚠️ 该维权重为 0 → 不进总分</b>：'
+           f'覆盖仅 {_es_have_pct:.1%}（&lt;{scale_calc.ES_COVERAGE_MIN:.0%} 门槛），'
+           f'且原三档口径前瞻检验 h=5 IC +0.0036、置换检验 p=0.938（纯随机）→ '
+           f'按方案 A 显式归零并转研究项，徽标与分档仅供跟踪。'
+           f'负基数（去年同期单季净利≤0 → 增速无定义）判 <b>structural</b>（分子分母同剔），'
+           f'禁按 0 分罚 —— 增速无定义 ≠ 业绩差。'
+           if _es_w_now <= 0 else ''))
     html_parts.append(f'''
     <!-- v3.5.1 growth 口径与 Q3 预测披露 -->
     <div class="section-block" style="margin:24px 0;padding:16px 20px;background:#0f172a;border:1px solid #334155;border-radius:12px;">

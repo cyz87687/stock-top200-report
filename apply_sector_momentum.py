@@ -54,8 +54,8 @@ MAP_PATH = os.path.join(SECTOR_DIR, 'sw_map.json')
 _W_PRIOR_10D = {
     "score_attention": 0.000000,
     "score_bias60": 0.050000,
-    "score_ep": 0.150000,
-    "score_es": 0.050000,
+    "score_ep": 0.200000,
+    "score_es": 0.000000,
     "score_fund": 0.150000,
     "score_growth": 0.200000,
     "score_lowvol20": 0.000000,

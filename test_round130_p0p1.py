@@ -73,7 +73,20 @@ class TestScoringKernelP01(unittest.TestCase):
         self.assertEqual(a["kernel_id"], b["kernel_id"])
         self.assertAlmostEqual(a["sum_active_weights"], 1.0)
         self.assertEqual(a["target_horizon"], 20)
-        self.assertEqual(len(a["weights"]), 8, "本轮不得改权重或生效维数")
+        # ⚠️ 2026-11-25（v5.1-es-pending-ep-reclaim，老大裁决「落方案a」）：
+        #   生效维由 8 → 7 —— score_es 权重 0.05→0（转 pending_dims 研究项，
+        #   权重表 = 实际生效权重，清「名义5%/实际0」口径债），
+        #   score_ep 0.15→0.20（唯一合法回收去处）。
+        #   本断言原为「本轮不得改权重或生效维数」的**冻结锁**；权重经老大裁决
+        #   正式变更后，须显式更新锁（否则改权重会静默通过 = 冻结锁失效）。
+        self.assertEqual(len(a["weights"]), 7,
+                         "v5.1 起生效维 7 个（score_es 归零转 pending_dims）")
+        self.assertNotIn("score_es", a["weights"],
+                         "score_es 已退出生效维（研究项）")
+        self.assertAlmostEqual(float(a["weights"].get("score_ep") or 0.0), 0.20,
+                               places=6, msg="v5.1 起 score_ep = 0.20")
+        self.assertAlmostEqual(sum(float(v) for v in a["weights"].values()), 1.0,
+                               places=6)
 
     def test_classify_artifact_four_states(self):
         self.assertEqual(sc.classify_artifact({})["status"], "UNKNOWN")

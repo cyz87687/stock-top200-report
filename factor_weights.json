@@ -1,16 +1,16 @@
 {
-  "version": "v5.0-audit-revg-es",
+  "version": "v5.1-es-pending-ep-reclaim",
   "fitted_at": "2026-11-04 23:49:54",
   "target_horizon": 20,
-  "score_gates": "round129（2026-11-05，老大指令「按建议修改权重」）：G1 成长存量门槛——cagr3 缺失/为负 → score_growth 与 score_size_growth 封顶 5.0 让位中性（无存续锚不给成长溢价）；G2 质量现金红旗——OCF/NI<0 扣 2.0、accruals<-10 扣 1.5（floor 0，缺值不扣）；G3 PEG 分母改「cagr3 × 估值阶梯隐含增速」可用组件均值（切断脉冲增速→PEG虚小→严重低估加分的二次奖励链）。⚠️ weights 向量与 v4.18 逐字节一致（仅评分口径升级）——total 跨 v4.18/v4.19 禁比。 | v5.0（2026-11-23，评分审计驱动）：P0-A 市值双维**合并取高** score_size_comb=max(size_growth, dominant)，消除「同一市值事实算两次分」（原非龙头同时拿 .20+.10=.30）；合并后是**一个因子** → 权重 0.20（天然满足 dim_cap 0.20，无需豁免），原大类回收的 0.10 流向 quality(0.10→0.15) 与新增 score_es(0.05)，Σ=1.00；P0-B 缺维分层：结构性不适用（龙头无 size_growth）**剔分母**、真缺数据**按 0**，取代旧口径「一律填中性 5.0」（审计认定白送分：全池 1275 分≈128 只满分红）；P0-C 成长维接入营收增速 revg（α=0.30，申万一级行业内百分位，混入 composite 后再 rank）；P0-D 新增 score_es（业绩超预期，权 0.05，超预期10/符合5/低于2，无数据=缺维非0分）；P1-E quality 0.10→0.15、fund 0.20→0.15（让渡以满足「基本面」大类 ≤0.30，同时缩小 fund 门控覆盖 0% 的不可验证敞口）、ep 0.10→0.15、es +0.05；P1-F G1 成长门槛新增中间档：0<cagr3≤5% → 成长封顶 6.0（弱存量锚）。⚠️ 全部为**先验产品裁决**，非 IC 背书（G5 未闭合、fund 门控覆盖 0%）；禁称经验证的 alpha；total 跨版本禁比。",
+  "score_gates": "round129（2026-11-05，老大指令「按建议修改权重」）：G1 成长存量门槛——cagr3 缺失/为负 → score_growth 与 score_size_growth 封顶 5.0 让位中性（无存续锚不给成长溢价）；G2 质量现金红旗——OCF/NI<0 扣 2.0、accruals<-10 扣 1.5（floor 0，缺值不扣）；G3 PEG 分母改「cagr3 × 估值阶梯隐含增速」可用组件均值（切断脉冲增速→PEG虚小→严重低估加分的二次奖励链）。⚠️ weights 向量与 v4.18 逐字节一致（仅评分口径升级）——total 跨 v4.18/v4.19 禁比。 | v5.0（2026-11-23，评分审计驱动）：P0-A 市值双维**合并取高** score_size_comb=max(size_growth, dominant)，消除「同一市值事实算两次分」（原非龙头同时拿 .20+.10=.30）；合并后是**一个因子** → 权重 0.20（天然满足 dim_cap 0.20，无需豁免），原大类回收的 0.10 流向 quality(0.10→0.15) 与新增 score_es(0.05)，Σ=1.00；P0-B 缺维分层：结构性不适用（龙头无 size_growth）**剔分母**、真缺数据**按 0**，取代旧口径「一律填中性 5.0」（审计认定白送分：全池 1275 分≈128 只满分红）；P0-C 成长维接入营收增速 revg（α=0.30，申万一级行业内百分位，混入 composite 后再 rank）；P0-D 新增 score_es（业绩超预期，权 0.05，超预期10/符合5/低于2，无数据=缺维非0分）；P1-E quality 0.10→0.15、fund 0.20→0.15（让渡以满足「基本面」大类 ≤0.30，同时缩小 fund 门控覆盖 0% 的不可验证敞口）、ep 0.10→0.15、es +0.05；P1-F G1 成长门槛新增中间档：0<cagr3≤5% → 成长封顶 6.0（弱存量锚）。⚠️ 全部为**先验产品裁决**，非 IC 背书（G5 未闭合、fund 门控覆盖 0%）；禁称经验证的 alpha；total 跨版本禁比。 | v5.1（2026-11-25，老大裁决「落方案a，评分加到估值中，负基数归 structural」）：**方案 A 落地** —— score_es 权重 0.05→0（转 pending_dims 研究项，权重表=实际生效权重，清「名义5%/实际0」口径债），score_ep 0.15→0.20（唯一合法回收去处：基本面大类 fund+quality 已打满 .30 且 fund 已结案禁降、市值/业绩动量大类触 dim_cap、技术反转组属技术因子不宜承接业绩信息）。ep 加权为**产品裁决非 IC 背书**（G5 未闭合、准入裁决 G1/G2 FAIL 为既存advisory 状态），禁称『经验证的 alpha』；total 跨 v5.0/v5.1 禁比。负基数归 structural：ES 负基数（去年同期单季净利≤0→增速无定义）判 structural（分子分母同剔），禁按 zero 罚 0 分，判据唯一实现见 earnings_surprise。⚠️ 主页披露须从『名义5%、覆盖<30%让渡』改写为『未启用（研究项）+ 启用门槛』；禁写死『名义5%』。",
   "method": "v4.18-c1-head-excess：2026-11-04 round128「全部改动」裁决，采纳 P0-4 实证里唯一全档改善的 C1 方案。tech_neg .10→0（IC −0.0069 / NW t −0.67，与 0 无法区分，属机会成本而非负 alpha）、growth .10→.20。依据 data/weight_p04_constrained.json（C1_min_techneg_to_growth）：N6/N10/N13/N30/N50 全档优于现行（+0.14~+1.13pp），代价复合 IC −10%（+0.0539→+0.0485）。⭐ 目标函数是 **TopN 头部超额**（生产持仓 6~13 只），不是全截面 IC —— 实测两者方向相反：lowvol20 IC +0.0828 但 TopN 全区间负，size_growth IC +0.0337 但 TopN 全程正。**禁按 IC 排权重**。⚠️ 仍是产品裁决、非 IC 背书：G5 样本外未闭合、fund(0.20) 长面板无历史快照，禁止表述为『经验证的 alpha』。target_horizon=20 不变。 实测逐档：N6 −0.879→+0.250、N10 −0.531→+0.140、N13 −0.283→+0.378、N30 +0.366→+0.573、N50 +0.578→+0.718（pp）。",
   "weights": {
     "score_size_comb": 0.2,
     "score_fund": 0.15,
     "score_growth": 0.2,
     "score_quality": 0.15,
-    "score_ep": 0.15,
-    "score_es": 0.05,
+    "score_ep": 0.2,
+    "score_es": 0.0,
     "score_bias60": 0.05,
     "score_rsi_rev": 0.05,
     "score_tech_neg": 0.0,
@@ -31,8 +31,8 @@
     "score_fund": 0.15,
     "score_growth": 0.2,
     "score_quality": 0.15,
-    "score_ep": 0.15,
-    "score_es": 0.05,
+    "score_ep": 0.2,
+    "score_es": 0.0,
     "score_bias60": 0.05,
     "score_rsi_rev": 0.05,
     "score_tech_neg": 0.0,
@@ -568,6 +568,25 @@
         "N50": 0.14
       },
       "caveat": "只做 5 个手工方案、非样本外、n_eff≈82、N 之间高度相关；长面板 fund/dominant 覆盖 0/1653（round124 口径），故结论只回答方向，不构成收益承诺。"
+    }
+  },
+  "pending_dims": {
+    "score_es": {
+      "status": "PENDING_NOT_ACTIVATED",
+      "nominal_weight_before": 0.05,
+      "current_weight": 0.0,
+      "decided_at": "2026-11-25 老大裁决：落方案 A（显式归零 + 权重回收）",
+      "rationale": "ES 维此前为「名义 5%、实际 0」的死维：全池有效覆盖 57/1798=3.17% < 30% 门槛，运行时由 scale_calc.effective_weights_es_gate 按比例让渡给其余七维 → 权重表与实际生效权重长期不一致（口径债）。原口径（三档预测差）前瞻检验 h=5 七截面平均 IC +0.0036、t=0.28、置换检验 p=0.938（纯随机），n≈63/截面远低于 194 的 IC 截面中位门槛 → 禁作权重依据。方案 A 将其显式归零并把 5pp 回收给 score_ep（0.15→0.20，单因子恰在dim_cap 0.20 上限），使权重表 = 实际生效权重。",
+      "reactivation_thresholds": [
+        "① 有效覆盖 ≥30%（现 3.17%，机构 Q3 预测源仅 105 条）",
+        "② n≥194 截面、h=20（target_horizon=20）IC 显著为正（现 h=5 p=0.938）",
+        "③ G5 walkforward 样本外闭合（现 n_oos=0）",
+        "④ 与其他维秩相关 <0.4",
+        "⑤ 单因子 ≤0.20、大类 ≤0.30",
+        "⑥ 低基数饱和门槛（>300% 极端票 112 只/8.7%，待加）"
+      ],
+      "missing_reason_rule": "负基数（去年同期单季净利≤0 → 同比增速无定义）判 structural（分子分母同剔），禁按 zero 罚 0 分 —— 增速无定义 ≠ 业绩差。判据唯一实现见 earnings_surprise.",
+      "data_note": "score_es 字段与 es 徽标仍照常写入 scored 与页面（披露层保留，供跟踪），但**不进总分**。"
     }
   }
 }

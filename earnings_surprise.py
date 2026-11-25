@@ -83,6 +83,13 @@ A/B 双机构合并规则（fwd_mid / band）
     "source":     "a"|"b"|"ab"|None,
     "flags":      [...],        # suspect / ab_disagree_big / caliber_mismatch / negative_base
     "dev_ratio":  float|None,   # (act−fwd)/|fwd| 参考值；|fwd|<5 时 None（防小分母爆炸）
+    "missing_reason": "structural"|"data"|None,
+                  # 缺维归类（**唯一判据来源**，2026-11-25 老大裁决「负基数归 structural」）：
+                  #   "structural" = 增速无定义（负基数）→ 该维对此股结构性不适用，
+                  #       未来 ES 重新启用时分子分母同剔（禁按 zero 罚 0 分）；
+                  #   "data"       = 真缺数据（无预测/无实际/极端同源失真）→ 按 zero；
+                  #   None         = 非缺维（有有效档位）。
+                  # ⚠️ 增速无定义 ≠ 业绩差，禁把负基数当 0 分处理。
     "note":       str,          # 人类可读判定说明
   }
   表示方式：页面徽标 🔴超预期 +48pp / ⚪符合预期 / 🟢低于预期 −12pp / 扭亏兑现；
@@ -158,7 +165,7 @@ def judge_growth_surprise(fwd, act):
         "method": "missing_fwd", "caliber": caliber,
         "period": act.get("period") or "2026Q3",
         "source": fwd.get("source"), "flags": flags,
-        "dev_ratio": None, "note": "",
+        "dev_ratio": None, "missing_reason": "data", "note": "",
     }
     act_yoy = act.get("yoy") if _is_num(act.get("yoy")) else None
     act_np_q = act.get("np_q") if _is_num(act.get("np_q")) else None
@@ -169,13 +176,16 @@ def judge_growth_surprise(fwd, act):
     if kind == "turnaround":
         out["method"] = "turnaround"
         if act_np_q is None:
+            out["missing_reason"] = "data"
             out["note"] = "预测扭亏但实际单季净利润缺失，无法判定"
             return out
         if act_np_q > 0:
             out["tier"] = "符合预期"
+            out["missing_reason"] = None
             out["note"] = f"预测扭亏，实际单季净利 {act_np_q:.2f} 亿>0，方向兑现（无幅度预测，不设超预期档）"
         else:
             out["tier"] = "低于预期"
+            out["missing_reason"] = None
             out["note"] = f"预测扭亏，实际单季净利 {act_np_q:.2f} 亿≤0，扭亏未兑现"
         return out
 
@@ -183,6 +193,7 @@ def judge_growth_surprise(fwd, act):
     fwd_mid = fwd.get("mid") if _is_num(fwd.get("mid")) else None
     if fwd_mid is None or kind in ("none", None):
         out["method"] = "missing_fwd"
+        out["missing_reason"] = "data"
         out["note"] = "无机构预测增速，无法判定"
         return out
 
@@ -191,10 +202,17 @@ def judge_growth_surprise(fwd, act):
         if act.get("negative_base"):
             out["method"] = "negative_base"
             out["flags"] = flags + ["negative_base"]
-            out["note"] = "去年同期单季净利润≤0，同比增速无定义，无法判定"
+            # ⚠️ 2026-11-25 老大裁决「负基数归 structural」：去年同期单季净利≤0 →
+            #   同比增速**无定义**，这是增速口径的结构性不适用，**不是业绩差**。
+            #   归类 structural → 该维对此股分子分母同剔（未来 ES 重新启用时生效），
+            #   禁按 zero 罚 0 分（那会把 515 只负基数股系统性压低）。
+            out["missing_reason"] = "structural"
+            out["note"] = ("去年同期单季净利润≤0，同比增速无定义（增速口径结构性不适用）"
+                           "→ 无法判定，按缺维 structural 处理（禁按 0 分罚）")
         else:
             out["method"] = "missing_act"
             _why = act.get("src_note") or "定期报告未披露或数据不可得"
+            out["missing_reason"] = "data"
             out["note"] = f"实际单季同比增速缺失（{_why}），无法判定"
         return out
 
@@ -220,6 +238,9 @@ def judge_growth_surprise(fwd, act):
             "flags": flags + ["extreme_same_side"],
             "delta_pp": _round(act_yoy - fwd_mid, 1),
             "fwd_mid": _round(fwd_mid, 1),
+            # 极端同源 = 数据存在但判别力无意义 → 真缺数据类（按 zero），
+            #   区别于负基数的「增速无定义」（structural）。
+            "missing_reason": "data",
             "note": (f"实际 {act_yoy:+.1f}% 与预测中枢 {fwd_mid:+.1f}% 同侧且均处极端区"
                      f"（>{'300' if _extreme_pos else '-50'}%），判定不具判别力 → 无法判定（按缺维）"),
         })
@@ -246,6 +267,8 @@ def judge_growth_surprise(fwd, act):
         "band": [_round(band[0], 1), _round(band[1], 1)],
         "fwd_mid": _round(fwd_mid, 1), "method": method, "strength": strength,
         "dev_ratio": (_round(dev_ratio, 3) if dev_ratio is not None else None),
+        # 有效档位 → 非缺维
+        "missing_reason": None,
     })
     _suf = f"（{strength}）" if strength else ""
     out["note"] = (
