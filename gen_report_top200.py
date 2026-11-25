@@ -10822,6 +10822,8 @@ try:
         _es_notes = []
         if _es_pending:
             # v5.1 主口径：未启用（研究项）
+            _es_struct_n = sum(1 for r in results
+                                if (r.get("missing_reason") or {}).get("score_es") == "structural")
             _es_notes.append(
                 f"<b>业绩超预期(ES)维当前权重 = 0 → 未启用（研究项，不进总分）</b>；"
                 f"其分档与徽标仍照常展示供跟踪。启用门槛（六条全过才可进模型）："
@@ -10830,7 +10832,11 @@ try:
                 f"②n≥194 截面、<b>h=20</b> IC 显著为正（现原口径 h=5 IC +0.0036、"
                 f"置换检验 p=0.938 纯随机）③G5 walkforward 样本外闭合（现 n_oos=0）"
                 f"④与他维秩相关&lt;0.4 ⑤单因子≤0.20/大类≤0.30 "
-                f"⑥低基数饱和门槛（&gt;300% 极端票 112 只/8.7%）")
+                f"⑥低基数饱和门槛（&gt;300% 极端票 112 只/8.7%）。"
+                f"缺维归类：<b>负基数</b>（去年同期单季净利≤0 → 增速无定义）判 "
+                f"<b>structural</b>（分子分母同剔，禁按 0 分罚）—— "
+                f"<b>增速无定义 ≠ 业绩差</b>；本池 structural 负基数 "
+                f"<b>{_es_struct_n}</b> 只。")
         elif _es_gate:
             if _es_adjusted:
                 _es_notes.append(
