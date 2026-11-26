@@ -572,21 +572,21 @@
   },
   "pending_dims": {
     "score_es": {
-      "status": "PENDING_NOT_ACTIVATED",
+      "status": "RETIRED_SOURCE_PENDING_REBUILD",
       "nominal_weight_before": 0.05,
       "current_weight": 0.0,
-      "decided_at": "2026-11-25 老大裁决：落方案 A（显式归零 + 权重回收）",
-      "rationale": "ES 维此前为「名义 5%、实际 0」的死维：全池有效覆盖 57/1798=3.17% < 30% 门槛，运行时由 scale_calc.effective_weights_es_gate 按比例让渡给其余七维 → 权重表与实际生效权重长期不一致（口径债）。原口径（三档预测差）前瞻检验 h=5 七截面平均 IC +0.0036、t=0.28、置换检验 p=0.938（纯随机），n≈63/截面远低于 194 的 IC 截面中位门槛 → 禁作权重依据。方案 A 将其显式归零并把 5pp 回收给 score_ep（0.15→0.20，单因子恰在dim_cap 0.20 上限），使权重表 = 实际生效权重。",
+      "decided_at": "2026-11-25 老大裁决落方案 A；2026-11-26 老大指令下线手工预测源",
+      "rationale": "历史记录（不作当前依据）：ES 曾为名义 5%、实际 0 的死维，5pp 按方案 A 回收给 score_ep（0.15→0.20），权重表与实际生效权重保持一致。2026-11-26 起，原手工预测表随三季报披露失效并从项目删除，ES 判定所需 PIT 预测侧数据不复存在；在接入可审计的全市场季度预测数据源之前，ES 保持 0 权重且不产生任何字段。该回收属产品裁决，非 IC 背书。",
       "reactivation_thresholds": [
-        "① 有效覆盖 ≥30%（现 3.17%，机构 Q3 预测源仅 105 条）",
-        "② n≥194 截面、h=20（target_horizon=20）IC 显著为正（现 h=5 p=0.938）",
-        "③ G5 walkforward 样本外闭合（现 n_oos=0）",
-        "④ 与其他维秩相关 <0.4",
-        "⑤ 单因子 ≤0.20、大类 ≤0.30",
-        "⑥ 低基数饱和门槛（>300% 极端票 112 只/8.7%，待加）"
+        "① 先接入可核验、带 PIT 时间戳的全市场季度预测源（Wind/东财 MCP 等），禁止复用已退役手工表",
+        "② 有效覆盖 ≥30%，且 n≥194 截面",
+        "③ h=20（target_horizon=20）IC 显著为正并通过置换检验",
+        "④ G5 walkforward 样本外闭合，禁以样本内 IC 排权重",
+        "⑤ 与其他维秩相关 <0.4，单因子 ≤0.20、大类 ≤0.30",
+        "⑥ 负基数/极端同源须分别归 structural 与 data，低基数饱和门槛先落地"
       ],
-      "missing_reason_rule": "负基数（去年同期单季净利≤0 → 同比增速无定义）判 structural（分子分母同剔），禁按 zero 罚 0 分 —— 增速无定义 ≠ 业绩差。判据唯一实现见 earnings_surprise.",
-      "data_note": "score_es 字段与 es 徽标仍照常写入 scored 与页面（披露层保留，供跟踪），但**不进总分**。"
+      "missing_reason_rule": "规划规则（当前无数据，不生效）：负基数（去年同期单季净利≤0 → 同比无定义）归 structural，分子分母同剔；禁按 zero 罚 0 分。",
+      "data_note": "2026-11-26 起 score_es / es / es_meta / missing_reason.score_es 不再写入 scored 与页面；三季度事实分析改用 Wind/东财 MCP 的 2026Q3 实际披露数据，见 docs/三季度数据源替换说明_2026-11-26.md。"
     }
   }
 }

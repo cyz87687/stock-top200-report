@@ -158,7 +158,7 @@ model_str = data.get("model", "stock-scorer")
 # v3.4: 每日 AI 焦点池区块（替代 v3.1 已删除的观察池）
 # v3.5: score_fund 低基数失真治理 —— 增速饱和压缩审计展示（growth_raw→growth_eff）+ 周期股 durable 闸门收紧
 #   （注: v3.3~v3.4 报告层改动当时漏更本常量, 本次一并对齐; 线上页面此前显示的报告层版本号偏旧）
-# v3.5.1: growth 取数口径修复披露（年报→东财按报告期）+ Q3 预测景气加成审计徽标/全表列/覆盖率披露
+# growth 取数口径披露（年报→东财按报告期）+ 旧预测源退役说明
 # v3.5.3: ① 删除过时的「📊 评分模型总结」区块（v2.40 五维静态文案与当日算法层市场总结重复且数据陈旧，
 #          头部 Hero 已有当日算法层总结；数据字段 ai_model_summary 保留由 enhance 注入但不渲染）
 #         ② 累计 IC 曲线修复 y 轴量程按单期 IC 值(±0.4)计算致累计值(±3.5)溢出 viewBox 被裁剪，
@@ -374,8 +374,6 @@ _DIM_DEFS = [
     #   合并维 = max(size_growth, dominant)，唯一实现见 ep_size_ind.score_rows。
     #   旧两维权重已归零 → 仍列在下方（权重 0 → 页面不展示为生效维），字段保留供对照。
     ("市值(合并取高)", "score_size_comb", _DIM_W["score_size_comb"], False),
-    # v5.0：业绩超预期（es 权重 0.05）。超预期10 / 符合5 / 低于2；无数据=缺维（不计分）。
-    ("业绩超预期", "score_es", _DIM_W["score_es"], False),
     ("小盘成长溢价", "score_size_growth", _DIM_W.get("score_size_growth", 0.0), False),
     ("行业龙头壁垒", "score_dominant", _DIM_W.get("score_dominant", 0.0), False),
     ("小市值", "score_size", _DIM_W.get("score_size", 0.0), True),
@@ -403,8 +401,8 @@ def _load_dim_max_map():
            "score_ep": 10.0, "score_size_ind": 10.0,
            # v4.13-size2d：市值双维度（同为 0-10 池内分位/交互分）
            "score_size_growth": 10.0, "score_dominant": 10.0,
-           # v5.0：市值合并维 + 业绩超预期维（均 0-10 制）
-           "score_size_comb": 10.0, "score_es": 10.0}
+           # v5.0：市值合并维（0-10 制）
+           "score_size_comb": 10.0}
     _raw = dict(_fb)
     try:
         _p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "factor_weights.json")
@@ -460,8 +458,8 @@ _DIM_LABEL_SHORT = {
     "score_fund": "估值锚", "score_quality": "质量", "score_growth": "成长",
     "score_tech_neg": "技反", "score_bias60": "乖离", "score_rsi_rev": "RSI反",
     "score_size": "小市值", "score_lowvol20": "低波",
-    # v5.0：市值合并维 + 业绩超预期维
-    "score_size_comb": "市值合并", "score_es": "超预期",
+    # v5.0：市值合并维
+    "score_size_comb": "市值合并",
     # v4.9
     "score_ep": "EP", "score_size_ind": "行业内市值",
     # v4.13-size2d：市值双维度短标签
@@ -6487,7 +6485,7 @@ _review_card_html = f'''
         <div style="margin:8px 0 2px;padding:9px 12px;background:#1a1408;border-left:3px solid #d97706;border-radius:6px;font-size:11.5px;color:#fcd34d;line-height:1.75;">
             <b>⚠️ 评分口径 v5.0（2026-11-23 审计修订）—— 本页分数与 v4.19 及以前不可比</b><br>
             ① 市值双维<b>合并取高</b>（消除同一市值事实算两次分）；② 成长维<b>接入营收增速</b>（惩罚营收萎缩的利润修复）；
-            ③ 新增<b>业绩超预期</b>维；④ <b>缺维分层</b>（结构性不适用剔分母、真缺数据按 0，不再一律填中性 5.0）；
+            ③ 原<b>业绩超预期</b>维已于 2026-11-26 源退役后删除；④ <b>缺维分层</b>（结构性不适用剔分母、真缺数据按 0，不再一律填中性 5.0）；
             ⑤ G1 成长门槛新增中间档（cagr3≤5% 封顶 6.0）。<br>
             <b>权重为先验配置（非 IC 背书），准入闸门 G5 未过、新增维度未进历史面板 → 禁称「经验证的 alpha」。</b>
         </div>
@@ -9218,55 +9216,9 @@ for idx, r in enumerate(top20):
                           'border-radius:3px;background:#fef3c7;color:#b45309;margin-left:6px;cursor:help;">'
                           '📉低基数修正 ' + _raw_s + '→' + _eff_s + '</span>')
 
-    # ===== v3.5.1 Q3 预测景气加成审计徽标 =====
-    # Q3 景气预测（手工汇总表，半导体/消费电子链）触发 score_fund 加分时如实展示：
-    #   加分档位 + 加速度 + 去重闸门(implied_h2) 依据，与低基数修正徽标同口径「可审计不隐藏」。
+    # 2026-11-26：Q3 手工预测加分与 ES 三档徽标整体下线（源表已删除）。
     _q3_badge = ""
-    if (r.get("q3_bonus") or 0) > 0:
-        _qb = float(r.get("q3_bonus") or 0)
-        _q3_yoy_s = f"{r['q3_yoy']:+.0f}%" if isinstance(r.get("q3_yoy"), (int, float)) else "扭亏"
-        _q3_accel_s = f"{r['q3_accel']:+.0f}pt" if isinstance(r.get("q3_accel"), (int, float)) else "—"
-        _q3_ih2_s = f"{r['q3_implied_h2']:+.0f}%" if isinstance(r.get("q3_implied_h2"), (int, float)) else "无全年预测"
-        # v3.5.1 诚实性: Q3同比被低基数饱和时明示原始值（否则「加速度+0pt」会被误读为无加速）
-        _q3_sat_s = ""
-        _q3_raw, _q3_eff = r.get("q3_yoy_raw"), r.get("q3_yoy")
-        if (isinstance(_q3_raw, (int, float)) and isinstance(_q3_eff, (int, float))
-                and abs(_q3_raw - _q3_eff) > 1):
-            _q3_sat_s = f"；Q3原始同比{_q3_raw:+.0f}%，经低基数饱和后采用{_q3_eff:+.0f}%（加速度为饱和后口径）"
-        _q3_tip = (f"Q3预测景气加成 +{_qb:.1f}分(0-5分制, 传导总分+{_qb*_DIM_W['score_fund']*10:.1f})；"
-                   f"Q3同比{_q3_yoy_s} 加速度{_q3_accel_s}{_q3_sat_s}；"
-                   f"机构全年预期隐含H2增速{_q3_ih2_s}（Q3预测超出机构预期部分才计入，防止与FwdPE双重计价）；"
-                   f"数据源：手工汇总表(半导体/消费电子Q3预测, TTL45天)")
-        _q3_badge = ('<span title="' + _q3_tip.replace('"', "'") + '" '
-                     'style="font-size:11px;font-weight:700;padding:1px 6px;'
-                     'border-radius:3px;background:#dcfce7;color:#15803d;margin-left:6px;cursor:help;">'
-                     '📈Q3景气 +' + f"{_qb:.1f}" + '</span>')
-
-    # ===== 业绩预期差三档徽标（earnings_surprise，v5.1 起权重 0 → 研究项，不进总分）=====
-    # 判定：预测增速 vs 实际单季同比（超预期/符合预期/低于预期），规则见页尾披露⑤。
-    # 无法判定不渲染徽标（缺数据不编造）；配色沿用 Q3 徽标语义（好=绿/差=红/中性=灰蓝）。
-    # ⚠️ 本段变量一律 _es_* 唯一前缀（round57 教训：_ic/_t/_d 等模块级名会覆盖下游全局）。
     _es_badge = ""
-    _es_row = r.get("es") or {}
-    if _es_row.get("tier") and _es_row["tier"] != "无法判定":
-        _es_tier = _es_row["tier"]
-        _es_dpp = _es_row.get("delta_pp")
-        _es_ds = f"{_es_dpp:+.0f}pp" if isinstance(_es_dpp, (int, float)) else ""
-        _es_bg, _es_fg = ("#dcfce7", "#15803d") if _es_tier == "超预期" else (
-            ("#fee2e2", "#b91c1c") if _es_tier == "低于预期" else ("#e2e8f0", "#475569"))
-        _es_ic = "🔺" if _es_tier == "超预期" else ("🔻" if _es_tier == "低于预期" else "➖")
-        _es_sts = "·强" if _es_row.get("strength") == "strong" else ""
-        # v5.1：权重现算（禁写死「名义5%」——权重表已改，徽标 tooltip 必须同步）
-        _es_w_lbl = (f"权重 {_DIM_W.get('score_es', 0.0):.0%}（研究项，不进总分）"
-                     if float(_DIM_W.get("score_es") or 0.0) <= 0 else
-                     f"权重 {_DIM_W.get('score_es', 0.0):.0%}，覆盖率<30%时不计入")
-        _es_tip = (f"业绩预期差三档：{_es_tier}{_es_sts}；{_es_row.get('note','')}"
-                   f"（预测源 {_es_row.get('source') or '—'}·口径{'扣非' if _es_row.get('caliber')=='kf' else '归母'}"
-                   f"·方法 {_es_row.get('method')}）；{_es_w_lbl}（见口径披露）")
-        _es_badge = ('<span title="' + _es_tip.replace('"', "'") + '" '
-                     'style="font-size:11px;font-weight:700;padding:1px 6px;'
-                     f'border-radius:3px;background:{_es_bg};color:{_es_fg};margin-left:6px;cursor:help;">'
-                     f'{_es_ic}业绩{_es_tier} {_es_ds}</span>')
 
     # ===== v4.17 趋势状态徽标（空头排列/弱势/企稳中/多头排列，round90 趋势诊断）=====
     # 判定纯数据驱动（tech.ma5/10/20/60 + 现价），缺数据不渲染；不进评分、只作入场提示。
@@ -10021,8 +9973,7 @@ html_parts.append('''
                     <th class="s-total sticky-col col-total-sticky" data-sort="total">总分 <span class="sort-arrow"></span></th>
                     <th class="s-rating col-rating">评级</th>
                     <th class="s-pe col-pe">PE(TTM)/Fwd/阶梯</th>
-                    <th class="s-q3 col-q3" title="Q3预测景气（手工汇总表·半导体/消费电子链·覆盖率约13%）：Q3同比+相对中报的加速度；命中且超出机构全年预期才计加分">Q3景气</th>
-                    <th class="s-sector col-sub">细分题材</th>
+                                        <th class="s-sector col-sub">细分题材</th>
                     <th class="s-turnover col-turnover" data-sort="turnover">成交额 <span class="sort-arrow"></span></th>
                 </tr>
             </thead>
@@ -10095,35 +10046,7 @@ for idx, r in enumerate(results):
         _gr_s = f"{_gr:+.0f}%" if isinstance(_gr, (int, float)) else "?"
         _lb_mark = (f'<span style="color:#b45309;cursor:help;" '
                     f'title="低基数失真修正: 原始单点增速{_gr_s} 已按存续期趋势饱和至 {growth}">⚠</span>')
-    # v3.5.1: Q3 预测景气列 —— 仅当该股命中 Q3 手工预测表时渲染
-    # v3.9（老大「不要空着」）：未命中不再留裸 '-'，改为显式说明覆盖率缺口，
-    #   否则读者无法区分「无数据」与「数据为 0」。
-    _q3_cell = ('<span style="font-size:9.5px;color:#475569;cursor:help;" '
-                'title="Q3 景气为手工汇总表（半导体/消费电子链），'
-                '全库覆盖率约 13%，该股不在覆盖名单内 —— 不是漏填">未覆盖</span>')
-    if isinstance(r.get("q3_yoy"), (int, float)) or (r.get("q3_bonus") or 0) > 0:
-        _qy = f"{r['q3_yoy']:+.0f}%" if isinstance(r.get("q3_yoy"), (int, float)) else "扭亏"
-        _qacc = f"{r['q3_accel']:+.0f}pt" if isinstance(r.get("q3_accel"), (int, float)) else "—"
-        _qih2 = f"{r['q3_implied_h2']:+.0f}%" if isinstance(r.get("q3_implied_h2"), (int, float)) else "无全年预测"
-        _qbn = (r.get("q3_bonus") or 0)
-        _qcol = "#22c55e" if _qbn >= 0.6 else ("#a3e635" if _qbn > 0 else "#94a3b8")
-        # v3.5.1 诚实性: Q3同比被低基数饱和时 hover 附原始值
-        _qsat = ""
-        _qraw, _qeff = r.get("q3_yoy_raw"), r.get("q3_yoy")
-        if (isinstance(_qraw, (int, float)) and isinstance(_qeff, (int, float))
-                and abs(_qraw - _qeff) > 1):
-            _qsat = f" · 原始{_qraw:+.0f}%(已饱和)"
-        # 业绩预期差三档（es 字段）：并入本列 tooltip + 角标，不加新表列（变量 _esq_* 唯一前缀）
-        _esq_tier = (r.get("es") or {}).get("tier")
-        _esq_d = (r.get("es") or {}).get("delta_pp")
-        _esq_s = ""
-        _esq_gl = ""
-        if _esq_tier and _esq_tier != "无法判定":
-            _esq_s = f" · 业绩预期:{_esq_tier}{('(%+.1fpp)' % _esq_d) if isinstance(_esq_d, (int, float)) else ''}"
-            _esq_gl = ("🔺" if _esq_tier == "超预期" else ("🔻" if _esq_tier == "低于预期" else "➖"))
-        _q3_cell = (f"<span style='color:{_qcol};font-weight:700;' title='Q3预测同比{_qy} · 加速度{_qacc} · "
-                    f"机构预期隐含H2增速{_qih2}{_qsat} · 景气加成+{_qbn:.1f}分{_esq_s}'>"
-                    f"{_qy}<span style='font-size:10px;color:#64748b;'> {_qacc}{_esq_gl}</span></span>")
+    # 2026-11-26：Q3 手工预测列已删除，es 角标同步下线。
     ladder_val = r.get("pe_ladder")
     if ladder_val and isinstance(ladder_val, dict):
         yrs = sorted(ladder_val.keys())
@@ -10339,8 +10262,7 @@ for idx, r in enumerate(results):
                     <td class="s-total col-total sticky-col col-total-sticky" data-value="{r['total']}" style="color:{RATING_COLORS[rating]}">{r['total']:.2f}</td>
                     <td class="s-rating col-rating" style="background:{RATING_BG[rating]};color:{RATING_COLORS[rating]}" data-value="{rating}" title="{f'池内第 {r['rank']} 名 / 前 {r['percentile']}%' + (f' · 头部细分 {r['rating_fine']}' if r.get('rating_fine') else '') if r.get('rank') else '评级'}">{rating}{f'<sup style="font-size:8px;margin-left:1px;">{r["rating_fine"]}</sup>' if r.get('rating_fine') else ''}</td>
                     <td class="s-pe col-pe" data-value="{r.get('pe',0)}">{pe}/{fwd} {ladder_t} {growth}{_lb_mark}</td>
-                    <td class="s-q3 col-q3">{_q3_cell}</td>
-                    <td class="s-sector col-sub">{sub_theme_t if sub_theme_t else '-'}</td>
+                                        <td class="s-sector col-sub">{sub_theme_t if sub_theme_t else '-'}</td>
                     <td class="s-turnover col-turnover" data-value="{r.get('turnover',0)}">{turnover_yi:.0f}亿</td>
                 </tr>''')
 
@@ -10797,67 +10719,23 @@ except Exception as _bte:
         'border-left:3px solid #ef4444;border-radius:6px;font-size:11px;color:#fca5a5;">'
         f'⚠️ 回测口径披露渲染失败：{html_mod.escape(str(_bte)[:200])}</div>')
 
-# ④ ES 覆盖 / fallback 披露（2026-11-24 P0-6 §4 + P1-2；2026-11-25 v5.1 改写）──
-#   ⚠️ v5.1（2026-11-25，老大裁决「落方案a」）：score_es 权重 0.05 → **0**，
-#   转 pending_dims 研究项 → 披露口径从「名义5%、覆盖<30%让渡」改为
-#   「**未启用（研究项，不进总分）+ 启用门槛**」。
-#   ⚠️ 判据必须现算：权重从 factor_weights.json 读（禁写死「名义5%」——
-#   权重表已改，页面再写 5% 就是口径债复发）。
-#   ES 覆盖不足时有效权重已让渡（apply_sector_momentum 单一实现），
-#   AI 评估 fallback=True 时须双留痕。二者都属「可信度元信息」，留主页。
+# ④ ES 源退役 / AI fallback 披露（2026-11-26，披露不可迁：必须留主页）
+#   手工预测源已删除，score_es 权重 0 且不再产生任何字段；
+#   AI 评估 fallback=True 时仍须双留痕。
 _es_disclose = ""
 try:
-    _es_have = sum(1 for r in results if isinstance(r.get("score_es"), (int, float))
-                   and not isinstance(r.get("score_es"), bool))
-    _es_cov = (_es_have / len(results)) if results else 0.0
-    # 判据单一实现：门槛只读 scale_calc.ES_COVERAGE_MIN，不再依赖 scored 里
-    # 可选的 es_weight_adjusted 标记（老产物没有该字段时会把 3.7% 误写成「≥30%」）。
-    _es_gate = _es_cov < scale_calc.ES_COVERAGE_MIN
-    _es_adjusted = any(r.get("es_weight_adjusted") for r in results)
-    # v5.1：ES 当前生效权重（现算，禁写死）—— 0 表示该维已退出总分。
-    _es_w_now = float(_DIM_W.get("score_es") or 0.0)
-    _es_pending = _es_w_now <= 0.0
     _ai_fb = bool((ai_review or {}).get("fallback"))
-    if _es_pending or _es_gate or _ai_fb:
-        _es_notes = []
-        if _es_pending:
-            # v5.1 主口径：未启用（研究项）
-            _es_struct_n = sum(1 for r in results
-                                if (r.get("missing_reason") or {}).get("score_es") == "structural")
-            _es_notes.append(
-                f"<b>业绩超预期(ES)维当前权重 = 0 → 未启用（研究项，不进总分）</b>；"
-                f"其分档与徽标仍照常展示供跟踪。启用门槛（六条全过才可进模型）："
-                f"①有效覆盖 ≥{scale_calc.ES_COVERAGE_MIN:.0%}（现 "
-                f"{_es_have}/{len(results)} = {_es_cov:.1%}）"
-                f"②n≥194 截面、<b>h=20</b> IC 显著为正（现原口径 h=5 IC +0.0036、"
-                f"置换检验 p=0.938 纯随机）③G5 walkforward 样本外闭合（现 n_oos=0）"
-                f"④与他维秩相关&lt;0.4 ⑤单因子≤0.20/大类≤0.30 "
-                f"⑥低基数饱和门槛（&gt;300% 极端票 112 只/8.7%）。"
-                f"缺维归类：<b>负基数</b>（去年同期单季净利≤0 → 增速无定义）判 "
-                f"<b>structural</b>（分子分母同剔，禁按 0 分罚）—— "
-                f"<b>增速无定义 ≠ 业绩差</b>；本池 structural 负基数 "
-                f"<b>{_es_struct_n}</b> 只。")
-        elif _es_gate:
-            if _es_adjusted:
-                _es_notes.append(
-                    f"ES 维实际覆盖 <b>{_es_have}/{len(results)} = {_es_cov:.1%}</b> "
-                    f"&lt; {scale_calc.ES_COVERAGE_MIN:.0%}，其 {_es_w_now:.0%} 权重已按比例让渡给"
-                    "其余生效维（有效口径，名义权重表不变）")
-            else:
-                _es_notes.append(
-                    f"ES 维实际覆盖 <b>{_es_have}/{len(results)} = {_es_cov:.1%}</b> "
-                    f"&lt; {scale_calc.ES_COVERAGE_MIN:.0%}，按现行口径其 {_es_w_now:.0%} 权重应让渡；"
-                    f"当前 scored 产物无让渡标记 → 分数尚未按该口径重算（需重跑"
-                    " apply_sector_momentum），本页仅披露口径不冒充已重算")
-        else:
-            _es_notes.append(
-                f"ES 维覆盖 <b>{_es_cov:.1%}</b>（≥{scale_calc.ES_COVERAGE_MIN:.0%}，权重保留）")
-        if _ai_fb:
-            _es_notes.append("AI 评估当前为 <b>规则兜底(fallback=True)</b>，非在线大模型生成")
-        _es_disclose = (
-            '<div style="margin:14px 0;padding:10px 14px;background:rgba(245,158,11,0.08);'
-            'border-left:3px solid #f59e0b;border-radius:6px;font-size:11px;color:#fbbf24;">'
-            '⚠️ <b>ES 维 / AI 评估口径披露</b>：' + "；".join(_es_notes) + '</div>')
+    _es_notes = [
+        "<b>业绩超预期(ES)维已退役</b>：原手工预测源《已退役手工预测源》"
+        "随三季报披露失效，2026-11-26 已从项目删除；score_es 权重 0，"
+        "scored 与页面均不再写 es / score_es 字段，三季度事实分析改用 Wind/东财 MCP 的 2026Q3 实际披露数据"
+    ]
+    if _ai_fb:
+        _es_notes.append("AI 评估当前为 <b>规则兜底(fallback=True)</b>，非在线大模型生成")
+    _es_disclose = (
+        '<div style="margin:14px 0;padding:10px 14px;background:rgba(245,158,11,0.08);'
+        'border-left:3px solid #f59e0b;border-radius:6px;font-size:11px;color:#fbbf24;">'
+        '⚠️ <b>ES 源退役 / AI 评估口径披露</b>：' + "；".join(_es_notes) + '</div>')
 except Exception as _ese2:
     _es_disclose = ""
 
@@ -10899,10 +10777,10 @@ try:
             '<div style="margin:14px 0;padding:10px 14px;background:rgba(168,85,247,0.08);'
             'border-left:3px solid #a855f7;border-radius:6px;font-size:11px;color:#d8b4fe;">'
             f'🔄 <b>权重版本变更公告（{_wv_ver}）</b>：业绩超预期(ES)维权重 '
-            f'<b>已归零 → {_wv_es:.0%}（转研究项，不进总分）</b>，回收的权重给 '
+            f'<b>已归零 → {_wv_es:.0%}（源已退役，不进总分）</b>，回收的权重给 '
             f'<b>EP估值 {_wv_ep:.0%}</b>。'
-            f'<b style="color:#fca5a5;">total 跨 v5.0/v5.1 禁比</b> —— '
-            f'本页分数与历史分数不可直接比较（评级分布变化主要来自权重变更，非市场变化）。'
+            f'<b style="color:#fca5a5;">total 跨版本/跨口径禁比</b> —— '
+            f'本页分数与历史分数不可直接比较：除权重变更外，2026-11-26 已剔除失效手工表的 Q3 景气加分。'
             f'{_gate_txt}</div>')
 except Exception as _wve:
     _weight_ver_banner = ""
@@ -12939,76 +12817,39 @@ except Exception as _ce:
     pass
 
 
-# ===== v3.5.1: growth 取数口径变更 + Q3 预测加成披露（诚实披露纪律）=====
+# ===== growth 取数口径变更 + 旧预测源退役披露（诚实披露纪律）=====
 # 背景: 老大核查发现 growth 原取「按年度」摘要末行=最近年报，全池滞后半年以上
 #   （普冉股份年报口径 −38.7% vs 2026中报实际 +2994.08%）；
 #   且同比公式在负基数下符号反转（佰维存储扭亏 +2963% 被误判为 −2963%）。
 # 修复: 东财「按报告期」取各股最新已披露报告期扣非累计同比，官方口径 (cur−prev)/|prev|。
-#   Q3 预测为手工汇总表（半导体/消费电子链），覆盖率有限，仅作景气边际信号加分，
-#   非全年盈利预测输入；超出机构全年预期(implied_h2)部分才计分，防止与 FwdPE 双重计价。
+#   2026-11-26：Q3 手工预测表及 ES 判定源全部退役，三季度事实数据改用 Wind/东财 MCP。
 try:
     _g_em = sum(1 for x in results if x.get("growth_src") == "em")
-    _g_q3 = sum(1 for x in results if isinstance(x.get("q3_yoy"), (int, float)) or (x.get("q3_bonus") or 0) > 0)
-    _g_q3b = sum(1 for x in results if (x.get("q3_bonus") or 0) > 0)
     _g_cap = sum(1 for x in results if x.get("growth_capped"))
     _g_neg_old = sum(1 for x in results
                      if isinstance(x.get("growth_annual_ths"), (int, float)) and isinstance(x.get("growth"), (int, float))
                      and (x["growth_annual_ths"] > 0) != (x["growth"] > 0))
-    # ---- ⑤ 业绩预期差三档披露（阈值从 earnings_surprise 单一事实源读取，禁此处另写一套）----
-    try:
-        import earnings_surprise as _es_mod
-        _ES_BAND = _es_mod.POINT_BAND_PP
-        _ES_STRONG = _es_mod.STRONG_PP
-    except Exception as _esi:
-        print(f"⚠️ earnings_surprise 导入失败，披露⑤阈值回退模块缺省(10/25pp): {_esi!r}")
-        _ES_BAND, _ES_STRONG = 10.0, 25.0
-    _es_rows = [x for x in results if x.get("es")]
-    _es_judged = [x for x in _es_rows if (x["es"].get("tier") not in (None, "无法判定"))]
-    _es_tier_cnt = {"超预期": 0, "符合预期": 0, "低于预期": 0}
-    for _esx in _es_judged:
-        _es_tier_cnt[_esx["es"]["tier"]] = _es_tier_cnt.get(_esx["es"]["tier"], 0) + 1
-    _es_w_now = float(_DIM_W.get("score_es") or 0.0)
-    # 覆盖现算（禁写死数字；此处独立算一次，勿依赖上方 try 块内变量）
-    _es_have_pct = (sum(1 for x in results if isinstance(x.get("score_es"), (int, float))
-                        and not isinstance(x.get("score_es"), bool)) / len(results)
-                    if results else 0.0)
-    _es_w_lbl = (f'<b>当前权重 {_es_w_now:.0%} → 未启用（研究项，不进总分）</b>'
-                 if _es_w_now <= 0 else
-                 f'<b>名义权重 {_es_w_now:.0%}、覆盖&lt;30%时让渡</b>')
+    # ---- ⑤ ES 源退役披露（2026-11-26；不再读取任何手工预测表）----
     _es_disc = (
-        f'⑤ <b>业绩预期差三档</b>（2026-10-31 起，详情卡 ▣ 徽标，{_es_w_lbl}）：'
-        f'比对<b>机构预测增速</b>（Q3 手工汇总表，A/B 双机构，PIT 2026-10-14）与'
-        f'<b>实际单季同比</b>（fin_cache_em 定期报告累计值自拆单季，口径对齐扣非/归母）。'
-        f'判定带：区间预测用原始端点 [lo, hi]，点值预测用 ±{_ES_BAND:.0f}pp 等效带'
-        f'（≈A/B 双机构预测分歧中位 13.7pp 的单机构噪声带）；'
-        f'<b style="color:#22c55e;">超预期</b>=实际超带上沿 / '
-        f'<b style="color:#94a3b8;">符合预期</b>=带内 / '
-        f'<b style="color:#f87171;">低于预期</b>=破带下沿；'
-        f'|Δ|≥{_ES_STRONG:.0f}pp 标「强」。扭亏预测按方向兑现判（不设超预期档）。'
-        f'本池标注 {len(_es_rows)} 只、可判定 {len(_es_judged)} 只：'
-        f'超预期 {_es_tier_cnt["超预期"]} / 符合 {_es_tier_cnt["符合预期"]} / 低于 {_es_tier_cnt["低于预期"]}。'
-        + (f'<b style="color:#fbbf24;">⚠️ 该维权重为 0 → 不进总分</b>：'
-           f'覆盖仅 {_es_have_pct:.1%}（&lt;{scale_calc.ES_COVERAGE_MIN:.0%} 门槛），'
-           f'且原三档口径前瞻检验 h=5 IC +0.0036、置换检验 p=0.938（纯随机）→ '
-           f'按方案 A 显式归零并转研究项，徽标与分档仅供跟踪。'
-           f'负基数（去年同期单季净利≤0 → 增速无定义）判 <b>structural</b>（分子分母同剔），'
-           f'禁按 0 分罚 —— 增速无定义 ≠ 业绩差。'
-           if _es_w_now <= 0 else ''))
+        '⑤ <b>业绩超预期(ES)维已退役</b>：原手工预测源随三季报披露失效，'
+        '2026-11-26 已从项目删除；当前权重 0，scored 与页面均不再写 es / score_es 字段。'
+        '半导体/消费电子三季度事实分析改用 <b>Wind MCP / 东方财富 MCP 的 2026Q3 实际披露数据</b>'
+        '（含单季营收、归母/扣非净利及实际披露日期），见 docs/三季度数据源替换说明_2026-11-26.md。'
+        '<b style="color:#fbbf24;">⚠️ 原口径结论一律不得复用</b>；ES 重启须先接可审计 PIT 预测源并通过六门槛。')
     html_parts.append(f'''
-    <!-- v3.5.1 growth 口径与 Q3 预测披露 -->
+    <!-- 2026-11-26 growth 口径与旧数据源退役披露 -->
     <div class="section-block" style="margin:24px 0;padding:16px 20px;background:#0f172a;border:1px solid #334155;border-radius:12px;">
-        <div style="font-size:14px;font-weight:800;color:#38bdf8;margin-bottom:6px;">📐 盈利取数口径与 Q3 预测加成说明（{total_stocks} 只）</div>
+        <div style="font-size:14px;font-weight:800;color:#38bdf8;margin-bottom:6px;">📐 盈利取数口径与数据源退役说明（{total_stocks} 只）</div>
         <div style="font-size:12px;color:#cbd5e1;line-height:1.9;">
-            ① <b style="color:#fbbf24;">增速口径 v3.5.1 起变更</b>：growth 改为各股<b>最新已披露报告期</b>（2026中报为主）扣非累计同比，
-            东财「按报告期」接口取数，官方口径 <code>(本期−上年同期)/|上年同期|</code>；
-            修复了旧口径「按年度摘要取最近年报」导致的全池滞后半年以上问题。<br>
-            ② <b>口径切换影响</b>：{_g_em}/{total_stocks} 只走东财新口径；其中 <b style="color:#f87171;">{_g_neg_old} 只增长方向与旧年报口径相反</b>；
+            ① <b style="color:#fbbf24;">增速口径</b>：growth 为各股<b>最新已披露报告期</b>扣非累计同比，
+            东财「按报告期」接口取数，官方口径 <code>(本期−上年同期)/|上年同期|</code>。<br>
+            ② <b>口径影响</b>：{_g_em}/{total_stocks} 只走东财口径；其中 <b style="color:#f87171;">{_g_neg_old} 只增长方向与旧年报口径相反</b>；
             {_g_cap} 只触发低基数失真饱和压缩（详情卡 📉 徽标可审计）。<br>
-            ③ <b>Q3 预测景气加成</b>：数据源为手工汇总表（半导体/消费电子链 105 只），
-            池内覆盖 <b>{_g_q3} 只（{_g_q3/total_stocks*100:.1f}%）</b>，实际获加分 <b style="color:#22c55e;">{_g_q3b} 只</b>（上限 +1.0 分/0-5 分制 → 总分 +3.6）。
-            加分条件：Q3 预测同比（经同样饱和处理）相对中报<b>加速</b>，且超出机构全年盈利预期隐含的 H2 增速
-            （否则视为已被 FwdPE 计价，不加分）——<b>只加分、不扣分</b>，Q3 为预测值非已披露事实。<br>
-            ④ 该表非程序化接口、TTL 45 天，未覆盖个股按原口径评分，不受影响。<br>
+            ③ <b>已退役数据源</b>：2026-11-26 起删除《已退役手工预测源》及其全部派生字段
+            （Q3 景气加分、ES 三档、score_es、es_meta）。旧加分已从本批总分中剔除，
+            <b>total 与历史快照不可直接比较</b>。<br>
+            ④ <b>替代数据源</b>：半导体/消费电子 2026Q3 分析改用 Wind MCP / 东方财富 MCP 的实际披露数据，
+            覆盖单季营收、归母/扣非净利、同比与实际披露日期，详见 docs/三季度数据源替换说明_2026-11-26.md。<br>
             {_es_disc}
         </div>
     </div>''')
@@ -13252,7 +13093,7 @@ html_parts.append('''
     <div class="footer" id="sec-notes">
         <p style="color:#64748b;">📄 ''' + REPORT_VER + ''' 报告层 · ''' + _SCORER_VER + ''' 评分层 · 数据日期 ''' + date_str + ''' · 更新时间 ''' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '''</p>
         <p>📚 数据源：东方财富 + 腾讯K线 + 同花顺 + 新浪/乐股 · 全市场成交额排名 · 样本池 TOP''' + str(_POOL_N) + '''（覆盖 ''' + str(total_stocks) + ''' 只 / ''' + f'{_pool_cov:.0%}' + '''）</p>
-        <p>📐 盈利取数口径（v3.5.1 起）：growth = 各股最新已披露报告期（2026中报为主）扣非累计同比，东财按报告期接口、官方口径 (本期−上年同期)/|上年同期|；Q3 预测景气加成来自手工汇总表（半导体/消费电子链，池内覆盖约13%，超出机构全年预期部分才计分）</p>
+        <p>📐 盈利取数口径：growth = 各股最新已披露报告期扣非累计同比，东财按报告期接口、官方口径 (本期−上年同期)/|上年同期|；2026-11-26 起旧手工 旧 Q3 预测（已退役）加分与 ES 三档已删除，三季度事实数据改用 Wind/东财 MCP 的 2026Q3 实际披露数据</p>
         <p>🗒️ 点评来源：''' + _ai_src_label + '''（''' + html_mod.escape(_ai_src_tip) + '''）</p>
         <p>⚠️ 免责声明: 本报告由AI基于stock-scorer极简评分模型自动生成,仅供参考,不构成投资建议。投资有风险,入市需谨慎。</p>
         <p>评分模型 (''' + _SCORER_VER + '''): '''
@@ -13261,7 +13102,6 @@ html_parts.append('''
            + ' + 成长(接入营收增速)' + f'{_DIM_W["score_growth"]:.0%}'
            + ' + EP估值' + f'{_DIM_W["score_ep"]:.0%}'
            + ' + 市值(双维合并取高)' + f'{_DIM_W["score_size_comb"]:.0%}'
-           + ' + 业绩超预期' + f'{_DIM_W["score_es"]:.0%}'
            + ' + 乖离低位' + f'{_DIM_W["score_bias60"]:.1%}'
            + ' + RSI反转' + f'{_DIM_W["score_rsi_rev"]:.1%}'
            + '。<b>2026-11-23 v5.0 评分审计修订</b>：'
@@ -13269,7 +13109,7 @@ html_parts.append('''
            + '消除「同一市值事实算两次分」（原非龙头同时拿 20%+10%）；'
            + '② 成长维接入营收增速 revg（α=0.30，申万一级行业内百分位），'
            + '惩罚「营收萎缩、利润靠费用优化修复」的伪成长；'
-           + '③ 新增业绩超预期维（超预期10/符合5/低于2，无数据不计分）；'
+           + '③ 原业绩超预期维因手工预测源退役，已于 2026-11-26 删除（权重 0，字段不再落库）；'
            + '④ 缺维分层：结构性不适用剔分母、真缺数据按 0（不再一律填中性 5.0）；'
            + '⑤ G1 成长门槛新增中间档（0&lt;cagr3≤5% 封顶 6.0）。'
            + '⚠️ 全部为<b>先验产品裁决</b>，G5 未闭合、fund 门控覆盖 0%、'
@@ -13712,7 +13552,7 @@ if SHOW_CORE_ONLY:
                    '消除「同一市值事实算两次分」；'
                    '② 成长维<b>接入营收增速</b> revg（α=0.30，申万一级行业内百分位），'
                    '惩罚「营收萎缩、利润靠费用优化修复」的伪成长；'
-                   '③ 新增<b>业绩超预期</b>维（超预期10/符合5/低于2，无数据不计分）；'
+                   '③ 原<b>业绩超预期</b>维因手工预测源退役，2026-11-26 删除（权重 0、字段不再落库）；'
                    '④ <b>缺维分层</b>：结构性不适用剔分母、真缺数据按 0'
                    '（不再一律填中性 5.0）；'
                    '⑤ G1 成长门槛新增中间档（0&lt;cagr3≤5% 封顶 6.0）。'

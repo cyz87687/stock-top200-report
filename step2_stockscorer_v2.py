@@ -855,73 +855,12 @@ def fetch_em_growth_cached(sym, ttl_days=EM_FIN_CACHE_TTL_DAYS):
 
 
 # ============================================================
-# v3.5.1: Q3 预测景气加分（数据源：手工汇总表 parse_q3_forecast.py 结构化产物）
-# 定位：Q3 预测**不作为全年盈利预测的直接输入**，而是「景气边际动能确认信号」，
-#   以加分项形式接入 score_fund（只加分不扣分，Q3 是预测非事实）。
-# 去重闸门：Q3 同比须**超出机构全年预测隐含的下半年增速(implied_h2)**才算增量信息，
-#   避免与 fwd_np（同花顺机构一致预期）双重计数。
-# 标定依据（2026-10-14，池内 65 只匹配样本实测）：
-#   · 匹配样本 margin=q3_eff−implied_h2 呈双峰分布（≥56pt 或 <10pt），
-#     +30/+15 与 +50/+25 两套阈值对当前数据**判定结果完全一致**（空区鲁棒）；
-#   · implied_h2 可算 60/65（5 只缺 fwd_pe 或中报扣非≤0 → 走退化规则）；
-#   · 扭亏文字样本池内 6 只（长鑫科技/国科微/芯源微/正帆科技/天岳先进/迅捷兴）。
+# 2026-11-26 数据源退役：原「旧 Q3 预测（已退役）景气加分」依赖已退役预测源
+# 《已退役手工预测源（2026-11-26 删除）》，三季报披露后已失效并从项目删除。
+# 该加分项及其参数/别名/审计字段全部下线；三季度事实分析改用
+# Wind / 东方财富 MCP 的 2026Q3 实际披露数据（见 docs/三季度数据源替换说明_2026-11-26.md）。
+# 严禁在本模块重新引入该手工表或任何派生字段。
 # ============================================================
-Q3_BONUS_CAP = 1.0          # score_fund(5分制) 加分上限 → 百分制 +3.6≈+4 分
-Q3_STRONG_MARGIN = 30.0     # 强加速: q3_eff − implied_h2 > 30pt
-Q3_MILD_MARGIN = 15.0       # 温和加速: > 15pt
-Q3_BEAT_FLOOR = 10.0        # 略超预期: ≥ 10pt（implied_h2 估算噪声缓冲；实测空区 6.3→20.7）
-Q3_STRONG_ABS = 50.0        # 强加速绝对增速下限(%)，防"低增速+负ih2基槛"被高估
-Q3_MILD_ABS = 30.0          # 温和加速绝对增速下限(%)
-Q3_TURNAROUND_BONUS = 0.4   # 扭亏确认（文字无数值，幅度保守，占上限40%）
-Q3_DEGRADED_CAP = 0.3       # implied_h2 缺失(无法去重)时的加分上限
-Q3_FORECAST_TTL_DAYS = 45   # Q3实际披露(约10月底)后即失效
-
-# 显式别名表白名单（Q3表名 → 池内名）—— **严禁任何形式的前缀/模糊匹配**
-#   历史教训：比亚迪电子(0285.HK) ≠ 比亚迪(sz002594)，前缀匹配会完全错配。
-Q3_NAME_ALIAS = {"芯联集成-U": "芯联集成"}
-
-
-def load_q3_forecast(ttl_days=Q3_FORECAST_TTL_DAYS):
-    """取最新 data/q3_forecast_*.json，返回 {池内名: rec}（别名已映射）。
-
-    rec 字段：sector_raw / a_yoy / a_kind / b_yoy / b_kind / a_rev / b_rev /
-              a_np / b_np / b_np_kf / a_qoq / b_qoq / flag
-    TTL 45 天（Q3 实际披露后失效）；无文件/过期返回 {}（不加分，不阻塞）。
-    """
-    try:
-        paths = sorted(glob.glob(os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), 'data', 'q3_forecast_*.json')),
-            reverse=True)
-        if not paths:
-            return {}
-        path = paths[0]
-        age = (time.time() - os.path.getmtime(path)) / 86400
-        if age > ttl_days:
-            print(f"   ⚠️ Q3预测数据过期({age:.0f}天>{ttl_days}天)：{os.path.basename(path)}，不加分")
-            return {}
-        payload = json.load(open(path, encoding='utf-8'))
-        data = payload.get('data') or {}
-        out = {}
-        for nm, rec in data.items():
-            out[Q3_NAME_ALIAS.get(nm, nm)] = rec      # 显式别名映射
-        return out
-    except Exception as e:
-        print(f"   ⚠️ Q3预测加载失败（不加分）：{e}")
-        return {}
-
-
-def merge_q3_yoy(rec):
-    """A/B 机构 Q3 净利润同比合并：双方有点值取均值，一方有取该方，都没有 None。
-
-    分歧度留档由调用方处理（a_yoy/b_yoy 均在 rec 中，报告层可查）。
-    实测 23 只双方都有：中位分歧 13.7pt，>50pt 的 5 只（普冉/兆易/南亚新材/豪威/立讯），
-    均为低基数情形，由 _effective_growth 饱和兜底。
-    """
-    a, b = rec.get('a_yoy'), rec.get('b_yoy')
-    cand = [x for x in (a, b) if isinstance(x, (int, float))]
-    if not cand:
-        return None
-    return round(sum(cand) / len(cand), 2)
 
 
 def fetch_research_reports_map(days=7, codes=None):
@@ -1602,7 +1541,7 @@ _CYCLICAL_SECTORS_FALLBACK = {
     "钢铁", "石油", "建材", "基础材料",
 }
 
-# ===== v3.5: growth 低基数失真治理（依据《半导体消费电子三季度预测汇总.xlsx》诊断）=====
+# ===== v3.5: growth 低基数失真治理（依据《已退役手工预测源（2026-11-26 删除）》诊断）=====
 # 问题：growth 取自「扣非净利润同比增长率」单点值，当基数极低(接近0或为负)时会出现
 #   利通电子 +3906%、凯美特气 +3720% 这类失真值。原逻辑 `growth>50` 是二值闸门——
 #   871% 与 55% 同拿满分，再叠加 PEG=PE/growth 因分母虚大而误判"严重低估"，构成双重奖励。
@@ -1710,7 +1649,7 @@ _EP_CAP_LOG = []   # P1-5 ep 封顶审计留痕（name(code) 列表，收尾汇�
 def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
                roe=None, gross_margin=None, sub_theme_label=None,
                hist_loss_free=False, fwd_np=None, sw_l2=None, cagr3=None,
-               q3_info=None, roe_unit=None):
+               roe_unit=None):
     """基本面+竞争力评分 0-5，用估值阶梯替代单年PEG
     v2.8: 增加PEG指标、ROE、毛利率评分
     v2.10: 增加公司持续性/低PE可持续性子评分(周期股/存储链重点论证)
@@ -1720,8 +1659,8 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
     v2.15: 模组/分销业务模式不可持续 → 基本面封顶3分(标签+名单双识别)
     v2.16: 名单改以【财报主营构成】为依据(德明利收入100%存储/毛利14.8%=模组厂,
            非"存储控制器"标签; 名单含主营构成证据注释)
-    v3.5.1: 新增 q3_info(Q3预测景气加分)——只加分不扣分；叠加在持续性封顶**之前**
-           （周期股封顶不被加分突破；被封顶标的的加分可能被部分/全部吸收，审计留档）
+    2026-11-26: 原 Q3 手工预测景气加分整体下线（源表过期并从项目删除），
+           本函数只按已披露财报/一致预期评分，不再接受任何预测表加分入参。
     """
     effective_pe = fwd_pe if fwd_pe else pe
     if code in KNOWN:
@@ -2034,64 +1973,8 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
             sustain_score = 3.0
             sustain_note = "盈利持续性中性"
 
-    # ===== v3.5.1: Q3 预测景气加速加分（只加分不扣分）=====
-    # 三层机制：①Q3同比先过 _effective_growth 饱和（防低基数极值触发最高档）
-    #          ②与机构全年预测隐含下半年增速 implied_h2 做去重闸门（防与 fwd_np 双重计数）
-    #          ③分档映射；叠加在下方持续性封顶**之前** → 周期股封顶不被加分突破
-    q3_bonus, q3_note = 0.0, ""
-    q3_audit = {"yoy_raw": None, "yoy_eff": None, "accel": None,
-                "implied_h2": None, "bonus": 0.0, "note": "", "src": None}
-    if q3_info:
-        q3_audit["src"] = q3_info.get("src") or "manual_q3_table"
-        _q3_yoy_raw = merge_q3_yoy(q3_info)
-        q3_audit["yoy_raw"] = _q3_yoy_raw
-        _q3_flag = q3_info.get("flag") or "none"
-        _q3_ih2 = q3_info.get("implied_h2")
-        if isinstance(_q3_ih2, (int, float)):
-            _q3_ih2 = float(_q3_ih2)
-        else:
-            _q3_ih2 = None
-        q3_audit["implied_h2"] = _q3_ih2
-        _q3_eff = None
-        if isinstance(_q3_yoy_raw, (int, float)):
-            _q3_eff = _effective_growth(float(_q3_yoy_raw), cagr3)[0]
-        q3_audit["yoy_eff"] = _q3_eff
-        # accel = Q3饱和同比 − H1饱和同比（growth 此时已是 _effective_growth 后的值）
-        _q3_accel = ((_q3_eff - growth)
-                     if (_q3_eff is not None and isinstance(growth, (int, float))) else None)
-        q3_audit["accel"] = _q3_accel
-        if _q3_flag == "turnaround":
-            # 扭亏文字不赋数值：最强度数但幅度保守（占上限40%）
-            q3_bonus = Q3_TURNAROUND_BONUS
-            q3_note = "Q3预测扭亏为盈(文字表述,未量化)"
-        elif _q3_eff is not None and _q3_eff > 0:
-            if _q3_ih2 is not None:
-                _margin = _q3_eff - _q3_ih2
-                if (_q3_accel is not None and _q3_accel > 0
-                        and _q3_eff >= Q3_STRONG_ABS and _margin > Q3_STRONG_MARGIN):
-                    q3_bonus = Q3_BONUS_CAP
-                    q3_note = (f"Q3预测强加速(+{_q3_eff:.0f}%,H1+{growth:.0f}%)"
-                               f"且超机构隐含下半年增速({_margin:+.0f}pt)")
-                elif (_q3_accel is not None and _q3_accel > 0
-                      and _q3_eff >= Q3_MILD_ABS and _margin > Q3_MILD_MARGIN):
-                    q3_bonus = 0.6
-                    q3_note = (f"Q3预测温和加速(+{_q3_eff:.0f}%,H1+{growth:.0f}%)"
-                               f"超机构隐含增速({_margin:+.0f}pt)")
-                elif _margin >= Q3_BEAT_FLOOR:
-                    q3_bonus = 0.3
-                    q3_note = f"Q3预测略超机构隐含下半年增速({_margin:+.0f}pt)"
-            elif _q3_accel is not None and _q3_accel > 0:
-                # 退化规则：implied_h2 缺失(缺fwd_pe或中报扣非≤0) → 无法去重，加分上限+0.3
-                q3_bonus = Q3_DEGRADED_CAP
-                q3_note = f"Q3预测加速(+{_q3_eff:.0f}%,H1+{growth:.0f}%);无法计算机构隐含增速,加分降档"
-        if _q3_flag == "suspect" and q3_bonus > 0:
-            q3_bonus = round(q3_bonus * 0.5, 2)     # 区间颠倒样本加分减半
-            q3_note += "(机构区间颠倒,加分减半)"
-        q3_audit["bonus"] = q3_bonus
-        q3_audit["note"] = q3_note
-        if q3_bonus > 0:
-            s = min(5, s + q3_bonus)
-            reasons.append(f"Q3预测景气确认(+{q3_bonus:.1f}):{q3_note}")
+    # 2026-11-26：原 Q3 手工预测景气加分已整体下线（源表过期并删除），
+    # 本处不再有任何预测加分；三季度事实数据只作为后续分析数据源，不改变本维评分。
 
     # v2.12 持续性修正: 非周期股用有限权重(±0.2)微调;
     # 周期/存储链采用"封顶"策略——只有"可持续"(durable)才允许满分:
@@ -2121,15 +2004,6 @@ def score_fund(pe, fwd_pe, growth, code, sector, pe_ladder_data=None,
         "growth_eff": growth,
         "growth_capped": bool(_g_capped),
         "growth_note": _g_note,
-        # v3.5.1: Q3 预测景气加分审计（yoy_raw=机构合并原值 / yoy_eff=饱和后 /
-        #   accel=Q3−H1饱和同比 / implied_h2=机构全年隐含下半年增速 / bonus=加分）
-        "q3_yoy_raw": q3_audit.get("yoy_raw"),
-        "q3_yoy_eff": q3_audit.get("yoy_eff"),
-        "q3_accel": q3_audit.get("accel"),
-        "q3_implied_h2": q3_audit.get("implied_h2"),
-        "q3_bonus": q3_audit.get("bonus", 0.0),
-        "q3_note": q3_audit.get("note", ""),
-        "q3_src": q3_audit.get("src"),
     }
 
     # ══════════════════════════════════════════════════════════════════════
@@ -5183,13 +5057,13 @@ def main():
     
     print(f"   ✅ 增速={len(growth_map)} FwdPE={len(computed_fwd_pe)} PE阶梯={len(pe_ladder)} PE-TTM={len(pe_map)} MktCap={len(mktcap_map)}")
 
-    # --- Step 4.7: v3.5.1 growth口径修复(东财按报告期) + Q3预测加载 + implied_h2 ---    #   原 growth_map 走同花顺「按年度」摘要，末行=最近年报(2025) → 全池结构性滞后半年以上
+    # --- Step 4.7: growth口径修复(东财按报告期) ---    #   原 growth_map 走同花顺「按年度」摘要，末行=最近年报(2025) → 全池结构性滞后半年以上
     #   （老大核查铁证：普冉股份年报口径 −38.7% vs 2026中报实际 +2994.08%；全池 490/490 缓存
     #    最后报告期均为 2025）。现改为东财按报告期「各股最新已披露报告期」累计同比
     #   （官方口径 (cur−prev)/|prev|，见 fetch_em_growth_cached 注释）；
     #    同花顺年报数据降级为兜底（growth_src 留档，不静默混用）。
     _T("Step4.5 THS摘要")
-    print(f"\n📊 Step 4.7: growth口径修复(东财按报告期) + Q3预测 ({len(stocks)}只)")
+    print(f"\n📊 Step 4.7: growth口径修复(东财按报告期) ({len(stocks)}只)")
     import concurrent.futures as _cf
     em_growth_map = {}
 
@@ -5210,30 +5084,7 @@ def main():
     print(f"   ✅ 东财报告期增速: {_em_ok}/{len(stocks)} 只  报告期分布: "
           f"{dict(sorted(((k or '无'), v) for k, v in _em_per.items()))}")
 
-    q3_forecast_map = load_q3_forecast()
-    q3_map = {}
-    if q3_forecast_map:
-        _q3_hit = 0
-        for s in stocks:
-            code = s["code"]
-            rec = q3_forecast_map.get(s["name"])
-            if not rec:
-                continue
-            _q3_hit += 1
-            # implied_h2 = 机构2026预测净利润(亿元) / (H1扣非实际×2) − 1（粗略年化基准，
-            #   作为"已被定价的乐观度"去重闸门；H1扣非≤0 时数学无意义 → None 走退化规则）
-            ih2 = None
-            _cur = (em_growth_map.get(code) or {}).get('cur')
-            _fwd = fwd_pe_map.get(code) or {}
-            _np26 = _fwd.get(2026, _fwd.get('2026'))
-            if (isinstance(_cur, (int, float)) and _cur > 0
-                    and isinstance(_np26, (int, float)) and _np26 > 0):
-                ih2 = round((_np26 * 1e8) / (_cur * 2) * 100 - 100, 1)
-            q3_map[code] = dict(rec, src='manual_q3_table', implied_h2=ih2)
-        _ih2_ok = sum(1 for v in q3_map.values() if v.get('implied_h2') is not None)
-        print(f"   ✅ Q3预测匹配: {_q3_hit}/{len(stocks)} 只；implied_h2可算 {_ih2_ok}/{_q3_hit}")
-    else:
-        print("   ⚠️ 无Q3预测数据（不加分，不影响其余维度）")
+    # 2026-11-26：Q3 手工预测表已下线，不再加载；Q3 实际财报由东财/Wind MCP 另行取数。
 
 
     # --- Step 4.8: 题材动量预计算（基于已抓取的日K线，不依赖外部板块接口） ---
@@ -5401,7 +5252,7 @@ def main():
             roe=roe_input, gross_margin=gm_input, sub_theme_label=sub_theme_label,
             hist_loss_free=hist_loss_free_map.get(code, False),
             fwd_np=fwd_pe_map.get(code), sw_l2=sw_l2, cagr3=cagr3_input,
-            q3_info=q3_map.get(code), roe_unit=roe_unit_input)
+            roe_unit=roe_unit_input)
         # 陈旧守卫留痕（fwd_stale_guard）：行级披露 + fund_reasons 注记，
         # 防止下游把 fwd_pe>pe 误读成「预期下修」。
         _fg = fwd_guard_meta.get(code)
@@ -5770,13 +5621,6 @@ def main():
             # round129 门槛留痕：审计「成长溢价有无存续锚」「利润是否收现」
             "growth_anchor_note": growth_anchor_note,
             "quality_cash_flags": quality_cash_flags,
-            # v3.5.1: Q3 预测景气加分审计（手工汇总表数据源，仅匹配个股有值）
-            "q3_yoy": sustain_info.get("q3_yoy_eff"),
-            "q3_yoy_raw": sustain_info.get("q3_yoy_raw"),
-            "q3_accel": sustain_info.get("q3_accel"),
-            "q3_implied_h2": sustain_info.get("q3_implied_h2"),
-            "q3_bonus": sustain_info.get("q3_bonus", 0.0),
-            "q3_note": sustain_info.get("q3_note"),
             # v3.0 B2: 同花顺摘要扩容字段(全池可得, 供报告层/护栏/后续因子用)
             "roe": _ths_ex.get("roe"),
             # ⚠️ 2026-10-27 P0：roe 的量纲必须一起落库，否则报告层不知道

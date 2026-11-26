@@ -40,6 +40,8 @@ __pycache__/
 # v5.1 fwd 年报一致预期核验链（输入快照 + 审计留档，保证口径可复现）
 !data/fwd_annual_consensus_2026-11-23_wind.json
 !data/fwd_annual_audit_2026-11-23.json
+# 2026Q3 半导体/消费电子实际披露数据（替代已退役的手工预测表；三季度分析唯一可用新源）
+!data/q3_2026_actual_em_20261126.json
 # 多重检验台账（K 的唯一硬输入，决定 Bonferroni 阈值；缺失则阈值不可审计）
 !data/trial_log.json
 update_rating.py

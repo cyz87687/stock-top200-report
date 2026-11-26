@@ -382,50 +382,10 @@ def main():
         if ai_applied:
             changed += 1
 
-    # ---- 业绩预期差三档（超预期/符合预期/低于预期，2026-10-31 老大指令）----
-    #   earnings_surprise 唯一实现：预测增速 vs 实际单季同比（口径对齐扣非/归母）。
-    #   **v5.0（2026-11-23）**：es 权重由 0 → 0.05，正式进总分。
-    #   分值映射走 earnings_surprise.tier_to_score（唯一实现，禁两处各写一套）。
-    #   无数据 → score_es=None（缺维，非 0 分）—— 否则惩罚 96.6% 无覆盖的股票。
-    #   失败必须大声告警，禁静默降级。
-    try:
-        import earnings_surprise as _es_mod
-        _es_map = _es_mod.compute_es_map({x.get("name"): x.get("code") for x in results})
-        _es_n = 0
-        _es_struct = 0
-        for r in results:
-            _e = _es_map.get(r.get("name"))
-            if _e:
-                r["es"] = {k: _e[k] for k in (
-                    "tier", "delta_pp", "band", "fwd_mid", "act_yoy", "act_np_q",
-                    "strength", "method", "caliber", "period", "source", "flags",
-                    "dev_ratio", "note")}
-                _es_n += 1
-                # v5.0：写 0-10 评分（无数据/无法判定 → None 缺维）
-                r["score_es"] = _es_mod.tier_to_score(_e.get("tier"))
-                # ⚠️ v5.1（2026-11-25 老大裁决「负基数归 structural」）：
-                #   缺维归类由 earnings_surprise 唯一给出（判据只能由产生该维的模块给），
-                #   这里只做透传：写进 scored 的 missing_reason["score_es"]。
-                #   "structural" = 负基数（增速无定义，≠业绩差）→ 未来 ES 重新启用时
-                #                   分子分母同剔；"data" = 真缺数据 → 按 zero。
-                #   ⚠️ 当前 ES 权重为 0（pending 研究项，不进总分），本标记是为
-                #      ES 重新启用预埋，避免届时 515 只负基数股被按 0 分系统性压低。
-                _mr = _e.get("missing_reason")
-                if _mr in ("structural", "data"):
-                    _mrr = dict(r.get("missing_reason") or {})
-                    _mrr["score_es"] = _mr
-                    r["missing_reason"] = _mrr
-                    if _mr == "structural":
-                        _es_struct += 1
-        print(f"🎯 业绩预期差三档: {_es_n}/{len(results)} 只标注"
-              f"（超预期 {sum(1 for r in results if (r.get('es') or {}).get('tier') == '超预期')} / "
-              f"符合 {sum(1 for r in results if (r.get('es') or {}).get('tier') == '符合预期')} / "
-              f"低于 {sum(1 for r in results if (r.get('es') or {}).get('tier') == '低于预期')}）；"
-              f"缺维归类 structural(负基数增速无定义)={_es_struct} 只 → "
-              f"missing_reason['score_es']（ES 权重 0，暂不进总分）")
-    except Exception as _ese:
-        # 🚨 禁静默降级：es 缺失时页面该徽标消失即可，但必须留可见痕迹
-        print(f"🚨 业绩预期差模块失败（本批不写 es 字段）: {_ese!r}")
+    # ---- 2026-11-26：ES 维度整体退役 ----
+    # 原预测源《已退役手工预测源（2026-11-26 删除）》已随三季报披露失效并从项目删除；
+    # 不再装配 es / score_es / missing_reason.score_es 字段。三季度事实分析改用
+    # Wind / 东方财富 MCP 的 2026Q3 实际披露数据（见 docs/三季度数据源替换说明_2026-11-26.md）。
 
     # 重排 + 重算 stats
     results.sort(key=lambda x: (-x["total"], -(x.get("turnover") or 0)))
