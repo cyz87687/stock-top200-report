@@ -1489,6 +1489,89 @@ def _stale_placeholder(subject, check, anchor_id="", hidden_items=()):
             '数据纪律：产物日期与数据日期不一致时，相关数值一律不产出、不展示；' +
             '这是数据管道告警，不是「今日无数据」。</div></div>')
 
+def _revision_disclosure_html(data_date):
+    """FY1 预期修正（Revision）研究层披露 — 2026-11-26 老大裁决选此口径。
+
+    ⚠️ 只进独立分析页（过程分析），不进主页核心评分区。
+    ⚠️ 数字全部现算自 revision_factor 结果产物，禁止写死；产物缺失则整块不渲染。
+    ⚠️ 状态恒为 RESEARCH_ONLY：未过六门槛，score_es 权重 0，不进总分/组合。
+    """
+    _p = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                      "data", "fy1_revision_result_20261126.json")
+    if not os.path.exists(_p):
+        return ""
+    try:
+        with open(_p, encoding="utf-8") as _f:
+            _rv = json.load(_f)
+    except Exception:
+        return ""
+    if _rv.get("status") != "RESEARCH_ONLY":
+        return ""
+    _cov = _rv.get("coverage") or {}
+    _n = _cov.get("n_scored", 0)
+    _tot = _cov.get("n_universe", 0)
+    _pct = _cov.get("coverage_pct", 0)
+    _miss = _cov.get("missing_reason_counts") or {}
+    _g3 = _cov.get("threshold_2_coverage_ge_30pct")
+    _g194 = _cov.get("threshold_2_n_ge_194")
+    _w = _rv.get("winsor") or {}
+    _up = (_rv.get("top_up") or [])[:5]
+    _dn = (_rv.get("top_down") or [])[:5]
+
+    def _rows(items, sign):
+        out = []
+        for r in items:
+            out.append(
+                f'<tr><td style="padding:3px 6px;color:#e2e8f0;">'
+                f'{html_mod.escape(str(r.get("name") or ""))}</td>'
+                f'<td style="padding:3px 6px;color:{"#ef4444" if sign>0 else "#22c55e"};'
+                f'text-align:right;">{r.get("revision_pct")}%</td>'
+                f'<td style="padding:3px 6px;color:#94a3b8;text-align:right;">'
+                f'{r.get("score")}</td></tr>')
+        return "".join(out)
+
+    return (
+        '<div class="chart-card" id="sec-revision" '
+        'style="padding:16px;margin:14px 0;border-left:3px solid #38bdf8;">'
+        '<h3 style="font-size:13px;margin-bottom:8px;">'
+        '🧭 FY1 预期修正（Revision）— 研究层，未进总分</h3>'
+        '<div style="font-size:11px;color:#cbd5e1;line-height:1.85;">'
+        '2026-11-26 老大裁决：ES 手工源退役后，改用<b>一致预期净利润在披露前后两时点的变化率</b>'
+        '作为预期修正代理。数据源 Wind MCP「机构预测 2026 全年归母净利润一致预期平均值」，'
+        'T0=2026-09-30（三季报披露前）、T1=2026-11-25（披露后），经探查为<b>真 PIT</b>（非回填）。'
+        '<br><b style="color:#f59e0b;">口径边界</b>：这是全年 FY1 预期修正，'
+        '<b>不是传统单季 SUE/ES</b>（三源 MCP 均无单季预测，无法算「披露前单季预测 vs 单季实际」），'
+        '禁称 ES 或「单季超预期」。<br>'
+        f'覆盖：{_n}/{_tot} 只有效（{_pct}%）；缺任一预测时点 {_miss.get("data", 0)} 只归 data、'
+        f'负基数 {_miss.get("structural", 0)} 只归 structural（分子分母同剔，禁按 zero 罚 0）；'
+        f'1/99 缩尾边界 [{_w.get("lo")}%, {_w.get("hi")}%]，线性映射 [1,10]。'
+        '<br><b style="color:#f59e0b;">门槛裁决</b>：'
+        f'覆盖≥30% {"✅" if _g3 else "❌"}、n≥194 {"✅" if _g194 else "❌（n=" + str(_n) + "）"}；'
+        '历史 FY1 PIT 截面从未落库（fwd_hist 仅 fwd_pe），h=20 IC 与 G5 walkforward <b>无法验证</b>。'
+        '<b style="color:#ef4444;">六门槛未过 → score_es 权重恒 0，本因子不进总分/组合、'
+        '禁称经验证 alpha</b>；唯一实现 revision_factor.py。'
+        '</div>'
+        '<div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;">'
+        '<div style="flex:1;min-width:200px;"><div style="font-size:11px;color:#38bdf8;margin-bottom:4px;">'
+        '上修前 5（仅事实罗列，非推荐）</div>'
+        '<table style="width:100%;border-collapse:collapse;font-size:10px;">'
+        '<tr style="color:#64748b;"><th style="text-align:left;padding:3px 6px;">名称</th>'
+        '<th style="text-align:right;padding:3px 6px;">修正</th>'
+        '<th style="text-align:right;padding:3px 6px;">档</th></tr>'
+        f'{_rows(_up, 1)}</table></div>'
+        '<div style="flex:1;min-width:200px;"><div style="font-size:11px;color:#22c55e;margin-bottom:4px;">'
+        '下修前 5（含预期转亏）</div>'
+        '<table style="width:100%;border-collapse:collapse;font-size:10px;">'
+        '<tr style="color:#64748b;"><th style="text-align:left;padding:3px 6px;">名称</th>'
+        '<th style="text-align:right;padding:3px 6px;">修正</th>'
+        '<th style="text-align:right;padding:3px 6px;">档</th></tr>'
+        f'{_rows(_dn, -1)}</table></div></div>'
+        '<div style="font-size:10px;color:#64748b;margin-top:8px;">'
+        '极端值多为小基数（FY1&lt;1 亿）或正负翻转，已由 1/99 缩尾约束，'
+        '不可按原始百分比直接解读为「超预期幅度」。完整口径见 docs/Revision因子六门槛对照_2026-11-26.md。</div>'
+        '</div>')
+
+
 # ===================================================================
 # v4.0 页面信息架构收敛（2026-10-25 老大指令）
 # -------------------------------------------------------------------
@@ -13740,7 +13823,8 @@ if SHOW_CORE_ONLY:
             '<h3 style="font-size:13px;margin-bottom:8px;">'
             '🔬 模型结构结论与方法论证据（主页权重条摘要全文）</h3>'
             f'{_ms_digest_full}</div>'
-            + "\n".join(_DETAIL_PARTS) +
+            + _revision_disclosure_html(_data_date) +
+            "\n".join(_DETAIL_PARTS) +
             '<div class="footer" style="margin-top:20px;font-size:11px;color:#64748b;">'
             f'生成 {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} · 数据日期 {_data_date} · '
             '由 gen_report_top200.py 自动生成（SHOW_CORE_ONLY=True） · '

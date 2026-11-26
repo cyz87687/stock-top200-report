@@ -1,0 +1,292 @@
+{
+ "dataset": "FY1 Revision 因子结果（研究层，未进总分）",
+ "computed_at": "2026-11-26 16:05 +08:00",
+ "source_input": "data/fy1_consensus_wind_2pt_20261126.json",
+ "unique_impl": "revision_factor.py::compute_revision_map",
+ "caliber": "revision_pct=(FY1_1125-FY1_0930)/|FY1_0930|*100; 1/99缩尾线性映射[1,10]",
+ "coverage": {
+  "n_universe": 275,
+  "n_scored": 163,
+  "coverage_pct": 59.27,
+  "missing_reason_counts": {
+   "data": 98,
+   "structural": 14
+  },
+  "dirty_flag_counts": {
+   "fy1_lt_q3_actual": 3,
+   "sign_flip_to_loss": 4
+  },
+  "threshold_2_coverage_ge_30pct": true,
+  "threshold_2_n_ge_194": false
+ },
+ "winsor": {
+  "lo": -170.22,
+  "hi": 74.92
+ },
+ "top_up": [
+  {
+   "code": "300223",
+   "name": "君正股份",
+   "revision_pct": 165.49,
+   "score": 10.0
+  },
+  {
+   "code": "688110",
+   "name": "东芯股份",
+   "revision_pct": 82.98,
+   "score": 10.0
+  },
+  {
+   "code": "688802",
+   "name": "沐曦股份",
+   "revision_pct": 69.98,
+   "score": 9.82
+  },
+  {
+   "code": "301536",
+   "name": "星宸科技",
+   "revision_pct": 65.32,
+   "score": 9.65
+  },
+  {
+   "code": "688536",
+   "name": "思瑞浦",
+   "revision_pct": 45.97,
+   "score": 8.94
+  },
+  {
+   "code": "688146",
+   "name": "中船特气",
+   "revision_pct": 42.69,
+   "score": 8.82
+  },
+  {
+   "code": "688045",
+   "name": "必易微",
+   "revision_pct": 36.87,
+   "score": 8.6
+  },
+  {
+   "code": "300706",
+   "name": "阿石创",
+   "revision_pct": 34.62,
+   "score": 8.52
+  },
+  {
+   "code": "688498",
+   "name": "源杰科技",
+   "revision_pct": 33.64,
+   "score": 8.48
+  },
+  {
+   "code": "688347",
+   "name": "华虹宏力",
+   "revision_pct": 32.68,
+   "score": 8.45
+  },
+  {
+   "code": "688661",
+   "name": "和林微纳",
+   "revision_pct": 31.62,
+   "score": 8.41
+  },
+  {
+   "code": "002156",
+   "name": "通富微电",
+   "revision_pct": 27.17,
+   "score": 8.25
+  },
+  {
+   "code": "688525",
+   "name": "佰维存储",
+   "revision_pct": 26.42,
+   "score": 8.22
+  },
+  {
+   "code": "300623",
+   "name": "捷捷微电",
+   "revision_pct": 25.58,
+   "score": 8.19
+  },
+  {
+   "code": "603986",
+   "name": "兆易创新",
+   "revision_pct": 24.85,
+   "score": 8.16
+  },
+  {
+   "code": "688449",
+   "name": "联芸科技",
+   "revision_pct": 24.51,
+   "score": 8.15
+  },
+  {
+   "code": "688072",
+   "name": "拓荆科技",
+   "revision_pct": 24.08,
+   "score": 8.13
+  },
+  {
+   "code": "688981",
+   "name": "中芯国际",
+   "revision_pct": 23.8,
+   "score": 8.12
+  },
+  {
+   "code": "688729",
+   "name": "屹唐股份",
+   "revision_pct": 21.84,
+   "score": 8.05
+  },
+  {
+   "code": "688368",
+   "name": "晶丰明源",
+   "revision_pct": 20.18,
+   "score": 7.99
+  }
+ ],
+ "top_down": [
+  {
+   "code": "688007",
+   "name": "光峰科技",
+   "revision_pct": -435.71,
+   "score": 1.0,
+   "dirty": "sign_flip_to_loss"
+  },
+  {
+   "code": "688153",
+   "name": "唯捷创芯",
+   "revision_pct": -220.24,
+   "score": 1.0,
+   "dirty": "sign_flip_to_loss"
+  },
+  {
+   "code": "688521",
+   "name": "芯原股份",
+   "revision_pct": -139.57,
+   "score": 2.13,
+   "dirty": "sign_flip_to_loss"
+  },
+  {
+   "code": "688381",
+   "name": "帝奥微",
+   "revision_pct": -120.3,
+   "score": 2.83,
+   "dirty": "sign_flip_to_loss"
+  },
+  {
+   "code": "301285",
+   "name": "鸿日达",
+   "revision_pct": -79.17,
+   "score": 4.34,
+   "dirty": null
+  },
+  {
+   "code": "688403",
+   "name": "汇成股份",
+   "revision_pct": -68.03,
+   "score": 4.75,
+   "dirty": null
+  },
+  {
+   "code": "300115",
+   "name": "长盈精密",
+   "revision_pct": -60.57,
+   "score": 5.03,
+   "dirty": null
+  },
+  {
+   "code": "688775",
+   "name": "影石创新",
+   "revision_pct": -55.28,
+   "score": 5.22,
+   "dirty": null
+  },
+  {
+   "code": "603005",
+   "name": "晶方科技",
+   "revision_pct": -47.78,
+   "score": 5.5,
+   "dirty": null
+  },
+  {
+   "code": "688361",
+   "name": "中科飞测",
+   "revision_pct": -37.46,
+   "score": 5.87,
+   "dirty": null
+  },
+  {
+   "code": "688352",
+   "name": "颀中科技",
+   "revision_pct": -35.92,
+   "score": 5.93,
+   "dirty": null
+  },
+  {
+   "code": "603160",
+   "name": "汇顶科技",
+   "revision_pct": -35.74,
+   "score": 5.94,
+   "dirty": null
+  },
+  {
+   "code": "603290",
+   "name": "斯达半导",
+   "revision_pct": -32.12,
+   "score": 6.07,
+   "dirty": null
+  },
+  {
+   "code": "688037",
+   "name": "芯源微",
+   "revision_pct": -31.58,
+   "score": 6.09,
+   "dirty": null
+  },
+  {
+   "code": "002139",
+   "name": "拓邦股份",
+   "revision_pct": -31.38,
+   "score": 6.1,
+   "dirty": null
+  },
+  {
+   "code": "002402",
+   "name": "和而泰",
+   "revision_pct": -26.37,
+   "score": 6.28,
+   "dirty": null
+  },
+  {
+   "code": "002993",
+   "name": "奥海科技",
+   "revision_pct": -25.91,
+   "score": 6.3,
+   "dirty": null
+  },
+  {
+   "code": "688608",
+   "name": "恒玄科技",
+   "revision_pct": -24.93,
+   "score": 6.33,
+   "dirty": null
+  },
+  {
+   "code": "688486",
+   "name": "龙迅股份",
+   "revision_pct": -24.73,
+   "score": 6.34,
+   "dirty": null
+  },
+  {
+   "code": "688702",
+   "name": "盛科通信",
+   "revision_pct": -23.56,
+   "score": 6.38,
+   "dirty": null
+  }
+ ],
+ "status": "RESEARCH_ONLY",
+ "disclaimer": "未过六门槛（门槛② n=163<194；门槛③④因历史FY1 PIT截面未落库无法验证）；score_es权重恒0，不进总分/组合；禁称经验证alpha。"
+}
