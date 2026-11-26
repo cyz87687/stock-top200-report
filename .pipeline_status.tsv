@@ -34,3 +34,9 @@ factor_eval	1	0		2026-11-26 16:34:52	连续两次执行被工具层SIGTERM(120s/
 selfcheck_pipeline	0	1		2026-11-26 16:34:53	
 fetch_focus_list	0	1		2026-11-26 16:34:55	
 gen_report_top200	0	1		2026-11-26 16:35:42	
+selfcheck_pipeline	0	1		2026-11-26 16:38:35	
+fetch_focus_list	0	1		2026-11-26 16:38:43	
+fetch_bench	0	1		2026-11-26 16:38:55	
+regime_model	0	1		2026-11-26 16:39:09	
+factor_eval	1	0		2026-11-26 16:44:40	watchdog: 超时降级(>25min 无进度)，后台仍在跑，结果不计入本日报告
+gen_report_top200	0	1		2026-11-26 16:47:14	并发会话后重新finalize生成
