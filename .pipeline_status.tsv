@@ -1,42 +1,29 @@
-fetch_top200_sina	0	1		2026-11-26 15:45:13	分批前台
-check_data_fresh	0	1		2026-11-26 15:45:43	
-step2_stockscorer	0	1		2026-11-26 15:57:37	
-append_klines_latest	0	1		2026-11-26 16:11:02	3 shards all rc=0
-refresh_kline_meta	0	1		2026-11-26 16:11:20	
-archive_fund_universe	0	1		2026-11-26 16:11:48	3 shards + merge
-archive_fwd_snapshot	0	1		2026-11-26 16:12:03	
-generate_ai_assessment	0	1		2026-11-26 16:12:12	
-enhance_scores	0	1		2026-11-26 16:12:37	
-apply_sector_momentum	0	1		2026-11-26 16:16:00	
-gen_portfolio_report	0	1		2026-11-26 16:16:13	P0-5 单独记录
-portfolio_risk	0	1		2026-11-26 16:16:21	
-append_klines_latest	0	1		2026-11-26 16:17:06	库已含当日2137/2138，增量0新增，数据已全
-refresh_kline_meta	0	1		2026-11-26 16:17:06	
-verify_qfq_anchor	0	1		2026-11-26 16:17:20	
-archive_fwd_snapshot	0	1		2026-11-26 16:17:20	
-archive_fund_universe	0	1		2026-11-26 16:17:29	
-track_recommendations	0	1		2026-11-26 16:17:33	
-generate_ai_assessment	0	1		2026-11-26 16:17:35	rc=0; 检查fallback标记
-panel_audit	0	1		2026-11-26 16:17:42	
-enhance_scores	0	1		2026-11-26 16:17:44	
-pick_portfolio	0	1		2026-11-26 16:20:03	手工分批
-gen_portfolio_report	0	1		2026-11-26 16:20:04	
-portfolio_risk	0	1		2026-11-26 16:20:04	
-fetch_bench	0	1		2026-11-26 16:20:29	
-regime_model	0	1		2026-11-26 16:20:30	
-pick_portfolio	0	1		2026-11-26 16:20:35	regime当日后重跑
-gen_portfolio_report	0	1		2026-11-26 16:20:36	
-portfolio_risk	0	1		2026-11-26 16:20:37	
-track_recommendations	0	1		2026-11-26 16:22:16	
-portfolio_metrics	0	1		2026-11-26 16:22:17	
-panel_audit	0	1		2026-11-26 16:22:17	
-factor_eval	1	0		2026-11-26 16:34:52	连续两次执行被工具层SIGTERM(120s/600s)；factor_ic停在11-18，报告侧按>3天降级占位
-selfcheck_pipeline	0	1		2026-11-26 16:34:53	
-fetch_focus_list	0	1		2026-11-26 16:34:55	
-gen_report_top200	0	1		2026-11-26 16:35:42	
-selfcheck_pipeline	0	1		2026-11-26 16:38:35	
-fetch_focus_list	0	1		2026-11-26 16:38:43	
-fetch_bench	0	1		2026-11-26 16:38:55	
-regime_model	0	1		2026-11-26 16:39:09	
-factor_eval	1	0		2026-11-26 16:44:40	watchdog: 超时降级(>25min 无进度)，后台仍在跑，结果不计入本日报告
-gen_report_top200	0	1		2026-11-26 16:47:14	并发会话后重新finalize生成
+fetch_top200_sina	0	1		2026-11-27 15:35:51	
+check_data_fresh	0	1		2026-11-27 15:36:00	
+step2_stockscorer	0	1		2026-11-27 15:50:41	
+append_klines_latest	0	1		2026-11-27 15:59:40	
+refresh_kline_meta	0	1		2026-11-27 15:59:46	
+archive_fund_universe	0	1		2026-11-27 16:00:32	
+archive_fwd_snapshot	0	1		2026-11-27 16:00:37	
+generate_ai_assessment	0	1		2026-11-27 16:00:46	fallback=True LLM订阅过期
+enhance_scores	0	1		2026-11-27 16:01:05	
+sector_momentum_daily	0	1		2026-11-27 16:05:21	
+apply_sector_momentum	0	1		2026-11-27 16:05:25	
+pick_portfolio	0	1		2026-11-27 16:06:02	STALE_DATE_HIDDEN 待regime后重跑
+gen_portfolio_report	0	1		2026-11-27 16:06:14	组合区块空占位，待regime后重跑
+portfolio_risk	0	1		2026-11-27 16:06:25	
+track_recommendations	0	1		2026-11-27 16:08:33	
+panel_audit	0	1		2026-11-27 16:08:39	
+fetch_focus_list	0	1		2026-11-27 16:22:44	
+fetch_bench	0	1		2026-11-27 16:22:56	
+regime_model	0	1		2026-11-27 16:23:01	
+gen_portfolio_report	0	1		2026-11-27 16:23:26	regime后重跑，组合区块已产出
+portfolio_risk	0	1		2026-11-27 16:23:26	
+factor_eval	0	1		2026-11-27 16:37:39	截面IC only（28m51s）
+selfcheck_pipeline	0	1		2026-11-27 16:37:48	
+gen_report_top200	0	1		2026-11-27 16:38:33	
+long_panel_ic	0	1		2026-11-27 16:38:54	
+long_panel_ic	1	0		2026-11-27 16:40:01	矩阵缺 score_size_comb 列，pack_panel_npz 无该维，重建失败（同11-25口径）
+verify_qfq_anchor	0	1		2026-11-27 16:40:22	
+portfolio_metrics	0	1		2026-11-27 16:40:30	
+orphan_scan	0	1		2026-11-27 16:40:35	
