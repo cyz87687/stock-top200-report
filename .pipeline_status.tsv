@@ -1,29 +1,8 @@
-fetch_top200_sina	0	1		2026-11-27 15:35:51	
-check_data_fresh	0	1		2026-11-27 15:36:00	
-step2_stockscorer	0	1		2026-11-27 15:50:41	
-append_klines_latest	0	1		2026-11-27 15:59:40	
-refresh_kline_meta	0	1		2026-11-27 15:59:46	
-archive_fund_universe	0	1		2026-11-27 16:00:32	
-archive_fwd_snapshot	0	1		2026-11-27 16:00:37	
-generate_ai_assessment	0	1		2026-11-27 16:00:46	fallback=True LLM订阅过期
-enhance_scores	0	1		2026-11-27 16:01:05	
-sector_momentum_daily	0	1		2026-11-27 16:05:21	
-apply_sector_momentum	0	1		2026-11-27 16:05:25	
-pick_portfolio	0	1		2026-11-27 16:06:02	STALE_DATE_HIDDEN 待regime后重跑
-gen_portfolio_report	0	1		2026-11-27 16:06:14	组合区块空占位，待regime后重跑
-portfolio_risk	0	1		2026-11-27 16:06:25	
-track_recommendations	0	1		2026-11-27 16:08:33	
-panel_audit	0	1		2026-11-27 16:08:39	
-fetch_focus_list	0	1		2026-11-27 16:22:44	
-fetch_bench	0	1		2026-11-27 16:22:56	
-regime_model	0	1		2026-11-27 16:23:01	
-gen_portfolio_report	0	1		2026-11-27 16:23:26	regime后重跑，组合区块已产出
-portfolio_risk	0	1		2026-11-27 16:23:26	
-factor_eval	0	1		2026-11-27 16:37:39	截面IC only（28m51s）
-selfcheck_pipeline	0	1		2026-11-27 16:37:48	
-gen_report_top200	0	1		2026-11-27 16:38:33	
-long_panel_ic	0	1		2026-11-27 16:38:54	
-long_panel_ic	1	0		2026-11-27 16:40:01	矩阵缺 score_size_comb 列，pack_panel_npz 无该维，重建失败（同11-25口径）
-verify_qfq_anchor	0	1		2026-11-27 16:40:22	
-portfolio_metrics	0	1		2026-11-27 16:40:30	
-orphan_scan	0	1		2026-11-27 16:40:35	
+step2_stockscorer	0	1		2026-11-27 22:41:50	v5.2重算:gq_neg_final_cap+ep软降权
+enhance_scores	0	1		2026-11-27 22:42:10	v5.2:装gq_neg_final_cap双装
+apply_sector_momentum	0	1		2026-11-27 22:42:14	
+pick_portfolio	0	1		2026-11-27 22:42:18	
+enhance_scores	0	1		2026-11-27 22:42:37	v5.2双装gq_cap
+apply_sector_momentum	0	1		2026-11-27 22:42:37	
+pick_portfolio	0	1		2026-11-27 22:42:37	per_sector=2
+gen_report	0	1		2026-11-27 22:42:55	

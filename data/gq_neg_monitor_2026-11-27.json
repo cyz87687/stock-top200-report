@@ -1,0 +1,7886 @@
+{
+  "version": "v5.2-gq-neg-monitor",
+  "asof": "2026-11-27",
+  "definition": "g_q<0（单季扣非同比为负）全池个股；v5.2 起 score_growth 已被 gq_neg_final_cap 封顶≤4.0",
+  "purpose": "研究层监控清单：跟踪这批票未来20日相对收益，验证「单季下滑→负面α」是否成立。禁称经验证alpha（G5未过、长面板重建失败）。",
+  "count": 710,
+  "cap_triggered_count": 710,
+  "note": "影子分对照：g_q<0 票在 v5.1（无最终分硬上限）下成长分可达6~9.4；v5.2 封顶4.0。两版 total 跨版本禁比。",
+  "items": [
+    {
+      "code": "sz301345",
+      "name": "涛涛车业",
+      "g_q": -0.0087,
+      "score_growth": 4.0,
+      "total": 77.4,
+      "sector_l2": "摩托车及其他",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603067",
+      "name": "振华股份",
+      "g_q": -0.3158,
+      "score_growth": 4.0,
+      "total": 71.47,
+      "sector_l2": "化学原料",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600378",
+      "name": "昊华科技",
+      "g_q": -0.2087,
+      "score_growth": 4.0,
+      "total": 70.74,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603444",
+      "name": "吉比特",
+      "g_q": -0.1498,
+      "score_growth": 4.0,
+      "total": 68.09,
+      "sector_l2": "游戏Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300415",
+      "name": "伊之密",
+      "g_q": -0.354,
+      "score_growth": 3.81,
+      "total": 66.88,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002545",
+      "name": "东方铁塔",
+      "g_q": -0.3473,
+      "score_growth": 4.0,
+      "total": 66.75,
+      "sector_l2": "农化制品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002126",
+      "name": "银轮股份",
+      "g_q": -0.0394,
+      "score_growth": 4.0,
+      "total": 65.53,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh605118",
+      "name": "力鼎光电",
+      "g_q": -0.0846,
+      "score_growth": 4.0,
+      "total": 65.42,
+      "sector_l2": "计算机设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002202",
+      "name": "金风科技",
+      "g_q": -0.0846,
+      "score_growth": 3.54,
+      "total": 65.4,
+      "sector_l2": "风电设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz000887",
+      "name": "中鼎股份",
+      "g_q": -0.0455,
+      "score_growth": 4.0,
+      "total": 65.33,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz301305",
+      "name": "朗坤科技",
+      "g_q": -0.0718,
+      "score_growth": 4.0,
+      "total": 64.93,
+      "sector_l2": "环境治理",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002004",
+      "name": "华邦健康",
+      "g_q": -0.122,
+      "score_growth": 2.77,
+      "total": 64.91,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002803",
+      "name": "吉宏股份",
+      "g_q": -0.5908,
+      "score_growth": 4.0,
+      "total": 64.36,
+      "sector_l2": "互联网电商",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz301110",
+      "name": "青木科技",
+      "g_q": -0.7142,
+      "score_growth": 4.0,
+      "total": 63.98,
+      "sector_l2": "互联网电商",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600114",
+      "name": "东睦股份",
+      "g_q": -0.5213,
+      "score_growth": 2.78,
+      "total": 63.91,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh601799",
+      "name": "星宇股份",
+      "g_q": -0.4586,
+      "score_growth": 3.25,
+      "total": 63.8,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002487",
+      "name": "大金重工",
+      "g_q": -0.6919,
+      "score_growth": 1.88,
+      "total": 63.38,
+      "sector_l2": "风电设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603115",
+      "name": "海星股份",
+      "g_q": -0.1185,
+      "score_growth": 4.0,
+      "total": 63.24,
+      "sector_l2": "电子化学品Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh601069",
+      "name": "西部黄金",
+      "g_q": -0.18,
+      "score_growth": 4.0,
+      "total": 63.04,
+      "sector_l2": "贵金属",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603799",
+      "name": "华友钴业",
+      "g_q": -0.4813,
+      "score_growth": 4.0,
+      "total": 62.67,
+      "sector_l2": "能源金属",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz301059",
+      "name": "金三江",
+      "g_q": -0.2242,
+      "score_growth": 4.0,
+      "total": 62.47,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002020",
+      "name": "京新药业",
+      "g_q": -0.0921,
+      "score_growth": 3.45,
+      "total": 62.36,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300850",
+      "name": "新强联",
+      "g_q": -0.3466,
+      "score_growth": 1.38,
+      "total": 62.22,
+      "sector_l2": "风电设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh688668",
+      "name": "鼎通科技",
+      "g_q": -0.4379,
+      "score_growth": 4.0,
+      "total": 62.16,
+      "sector_l2": "通信设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002264",
+      "name": "新 华 都",
+      "g_q": -0.3864,
+      "score_growth": 4.0,
+      "total": 62.09,
+      "sector_l2": "广告营销",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002335",
+      "name": "科华数据",
+      "g_q": -0.0029,
+      "score_growth": 3.28,
+      "total": 61.89,
+      "sector_l2": "其他电源设备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300816",
+      "name": "艾可蓝",
+      "g_q": -0.4358,
+      "score_growth": 4.0,
+      "total": 61.89,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000719",
+      "name": "中原传媒",
+      "g_q": -0.021,
+      "score_growth": 3.71,
+      "total": 61.78,
+      "sector_l2": "出版",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz000426",
+      "name": "兴业银锡",
+      "g_q": -0.5287,
+      "score_growth": 4.0,
+      "total": 61.77,
+      "sector_l2": "工业金属",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002837",
+      "name": "英维克",
+      "g_q": -0.002,
+      "score_growth": 4.0,
+      "total": 61.61,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603045",
+      "name": "福达合金",
+      "g_q": -0.9931,
+      "score_growth": 4.0,
+      "total": 61.56,
+      "sector_l2": "金属新材料",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600621",
+      "name": "华鑫股份",
+      "g_q": -0.587,
+      "score_growth": 4.0,
+      "total": 61.41,
+      "sector_l2": "证券Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz001696",
+      "name": "宗申动力",
+      "g_q": -0.2277,
+      "score_growth": 1.58,
+      "total": 61.39,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh601689",
+      "name": "拓普集团",
+      "g_q": -0.0791,
+      "score_growth": 4.0,
+      "total": 61.37,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz301575",
+      "name": "艾芬达",
+      "g_q": -0.2396,
+      "score_growth": 4.0,
+      "total": 61.28,
+      "sector_l2": "家居用品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002050",
+      "name": "三花智控",
+      "g_q": -0.0509,
+      "score_growth": 4.0,
+      "total": 61.14,
+      "sector_l2": "家电零部件Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300145",
+      "name": "南方泵业",
+      "g_q": -0.1031,
+      "score_growth": 3.22,
+      "total": 61.11,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz301160",
+      "name": "翔楼新材",
+      "g_q": -0.2454,
+      "score_growth": 2.4,
+      "total": 61.07,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600711",
+      "name": "盛屯矿业",
+      "g_q": -0.1022,
+      "score_growth": 4.0,
+      "total": 60.98,
+      "sector_l2": "工业金属",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz000690",
+      "name": "宝新能源",
+      "g_q": -0.2726,
+      "score_growth": 4.0,
+      "total": 60.87,
+      "sector_l2": "电力",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz001337",
+      "name": "四川黄金",
+      "g_q": -0.249,
+      "score_growth": 4.0,
+      "total": 60.72,
+      "sector_l2": "贵金属",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600366",
+      "name": "宁波韵升",
+      "g_q": -0.4214,
+      "score_growth": 4.0,
+      "total": 60.53,
+      "sector_l2": "金属新材料",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002947",
+      "name": "恒铭达",
+      "g_q": -0.4531,
+      "score_growth": 2.79,
+      "total": 59.7,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300191",
+      "name": "潜能恒信",
+      "g_q": -6.9187,
+      "score_growth": 4.0,
+      "total": 59.68,
+      "sector_l2": "油服工程",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600993",
+      "name": "马应龙",
+      "g_q": -0.0301,
+      "score_growth": 4.0,
+      "total": 59.59,
+      "sector_l2": "中药Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600933",
+      "name": "爱柯迪",
+      "g_q": -0.2662,
+      "score_growth": 4.0,
+      "total": 59.57,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002249",
+      "name": "大洋电机",
+      "g_q": -0.766,
+      "score_growth": 3.09,
+      "total": 59.54,
+      "sector_l2": "电机Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600210",
+      "name": "紫江企业",
+      "g_q": -0.0643,
+      "score_growth": 3.08,
+      "total": 59.53,
+      "sector_l2": "包装印刷",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300181",
+      "name": "佐力药业",
+      "g_q": -0.1042,
+      "score_growth": 4.0,
+      "total": 59.52,
+      "sector_l2": "中药Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh605133",
+      "name": "嵘泰股份",
+      "g_q": -0.3357,
+      "score_growth": 4.0,
+      "total": 58.91,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603063",
+      "name": "禾望电气",
+      "g_q": -1.3503,
+      "score_growth": 1.81,
+      "total": 58.72,
+      "sector_l2": "风电设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002811",
+      "name": "郑中设计",
+      "g_q": -0.0078,
+      "score_growth": 4.0,
+      "total": 58.72,
+      "sector_l2": "装修装饰Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300976",
+      "name": "达瑞电子",
+      "g_q": -0.319,
+      "score_growth": 4.0,
+      "total": 58.71,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh601678",
+      "name": "滨化股份",
+      "g_q": -1.2666,
+      "score_growth": 4.0,
+      "total": 58.71,
+      "sector_l2": "化学原料",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300783",
+      "name": "三只松鼠",
+      "g_q": -0.8789,
+      "score_growth": 3.53,
+      "total": 58.67,
+      "sector_l2": "休闲食品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300861",
+      "name": "美畅股份",
+      "g_q": -1.5419,
+      "score_growth": 4.0,
+      "total": 58.43,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002824",
+      "name": "和胜股份",
+      "g_q": -0.3904,
+      "score_growth": 4.0,
+      "total": 58.41,
+      "sector_l2": "工业金属",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603337",
+      "name": "杰克科技",
+      "g_q": -0.6528,
+      "score_growth": 4.0,
+      "total": 58.21,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300002",
+      "name": "神州泰岳",
+      "g_q": -0.2133,
+      "score_growth": 4.0,
+      "total": 58.16,
+      "sector_l2": "游戏Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002154",
+      "name": "报 喜 鸟",
+      "g_q": -0.5463,
+      "score_growth": 4.0,
+      "total": 57.98,
+      "sector_l2": "服装家纺",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh605589",
+      "name": "圣泉集团",
+      "g_q": -0.1918,
+      "score_growth": 4.0,
+      "total": 57.94,
+      "sector_l2": "塑料",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh688321",
+      "name": "微芯生物",
+      "g_q": -0.6225,
+      "score_growth": 4.0,
+      "total": 57.9,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688625",
+      "name": "呈和科技",
+      "g_q": -0.7953,
+      "score_growth": 4.0,
+      "total": 57.72,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301373",
+      "name": "凌玮科技",
+      "g_q": -0.1299,
+      "score_growth": 4.0,
+      "total": 57.7,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300008",
+      "name": "天海防务",
+      "g_q": -0.3004,
+      "score_growth": 4.0,
+      "total": 57.67,
+      "sector_l2": "航海装备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603867",
+      "name": "新化股份",
+      "g_q": -0.4085,
+      "score_growth": 4.0,
+      "total": 57.66,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002443",
+      "name": "金洲管道",
+      "g_q": -0.2312,
+      "score_growth": 4.0,
+      "total": 57.38,
+      "sector_l2": "特钢Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603950",
+      "name": "长源东谷",
+      "g_q": -0.0906,
+      "score_growth": 1.54,
+      "total": 57.1,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300790",
+      "name": "宇瞳光学",
+      "g_q": -0.428,
+      "score_growth": 4.0,
+      "total": 57.01,
+      "sector_l2": "计算机设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603730",
+      "name": "岱美股份",
+      "g_q": -0.2459,
+      "score_growth": 2.19,
+      "total": 56.88,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh601218",
+      "name": "吉鑫科技",
+      "g_q": -0.2696,
+      "score_growth": 4.0,
+      "total": 56.74,
+      "sector_l2": "风电设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002842",
+      "name": "翔鹭钨业",
+      "g_q": -0.7693,
+      "score_growth": 4.0,
+      "total": 56.7,
+      "sector_l2": "小金属",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh688800",
+      "name": "瑞可达",
+      "g_q": -0.4736,
+      "score_growth": 2.3,
+      "total": 56.54,
+      "sector_l2": "其他电子Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603698",
+      "name": "航天工程",
+      "g_q": -0.6058,
+      "score_growth": 4.0,
+      "total": 56.39,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002290",
+      "name": "禾盛新材",
+      "g_q": -0.2156,
+      "score_growth": 3.29,
+      "total": 56.28,
+      "sector_l2": "家电零部件Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600737",
+      "name": "中粮糖业",
+      "g_q": -0.1923,
+      "score_growth": 0.42,
+      "total": 56.17,
+      "sector_l2": "农产品加工",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603416",
+      "name": "信捷电气",
+      "g_q": -0.2341,
+      "score_growth": 4.0,
+      "total": 55.92,
+      "sector_l2": "自动化设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300738",
+      "name": "奥飞数据",
+      "g_q": -0.8386,
+      "score_growth": 4.0,
+      "total": 55.84,
+      "sector_l2": "通信服务",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301580",
+      "name": "爱迪特",
+      "g_q": -0.0084,
+      "score_growth": 4.0,
+      "total": 55.83,
+      "sector_l2": "医疗器械",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz301568",
+      "name": "思泰克",
+      "g_q": -0.6817,
+      "score_growth": 4.0,
+      "total": 55.82,
+      "sector_l2": "自动化设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688308",
+      "name": "欧科亿",
+      "g_q": -0.639,
+      "score_growth": 4.0,
+      "total": 55.74,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300873",
+      "name": "海晨股份",
+      "g_q": -0.3757,
+      "score_growth": 4.0,
+      "total": 55.62,
+      "sector_l2": "物流",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002668",
+      "name": "TCL智家",
+      "g_q": -0.2087,
+      "score_growth": 4.0,
+      "total": 55.54,
+      "sector_l2": "白色家电",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz301235",
+      "name": "华康洁净",
+      "g_q": -0.1002,
+      "score_growth": 4.0,
+      "total": 55.36,
+      "sector_l2": "医疗器械",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603538",
+      "name": "美诺华",
+      "g_q": -0.2849,
+      "score_growth": 4.0,
+      "total": 55.31,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600694",
+      "name": "大商股份",
+      "g_q": -0.6961,
+      "score_growth": 4.0,
+      "total": 55.31,
+      "sector_l2": "一般零售",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002170",
+      "name": "芭田股份",
+      "g_q": -0.8836,
+      "score_growth": 0.78,
+      "total": 55.27,
+      "sector_l2": "农化制品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603368",
+      "name": "柳药集团",
+      "g_q": -0.1191,
+      "score_growth": 3.95,
+      "total": 55.16,
+      "sector_l2": "医药商业",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300443",
+      "name": "金雷股份",
+      "g_q": -0.2475,
+      "score_growth": 3.52,
+      "total": 55.05,
+      "sector_l2": "风电设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002062",
+      "name": "宏润建设",
+      "g_q": -0.1697,
+      "score_growth": 3.74,
+      "total": 54.95,
+      "sector_l2": "基础建设",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300917",
+      "name": "特发服务",
+      "g_q": -0.082,
+      "score_growth": 4.0,
+      "total": 54.94,
+      "sector_l2": "房地产服务",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002536",
+      "name": "飞龙股份",
+      "g_q": -0.6664,
+      "score_growth": 4.0,
+      "total": 54.91,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603179",
+      "name": "新泉股份",
+      "g_q": -0.1226,
+      "score_growth": 4.0,
+      "total": 54.89,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002155",
+      "name": "湖南黄金",
+      "g_q": -0.4901,
+      "score_growth": 0.63,
+      "total": 54.73,
+      "sector_l2": "贵金属",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600461",
+      "name": "洪城环境",
+      "g_q": -0.0694,
+      "score_growth": 1.56,
+      "total": 54.62,
+      "sector_l2": "环境治理",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600558",
+      "name": "大西洋",
+      "g_q": -0.3146,
+      "score_growth": 2.55,
+      "total": 54.49,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603014",
+      "name": "威高血净",
+      "g_q": -0.1383,
+      "score_growth": 4.0,
+      "total": 54.24,
+      "sector_l2": "医疗器械",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688307",
+      "name": "中润光学",
+      "g_q": -0.5589,
+      "score_growth": 4.0,
+      "total": 54.15,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688726",
+      "name": "拉普拉斯",
+      "g_q": -0.765,
+      "score_growth": 0.83,
+      "total": 54.13,
+      "sector_l2": "光伏设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002773",
+      "name": "康弘药业",
+      "g_q": -0.2205,
+      "score_growth": 1.54,
+      "total": 54.04,
+      "sector_l2": "生物制品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002897",
+      "name": "意华股份",
+      "g_q": -0.5469,
+      "score_growth": 1.41,
+      "total": 53.88,
+      "sector_l2": "通信设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301216",
+      "name": "万凯新材",
+      "g_q": -0.006,
+      "score_growth": 4.0,
+      "total": 53.68,
+      "sector_l2": "塑料",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300957",
+      "name": "贝泰妮",
+      "g_q": -21.1908,
+      "score_growth": 4.0,
+      "total": 53.66,
+      "sector_l2": "化妆品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002286",
+      "name": "保龄宝",
+      "g_q": -0.114,
+      "score_growth": 4.0,
+      "total": 53.59,
+      "sector_l2": "农产品加工",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh688639",
+      "name": "华恒生物",
+      "g_q": -0.5036,
+      "score_growth": 3.9,
+      "total": 53.59,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz001399",
+      "name": "惠科股份",
+      "g_q": -0.0072,
+      "score_growth": 2.32,
+      "total": 53.58,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603300",
+      "name": "海南华铁",
+      "g_q": -0.2749,
+      "score_growth": 4.0,
+      "total": 53.58,
+      "sector_l2": "多元金融",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002033",
+      "name": "丽江股份",
+      "g_q": -0.0384,
+      "score_growth": 4.0,
+      "total": 53.58,
+      "sector_l2": "旅游及景区",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300566",
+      "name": "激智科技",
+      "g_q": -0.4431,
+      "score_growth": 1.51,
+      "total": 53.49,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300580",
+      "name": "贝斯特",
+      "g_q": -0.1113,
+      "score_growth": 4.0,
+      "total": 53.44,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300201",
+      "name": "海伦哲",
+      "g_q": -0.1973,
+      "score_growth": 4.0,
+      "total": 53.43,
+      "sector_l2": "工程机械",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300910",
+      "name": "瑞丰新材",
+      "g_q": -0.5813,
+      "score_growth": 4.0,
+      "total": 53.41,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300401",
+      "name": "花园生物",
+      "g_q": -0.558,
+      "score_growth": 4.0,
+      "total": 53.2,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300680",
+      "name": "隆盛科技",
+      "g_q": -0.0841,
+      "score_growth": 3.44,
+      "total": 53.16,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002937",
+      "name": "兴瑞科技",
+      "g_q": -0.089,
+      "score_growth": 4.0,
+      "total": 53.02,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600988",
+      "name": "赤峰黄金",
+      "g_q": -0.4001,
+      "score_growth": 2.45,
+      "total": 52.96,
+      "sector_l2": "贵金属",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603949",
+      "name": "雪龙集团",
+      "g_q": -0.6922,
+      "score_growth": 4.0,
+      "total": 52.87,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh688138",
+      "name": "清溢光电",
+      "g_q": -0.2148,
+      "score_growth": 2.18,
+      "total": 52.81,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300136",
+      "name": "信维通信",
+      "g_q": -0.2838,
+      "score_growth": 1.83,
+      "total": 52.68,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh605338",
+      "name": "巴比食品",
+      "g_q": -0.016,
+      "score_growth": 4.0,
+      "total": 52.58,
+      "sector_l2": "食品加工",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002258",
+      "name": "利尔化学",
+      "g_q": -0.1823,
+      "score_growth": 3.17,
+      "total": 52.55,
+      "sector_l2": "农化制品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002093",
+      "name": "国脉科技",
+      "g_q": -0.205,
+      "score_growth": 3.14,
+      "total": 52.53,
+      "sector_l2": "教育",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600316",
+      "name": "洪都航空",
+      "g_q": -0.7596,
+      "score_growth": 4.0,
+      "total": 52.47,
+      "sector_l2": "航空装备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002537",
+      "name": "海联金汇",
+      "g_q": -0.3316,
+      "score_growth": 1.32,
+      "total": 52.43,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603267",
+      "name": "鸿远电子",
+      "g_q": -0.7881,
+      "score_growth": 3.39,
+      "total": 52.39,
+      "sector_l2": "军工电子Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002969",
+      "name": "嘉美包装",
+      "g_q": -0.575,
+      "score_growth": 4.0,
+      "total": 52.36,
+      "sector_l2": "包装印刷",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603187",
+      "name": "海容冷链",
+      "g_q": -0.3942,
+      "score_growth": 3.51,
+      "total": 52.36,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603112",
+      "name": "华翔股份",
+      "g_q": -0.4299,
+      "score_growth": 4.0,
+      "total": 52.24,
+      "sector_l2": "家电零部件Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600368",
+      "name": "五洲交通",
+      "g_q": -0.088,
+      "score_growth": 4.0,
+      "total": 52.18,
+      "sector_l2": "铁路公路",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002860",
+      "name": "星帅尔",
+      "g_q": -0.4536,
+      "score_growth": 1.77,
+      "total": 52.12,
+      "sector_l2": "家电零部件Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603757",
+      "name": "大元泵业",
+      "g_q": -0.2819,
+      "score_growth": 1.79,
+      "total": 52.08,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300776",
+      "name": "帝尔激光",
+      "g_q": -0.3576,
+      "score_growth": 1.27,
+      "total": 52.03,
+      "sector_l2": "光伏设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301291",
+      "name": "明阳电气",
+      "g_q": -0.3446,
+      "score_growth": 1.4,
+      "total": 51.87,
+      "sector_l2": "电网设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002693",
+      "name": "双成药业",
+      "g_q": -0.6913,
+      "score_growth": 4.0,
+      "total": 51.85,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300035",
+      "name": "中科电气",
+      "g_q": -0.2828,
+      "score_growth": 4.0,
+      "total": 51.83,
+      "sector_l2": "电池",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz301128",
+      "name": "强瑞技术",
+      "g_q": -0.0874,
+      "score_growth": 4.0,
+      "total": 51.73,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600633",
+      "name": "浙数文化",
+      "g_q": -0.257,
+      "score_growth": 4.0,
+      "total": 51.72,
+      "sector_l2": "游戏Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300918",
+      "name": "南山智尚",
+      "g_q": -0.3793,
+      "score_growth": 4.0,
+      "total": 51.7,
+      "sector_l2": "纺织制造",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688698",
+      "name": "伟创电气",
+      "g_q": -0.2593,
+      "score_growth": 4.0,
+      "total": 51.67,
+      "sector_l2": "自动化设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002605",
+      "name": "姚记科技",
+      "g_q": -0.3295,
+      "score_growth": 3.59,
+      "total": 51.65,
+      "sector_l2": "游戏Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002617",
+      "name": "露笑科技",
+      "g_q": -0.4601,
+      "score_growth": 4.0,
+      "total": 51.41,
+      "sector_l2": "电力",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603650",
+      "name": "彤程新材",
+      "g_q": -0.0841,
+      "score_growth": 4.0,
+      "total": 51.36,
+      "sector_l2": "橡胶",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603099",
+      "name": "长白山",
+      "g_q": -0.0802,
+      "score_growth": 3.71,
+      "total": 51.3,
+      "sector_l2": "旅游及景区",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600699",
+      "name": "均胜电子",
+      "g_q": -0.4821,
+      "score_growth": 1.55,
+      "total": 51.22,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603266",
+      "name": "天龙股份",
+      "g_q": -0.602,
+      "score_growth": 4.0,
+      "total": 51.14,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300681",
+      "name": "英搏尔",
+      "g_q": -0.1657,
+      "score_growth": 4.0,
+      "total": 51.12,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh688372",
+      "name": "伟测科技",
+      "g_q": -0.2173,
+      "score_growth": 4.0,
+      "total": 51.07,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300558",
+      "name": "贝达药业",
+      "g_q": -1.3031,
+      "score_growth": 4.0,
+      "total": 50.79,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002970",
+      "name": "锐明技术",
+      "g_q": -0.4143,
+      "score_growth": 4.0,
+      "total": 50.73,
+      "sector_l2": "计算机设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300274",
+      "name": "阳光电源",
+      "g_q": -0.5758,
+      "score_growth": 0.75,
+      "total": 50.66,
+      "sector_l2": "光伏设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz301498",
+      "name": "乖宝宠物",
+      "g_q": -0.8093,
+      "score_growth": 4.0,
+      "total": 50.64,
+      "sector_l2": "饲料",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh688545",
+      "name": "兴福电子",
+      "g_q": -0.0532,
+      "score_growth": 4.0,
+      "total": 50.5,
+      "sector_l2": "电子化学品Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002437",
+      "name": "誉衡药业",
+      "g_q": -0.0393,
+      "score_growth": 1.27,
+      "total": 50.44,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002611",
+      "name": "东方精工",
+      "g_q": -0.5809,
+      "score_growth": 0.31,
+      "total": 50.42,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688678",
+      "name": "福立旺",
+      "g_q": -0.9987,
+      "score_growth": 4.0,
+      "total": 50.28,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300130",
+      "name": "新国都",
+      "g_q": -0.078,
+      "score_growth": 4.0,
+      "total": 50.24,
+      "sector_l2": "计算机设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz000534",
+      "name": "万泽股份",
+      "g_q": -0.7069,
+      "score_growth": 3.51,
+      "total": 50.2,
+      "sector_l2": "生物制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000715",
+      "name": "中兴商业",
+      "g_q": -0.0611,
+      "score_growth": 4.0,
+      "total": 50.2,
+      "sector_l2": "一般零售",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300842",
+      "name": "帝科股份",
+      "g_q": -1.3174,
+      "score_growth": 4.0,
+      "total": 50.1,
+      "sector_l2": "光伏设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh688179",
+      "name": "阿拉丁",
+      "g_q": -0.0278,
+      "score_growth": 4.0,
+      "total": 50.1,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh688677",
+      "name": "海泰新光",
+      "g_q": -0.439,
+      "score_growth": 4.0,
+      "total": 50.02,
+      "sector_l2": "医疗器械",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002959",
+      "name": "小熊电器",
+      "g_q": -0.3464,
+      "score_growth": 2.12,
+      "total": 49.97,
+      "sector_l2": "小家电",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300763",
+      "name": "锦浪科技",
+      "g_q": -0.4412,
+      "score_growth": 3.37,
+      "total": 49.95,
+      "sector_l2": "光伏设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603663",
+      "name": "三祥新材",
+      "g_q": -0.1289,
+      "score_growth": 0.96,
+      "total": 49.92,
+      "sector_l2": "化学原料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz001227",
+      "name": "兰州银行",
+      "g_q": -0.0285,
+      "score_growth": 4.0,
+      "total": 49.91,
+      "sector_l2": "城商行Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300770",
+      "name": "新媒股份",
+      "g_q": -0.0034,
+      "score_growth": 4.0,
+      "total": 49.89,
+      "sector_l2": "电视广播Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh688629",
+      "name": "华丰科技",
+      "g_q": -0.4107,
+      "score_growth": 4.0,
+      "total": 49.86,
+      "sector_l2": "军工电子Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300980",
+      "name": "祥源新材",
+      "g_q": -0.8211,
+      "score_growth": 4.0,
+      "total": 49.84,
+      "sector_l2": "塑料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300824",
+      "name": "北鼎股份",
+      "g_q": -0.3054,
+      "score_growth": 4.0,
+      "total": 49.77,
+      "sector_l2": "小家电",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300226",
+      "name": "上海钢联",
+      "g_q": -0.0253,
+      "score_growth": 4.0,
+      "total": 49.74,
+      "sector_l2": "软件开发",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600502",
+      "name": "安徽建工",
+      "g_q": -0.6929,
+      "score_growth": 4.0,
+      "total": 49.64,
+      "sector_l2": "基础建设",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600547",
+      "name": "山东黄金",
+      "g_q": -1.2916,
+      "score_growth": 1.24,
+      "total": 49.62,
+      "sector_l2": "贵金属",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh688312",
+      "name": "燕麦科技",
+      "g_q": -0.2051,
+      "score_growth": 1.35,
+      "total": 49.6,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300031",
+      "name": "宝通科技",
+      "g_q": -1.2187,
+      "score_growth": 4.0,
+      "total": 49.55,
+      "sector_l2": "游戏Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688088",
+      "name": "虹软科技",
+      "g_q": -0.798,
+      "score_growth": 4.0,
+      "total": 49.41,
+      "sector_l2": "IT服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603027",
+      "name": "千禾味业",
+      "g_q": -0.4968,
+      "score_growth": 4.0,
+      "total": 49.38,
+      "sector_l2": "调味发酵品Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002150",
+      "name": "正泰电源",
+      "g_q": -0.2153,
+      "score_growth": 3.78,
+      "total": 49.35,
+      "sector_l2": "光伏设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600865",
+      "name": "百大集团",
+      "g_q": -0.2805,
+      "score_growth": 3.76,
+      "total": 49.31,
+      "sector_l2": "一般零售",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301638",
+      "name": "南网数字",
+      "g_q": -0.4666,
+      "score_growth": 4.0,
+      "total": 49.16,
+      "sector_l2": "IT服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002555",
+      "name": "三七互娱",
+      "g_q": -0.7928,
+      "score_growth": 3.41,
+      "total": 49.13,
+      "sector_l2": "游戏Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603038",
+      "name": "华立股份",
+      "g_q": -0.9639,
+      "score_growth": 4.0,
+      "total": 49.08,
+      "sector_l2": "装修建材",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600853",
+      "name": "龙建股份",
+      "g_q": -0.2609,
+      "score_growth": 3.12,
+      "total": 49.06,
+      "sector_l2": "基础建设",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002297",
+      "name": "博云新材",
+      "g_q": -3.419,
+      "score_growth": 4.0,
+      "total": 49.05,
+      "sector_l2": "航空装备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688199",
+      "name": "久日新材",
+      "g_q": -11.0646,
+      "score_growth": 4.0,
+      "total": 49.05,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603809",
+      "name": "豪能股份",
+      "g_q": -0.524,
+      "score_growth": 4.0,
+      "total": 49.05,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz301599",
+      "name": "理奇智能",
+      "g_q": -0.1047,
+      "score_growth": 2.71,
+      "total": 48.92,
+      "sector_l2": "电池",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh688799",
+      "name": "华纳药厂",
+      "g_q": -0.4802,
+      "score_growth": 1.69,
+      "total": 48.86,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300171",
+      "name": "东富龙",
+      "g_q": -0.1127,
+      "score_growth": 2.94,
+      "total": 48.82,
+      "sector_l2": "医疗器械",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688503",
+      "name": "聚和材料",
+      "g_q": -0.956,
+      "score_growth": 4.0,
+      "total": 48.7,
+      "sector_l2": "光伏设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603305",
+      "name": "旭升集团",
+      "g_q": -0.2943,
+      "score_growth": 4.0,
+      "total": 48.64,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600392",
+      "name": "盛和资源",
+      "g_q": -0.4056,
+      "score_growth": 4.0,
+      "total": 48.59,
+      "sector_l2": "小金属",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002106",
+      "name": "莱宝高科",
+      "g_q": -1.1536,
+      "score_growth": 0.73,
+      "total": 48.46,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301225",
+      "name": "恒勃股份",
+      "g_q": -0.27,
+      "score_growth": 4.0,
+      "total": 48.38,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002271",
+      "name": "东方雨虹",
+      "g_q": -0.7366,
+      "score_growth": 4.0,
+      "total": 48.37,
+      "sector_l2": "装修建材",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600498",
+      "name": "烽火通信",
+      "g_q": -0.4338,
+      "score_growth": 4.0,
+      "total": 48.33,
+      "sector_l2": "通信设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301301",
+      "name": "川宁生物",
+      "g_q": -0.6467,
+      "score_growth": 0.98,
+      "total": 48.25,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz301608",
+      "name": "博实结",
+      "g_q": -0.042,
+      "score_growth": 4.0,
+      "total": 48.15,
+      "sector_l2": "计算机设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300113",
+      "name": "顺网科技",
+      "g_q": -0.2433,
+      "score_growth": 0.94,
+      "total": 48.12,
+      "sector_l2": "游戏Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300660",
+      "name": "江苏雷利",
+      "g_q": -0.5405,
+      "score_growth": 4.0,
+      "total": 48.12,
+      "sector_l2": "电机Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603859",
+      "name": "能科科技",
+      "g_q": -0.4971,
+      "score_growth": 4.0,
+      "total": 48.02,
+      "sector_l2": "IT服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603005",
+      "name": "晶方科技",
+      "g_q": -0.2994,
+      "score_growth": 1.55,
+      "total": 47.97,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002292",
+      "name": "奥飞娱乐",
+      "g_q": -0.7638,
+      "score_growth": 4.0,
+      "total": 47.95,
+      "sector_l2": "影视院线",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600941",
+      "name": "中国移动",
+      "g_q": -0.0023,
+      "score_growth": 3.35,
+      "total": 47.9,
+      "sector_l2": "通信服务",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300590",
+      "name": "移为通信",
+      "g_q": -0.6881,
+      "score_growth": 4.0,
+      "total": 47.88,
+      "sector_l2": "通信设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603306",
+      "name": "华懋科技",
+      "g_q": -0.7758,
+      "score_growth": 2.73,
+      "total": 47.86,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688550",
+      "name": "瑞联新材",
+      "g_q": -0.6395,
+      "score_growth": 1.18,
+      "total": 47.82,
+      "sector_l2": "电子化学品Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh688333",
+      "name": "铂力特",
+      "g_q": -0.2726,
+      "score_growth": 3.66,
+      "total": 47.8,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000407",
+      "name": "胜利股份",
+      "g_q": -0.326,
+      "score_growth": 4.0,
+      "total": 47.75,
+      "sector_l2": "燃气Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300724",
+      "name": "捷佳伟创",
+      "g_q": -0.6981,
+      "score_growth": 0.2,
+      "total": 47.73,
+      "sector_l2": "光伏设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603040",
+      "name": "新坐标",
+      "g_q": -0.3365,
+      "score_growth": 3.66,
+      "total": 47.71,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603166",
+      "name": "福达股份",
+      "g_q": -0.0491,
+      "score_growth": 4.0,
+      "total": 47.64,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz301119",
+      "name": "正强股份",
+      "g_q": -0.054,
+      "score_growth": 4.0,
+      "total": 47.61,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh688636",
+      "name": "智明达",
+      "g_q": -0.2459,
+      "score_growth": 3.34,
+      "total": 47.56,
+      "sector_l2": "军工电子Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300063",
+      "name": "天龙集团",
+      "g_q": -0.5668,
+      "score_growth": 4.0,
+      "total": 47.48,
+      "sector_l2": "广告营销",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301219",
+      "name": "腾远钴业",
+      "g_q": -1.9527,
+      "score_growth": 4.0,
+      "total": 47.43,
+      "sector_l2": "能源金属",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300263",
+      "name": "隆华科技",
+      "g_q": -0.397,
+      "score_growth": 4.0,
+      "total": 47.42,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000533",
+      "name": "顺钠股份",
+      "g_q": -0.1305,
+      "score_growth": 4.0,
+      "total": 47.37,
+      "sector_l2": "电网设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600488",
+      "name": "津药药业",
+      "g_q": -0.8472,
+      "score_growth": 0.95,
+      "total": 47.3,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002048",
+      "name": "宁波华翔",
+      "g_q": -0.567,
+      "score_growth": 0.26,
+      "total": 47.24,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300893",
+      "name": "松原安全",
+      "g_q": -0.11,
+      "score_growth": 4.0,
+      "total": 47.23,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600602",
+      "name": "云赛智联",
+      "g_q": -0.0169,
+      "score_growth": 2.5,
+      "total": 47.16,
+      "sector_l2": "软件开发",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603890",
+      "name": "春秋电子",
+      "g_q": -1.1414,
+      "score_growth": 1.87,
+      "total": 47.05,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300073",
+      "name": "当升科技",
+      "g_q": -0.1042,
+      "score_growth": 4.0,
+      "total": 46.97,
+      "sector_l2": "电池",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603500",
+      "name": "祥和实业",
+      "g_q": -0.513,
+      "score_growth": 1.0,
+      "total": 46.97,
+      "sector_l2": "轨交设备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh601858",
+      "name": "中国科传",
+      "g_q": -0.2319,
+      "score_growth": 4.0,
+      "total": 46.89,
+      "sector_l2": "出版",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002787",
+      "name": "华源控股",
+      "g_q": -0.4408,
+      "score_growth": 4.0,
+      "total": 46.88,
+      "sector_l2": "包装印刷",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300409",
+      "name": "道氏技术",
+      "g_q": -1.0962,
+      "score_growth": 4.0,
+      "total": 46.83,
+      "sector_l2": "电池",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh688182",
+      "name": "灿勤科技",
+      "g_q": -0.2571,
+      "score_growth": 4.0,
+      "total": 46.8,
+      "sector_l2": "通信设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000591",
+      "name": "太阳能",
+      "g_q": -0.1794,
+      "score_growth": 3.29,
+      "total": 46.73,
+      "sector_l2": "电力",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603270",
+      "name": "金帝股份",
+      "g_q": -1.0925,
+      "score_growth": 4.0,
+      "total": 46.73,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300773",
+      "name": "拉卡拉",
+      "g_q": -0.1696,
+      "score_growth": 4.0,
+      "total": 46.69,
+      "sector_l2": "多元金融",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300303",
+      "name": "聚飞光电",
+      "g_q": -0.4049,
+      "score_growth": 1.86,
+      "total": 46.69,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000506",
+      "name": "招金黄金",
+      "g_q": -0.6931,
+      "score_growth": 4.0,
+      "total": 46.67,
+      "sector_l2": "贵金属",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002324",
+      "name": "普利特",
+      "g_q": -0.8333,
+      "score_growth": 4.0,
+      "total": 46.66,
+      "sector_l2": "塑料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603926",
+      "name": "铁流股份",
+      "g_q": -0.0867,
+      "score_growth": 2.68,
+      "total": 46.62,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300840",
+      "name": "酷特智能",
+      "g_q": -0.9228,
+      "score_growth": 4.0,
+      "total": 46.55,
+      "sector_l2": "服装家纺",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300505",
+      "name": "川金诺",
+      "g_q": -0.6598,
+      "score_growth": 4.0,
+      "total": 46.5,
+      "sector_l2": "农化制品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz000513",
+      "name": "丽珠集团",
+      "g_q": -0.1839,
+      "score_growth": 0.72,
+      "total": 46.48,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz301310",
+      "name": "鑫宏业",
+      "g_q": -0.1649,
+      "score_growth": 4.0,
+      "total": 46.47,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300679",
+      "name": "电连技术",
+      "g_q": -0.1133,
+      "score_growth": 1.46,
+      "total": 46.44,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh601222",
+      "name": "林洋能源",
+      "g_q": -0.423,
+      "score_growth": 4.0,
+      "total": 46.39,
+      "sector_l2": "电网设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz001216",
+      "name": "华瓷股份",
+      "g_q": -0.4703,
+      "score_growth": 0.95,
+      "total": 46.36,
+      "sector_l2": "家居用品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz003033",
+      "name": "征和工业",
+      "g_q": -0.2314,
+      "score_growth": 4.0,
+      "total": 46.24,
+      "sector_l2": "摩托车及其他",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh688711",
+      "name": "宏微科技",
+      "g_q": -17.3994,
+      "score_growth": 4.0,
+      "total": 46.21,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002239",
+      "name": "奥特佳",
+      "g_q": -0.0622,
+      "score_growth": 2.02,
+      "total": 46.2,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300674",
+      "name": "宇信科技",
+      "g_q": -0.437,
+      "score_growth": 1.95,
+      "total": 45.96,
+      "sector_l2": "IT服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002378",
+      "name": "章源钨业",
+      "g_q": -0.65,
+      "score_growth": 4.0,
+      "total": 45.94,
+      "sector_l2": "小金属",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300403",
+      "name": "汉宇集团",
+      "g_q": -0.1654,
+      "score_growth": 3.89,
+      "total": 45.89,
+      "sector_l2": "家电零部件Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz301179",
+      "name": "泽宇智能",
+      "g_q": -8.0146,
+      "score_growth": 4.0,
+      "total": 45.84,
+      "sector_l2": "电网设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301076",
+      "name": "新瀚新材",
+      "g_q": -0.0321,
+      "score_growth": 4.0,
+      "total": 45.82,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002734",
+      "name": "利民股份",
+      "g_q": -1.4363,
+      "score_growth": 0.56,
+      "total": 45.81,
+      "sector_l2": "农化制品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002703",
+      "name": "浙江世宝",
+      "g_q": -0.3325,
+      "score_growth": 4.0,
+      "total": 45.8,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603105",
+      "name": "芯能科技",
+      "g_q": -0.6877,
+      "score_growth": 4.0,
+      "total": 45.3,
+      "sector_l2": "电力",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600644",
+      "name": "乐山电力",
+      "g_q": -0.5454,
+      "score_growth": 4.0,
+      "total": 45.27,
+      "sector_l2": "电力",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600113",
+      "name": "浙江东日",
+      "g_q": -0.3035,
+      "score_growth": 3.56,
+      "total": 45.21,
+      "sector_l2": "一般零售",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301362",
+      "name": "民爆光电",
+      "g_q": -0.2567,
+      "score_growth": 4.0,
+      "total": 45.18,
+      "sector_l2": "照明设备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600686",
+      "name": "金龙汽车",
+      "g_q": -1.107,
+      "score_growth": 2.86,
+      "total": 45.06,
+      "sector_l2": "商用车",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600559",
+      "name": "老白干酒",
+      "g_q": -0.0564,
+      "score_growth": 1.44,
+      "total": 45.04,
+      "sector_l2": "白酒Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002488",
+      "name": "金固股份",
+      "g_q": -0.3672,
+      "score_growth": 4.0,
+      "total": 44.98,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000400",
+      "name": "许继电气",
+      "g_q": -0.331,
+      "score_growth": 3.31,
+      "total": 44.85,
+      "sector_l2": "电网设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002041",
+      "name": "登海种业",
+      "g_q": -28.6007,
+      "score_growth": 4.0,
+      "total": 44.78,
+      "sector_l2": "种植业",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002697",
+      "name": "红旗连锁",
+      "g_q": -0.1038,
+      "score_growth": 4.0,
+      "total": 44.76,
+      "sector_l2": "一般零售",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh601975",
+      "name": "招商南油",
+      "g_q": -0.0946,
+      "score_growth": 4.0,
+      "total": 44.53,
+      "sector_l2": "航运港口",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600863",
+      "name": "华能蒙电",
+      "g_q": -0.2273,
+      "score_growth": 1.82,
+      "total": 44.49,
+      "sector_l2": "电力",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh601999",
+      "name": "出版传媒",
+      "g_q": -0.0218,
+      "score_growth": 1.96,
+      "total": 44.44,
+      "sector_l2": "出版",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300820",
+      "name": "英杰电气",
+      "g_q": -0.2873,
+      "score_growth": 1.72,
+      "total": 44.42,
+      "sector_l2": "其他电源设备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz001896",
+      "name": "豫能控股",
+      "g_q": -0.7928,
+      "score_growth": 3.76,
+      "total": 44.33,
+      "sector_l2": "电力",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688166",
+      "name": "博瑞医药",
+      "g_q": -0.5698,
+      "score_growth": 4.0,
+      "total": 44.31,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688332",
+      "name": "中科蓝讯",
+      "g_q": -0.3458,
+      "score_growth": 2.69,
+      "total": 44.25,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000848",
+      "name": "承德露露",
+      "g_q": -0.4098,
+      "score_growth": 4.0,
+      "total": 44.08,
+      "sector_l2": "饮料乳品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002940",
+      "name": "昂利康",
+      "g_q": -0.3668,
+      "score_growth": 1.12,
+      "total": 44.08,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600626",
+      "name": "申达股份",
+      "g_q": -0.2698,
+      "score_growth": 2.55,
+      "total": 44.08,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603110",
+      "name": "东方材料",
+      "g_q": -2.0145,
+      "score_growth": 4.0,
+      "total": 43.84,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002625",
+      "name": "光启技术",
+      "g_q": -1.0383,
+      "score_growth": 2.43,
+      "total": 43.82,
+      "sector_l2": "航空装备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz001270",
+      "name": "铖昌科技",
+      "g_q": -0.4669,
+      "score_growth": 4.0,
+      "total": 43.8,
+      "sector_l2": "军工电子Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301419",
+      "name": "阿莱德",
+      "g_q": -0.182,
+      "score_growth": 4.0,
+      "total": 43.77,
+      "sector_l2": "通信设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301479",
+      "name": "弘景光电",
+      "g_q": -0.5079,
+      "score_growth": 2.36,
+      "total": 43.76,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh603109",
+      "name": "神驰机电",
+      "g_q": -0.8677,
+      "score_growth": 4.0,
+      "total": 43.7,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688627",
+      "name": "精智达",
+      "g_q": -0.3994,
+      "score_growth": 4.0,
+      "total": 43.64,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002039",
+      "name": "黔源电力",
+      "g_q": -0.524,
+      "score_growth": 0.96,
+      "total": 43.58,
+      "sector_l2": "电力",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300540",
+      "name": "蜀道装备",
+      "g_q": -0.9014,
+      "score_growth": 2.16,
+      "total": 43.43,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688233",
+      "name": "神工股份",
+      "g_q": -0.1189,
+      "score_growth": 2.17,
+      "total": 43.33,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300382",
+      "name": "斯莱克",
+      "g_q": -0.6473,
+      "score_growth": 4.0,
+      "total": 43.3,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688797",
+      "name": "臻宝科技",
+      "g_q": -0.0085,
+      "score_growth": 4.0,
+      "total": 43.15,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002226",
+      "name": "江南化工",
+      "g_q": -0.4836,
+      "score_growth": 3.97,
+      "total": 43.12,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002928",
+      "name": "华夏航空",
+      "g_q": -0.7825,
+      "score_growth": 4.0,
+      "total": 43.11,
+      "sector_l2": "航空机场",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh601890",
+      "name": "亚星锚链",
+      "g_q": -0.5641,
+      "score_growth": 4.0,
+      "total": 42.96,
+      "sector_l2": "航海装备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300170",
+      "name": "汉得信息",
+      "g_q": -0.6482,
+      "score_growth": 4.0,
+      "total": 42.95,
+      "sector_l2": "IT服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301513",
+      "name": "尚水智能",
+      "g_q": -1.8165,
+      "score_growth": 4.0,
+      "total": 42.94,
+      "sector_l2": "电池",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz001318",
+      "name": "阳光乳业",
+      "g_q": -0.2087,
+      "score_growth": 2.51,
+      "total": 42.85,
+      "sector_l2": "饮料乳品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002402",
+      "name": "和而泰",
+      "g_q": -0.9487,
+      "score_growth": 2.07,
+      "total": 42.83,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000919",
+      "name": "金陵药业",
+      "g_q": -0.8999,
+      "score_growth": 3.25,
+      "total": 42.8,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301188",
+      "name": "力诺药包",
+      "g_q": -0.0327,
+      "score_growth": 4.0,
+      "total": 42.76,
+      "sector_l2": "医疗器械",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000559",
+      "name": "万向钱潮",
+      "g_q": -0.1266,
+      "score_growth": 1.15,
+      "total": 42.65,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002971",
+      "name": "和远气体",
+      "g_q": -0.1561,
+      "score_growth": 3.68,
+      "total": 42.65,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603668",
+      "name": "天马科技",
+      "g_q": -178.0423,
+      "score_growth": 4.0,
+      "total": 42.65,
+      "sector_l2": "饲料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002026",
+      "name": "山东威达",
+      "g_q": -0.1162,
+      "score_growth": 4.0,
+      "total": 42.59,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002539",
+      "name": "云图控股",
+      "g_q": -0.3118,
+      "score_growth": 2.29,
+      "total": 42.41,
+      "sector_l2": "农化制品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002046",
+      "name": "国机精工",
+      "g_q": -0.5387,
+      "score_growth": 2.63,
+      "total": 42.24,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688122",
+      "name": "西部超导",
+      "g_q": -0.5199,
+      "score_growth": 3.85,
+      "total": 42.14,
+      "sector_l2": "航空装备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600838",
+      "name": "上海九百",
+      "g_q": -0.0437,
+      "score_growth": 4.0,
+      "total": 42.13,
+      "sector_l2": "一般零售",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300969",
+      "name": "恒帅股份",
+      "g_q": -0.1753,
+      "score_growth": 4.0,
+      "total": 42.11,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002866",
+      "name": "传艺科技",
+      "g_q": -0.7505,
+      "score_growth": 0.97,
+      "total": 41.95,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300473",
+      "name": "德尔股份",
+      "g_q": -0.2504,
+      "score_growth": 3.0,
+      "total": 41.78,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz003006",
+      "name": "百亚股份",
+      "g_q": -1.5912,
+      "score_growth": 0.01,
+      "total": 41.77,
+      "sector_l2": "个护用品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300945",
+      "name": "曼卡龙",
+      "g_q": -0.9789,
+      "score_growth": 0.01,
+      "total": 41.57,
+      "sector_l2": "饰品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002917",
+      "name": "金奥博",
+      "g_q": -0.8661,
+      "score_growth": 1.35,
+      "total": 41.52,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz000735",
+      "name": "罗 牛 山",
+      "g_q": -28.9259,
+      "score_growth": 4.0,
+      "total": 41.51,
+      "sector_l2": "养殖业",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002009",
+      "name": "天奇股份",
+      "g_q": -0.8842,
+      "score_growth": 4.0,
+      "total": 41.42,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300322",
+      "name": "硕贝德",
+      "g_q": -0.0913,
+      "score_growth": 3.98,
+      "total": 41.38,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688486",
+      "name": "龙迅股份",
+      "g_q": -0.3159,
+      "score_growth": 3.09,
+      "total": 41.3,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600667",
+      "name": "太极实业",
+      "g_q": -0.9349,
+      "score_growth": 4.0,
+      "total": 41.24,
+      "sector_l2": "工程咨询服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301560",
+      "name": "众捷股份",
+      "g_q": -1.4871,
+      "score_growth": 4.0,
+      "total": 41.23,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000725",
+      "name": "京东方Ａ",
+      "g_q": -0.9643,
+      "score_growth": 1.36,
+      "total": 41.22,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300400",
+      "name": "劲拓股份",
+      "g_q": -0.2437,
+      "score_growth": 2.34,
+      "total": 41.22,
+      "sector_l2": "自动化设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603580",
+      "name": "艾艾精工",
+      "g_q": -0.6372,
+      "score_growth": 4.0,
+      "total": 41.14,
+      "sector_l2": "塑料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688400",
+      "name": "凌云光",
+      "g_q": -0.3285,
+      "score_growth": 3.03,
+      "total": 41.12,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301618",
+      "name": "长联科技",
+      "g_q": -0.0176,
+      "score_growth": 4.0,
+      "total": 41.11,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600728",
+      "name": "佳都科技",
+      "g_q": -0.0096,
+      "score_growth": 4.0,
+      "total": 41.09,
+      "sector_l2": "IT服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002530",
+      "name": "金财互联",
+      "g_q": -0.1781,
+      "score_growth": 4.0,
+      "total": 41.02,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301611",
+      "name": "珂玛科技",
+      "g_q": -0.3096,
+      "score_growth": 3.91,
+      "total": 40.95,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300792",
+      "name": "壹网壹创",
+      "g_q": -0.0517,
+      "score_growth": 1.01,
+      "total": 40.94,
+      "sector_l2": "互联网电商",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300788",
+      "name": "中信出版",
+      "g_q": -0.3626,
+      "score_growth": 4.0,
+      "total": 40.91,
+      "sector_l2": "出版",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600330",
+      "name": "天通股份",
+      "g_q": -24.9607,
+      "score_growth": 3.54,
+      "total": 40.73,
+      "sector_l2": "电子化学品Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603319",
+      "name": "美湖股份",
+      "g_q": -0.4989,
+      "score_growth": 4.0,
+      "total": 40.69,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002560",
+      "name": "通达股份",
+      "g_q": -0.7222,
+      "score_growth": 3.05,
+      "total": 40.63,
+      "sector_l2": "电网设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300100",
+      "name": "双林股份",
+      "g_q": -0.7955,
+      "score_growth": 0.93,
+      "total": 40.62,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300905",
+      "name": "宝丽迪",
+      "g_q": -0.1533,
+      "score_growth": 2.98,
+      "total": 40.61,
+      "sector_l2": "化学纤维",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002647",
+      "name": "仁东控股",
+      "g_q": -0.6354,
+      "score_growth": 4.0,
+      "total": 40.57,
+      "sector_l2": "多元金融",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301321",
+      "name": "翰博高新",
+      "g_q": -2.2111,
+      "score_growth": 4.0,
+      "total": 40.56,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600967",
+      "name": "内蒙一机",
+      "g_q": -0.2001,
+      "score_growth": 4.0,
+      "total": 40.51,
+      "sector_l2": "地面兵装Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301379",
+      "name": "天山电子",
+      "g_q": -0.1463,
+      "score_growth": 3.04,
+      "total": 40.38,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002685",
+      "name": "华东重机",
+      "g_q": -0.8179,
+      "score_growth": 4.0,
+      "total": 40.34,
+      "sector_l2": "工程机械",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603037",
+      "name": "凯众股份",
+      "g_q": -0.7582,
+      "score_growth": 4.0,
+      "total": 40.34,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600895",
+      "name": "张江高科",
+      "g_q": -0.3416,
+      "score_growth": 4.0,
+      "total": 40.18,
+      "sector_l2": "房地产开发",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300142",
+      "name": "沃森生物",
+      "g_q": -2.1451,
+      "score_growth": 0.07,
+      "total": 40.11,
+      "sector_l2": "生物制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300802",
+      "name": "矩子科技",
+      "g_q": -0.1019,
+      "score_growth": 4.0,
+      "total": 40.02,
+      "sector_l2": "自动化设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301332",
+      "name": "德尔玛",
+      "g_q": -0.3902,
+      "score_growth": 0.62,
+      "total": 39.94,
+      "sector_l2": "小家电",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600744",
+      "name": "华银电力",
+      "g_q": -0.5809,
+      "score_growth": 4.0,
+      "total": 39.91,
+      "sector_l2": "电力",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688362",
+      "name": "甬矽电子",
+      "g_q": -4.1552,
+      "score_growth": 4.0,
+      "total": 39.86,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600609",
+      "name": "金杯汽车",
+      "g_q": -0.6263,
+      "score_growth": 2.31,
+      "total": 39.71,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002741",
+      "name": "光华科技",
+      "g_q": -0.037,
+      "score_growth": 4.0,
+      "total": 39.51,
+      "sector_l2": "电子化学品Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300943",
+      "name": "春晖智控",
+      "g_q": -0.0935,
+      "score_growth": 2.14,
+      "total": 39.47,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688543",
+      "name": "国科军工",
+      "g_q": -0.5775,
+      "score_growth": 2.06,
+      "total": 39.47,
+      "sector_l2": "地面兵装Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603160",
+      "name": "汇顶科技",
+      "g_q": -0.5958,
+      "score_growth": 0.75,
+      "total": 39.43,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300634",
+      "name": "彩讯股份",
+      "g_q": -0.5092,
+      "score_growth": 1.57,
+      "total": 39.42,
+      "sector_l2": "IT服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz003021",
+      "name": "兆威机电",
+      "g_q": -0.3303,
+      "score_growth": 2.65,
+      "total": 39.29,
+      "sector_l2": "电机Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002025",
+      "name": "航天电器",
+      "g_q": -0.3593,
+      "score_growth": 4.0,
+      "total": 39.29,
+      "sector_l2": "军工电子Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603999",
+      "name": "读者传媒",
+      "g_q": -0.3549,
+      "score_growth": 2.67,
+      "total": 39.27,
+      "sector_l2": "出版",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688106",
+      "name": "金宏气体",
+      "g_q": -2.8438,
+      "score_growth": 3.6,
+      "total": 38.86,
+      "sector_l2": "电子化学品Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603948",
+      "name": "建业股份",
+      "g_q": -0.256,
+      "score_growth": 2.19,
+      "total": 38.74,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600789",
+      "name": "鲁抗医药",
+      "g_q": -0.6917,
+      "score_growth": 3.34,
+      "total": 38.73,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300115",
+      "name": "长盈精密",
+      "g_q": -1.6204,
+      "score_growth": 4.0,
+      "total": 38.7,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz302132",
+      "name": "中航成飞",
+      "g_q": -0.8847,
+      "score_growth": 0.3,
+      "total": 38.65,
+      "sector_l2": "航空装备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz003013",
+      "name": "地铁设计",
+      "g_q": -0.6403,
+      "score_growth": 2.81,
+      "total": 38.56,
+      "sector_l2": "工程咨询服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002051",
+      "name": "中工国际",
+      "g_q": -0.2908,
+      "score_growth": 4.0,
+      "total": 38.43,
+      "sector_l2": "专业工程",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600593",
+      "name": "大连圣亚",
+      "g_q": -0.2876,
+      "score_growth": 1.64,
+      "total": 38.34,
+      "sector_l2": "旅游及景区",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600478",
+      "name": "科力远",
+      "g_q": -1.0575,
+      "score_growth": 4.0,
+      "total": 38.33,
+      "sector_l2": "电池",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002035",
+      "name": "华帝股份",
+      "g_q": -0.5391,
+      "score_growth": 0.9,
+      "total": 38.2,
+      "sector_l2": "厨卫电器",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002079",
+      "name": "苏州固锝",
+      "g_q": -2.7547,
+      "score_growth": 4.0,
+      "total": 38.11,
+      "sector_l2": "光伏设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600226",
+      "name": "亨通股份",
+      "g_q": -0.0841,
+      "score_growth": 4.0,
+      "total": 38.08,
+      "sector_l2": "电力",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000888",
+      "name": "峨眉山Ａ",
+      "g_q": -0.1868,
+      "score_growth": 1.13,
+      "total": 38.05,
+      "sector_l2": "旅游及景区",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300751",
+      "name": "迈为股份",
+      "g_q": -0.9413,
+      "score_growth": 0.49,
+      "total": 38.04,
+      "sector_l2": "光伏设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300192",
+      "name": "科德教育",
+      "g_q": -0.8778,
+      "score_growth": 2.08,
+      "total": 37.8,
+      "sector_l2": "教育",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz001229",
+      "name": "魅视科技",
+      "g_q": -1.1705,
+      "score_growth": 4.0,
+      "total": 37.8,
+      "sector_l2": "计算机设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300018",
+      "name": "中元股份",
+      "g_q": -0.3889,
+      "score_growth": 1.97,
+      "total": 37.8,
+      "sector_l2": "电网设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002614",
+      "name": "奥佳华",
+      "g_q": -1.1611,
+      "score_growth": 4.0,
+      "total": 37.74,
+      "sector_l2": "其他家电Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002749",
+      "name": "国光股份",
+      "g_q": -0.525,
+      "score_growth": 1.6,
+      "total": 37.63,
+      "sector_l2": "农化制品",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002452",
+      "name": "长高电气",
+      "g_q": -0.1543,
+      "score_growth": 2.52,
+      "total": 37.58,
+      "sector_l2": "电网设备",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz300756",
+      "name": "金马游乐",
+      "g_q": -1.1915,
+      "score_growth": 0.93,
+      "total": 37.45,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600628",
+      "name": "新世界",
+      "g_q": -0.84,
+      "score_growth": 4.0,
+      "total": 37.36,
+      "sector_l2": "一般零售",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688757",
+      "name": "胜科纳米",
+      "g_q": -0.4858,
+      "score_growth": 4.0,
+      "total": 37.35,
+      "sector_l2": "专业服务",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301012",
+      "name": "扬电科技",
+      "g_q": -0.1988,
+      "score_growth": 4.0,
+      "total": 37.25,
+      "sector_l2": "电网设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300870",
+      "name": "欧陆通",
+      "g_q": -1.0795,
+      "score_growth": 4.0,
+      "total": 37.23,
+      "sector_l2": "其他电源设备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh601789",
+      "name": "宁波建工",
+      "g_q": -0.4156,
+      "score_growth": 2.25,
+      "total": 37.19,
+      "sector_l2": "房屋建设Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sh600576",
+      "name": "祥源文旅",
+      "g_q": -0.4131,
+      "score_growth": 4.0,
+      "total": 37.03,
+      "sector_l2": "旅游及景区",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300829",
+      "name": "金丹科技",
+      "g_q": -0.2166,
+      "score_growth": 2.91,
+      "total": 36.94,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300533",
+      "name": "冰川网络",
+      "g_q": -1.8932,
+      "score_growth": 4.0,
+      "total": 36.92,
+      "sector_l2": "游戏Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688386",
+      "name": "泛亚微透",
+      "g_q": -0.723,
+      "score_growth": 2.64,
+      "total": 36.89,
+      "sector_l2": "塑料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300207",
+      "name": "欣旺达",
+      "g_q": -0.6998,
+      "score_growth": 4.0,
+      "total": 36.85,
+      "sector_l2": "电池",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002993",
+      "name": "奥海科技",
+      "g_q": -1.4472,
+      "score_growth": 4.0,
+      "total": 36.85,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh605179",
+      "name": "一鸣食品",
+      "g_q": -1.0726,
+      "score_growth": 4.0,
+      "total": 36.8,
+      "sector_l2": "饮料乳品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600506",
+      "name": "统一股份",
+      "g_q": -1.4879,
+      "score_growth": 4.0,
+      "total": 36.78,
+      "sector_l2": "炼化及贸易",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300652",
+      "name": "雷迪克",
+      "g_q": -0.3564,
+      "score_growth": 0.58,
+      "total": 36.77,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002112",
+      "name": "三变科技",
+      "g_q": -1.9361,
+      "score_growth": 4.0,
+      "total": 36.73,
+      "sector_l2": "电网设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002849",
+      "name": "威星智能",
+      "g_q": -2.1256,
+      "score_growth": 1.99,
+      "total": 36.7,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002139",
+      "name": "拓邦股份",
+      "g_q": -0.225,
+      "score_growth": 2.7,
+      "total": 36.66,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000917",
+      "name": "电广传媒",
+      "g_q": -2.0758,
+      "score_growth": 4.0,
+      "total": 36.63,
+      "sector_l2": "电视广播Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688605",
+      "name": "先锋精科",
+      "g_q": -0.1124,
+      "score_growth": 4.0,
+      "total": 36.6,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000011",
+      "name": "深物业A",
+      "g_q": -4.377,
+      "score_growth": 4.0,
+      "total": 36.58,
+      "sector_l2": "房地产开发",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600580",
+      "name": "卧龙电驱",
+      "g_q": -0.9975,
+      "score_growth": 1.46,
+      "total": 36.53,
+      "sector_l2": "电机Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000156",
+      "name": "华数传媒",
+      "g_q": -0.3179,
+      "score_growth": 4.0,
+      "total": 36.47,
+      "sector_l2": "电视广播Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301205",
+      "name": "联特科技",
+      "g_q": -0.8035,
+      "score_growth": 4.0,
+      "total": 36.41,
+      "sector_l2": "通信设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz001226",
+      "name": "拓山重工",
+      "g_q": -0.8421,
+      "score_growth": 4.0,
+      "total": 36.31,
+      "sector_l2": "工程机械",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300354",
+      "name": "东华测试",
+      "g_q": -0.3277,
+      "score_growth": 0.9,
+      "total": 36.3,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002354",
+      "name": "天娱数科",
+      "g_q": -0.4622,
+      "score_growth": 4.0,
+      "total": 36.25,
+      "sector_l2": "广告营销",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301682",
+      "name": "宏明电子",
+      "g_q": -0.5525,
+      "score_growth": 4.0,
+      "total": 36.24,
+      "sector_l2": "军工电子Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600613",
+      "name": "神奇制药",
+      "g_q": -1.1482,
+      "score_growth": 1.8,
+      "total": 36.17,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301005",
+      "name": "超捷股份",
+      "g_q": -7.4974,
+      "score_growth": 4.0,
+      "total": 36.15,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603881",
+      "name": "数据港",
+      "g_q": -0.1749,
+      "score_growth": 2.8,
+      "total": 36.02,
+      "sector_l2": "通信服务",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300468",
+      "name": "四方精创",
+      "g_q": -0.1442,
+      "score_growth": 4.0,
+      "total": 35.84,
+      "sector_l2": "软件开发",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002976",
+      "name": "瑞玛精密",
+      "g_q": -34.0687,
+      "score_growth": 4.0,
+      "total": 35.81,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000681",
+      "name": "视觉中国",
+      "g_q": -0.4363,
+      "score_growth": 4.0,
+      "total": 35.8,
+      "sector_l2": "数字媒体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300863",
+      "name": "卡倍亿",
+      "g_q": -0.0666,
+      "score_growth": 4.0,
+      "total": 35.76,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002827",
+      "name": "高争民爆",
+      "g_q": -0.1329,
+      "score_growth": 1.31,
+      "total": 35.65,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300005",
+      "name": "探路者",
+      "g_q": -4.4437,
+      "score_growth": 4.0,
+      "total": 35.56,
+      "sector_l2": "服装家纺",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002864",
+      "name": "盘龙药业",
+      "g_q": -0.5736,
+      "score_growth": 0.24,
+      "total": 35.55,
+      "sector_l2": "中药Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002196",
+      "name": "方正电机",
+      "g_q": -2.3484,
+      "score_growth": 4.0,
+      "total": 35.51,
+      "sector_l2": "电机Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603078",
+      "name": "江化微",
+      "g_q": -0.2903,
+      "score_growth": 3.87,
+      "total": 35.48,
+      "sector_l2": "电子化学品Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301592",
+      "name": "六九一二",
+      "g_q": -7.3933,
+      "score_growth": 4.0,
+      "total": 35.43,
+      "sector_l2": "军工电子Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603185",
+      "name": "弘元绿能",
+      "g_q": -1.8203,
+      "score_growth": 4.0,
+      "total": 35.42,
+      "sector_l2": "光伏设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301123",
+      "name": "奕东电子",
+      "g_q": -1.7254,
+      "score_growth": 4.0,
+      "total": 35.37,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002983",
+      "name": "芯瑞达",
+      "g_q": -0.1299,
+      "score_growth": 2.53,
+      "total": 35.3,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000767",
+      "name": "晋控电力",
+      "g_q": -1.5748,
+      "score_growth": 4.0,
+      "total": 35.28,
+      "sector_l2": "电力",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002965",
+      "name": "祥鑫科技",
+      "g_q": -0.9089,
+      "score_growth": 4.0,
+      "total": 35.26,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688626",
+      "name": "翔宇医疗",
+      "g_q": -0.6911,
+      "score_growth": 3.56,
+      "total": 35.26,
+      "sector_l2": "医疗器械",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688608",
+      "name": "恒玄科技",
+      "g_q": -0.792,
+      "score_growth": 0.29,
+      "total": 35.05,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600977",
+      "name": "中国电影",
+      "g_q": -0.7558,
+      "score_growth": 2.97,
+      "total": 35.03,
+      "sector_l2": "影视院线",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603151",
+      "name": "邦基科技",
+      "g_q": -1.0212,
+      "score_growth": 4.0,
+      "total": 34.95,
+      "sector_l2": "饲料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600222",
+      "name": "太龙药业",
+      "g_q": -0.6968,
+      "score_growth": 2.6,
+      "total": 34.93,
+      "sector_l2": "中药Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688717",
+      "name": "艾罗能源",
+      "g_q": -16.1935,
+      "score_growth": 4.0,
+      "total": 34.9,
+      "sector_l2": "光伏设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688584",
+      "name": "上海合晶",
+      "g_q": -0.7143,
+      "score_growth": 1.05,
+      "total": 34.85,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002456",
+      "name": "欧菲光",
+      "g_q": -20.2571,
+      "score_growth": 0.35,
+      "total": 34.74,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301000",
+      "name": "肇民科技",
+      "g_q": -0.452,
+      "score_growth": 4.0,
+      "total": 34.7,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000420",
+      "name": "吉林化纤",
+      "g_q": -2.1729,
+      "score_growth": 3.18,
+      "total": 34.63,
+      "sector_l2": "化学纤维",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301312",
+      "name": "智立方",
+      "g_q": -0.641,
+      "score_growth": 4.0,
+      "total": 34.51,
+      "sector_l2": "自动化设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300775",
+      "name": "三角防务",
+      "g_q": -0.9407,
+      "score_growth": 0.64,
+      "total": 34.49,
+      "sector_l2": "航空装备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603725",
+      "name": "天安新材",
+      "g_q": -0.932,
+      "score_growth": 1.72,
+      "total": 34.43,
+      "sector_l2": "家居用品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301487",
+      "name": "盟固利",
+      "g_q": -0.9022,
+      "score_growth": 4.0,
+      "total": 34.38,
+      "sector_l2": "电池",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301232",
+      "name": "飞沃科技",
+      "g_q": -1.8769,
+      "score_growth": 3.78,
+      "total": 34.38,
+      "sector_l2": "风电设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301230",
+      "name": "泓博医药",
+      "g_q": -1.6545,
+      "score_growth": 4.0,
+      "total": 34.33,
+      "sector_l2": "医疗服务",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300214",
+      "name": "日科化学",
+      "g_q": -33.1863,
+      "score_growth": 1.66,
+      "total": 34.26,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600184",
+      "name": "光电股份",
+      "g_q": -1.3877,
+      "score_growth": 1.66,
+      "total": 34.19,
+      "sector_l2": "地面兵装Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603175",
+      "name": "超颖电子",
+      "g_q": -0.0227,
+      "score_growth": 4.0,
+      "total": 34.01,
+      "sector_l2": "元件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600821",
+      "name": "金开新能",
+      "g_q": -0.3542,
+      "score_growth": 2.36,
+      "total": 34.01,
+      "sector_l2": "电力",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002559",
+      "name": "亚威股份",
+      "g_q": -0.714,
+      "score_growth": 2.24,
+      "total": 33.94,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300265",
+      "name": "通光线缆",
+      "g_q": -2.9508,
+      "score_growth": 2.14,
+      "total": 33.88,
+      "sector_l2": "电网设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688449",
+      "name": "联芸科技",
+      "g_q": -0.4997,
+      "score_growth": 4.0,
+      "total": 33.86,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688663",
+      "name": "新风光",
+      "g_q": -0.7788,
+      "score_growth": 1.14,
+      "total": 33.84,
+      "sector_l2": "电网设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002300",
+      "name": "太阳电缆",
+      "g_q": -0.8281,
+      "score_growth": 4.0,
+      "total": 33.73,
+      "sector_l2": "电网设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz001388",
+      "name": "信通电子",
+      "g_q": -0.458,
+      "score_growth": 2.39,
+      "total": 33.69,
+      "sector_l2": "电网设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301191",
+      "name": "菲菱科思",
+      "g_q": -0.3429,
+      "score_growth": 4.0,
+      "total": 33.67,
+      "sector_l2": "通信设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002241",
+      "name": "歌尔股份",
+      "g_q": -0.0356,
+      "score_growth": 1.64,
+      "total": 33.65,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300525",
+      "name": "博思软件",
+      "g_q": -0.3069,
+      "score_growth": 2.56,
+      "total": 33.56,
+      "sector_l2": "软件开发",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300925",
+      "name": "法本信息",
+      "g_q": -0.3997,
+      "score_growth": 4.0,
+      "total": 33.53,
+      "sector_l2": "软件开发",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300567",
+      "name": "精测电子",
+      "g_q": -1.0832,
+      "score_growth": 4.0,
+      "total": 33.5,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603004",
+      "name": "鼎龙科技",
+      "g_q": -0.4276,
+      "score_growth": 1.11,
+      "total": 33.4,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688721",
+      "name": "龙图光罩",
+      "g_q": -0.8749,
+      "score_growth": 3.3,
+      "total": 33.08,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301658",
+      "name": "首航新能",
+      "g_q": -5.8935,
+      "score_growth": 4.0,
+      "total": 32.95,
+      "sector_l2": "光伏设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600812",
+      "name": "华北制药",
+      "g_q": -1.8208,
+      "score_growth": 0.57,
+      "total": 32.92,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301115",
+      "name": "联检科技",
+      "g_q": -1.9775,
+      "score_growth": 4.0,
+      "total": 32.92,
+      "sector_l2": "专业服务",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603516",
+      "name": "淳中科技",
+      "g_q": -2.8107,
+      "score_growth": 3.05,
+      "total": 32.89,
+      "sector_l2": "计算机设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603215",
+      "name": "比依股份",
+      "g_q": -0.8955,
+      "score_growth": 4.0,
+      "total": 32.78,
+      "sector_l2": "小家电",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300421",
+      "name": "力星股份",
+      "g_q": -1.14,
+      "score_growth": 2.21,
+      "total": 32.66,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603800",
+      "name": "洪田股份",
+      "g_q": -1.1854,
+      "score_growth": 0.42,
+      "total": 32.61,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600571",
+      "name": "信雅达",
+      "g_q": -0.5685,
+      "score_growth": 4.0,
+      "total": 32.49,
+      "sector_l2": "IT服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002777",
+      "name": "久远银海",
+      "g_q": -0.5614,
+      "score_growth": 2.15,
+      "total": 32.47,
+      "sector_l2": "IT服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688063",
+      "name": "派能科技",
+      "g_q": -6.2705,
+      "score_growth": 4.0,
+      "total": 32.46,
+      "sector_l2": "电池",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300619",
+      "name": "金银河",
+      "g_q": -0.8015,
+      "score_growth": 4.0,
+      "total": 32.39,
+      "sector_l2": "电池",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600610",
+      "name": "中毅达",
+      "g_q": -0.1968,
+      "score_growth": 3.37,
+      "total": 32.27,
+      "sector_l2": "化学原料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh601615",
+      "name": "明阳智能",
+      "g_q": -12.7617,
+      "score_growth": 1.7,
+      "total": 32.24,
+      "sector_l2": "风电设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300638",
+      "name": "广和通",
+      "g_q": -0.7448,
+      "score_growth": 4.0,
+      "total": 32.23,
+      "sector_l2": "通信设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301015",
+      "name": "百洋制药",
+      "g_q": -0.8503,
+      "score_growth": 2.22,
+      "total": 32.2,
+      "sector_l2": "医药商业",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz001248",
+      "name": "华润新能",
+      "g_q": -0.2971,
+      "score_growth": 4.0,
+      "total": 32.16,
+      "sector_l2": "电力",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300909",
+      "name": "汇创达",
+      "g_q": -1.1109,
+      "score_growth": 2.51,
+      "total": 32.07,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300248",
+      "name": "新开普",
+      "g_q": -0.4562,
+      "score_growth": 3.92,
+      "total": 32.03,
+      "sector_l2": "计算机设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh601020",
+      "name": "华钰矿业",
+      "g_q": -0.928,
+      "score_growth": 0.19,
+      "total": 32.0,
+      "sector_l2": "工业金属",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688775",
+      "name": "影石创新",
+      "g_q": -0.9182,
+      "score_growth": 4.0,
+      "total": 31.97,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600721",
+      "name": "百花医药",
+      "g_q": -0.7796,
+      "score_growth": 0.45,
+      "total": 31.97,
+      "sector_l2": "医疗服务",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300508",
+      "name": "维宏股份",
+      "g_q": -0.6441,
+      "score_growth": 4.0,
+      "total": 31.84,
+      "sector_l2": "计算机设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000766",
+      "name": "通化金马",
+      "g_q": -2.6715,
+      "score_growth": 0.87,
+      "total": 31.84,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301550",
+      "name": "斯菱智驱",
+      "g_q": -0.0734,
+      "score_growth": 4.0,
+      "total": 31.79,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300098",
+      "name": "高新兴",
+      "g_q": -1.0433,
+      "score_growth": 4.0,
+      "total": 31.79,
+      "sector_l2": "通信设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600637",
+      "name": "东方明珠",
+      "g_q": -1.5513,
+      "score_growth": 3.33,
+      "total": 31.67,
+      "sector_l2": "电视广播Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603696",
+      "name": "安记食品",
+      "g_q": -0.9418,
+      "score_growth": 3.89,
+      "total": 31.66,
+      "sector_l2": "调味发酵品Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300058",
+      "name": "蓝色光标",
+      "g_q": -0.4982,
+      "score_growth": 4.0,
+      "total": 31.65,
+      "sector_l2": "广告营销",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002342",
+      "name": "巨力索具",
+      "g_q": -12.4357,
+      "score_growth": 4.0,
+      "total": 31.57,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300772",
+      "name": "运达股份",
+      "g_q": -2.1875,
+      "score_growth": 4.0,
+      "total": 31.56,
+      "sector_l2": "风电设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300539",
+      "name": "横河精密",
+      "g_q": -0.0429,
+      "score_growth": 1.51,
+      "total": 31.53,
+      "sector_l2": "塑料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002649",
+      "name": "博彦科技",
+      "g_q": -0.1107,
+      "score_growth": 2.44,
+      "total": 31.53,
+      "sector_l2": "IT服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002912",
+      "name": "中新赛克",
+      "g_q": -1.0705,
+      "score_growth": 4.0,
+      "total": 31.47,
+      "sector_l2": "计算机设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300413",
+      "name": "芒果超媒",
+      "g_q": -0.9871,
+      "score_growth": 4.0,
+      "total": 31.45,
+      "sector_l2": "数字媒体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002889",
+      "name": "东方嘉盛",
+      "g_q": -1.7262,
+      "score_growth": 0.01,
+      "total": 31.32,
+      "sector_l2": "物流",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688591",
+      "name": "泰凌微",
+      "g_q": -0.1863,
+      "score_growth": 2.73,
+      "total": 31.31,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300296",
+      "name": "利亚德",
+      "g_q": -0.4604,
+      "score_growth": 0.54,
+      "total": 31.3,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300692",
+      "name": "中赋科技",
+      "g_q": -0.3464,
+      "score_growth": 2.46,
+      "total": 31.25,
+      "sector_l2": "环境治理",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002131",
+      "name": "利欧股份",
+      "g_q": -1.658,
+      "score_growth": 4.0,
+      "total": 31.21,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002882",
+      "name": "金龙羽",
+      "g_q": -0.3613,
+      "score_growth": 2.83,
+      "total": 31.19,
+      "sector_l2": "电网设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301107",
+      "name": "瑜欣电子",
+      "g_q": -0.8482,
+      "score_growth": 3.69,
+      "total": 31.14,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603687",
+      "name": "大胜达",
+      "g_q": -1.2424,
+      "score_growth": 4.0,
+      "total": 31.01,
+      "sector_l2": "包装印刷",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688772",
+      "name": "珠海冠宇",
+      "g_q": -0.9037,
+      "score_growth": 3.99,
+      "total": 30.96,
+      "sector_l2": "电池",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688836",
+      "name": "宇树科技",
+      "g_q": -0.1805,
+      "score_growth": 4.0,
+      "total": 30.9,
+      "sector_l2": "自动化设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz001288",
+      "name": "运机集团",
+      "g_q": -0.4255,
+      "score_growth": 0.6,
+      "total": 30.89,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600963",
+      "name": "岳阳林纸",
+      "g_q": -6.6136,
+      "score_growth": 2.57,
+      "total": 30.83,
+      "sector_l2": "造纸",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600590",
+      "name": "泰豪科技",
+      "g_q": -32.8472,
+      "score_growth": 1.19,
+      "total": 30.7,
+      "sector_l2": "其他电源设备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002845",
+      "name": "同兴达",
+      "g_q": -0.2645,
+      "score_growth": 1.4,
+      "total": 30.68,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600666",
+      "name": "奥瑞德",
+      "g_q": -3.7144,
+      "score_growth": 4.0,
+      "total": 30.59,
+      "sector_l2": "IT服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688205",
+      "name": "德科立",
+      "g_q": -0.3147,
+      "score_growth": 4.0,
+      "total": 30.58,
+      "sector_l2": "通信设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301525",
+      "name": "儒竞科技",
+      "g_q": -0.1266,
+      "score_growth": 1.75,
+      "total": 30.48,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301488",
+      "name": "豪恩汽电",
+      "g_q": -0.814,
+      "score_growth": 4.0,
+      "total": 30.47,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300351",
+      "name": "永贵智能",
+      "g_q": -0.6205,
+      "score_growth": 4.0,
+      "total": 30.43,
+      "sector_l2": "轨交设备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000048",
+      "name": "京基智农",
+      "g_q": -3.9872,
+      "score_growth": 1.94,
+      "total": 30.42,
+      "sector_l2": "养殖业",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603586",
+      "name": "金麒麟",
+      "g_q": -0.2138,
+      "score_growth": 1.05,
+      "total": 30.4,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301387",
+      "name": "光大同创",
+      "g_q": -2.9906,
+      "score_growth": 4.0,
+      "total": 30.11,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002730",
+      "name": "电光科技",
+      "g_q": -0.3695,
+      "score_growth": 1.59,
+      "total": 30.05,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002169",
+      "name": "智光电气",
+      "g_q": -26.4619,
+      "score_growth": 3.83,
+      "total": 30.02,
+      "sector_l2": "电网设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600318",
+      "name": "新力金融",
+      "g_q": -0.8117,
+      "score_growth": 4.0,
+      "total": 29.99,
+      "sector_l2": "多元金融",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300348",
+      "name": "长亮科技",
+      "g_q": -3.7315,
+      "score_growth": 4.0,
+      "total": 29.89,
+      "sector_l2": "软件开发",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301060",
+      "name": "兰卫医学",
+      "g_q": -33.6387,
+      "score_growth": 0.71,
+      "total": 29.89,
+      "sector_l2": "医疗服务",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603496",
+      "name": "恒为科技",
+      "g_q": -0.2333,
+      "score_growth": 2.74,
+      "total": 29.88,
+      "sector_l2": "计算机设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300951",
+      "name": "博硕科技",
+      "g_q": -1.5838,
+      "score_growth": 3.19,
+      "total": 29.8,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688798",
+      "name": "艾为电子",
+      "g_q": -0.8077,
+      "score_growth": 1.28,
+      "total": 29.79,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603232",
+      "name": "格尔软件",
+      "g_q": -6.345,
+      "score_growth": 3.8,
+      "total": 29.77,
+      "sector_l2": "软件开发",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300720",
+      "name": "海川智能",
+      "g_q": -0.6806,
+      "score_growth": 3.77,
+      "total": 29.76,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002870",
+      "name": "香山股份",
+      "g_q": -1.4195,
+      "score_growth": 0.8,
+      "total": 29.67,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301326",
+      "name": "捷邦科技",
+      "g_q": -1.9715,
+      "score_growth": 2.0,
+      "total": 29.59,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002728",
+      "name": "特一药业",
+      "g_q": -0.2911,
+      "score_growth": 2.01,
+      "total": 29.56,
+      "sector_l2": "中药Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300550",
+      "name": "和仁科技",
+      "g_q": -3.2256,
+      "score_growth": 1.68,
+      "total": 29.48,
+      "sector_l2": "软件开发",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002651",
+      "name": "利君股份",
+      "g_q": -1.7217,
+      "score_growth": 4.0,
+      "total": 29.44,
+      "sector_l2": "航空装备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688777",
+      "name": "中控技术",
+      "g_q": -1.2306,
+      "score_growth": 1.6,
+      "total": 29.35,
+      "sector_l2": "自动化设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh605488",
+      "name": "福莱新材",
+      "g_q": -0.7965,
+      "score_growth": 4.0,
+      "total": 29.3,
+      "sector_l2": "塑料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002195",
+      "name": "岩山科技",
+      "g_q": -1.5535,
+      "score_growth": 4.0,
+      "total": 29.29,
+      "sector_l2": "IT服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002418",
+      "name": "康盛股份",
+      "g_q": -1.7395,
+      "score_growth": 4.0,
+      "total": 29.25,
+      "sector_l2": "家电零部件Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600556",
+      "name": "天下秀",
+      "g_q": -33.2415,
+      "score_growth": 4.0,
+      "total": 29.17,
+      "sector_l2": "广告营销",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002687",
+      "name": "乔治白",
+      "g_q": -1.7889,
+      "score_growth": 2.28,
+      "total": 29.14,
+      "sector_l2": "服装家纺",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz001358",
+      "name": "兴欣新材",
+      "g_q": -0.5408,
+      "score_growth": 0.85,
+      "total": 29.05,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300383",
+      "name": "光环新网",
+      "g_q": -0.4449,
+      "score_growth": 2.07,
+      "total": 29.0,
+      "sector_l2": "通信服务",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000993",
+      "name": "闽东电力",
+      "g_q": -0.0136,
+      "score_growth": 0.69,
+      "total": 28.96,
+      "sector_l2": "电力",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300939",
+      "name": "秋田微",
+      "g_q": -0.6172,
+      "score_growth": 1.83,
+      "total": 28.96,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301398",
+      "name": "星源卓镁",
+      "g_q": -1.6809,
+      "score_growth": 4.0,
+      "total": 28.96,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301256",
+      "name": "华融化学",
+      "g_q": -0.552,
+      "score_growth": 0.33,
+      "total": 28.95,
+      "sector_l2": "化学原料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300809",
+      "name": "华辰装备",
+      "g_q": -0.7011,
+      "score_growth": 0.37,
+      "total": 28.95,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002100",
+      "name": "天康生物",
+      "g_q": -3.5381,
+      "score_growth": 3.53,
+      "total": 28.91,
+      "sector_l2": "饲料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300696",
+      "name": "爱乐达",
+      "g_q": -2.3427,
+      "score_growth": 0.86,
+      "total": 28.89,
+      "sector_l2": "航空装备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603667",
+      "name": "五洲新春",
+      "g_q": -0.3488,
+      "score_growth": 0.66,
+      "total": 28.86,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz001360",
+      "name": "南矿集团",
+      "g_q": -0.254,
+      "score_growth": 3.66,
+      "total": 28.82,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300545",
+      "name": "联得装备",
+      "g_q": -0.1166,
+      "score_growth": 0.64,
+      "total": 28.79,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301669",
+      "name": "高特电子",
+      "g_q": -0.9279,
+      "score_growth": 1.53,
+      "total": 28.73,
+      "sector_l2": "其他电源设备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688685",
+      "name": "迈信林",
+      "g_q": -1.6878,
+      "score_growth": 2.71,
+      "total": 28.7,
+      "sector_l2": "航空装备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600513",
+      "name": "联环药业",
+      "g_q": -0.0019,
+      "score_growth": 4.0,
+      "total": 28.52,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301529",
+      "name": "福赛科技",
+      "g_q": -0.3727,
+      "score_growth": 3.55,
+      "total": 28.5,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301448",
+      "name": "开创电气",
+      "g_q": -3.2584,
+      "score_growth": 4.0,
+      "total": 28.46,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300139",
+      "name": "晓程科技",
+      "g_q": -0.9141,
+      "score_growth": 1.76,
+      "total": 28.38,
+      "sector_l2": "贵金属",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002361",
+      "name": "神剑股份",
+      "g_q": -3.0312,
+      "score_growth": 1.75,
+      "total": 28.38,
+      "sector_l2": "塑料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300779",
+      "name": "惠城环保",
+      "g_q": -2.7068,
+      "score_growth": 0.98,
+      "total": 28.32,
+      "sector_l2": "环境治理",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600435",
+      "name": "北方导航",
+      "g_q": -6.0186,
+      "score_growth": 0.43,
+      "total": 28.31,
+      "sector_l2": "地面兵装Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002446",
+      "name": "盛路通信",
+      "g_q": -1.1591,
+      "score_growth": 2.96,
+      "total": 28.3,
+      "sector_l2": "军工电子Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002639",
+      "name": "雪人集团",
+      "g_q": -4.4925,
+      "score_growth": 4.0,
+      "total": 28.27,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300007",
+      "name": "汉威科技",
+      "g_q": -0.0135,
+      "score_growth": 1.09,
+      "total": 28.17,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300310",
+      "name": "宜通世纪",
+      "g_q": -0.5986,
+      "score_growth": 3.16,
+      "total": 28.15,
+      "sector_l2": "通信服务",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600776",
+      "name": "东方通信",
+      "g_q": -1.0999,
+      "score_growth": 4.0,
+      "total": 28.09,
+      "sector_l2": "通信设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600879",
+      "name": "航天电子",
+      "g_q": -0.4094,
+      "score_growth": 1.87,
+      "total": 28.0,
+      "sector_l2": "航天装备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300102",
+      "name": "乾照光电",
+      "g_q": -0.8818,
+      "score_growth": 0.04,
+      "total": 27.88,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301008",
+      "name": "宏昌科技",
+      "g_q": -1.3292,
+      "score_growth": 4.0,
+      "total": 27.86,
+      "sector_l2": "家电零部件Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301236",
+      "name": "软通动力",
+      "g_q": -0.3329,
+      "score_growth": 4.0,
+      "total": 27.84,
+      "sector_l2": "IT服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300465",
+      "name": "高伟达",
+      "g_q": -1.3261,
+      "score_growth": 1.89,
+      "total": 27.78,
+      "sector_l2": "软件开发",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002655",
+      "name": "共达电声",
+      "g_q": -1.1533,
+      "score_growth": 2.48,
+      "total": 27.77,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300731",
+      "name": "科创新源",
+      "g_q": -2.1909,
+      "score_growth": 2.46,
+      "total": 27.61,
+      "sector_l2": "橡胶",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603316",
+      "name": "诚邦股份",
+      "g_q": -6.0659,
+      "score_growth": 4.0,
+      "total": 27.54,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603960",
+      "name": "克来机电",
+      "g_q": -0.115,
+      "score_growth": 4.0,
+      "total": 27.49,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300004",
+      "name": "南风股份",
+      "g_q": -1.4251,
+      "score_growth": 0.5,
+      "total": 27.48,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688582",
+      "name": "芯动联科",
+      "g_q": -1.0559,
+      "score_growth": 0.06,
+      "total": 27.46,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz001212",
+      "name": "中旗新材",
+      "g_q": -80.1994,
+      "score_growth": 0.57,
+      "total": 27.43,
+      "sector_l2": "装修建材",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300606",
+      "name": "金太阳",
+      "g_q": -0.3354,
+      "score_growth": 0.87,
+      "total": 27.35,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002174",
+      "name": "游族网络",
+      "g_q": -0.6572,
+      "score_growth": 4.0,
+      "total": 27.12,
+      "sector_l2": "游戏Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300418",
+      "name": "昆仑万维",
+      "g_q": -6.8641,
+      "score_growth": 4.0,
+      "total": 27.09,
+      "sector_l2": "游戏Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002931",
+      "name": "锋龙股份",
+      "g_q": -1.5457,
+      "score_growth": 2.95,
+      "total": 27.01,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300781",
+      "name": "因赛集团",
+      "g_q": -1.4157,
+      "score_growth": 4.0,
+      "total": 26.68,
+      "sector_l2": "广告营销",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300461",
+      "name": "田中精机",
+      "g_q": -0.1368,
+      "score_growth": 4.0,
+      "total": 26.67,
+      "sector_l2": "自动化设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002400",
+      "name": "省广集团",
+      "g_q": -2.1521,
+      "score_growth": 4.0,
+      "total": 26.6,
+      "sector_l2": "广告营销",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300920",
+      "name": "润阳科技",
+      "g_q": -0.9904,
+      "score_growth": 0.61,
+      "total": 26.6,
+      "sector_l2": "塑料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603990",
+      "name": "麦迪科技",
+      "g_q": -1.1101,
+      "score_growth": 1.48,
+      "total": 26.55,
+      "sector_l2": "软件开发",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002151",
+      "name": "北斗星通",
+      "g_q": -3.8131,
+      "score_growth": 4.0,
+      "total": 26.55,
+      "sector_l2": "军工电子Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688448",
+      "name": "磁谷科技",
+      "g_q": -1.9727,
+      "score_growth": 2.66,
+      "total": 26.55,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300593",
+      "name": "新雷能",
+      "g_q": -289.0264,
+      "score_growth": 4.0,
+      "total": 26.4,
+      "sector_l2": "其他电源设备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300339",
+      "name": "润和软件",
+      "g_q": -1.6863,
+      "score_growth": 4.0,
+      "total": 26.31,
+      "sector_l2": "IT服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000923",
+      "name": "河钢资源",
+      "g_q": -0.6252,
+      "score_growth": 0.01,
+      "total": 26.24,
+      "sector_l2": "冶钢原料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600481",
+      "name": "双良节能",
+      "g_q": -168.3193,
+      "score_growth": 0.92,
+      "total": 26.0,
+      "sector_l2": "光伏设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300703",
+      "name": "创源股份",
+      "g_q": -1.2229,
+      "score_growth": 4.0,
+      "total": 25.95,
+      "sector_l2": "文娱用品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603336",
+      "name": "宏辉果蔬",
+      "g_q": -1.7203,
+      "score_growth": 2.61,
+      "total": 25.94,
+      "sector_l2": "种植业",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300541",
+      "name": "先进数通",
+      "g_q": -0.3161,
+      "score_growth": 4.0,
+      "total": 25.85,
+      "sector_l2": "IT服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300315",
+      "name": "掌趣科技",
+      "g_q": -3.062,
+      "score_growth": 3.84,
+      "total": 25.81,
+      "sector_l2": "游戏Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300695",
+      "name": "兆丰股份",
+      "g_q": -0.3534,
+      "score_growth": 3.14,
+      "total": 25.6,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688549",
+      "name": "中巨芯",
+      "g_q": -0.4186,
+      "score_growth": 4.0,
+      "total": 25.57,
+      "sector_l2": "电子化学品Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000593",
+      "name": "德龙汇能",
+      "g_q": -39.9251,
+      "score_growth": 1.16,
+      "total": 25.48,
+      "sector_l2": "燃气Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002589",
+      "name": "瑞康医药",
+      "g_q": -7.0347,
+      "score_growth": 2.53,
+      "total": 25.23,
+      "sector_l2": "医药商业",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh601099",
+      "name": "太平洋",
+      "g_q": -0.8389,
+      "score_growth": 2.81,
+      "total": 25.2,
+      "sector_l2": "证券Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000925",
+      "name": "众合科技",
+      "g_q": -1.761,
+      "score_growth": 3.42,
+      "total": 25.2,
+      "sector_l2": "轨交设备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688601",
+      "name": "力芯微",
+      "g_q": -2.0257,
+      "score_growth": 3.65,
+      "total": 25.14,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002088",
+      "name": "鲁阳节能",
+      "g_q": -1.8403,
+      "score_growth": 1.68,
+      "total": 25.09,
+      "sector_l2": "装修建材",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh605598",
+      "name": "上海港湾",
+      "g_q": -3.9556,
+      "score_growth": 4.0,
+      "total": 25.07,
+      "sector_l2": "专业工程",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000521",
+      "name": "长虹美菱",
+      "g_q": -2.2257,
+      "score_growth": 1.16,
+      "total": 24.89,
+      "sector_l2": "白色家电",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688635",
+      "name": "长进光子",
+      "g_q": -0.6461,
+      "score_growth": 0.88,
+      "total": 24.85,
+      "sector_l2": "通信设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002526",
+      "name": "山东矿机",
+      "g_q": -0.0163,
+      "score_growth": 1.26,
+      "total": 24.83,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301502",
+      "name": "华阳智能",
+      "g_q": -1.2632,
+      "score_growth": 2.91,
+      "total": 24.76,
+      "sector_l2": "电机Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301656",
+      "name": "联合动力",
+      "g_q": -0.8393,
+      "score_growth": 4.0,
+      "total": 24.74,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600203",
+      "name": "福日电子",
+      "g_q": -0.8625,
+      "score_growth": 4.0,
+      "total": 24.67,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301322",
+      "name": "绿通科技",
+      "g_q": -0.0741,
+      "score_growth": 4.0,
+      "total": 24.61,
+      "sector_l2": "摩托车及其他",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002878",
+      "name": "元隆雅图",
+      "g_q": -1.9072,
+      "score_growth": 1.39,
+      "total": 24.57,
+      "sector_l2": "广告营销",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688508",
+      "name": "芯朋微",
+      "g_q": -6.7099,
+      "score_growth": 3.26,
+      "total": 24.52,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300088",
+      "name": "长信科技",
+      "g_q": -1.0479,
+      "score_growth": 0.4,
+      "total": 24.46,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300474",
+      "name": "景嘉微",
+      "g_q": -9.4286,
+      "score_growth": 4.0,
+      "total": 24.42,
+      "sector_l2": "军工电子Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301066",
+      "name": "万事利",
+      "g_q": -18.0328,
+      "score_growth": 4.0,
+      "total": 24.41,
+      "sector_l2": "纺织制造",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688322",
+      "name": "奥比中光",
+      "g_q": -0.4063,
+      "score_growth": 1.61,
+      "total": 24.28,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300189",
+      "name": "神农种业",
+      "g_q": -0.1802,
+      "score_growth": 2.32,
+      "total": 24.23,
+      "sector_l2": "种植业",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300835",
+      "name": "龙磁科技",
+      "g_q": -0.1522,
+      "score_growth": 3.08,
+      "total": 24.15,
+      "sector_l2": "金属新材料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603898",
+      "name": "好莱客",
+      "g_q": -0.6803,
+      "score_growth": 0.52,
+      "total": 24.15,
+      "sector_l2": "家居用品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300654",
+      "name": "世纪天鸿",
+      "g_q": -0.6682,
+      "score_growth": 3.8,
+      "total": 24.14,
+      "sector_l2": "出版",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301413",
+      "name": "安培龙",
+      "g_q": -0.7761,
+      "score_growth": 4.0,
+      "total": 24.04,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300342",
+      "name": "天银机电",
+      "g_q": -2.5671,
+      "score_growth": 2.9,
+      "total": 24.02,
+      "sector_l2": "家电零部件Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300618",
+      "name": "寒锐钴业",
+      "g_q": -2.9431,
+      "score_growth": 1.61,
+      "total": 24.0,
+      "sector_l2": "能源金属",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh601860",
+      "name": "紫金银行",
+      "g_q": -0.2983,
+      "score_growth": 1.24,
+      "total": 23.87,
+      "sector_l2": "农商行Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": true
+    },
+    {
+      "code": "sz002988",
+      "name": "豪美新材",
+      "g_q": -1.1213,
+      "score_growth": 2.08,
+      "total": 23.8,
+      "sector_l2": "工业金属",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688661",
+      "name": "和林微纳",
+      "g_q": -1.1829,
+      "score_growth": 0.82,
+      "total": 23.79,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002774",
+      "name": "快意电梯",
+      "g_q": -1.683,
+      "score_growth": 1.9,
+      "total": 23.75,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh605398",
+      "name": "新炬网络",
+      "g_q": -3.2591,
+      "score_growth": 4.0,
+      "total": 23.64,
+      "sector_l2": "IT服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000901",
+      "name": "航天科技",
+      "g_q": -0.8621,
+      "score_growth": 0.59,
+      "total": 23.53,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002735",
+      "name": "王子新材",
+      "g_q": -3.7006,
+      "score_growth": 3.43,
+      "total": 23.43,
+      "sector_l2": "包装印刷",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603396",
+      "name": "金辰股份",
+      "g_q": -0.6638,
+      "score_growth": 1.08,
+      "total": 23.42,
+      "sector_l2": "光伏设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603106",
+      "name": "恒银科技",
+      "g_q": -0.6803,
+      "score_growth": 0.71,
+      "total": 23.25,
+      "sector_l2": "计算机设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh605018",
+      "name": "长华集团",
+      "g_q": -1.7849,
+      "score_growth": 0.69,
+      "total": 23.07,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000017",
+      "name": "深中华A",
+      "g_q": -0.9594,
+      "score_growth": 0.79,
+      "total": 23.0,
+      "sector_l2": "饰品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688352",
+      "name": "颀中科技",
+      "g_q": -0.2272,
+      "score_growth": 1.03,
+      "total": 22.68,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603703",
+      "name": "盛洋科技",
+      "g_q": -8.5987,
+      "score_growth": 4.0,
+      "total": 22.67,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301155",
+      "name": "海力风电",
+      "g_q": -1.407,
+      "score_growth": 0.04,
+      "total": 22.67,
+      "sector_l2": "风电设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603353",
+      "name": "和顺石油",
+      "g_q": -1.689,
+      "score_growth": 2.2,
+      "total": 22.52,
+      "sector_l2": "炼化及贸易",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002955",
+      "name": "鸿合科技",
+      "g_q": -0.3102,
+      "score_growth": 1.18,
+      "total": 22.51,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603230",
+      "name": "内蒙新华",
+      "g_q": -0.6479,
+      "score_growth": 2.06,
+      "total": 22.48,
+      "sector_l2": "出版",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002248",
+      "name": "华东数控",
+      "g_q": -0.7178,
+      "score_growth": 1.43,
+      "total": 22.36,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002242",
+      "name": "九阳股份",
+      "g_q": -0.5792,
+      "score_growth": 1.52,
+      "total": 22.32,
+      "sector_l2": "小家电",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603220",
+      "name": "中贝通信",
+      "g_q": -0.8812,
+      "score_growth": 2.67,
+      "total": 21.99,
+      "sector_l2": "通信服务",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002094",
+      "name": "青岛金王",
+      "g_q": -0.5825,
+      "score_growth": 2.56,
+      "total": 21.98,
+      "sector_l2": "化妆品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688702",
+      "name": "盛科通信",
+      "g_q": -1.6311,
+      "score_growth": 4.0,
+      "total": 21.92,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002181",
+      "name": "粤 传 媒",
+      "g_q": -0.0225,
+      "score_growth": 4.0,
+      "total": 21.92,
+      "sector_l2": "出版",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300467",
+      "name": "迅游科技",
+      "g_q": -1.4956,
+      "score_growth": 4.0,
+      "total": 21.87,
+      "sector_l2": "游戏Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002708",
+      "name": "光洋股份",
+      "g_q": -5.0165,
+      "score_growth": 4.0,
+      "total": 21.76,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300522",
+      "name": "世名科技",
+      "g_q": -4.1967,
+      "score_growth": 0.7,
+      "total": 21.61,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603466",
+      "name": "风语筑",
+      "g_q": -2.8126,
+      "score_growth": 1.57,
+      "total": 21.59,
+      "sector_l2": "数字媒体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300787",
+      "name": "海能实业",
+      "g_q": -5.9073,
+      "score_growth": 3.06,
+      "total": 21.53,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002445",
+      "name": "中南文化",
+      "g_q": -1.1005,
+      "score_growth": 1.83,
+      "total": 21.45,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300444",
+      "name": "双杰电气",
+      "g_q": -2.7359,
+      "score_growth": 0.43,
+      "total": 21.41,
+      "sector_l2": "电网设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300258",
+      "name": "精锻科技",
+      "g_q": -2.4706,
+      "score_growth": 1.36,
+      "total": 21.41,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301357",
+      "name": "北方长龙",
+      "g_q": -2.4562,
+      "score_growth": 1.1,
+      "total": 21.31,
+      "sector_l2": "地面兵装Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002765",
+      "name": "蓝黛科技",
+      "g_q": -1.5187,
+      "score_growth": 1.76,
+      "total": 21.28,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301395",
+      "name": "仁信新材",
+      "g_q": -4.3848,
+      "score_growth": 3.07,
+      "total": 21.25,
+      "sector_l2": "塑料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688583",
+      "name": "思看科技",
+      "g_q": -0.9466,
+      "score_growth": 2.68,
+      "total": 21.03,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603206",
+      "name": "嘉环科技",
+      "g_q": -0.2648,
+      "score_growth": 2.3,
+      "total": 21.0,
+      "sector_l2": "通信服务",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688621",
+      "name": "阳光诺和",
+      "g_q": -1.2617,
+      "score_growth": 0.39,
+      "total": 20.97,
+      "sector_l2": "医疗服务",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300991",
+      "name": "创益通",
+      "g_q": -7.2611,
+      "score_growth": 1.0,
+      "total": 20.91,
+      "sector_l2": "其他电子Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300916",
+      "name": "朗特智能",
+      "g_q": -0.1083,
+      "score_growth": 1.22,
+      "total": 20.65,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603200",
+      "name": "上海洗霸",
+      "g_q": -2.4589,
+      "score_growth": 3.45,
+      "total": 20.59,
+      "sector_l2": "环境治理",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300777",
+      "name": "中简科技",
+      "g_q": -1.4953,
+      "score_growth": 0.25,
+      "total": 20.53,
+      "sector_l2": "航空装备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688568",
+      "name": "中科星图",
+      "g_q": -4.847,
+      "score_growth": 0.17,
+      "total": 20.34,
+      "sector_l2": "IT服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300101",
+      "name": "振芯科技",
+      "g_q": -2.4485,
+      "score_growth": 1.39,
+      "total": 20.29,
+      "sector_l2": "军工电子Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh601778",
+      "name": "晶科科技",
+      "g_q": -0.9759,
+      "score_growth": 0.03,
+      "total": 20.13,
+      "sector_l2": "电力",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300036",
+      "name": "超图软件",
+      "g_q": -4.1185,
+      "score_growth": 0.74,
+      "total": 20.0,
+      "sector_l2": "软件开发",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301050",
+      "name": "雷电微力",
+      "g_q": -1.906,
+      "score_growth": 0.05,
+      "total": 19.95,
+      "sector_l2": "军工电子Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600839",
+      "name": "四川长虹",
+      "g_q": -13.866,
+      "score_growth": 4.0,
+      "total": 19.8,
+      "sector_l2": "黑色家电",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000818",
+      "name": "航锦科技",
+      "g_q": -1.7682,
+      "score_growth": 0.01,
+      "total": 19.75,
+      "sector_l2": "化学原料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301045",
+      "name": "天禄科技",
+      "g_q": -0.4531,
+      "score_growth": 0.91,
+      "total": 19.65,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603360",
+      "name": "百傲化学",
+      "g_q": -1.1211,
+      "score_growth": 0.14,
+      "total": 19.56,
+      "sector_l2": "农化制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002148",
+      "name": "北纬科技",
+      "g_q": -2.9012,
+      "score_growth": 3.41,
+      "total": 19.48,
+      "sector_l2": "通信服务",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603395",
+      "name": "红四方",
+      "g_q": -17.0447,
+      "score_growth": 1.49,
+      "total": 19.18,
+      "sector_l2": "农化制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh601606",
+      "name": "长城军工",
+      "g_q": -5.4737,
+      "score_growth": 2.59,
+      "total": 19.11,
+      "sector_l2": "地面兵装Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688820",
+      "name": "盛合晶微",
+      "g_q": -0.1617,
+      "score_growth": 2.42,
+      "total": 18.93,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002279",
+      "name": "久其软件",
+      "g_q": -1.5865,
+      "score_growth": 0.47,
+      "total": 18.79,
+      "sector_l2": "软件开发",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002549",
+      "name": "凯美特气",
+      "g_q": -1.5444,
+      "score_growth": 1.12,
+      "total": 18.61,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz001201",
+      "name": "东瑞股份",
+      "g_q": -14.846,
+      "score_growth": 4.0,
+      "total": 18.52,
+      "sector_l2": "养殖业",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688709",
+      "name": "成都华微",
+      "g_q": -4.9044,
+      "score_growth": 0.22,
+      "total": 18.5,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603121",
+      "name": "华培动力",
+      "g_q": -6.1897,
+      "score_growth": 3.72,
+      "total": 18.36,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301234",
+      "name": "五洲医疗",
+      "g_q": -0.9547,
+      "score_growth": 1.42,
+      "total": 18.35,
+      "sector_l2": "医疗器械",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002165",
+      "name": "红 宝 丽",
+      "g_q": -46.5967,
+      "score_growth": 4.0,
+      "total": 18.12,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh605318",
+      "name": "法狮龙",
+      "g_q": -2.7195,
+      "score_growth": 3.86,
+      "total": 17.39,
+      "sector_l2": "装修建材",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300719",
+      "name": "安达维尔",
+      "g_q": -1.8202,
+      "score_growth": 1.93,
+      "total": 17.35,
+      "sector_l2": "航空装备Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002434",
+      "name": "万里扬",
+      "g_q": -2.2525,
+      "score_growth": 0.16,
+      "total": 17.32,
+      "sector_l2": "汽车零部件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600629",
+      "name": "华建集团",
+      "g_q": -5.0483,
+      "score_growth": 0.86,
+      "total": 17.21,
+      "sector_l2": "工程咨询服务Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002127",
+      "name": "南极电商",
+      "g_q": -0.069,
+      "score_growth": 0.79,
+      "total": 17.18,
+      "sector_l2": "互联网电商",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301209",
+      "name": "联合化学",
+      "g_q": -1.4106,
+      "score_growth": 1.95,
+      "total": 17.12,
+      "sector_l2": "化学制品",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh601595",
+      "name": "上海电影",
+      "g_q": -0.9981,
+      "score_growth": 0.99,
+      "total": 17.04,
+      "sector_l2": "影视院线",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300516",
+      "name": "久之洋",
+      "g_q": -2.5624,
+      "score_growth": 0.23,
+      "total": 16.74,
+      "sector_l2": "其他电子Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300328",
+      "name": "宜安科技",
+      "g_q": -4.2001,
+      "score_growth": 0.77,
+      "total": 16.62,
+      "sector_l2": "工业金属",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300940",
+      "name": "南极光",
+      "g_q": -1.0185,
+      "score_growth": 0.2,
+      "total": 16.59,
+      "sector_l2": "光学光电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300278",
+      "name": "华昌达",
+      "g_q": -0.6166,
+      "score_growth": 2.93,
+      "total": 16.55,
+      "sector_l2": "自动化设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300251",
+      "name": "光线传媒",
+      "g_q": -0.9329,
+      "score_growth": 0.21,
+      "total": 16.3,
+      "sector_l2": "影视院线",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603595",
+      "name": "东尼电子",
+      "g_q": -2.3839,
+      "score_growth": 1.43,
+      "total": 16.11,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300110",
+      "name": "华仁药业",
+      "g_q": -1.1599,
+      "score_growth": 1.88,
+      "total": 15.75,
+      "sector_l2": "化学制药",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603690",
+      "name": "至纯科技",
+      "g_q": -10.3468,
+      "score_growth": 0.26,
+      "total": 14.94,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh605378",
+      "name": "野马电池",
+      "g_q": -1.0273,
+      "score_growth": 1.1,
+      "total": 14.74,
+      "sector_l2": "电池",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300164",
+      "name": "通源石油",
+      "g_q": -1.547,
+      "score_growth": 0.06,
+      "total": 14.7,
+      "sector_l2": "油服工程",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002277",
+      "name": "友阿股份",
+      "g_q": -2.3064,
+      "score_growth": 1.66,
+      "total": 14.54,
+      "sector_l2": "一般零售",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002579",
+      "name": "中京电子",
+      "g_q": -7.2412,
+      "score_growth": 1.9,
+      "total": 14.34,
+      "sector_l2": "元件",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603375",
+      "name": "盛景微",
+      "g_q": -2.9299,
+      "score_growth": 0.68,
+      "total": 14.18,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300045",
+      "name": "华力创通",
+      "g_q": -0.773,
+      "score_growth": 1.59,
+      "total": 14.1,
+      "sector_l2": "军工电子Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh600828",
+      "name": "茂业商业",
+      "g_q": -10.8985,
+      "score_growth": 0.28,
+      "total": 14.08,
+      "sector_l2": "一般零售",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300234",
+      "name": "开尔新材",
+      "g_q": -2.6054,
+      "score_growth": 3.33,
+      "total": 13.41,
+      "sector_l2": "装修建材",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688585",
+      "name": "上纬新材",
+      "g_q": -9.9654,
+      "score_growth": 1.28,
+      "total": 12.96,
+      "sector_l2": "塑料",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300931",
+      "name": "通用电梯",
+      "g_q": -2.8377,
+      "score_growth": 0.59,
+      "total": 12.33,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002298",
+      "name": "中电鑫龙",
+      "g_q": -3.2223,
+      "score_growth": 1.63,
+      "total": 12.05,
+      "sector_l2": "软件开发",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000712",
+      "name": "锦龙股份",
+      "g_q": -2.9794,
+      "score_growth": 0.01,
+      "total": 11.85,
+      "sector_l2": "证券Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301125",
+      "name": "腾亚精工",
+      "g_q": -330.797,
+      "score_growth": 1.22,
+      "total": 11.58,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz002943",
+      "name": "宇晶股份",
+      "g_q": -2.9926,
+      "score_growth": 0.21,
+      "total": 11.36,
+      "sector_l2": "通用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688210",
+      "name": "统联精密",
+      "g_q": -57.091,
+      "score_growth": 0.44,
+      "total": 11.34,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300032",
+      "name": "金龙机电",
+      "g_q": -2.1275,
+      "score_growth": 0.33,
+      "total": 11.05,
+      "sector_l2": "消费电子",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301052",
+      "name": "果麦文化",
+      "g_q": -2.3854,
+      "score_growth": 0.67,
+      "total": 10.74,
+      "sector_l2": "出版",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh603956",
+      "name": "威派格",
+      "g_q": -10.0678,
+      "score_growth": 0.15,
+      "total": 10.67,
+      "sector_l2": "专用设备",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz301583",
+      "name": "托伦斯",
+      "g_q": -0.4501,
+      "score_growth": 2.05,
+      "total": 10.48,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688286",
+      "name": "敏芯股份",
+      "g_q": -2.4552,
+      "score_growth": 0.53,
+      "total": 10.33,
+      "sector_l2": "半导体",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sh688371",
+      "name": "菲沃泰",
+      "g_q": -10.4973,
+      "score_growth": 0.55,
+      "total": 7.76,
+      "sector_l2": "电子化学品Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz000592",
+      "name": "平潭发展",
+      "g_q": -0.8295,
+      "score_growth": 0.15,
+      "total": 7.68,
+      "sector_l2": "林业Ⅱ",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    },
+    {
+      "code": "sz300071",
+      "name": "福石控股",
+      "g_q": -10.9005,
+      "score_growth": 0.34,
+      "total": 6.41,
+      "sector_l2": "广告营销",
+      "gq_cap_triggered": true,
+      "ep_capped": false
+    }
+  ],
+  "doc_subset_definition": "文档口径子集：v5.1 下 g_q<0 且成长分≥6（原封顶失效受害者），v5.2 应全部被压到≤4.0",
+  "doc_subset_count": 77,
+  "doc_subset_capped_count": 77,
+  "doc_subset": [
+    {
+      "code": "sz301345",
+      "name": "涛涛车业",
+      "g_q": -0.0087,
+      "v51_growth": 9.41,
+      "v52_growth": 4.0,
+      "v51_total": 85.08,
+      "v52_total": 77.4,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh603444",
+      "name": "吉比特",
+      "g_q": -0.1498,
+      "v51_growth": 8.87,
+      "v52_growth": 4.0,
+      "v51_total": 76.88,
+      "v52_total": 68.09,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh603067",
+      "name": "振华股份",
+      "g_q": -0.3158,
+      "v51_growth": 8.0,
+      "v52_growth": 4.0,
+      "v51_total": 76.79,
+      "v52_total": 71.47,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh600378",
+      "name": "昊华科技",
+      "g_q": -0.2087,
+      "v51_growth": 6.89,
+      "v52_growth": 4.0,
+      "v51_total": 75.42,
+      "v52_total": 70.74,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh605118",
+      "name": "力鼎光电",
+      "g_q": -0.0846,
+      "v51_growth": 8.68,
+      "v52_growth": 4.0,
+      "v51_total": 72.77,
+      "v52_total": 65.42,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz002126",
+      "name": "银轮股份",
+      "g_q": -0.0394,
+      "v51_growth": 8.29,
+      "v52_growth": 4.0,
+      "v51_total": 71.92,
+      "v52_total": 65.53,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz002803",
+      "name": "吉宏股份",
+      "g_q": -0.5908,
+      "v51_growth": 8.66,
+      "v52_growth": 4.0,
+      "v51_total": 71.88,
+      "v52_total": 64.36,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz002264",
+      "name": "新 华 都",
+      "g_q": -0.3864,
+      "v51_growth": 8.3,
+      "v52_growth": 4.0,
+      "v51_total": 70.33,
+      "v52_total": 62.09,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz002545",
+      "name": "东方铁塔",
+      "g_q": -0.3473,
+      "v51_growth": 6.47,
+      "v52_growth": 4.0,
+      "v51_total": 70.26,
+      "v52_total": 66.75,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz301575",
+      "name": "艾芬达",
+      "g_q": -0.2396,
+      "v51_growth": 8.63,
+      "v52_growth": 4.0,
+      "v51_total": 66.94,
+      "v52_total": 61.28,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh601069",
+      "name": "西部黄金",
+      "g_q": -0.18,
+      "v51_growth": 6.32,
+      "v52_growth": 4.0,
+      "v51_total": 66.93,
+      "v52_total": 63.04,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz300002",
+      "name": "神州泰岳",
+      "g_q": -0.2133,
+      "v51_growth": 8.55,
+      "v52_growth": 4.0,
+      "v51_total": 66.59,
+      "v52_total": 58.16,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz301110",
+      "name": "青木科技",
+      "g_q": -0.7142,
+      "v51_growth": 7.01,
+      "v52_growth": 4.0,
+      "v51_total": 66.59,
+      "v52_total": 63.98,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz001337",
+      "name": "四川黄金",
+      "g_q": -0.249,
+      "v51_growth": 6.88,
+      "v52_growth": 4.0,
+      "v51_total": 66.3,
+      "v52_total": 60.72,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh600933",
+      "name": "爱柯迪",
+      "g_q": -0.2662,
+      "v51_growth": 8.64,
+      "v52_growth": 4.0,
+      "v51_total": 66.28,
+      "v52_total": 59.57,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh603045",
+      "name": "福达合金",
+      "g_q": -0.9931,
+      "v51_growth": 8.0,
+      "v52_growth": 4.0,
+      "v51_total": 66.21,
+      "v52_total": 61.56,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh605133",
+      "name": "嵘泰股份",
+      "g_q": -0.3357,
+      "v51_growth": 8.92,
+      "v52_growth": 4.0,
+      "v51_total": 66.13,
+      "v52_total": 58.91,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz300191",
+      "name": "潜能恒信",
+      "g_q": -6.9187,
+      "v51_growth": 6.0,
+      "v52_growth": 4.0,
+      "v51_total": 63.7,
+      "v52_total": 59.68,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh688668",
+      "name": "鼎通科技",
+      "g_q": -0.4379,
+      "v51_growth": 7.18,
+      "v52_growth": 4.0,
+      "v51_total": 63.09,
+      "v52_total": 62.16,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz301373",
+      "name": "凌玮科技",
+      "g_q": -0.1299,
+      "v51_growth": 6.84,
+      "v52_growth": 4.0,
+      "v51_total": 62.77,
+      "v52_total": 57.7,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz002837",
+      "name": "英维克",
+      "g_q": -0.002,
+      "v51_growth": 6.24,
+      "v52_growth": 4.0,
+      "v51_total": 61.03,
+      "v52_total": 61.61,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz301580",
+      "name": "爱迪特",
+      "g_q": -0.0084,
+      "v51_growth": 6.9,
+      "v52_growth": 4.0,
+      "v51_total": 60.77,
+      "v52_total": 55.83,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh605589",
+      "name": "圣泉集团",
+      "g_q": -0.1918,
+      "v51_growth": 6.22,
+      "v52_growth": 4.0,
+      "v51_total": 60.57,
+      "v52_total": 57.94,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh688321",
+      "name": "微芯生物",
+      "g_q": -0.6225,
+      "v51_growth": 7.72,
+      "v52_growth": 4.0,
+      "v51_total": 59.96,
+      "v52_total": 57.9,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz301128",
+      "name": "强瑞技术",
+      "g_q": -0.0874,
+      "v51_growth": 8.99,
+      "v52_growth": 4.0,
+      "v51_total": 59.89,
+      "v52_total": 51.73,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz300790",
+      "name": "宇瞳光学",
+      "g_q": -0.428,
+      "v51_growth": 7.06,
+      "v52_growth": 4.0,
+      "v51_total": 59.37,
+      "v52_total": 57.01,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz301235",
+      "name": "华康洁净",
+      "g_q": -0.1002,
+      "v51_growth": 7.75,
+      "v52_growth": 4.0,
+      "v51_total": 59.32,
+      "v52_total": 55.36,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh600316",
+      "name": "洪都航空",
+      "g_q": -0.7596,
+      "v51_growth": 8.1,
+      "v52_growth": 4.0,
+      "v51_total": 58.63,
+      "v52_total": 52.47,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz301225",
+      "name": "恒勃股份",
+      "g_q": -0.27,
+      "v51_growth": 9.77,
+      "v52_growth": 4.0,
+      "v51_total": 58.16,
+      "v52_total": 48.38,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh603179",
+      "name": "新泉股份",
+      "g_q": -0.1226,
+      "v51_growth": 6.46,
+      "v52_growth": 4.0,
+      "v51_total": 58.0,
+      "v52_total": 54.89,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh603416",
+      "name": "信捷电气",
+      "g_q": -0.2341,
+      "v51_growth": 6.71,
+      "v52_growth": 4.0,
+      "v51_total": 57.73,
+      "v52_total": 55.92,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz300201",
+      "name": "海伦哲",
+      "g_q": -0.1973,
+      "v51_growth": 7.68,
+      "v52_growth": 4.0,
+      "v51_total": 57.55,
+      "v52_total": 53.43,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh603650",
+      "name": "彤程新材",
+      "g_q": -0.0841,
+      "v51_growth": 7.89,
+      "v52_growth": 4.0,
+      "v51_total": 57.34,
+      "v52_total": 51.36,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz301219",
+      "name": "腾远钴业",
+      "g_q": -1.9527,
+      "v51_growth": 8.0,
+      "v52_growth": 4.0,
+      "v51_total": 57.27,
+      "v52_total": 47.43,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz002297",
+      "name": "博云新材",
+      "g_q": -3.419,
+      "v51_growth": 8.0,
+      "v52_growth": 4.0,
+      "v51_total": 57.13,
+      "v52_total": 49.05,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz301638",
+      "name": "南网数字",
+      "g_q": -0.4666,
+      "v51_growth": 8.01,
+      "v52_growth": 4.0,
+      "v51_total": 57.12,
+      "v52_total": 49.16,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh600694",
+      "name": "大商股份",
+      "g_q": -0.6961,
+      "v51_growth": 6.0,
+      "v52_growth": 4.0,
+      "v51_total": 56.49,
+      "v52_total": 55.31,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz002286",
+      "name": "保龄宝",
+      "g_q": -0.114,
+      "v51_growth": 6.0,
+      "v52_growth": 4.0,
+      "v51_total": 55.79,
+      "v52_total": 53.59,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz300738",
+      "name": "奥飞数据",
+      "g_q": -0.8386,
+      "v51_growth": 6.13,
+      "v52_growth": 4.0,
+      "v51_total": 55.56,
+      "v52_total": 55.84,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz300063",
+      "name": "天龙集团",
+      "g_q": -0.5668,
+      "v51_growth": 7.95,
+      "v52_growth": 4.0,
+      "v51_total": 55.36,
+      "v52_total": 47.48,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh603038",
+      "name": "华立股份",
+      "g_q": -0.9639,
+      "v51_growth": 7.12,
+      "v52_growth": 4.0,
+      "v51_total": 55.3,
+      "v52_total": 49.08,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz002378",
+      "name": "章源钨业",
+      "g_q": -0.65,
+      "v51_growth": 8.0,
+      "v52_growth": 4.0,
+      "v51_total": 55.24,
+      "v52_total": 45.94,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz300130",
+      "name": "新国都",
+      "g_q": -0.078,
+      "v51_growth": 7.9,
+      "v52_growth": 4.0,
+      "v51_total": 54.96,
+      "v52_total": 50.24,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz301498",
+      "name": "乖宝宠物",
+      "g_q": -0.8093,
+      "v51_growth": 7.04,
+      "v52_growth": 4.0,
+      "v51_total": 54.92,
+      "v52_total": 50.64,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz000533",
+      "name": "顺钠股份",
+      "g_q": -0.1305,
+      "v51_growth": 7.44,
+      "v52_growth": 4.0,
+      "v51_total": 54.31,
+      "v52_total": 47.37,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz300893",
+      "name": "松原安全",
+      "g_q": -0.11,
+      "v51_growth": 8.37,
+      "v52_growth": 4.0,
+      "v51_total": 54.19,
+      "v52_total": 47.23,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh688182",
+      "name": "灿勤科技",
+      "g_q": -0.2571,
+      "v51_growth": 9.45,
+      "v52_growth": 4.0,
+      "v51_total": 54.18,
+      "v52_total": 46.8,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh603112",
+      "name": "华翔股份",
+      "g_q": -0.4299,
+      "v51_growth": 6.06,
+      "v52_growth": 4.0,
+      "v51_total": 54.09,
+      "v52_total": 52.24,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz300824",
+      "name": "北鼎股份",
+      "g_q": -0.3054,
+      "v51_growth": 7.03,
+      "v52_growth": 4.0,
+      "v51_total": 54.05,
+      "v52_total": 49.77,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz001227",
+      "name": "兰州银行",
+      "g_q": -0.0285,
+      "v51_growth": 6.0,
+      "v52_growth": 4.0,
+      "v51_total": 53.72,
+      "v52_total": 49.91,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh688307",
+      "name": "中润光学",
+      "g_q": -0.5589,
+      "v51_growth": 6.46,
+      "v52_growth": 4.0,
+      "v51_total": 53.65,
+      "v52_total": 54.15,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh603809",
+      "name": "豪能股份",
+      "g_q": -0.524,
+      "v51_growth": 7.56,
+      "v52_growth": 4.0,
+      "v51_total": 53.48,
+      "v52_total": 49.05,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh688545",
+      "name": "兴福电子",
+      "g_q": -0.0532,
+      "v51_growth": 7.37,
+      "v52_growth": 4.0,
+      "v51_total": 52.78,
+      "v52_total": 50.5,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh688629",
+      "name": "华丰科技",
+      "g_q": -0.4107,
+      "v51_growth": 6.82,
+      "v52_growth": 4.0,
+      "v51_total": 52.73,
+      "v52_total": 49.86,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz300409",
+      "name": "道氏技术",
+      "g_q": -1.0962,
+      "v51_growth": 6.8,
+      "v52_growth": 4.0,
+      "v51_total": 52.43,
+      "v52_total": 46.83,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh688372",
+      "name": "伟测科技",
+      "g_q": -0.2173,
+      "v51_growth": 6.0,
+      "v52_growth": 4.0,
+      "v51_total": 51.45,
+      "v52_total": 51.07,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz002324",
+      "name": "普利特",
+      "g_q": -0.8333,
+      "v51_growth": 7.73,
+      "v52_growth": 4.0,
+      "v51_total": 51.42,
+      "v52_total": 46.66,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz301608",
+      "name": "博实结",
+      "g_q": -0.042,
+      "v51_growth": 6.62,
+      "v52_growth": 4.0,
+      "v51_total": 51.39,
+      "v52_total": 48.15,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh603166",
+      "name": "福达股份",
+      "g_q": -0.0491,
+      "v51_growth": 6.28,
+      "v52_growth": 4.0,
+      "v51_total": 49.87,
+      "v52_total": 47.64,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz000735",
+      "name": "罗 牛 山",
+      "g_q": -28.9259,
+      "v51_growth": 8.0,
+      "v52_growth": 4.0,
+      "v51_total": 49.61,
+      "v52_total": 41.51,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh603859",
+      "name": "能科科技",
+      "g_q": -0.4971,
+      "v51_growth": 6.0,
+      "v52_growth": 4.0,
+      "v51_total": 49.31,
+      "v52_total": 48.02,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh688503",
+      "name": "聚和材料",
+      "g_q": -0.956,
+      "v51_growth": 6.0,
+      "v52_growth": 4.0,
+      "v51_total": 49.1,
+      "v52_total": 48.7,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz000848",
+      "name": "承德露露",
+      "g_q": -0.4098,
+      "v51_growth": 6.0,
+      "v52_growth": 4.0,
+      "v51_total": 48.26,
+      "v52_total": 44.08,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh603270",
+      "name": "金帝股份",
+      "g_q": -1.0925,
+      "v51_growth": 6.85,
+      "v52_growth": 4.0,
+      "v51_total": 48.14,
+      "v52_total": 46.73,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz301513",
+      "name": "尚水智能",
+      "g_q": -1.8165,
+      "v51_growth": 6.01,
+      "v52_growth": 4.0,
+      "v51_total": 46.94,
+      "v52_total": 42.94,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh688179",
+      "name": "阿拉丁",
+      "g_q": -0.0278,
+      "v51_growth": 6.0,
+      "v52_growth": 4.0,
+      "v51_total": 46.7,
+      "v52_total": 50.1,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz300468",
+      "name": "四方精创",
+      "g_q": -0.1442,
+      "v51_growth": 7.74,
+      "v52_growth": 4.0,
+      "v51_total": 43.34,
+      "v52_total": 35.84,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh688627",
+      "name": "精智达",
+      "g_q": -0.3994,
+      "v51_growth": 6.0,
+      "v52_growth": 4.0,
+      "v51_total": 43.06,
+      "v52_total": 43.64,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz300969",
+      "name": "恒帅股份",
+      "g_q": -0.1753,
+      "v51_growth": 6.0,
+      "v52_growth": 4.0,
+      "v51_total": 42.84,
+      "v52_total": 42.11,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh688757",
+      "name": "胜科纳米",
+      "g_q": -0.4858,
+      "v51_growth": 6.0,
+      "v52_growth": 4.0,
+      "v51_total": 41.33,
+      "v52_total": 37.35,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh603175",
+      "name": "超颖电子",
+      "g_q": -0.0227,
+      "v51_growth": 7.13,
+      "v52_growth": 4.0,
+      "v51_total": 40.29,
+      "v52_total": 34.01,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh603151",
+      "name": "邦基科技",
+      "g_q": -1.0212,
+      "v51_growth": 6.0,
+      "v52_growth": 4.0,
+      "v51_total": 38.05,
+      "v52_total": 34.95,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sh688775",
+      "name": "影石创新",
+      "g_q": -0.9182,
+      "v51_growth": 6.98,
+      "v52_growth": 4.0,
+      "v51_total": 36.39,
+      "v52_total": 31.97,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz300348",
+      "name": "长亮科技",
+      "g_q": -3.7315,
+      "v51_growth": 6.94,
+      "v52_growth": 4.0,
+      "v51_total": 35.43,
+      "v52_total": 29.89,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz301550",
+      "name": "斯菱智驱",
+      "g_q": -0.0734,
+      "v51_growth": 6.37,
+      "v52_growth": 4.0,
+      "v51_total": 35.08,
+      "v52_total": 31.79,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz002181",
+      "name": "粤 传 媒",
+      "g_q": -0.0225,
+      "v51_growth": 6.71,
+      "v52_growth": 4.0,
+      "v51_total": 27.34,
+      "v52_total": 21.92,
+      "v52_cap_triggered": true
+    },
+    {
+      "code": "sz301059",
+      "name": "金三江",
+      "g_q": -0.2242,
+      "v51_growth": 8.0,
+      "v52_growth": 4.0,
+      "v51_total": 23.26,
+      "v52_total": 62.47,
+      "v52_cap_triggered": true
+    }
+  ]
+}

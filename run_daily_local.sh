@@ -262,8 +262,9 @@ else
 fi
 
 # Step 3.9: Portfolio
-echo "[$(date '+%H:%M:%S')] Running pick_portfolio.py ..." >> "$LOG"
-if $PY pick_portfolio.py "$SCORED_JSON" --top 10 --per-sector 3 --per-parent 2 >> "$LOG" 2>&1; then
+# v5.2（2026-11-27 老大裁决隐患三）：per_sector 3→2，收紧同链 β 敞口（L1 偏离 8pp 不变）。
+echo "[$(date '+%H:%M:%S')] Running pick_portfolio.py (per_sector=2) ..." >> "$LOG"
+if $PY pick_portfolio.py "$SCORED_JSON" --top 10 --per-sector 2 --per-parent 2 >> "$LOG" 2>&1; then
   # 2026-11-24 P0-5 #2：上游日期自检。报告层已有「日期不一致不展示」守卫，
   # 但那要等出图时才发现；这里第一时间把「产物日期≠数据日期」记账为降级。
   PF_JSON="sector/portfolio_${BJ_TODAY}.json"

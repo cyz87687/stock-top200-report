@@ -213,13 +213,20 @@ class TestWeightsUntouched(unittest.TestCase):
         import hashlib
         p = os.path.join(HERE, "factor_weights.json")
         h = hashlib.sha1(open(p, "rb").read()).hexdigest()
+        # ⚠️ 2026-11-27 指纹更新（39e2f2d3 → e24759c9），是哪一步改的：
+        #   v5.2-top50-hazard-fix —— 老大裁决「按你的方案a改，3个隐患也全改」全量进总分。
+        #   **只改 version 字段 + score_gates 说明文本；weights/dim_max 与 v5.1 逐字节一致**
+        #   （verify_weights_round36 已核 Σw=1.0、7 生效维、六方一致）。属 score 口径升级
+        #   （g_q<0 最终分硬上限 + ep 软降权 + 组合 per_sector 3→2），**不是权重变更**。
+        #   ⚠️ 但总分口径变了 → total 跨 v5.1/v5.2 禁比；先验产品裁决非 IC 背书
+        #   （G5 未过、准入五门 FAIL、IC 与头部超额反向），禁称「经验证的 alpha」。
         # ⚠️ 2026-11-25 指纹更新（c9104e9d → 39e2f2d3），是哪一步改的：
         #   v5.1-es-pending-ep-reclaim —— 老大裁决「落方案a，评分加到估值中，
         #   负基数归 structural」：score_es 权重 0.05→0（转 pending_dims 研究项，
         #   权重表 = 实际生效权重，清「名义5%/实际0」口径债）、score_ep 0.15→0.20
         #   （唯一合法回收去处）。**这是真实的权重变更**，不是 score 口径升级。
         #   total 跨 v5.0/v5.1 禁比；ep 加权为产品裁决非 IC 背书（准入五门 FAIL）。
-        self.assertEqual(h, "39e2f2d391e98fcdca1ccd72101d4263a00e1450",
+        self.assertEqual(h, "e24759c9dbb282b5390d291321128bbf53990709",
                          "factor_weights.json 指纹变了 —— 改动前先回答「是哪一步改的」")
 
     def test_version_still_v417(self):

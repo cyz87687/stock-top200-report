@@ -51,8 +51,9 @@ else
 fi
 
 # Step 3.9: Portfolio
-echo "[$(date '+%H:%M:%S')] Running pick_portfolio.py ..." >> "$LOG"
-if $PY pick_portfolio.py "$SCORED" --top 10 --per-sector 3 --per-parent 2 >> "$LOG" 2>&1; then
+# v5.2（2026-11-27 老大裁决隐患三）：per_sector 3→2，收紧同链 β 敞口。
+echo "[$(date '+%H:%M:%S')] Running pick_portfolio.py (per_sector=2) ..." >> "$LOG"
+if $PY pick_portfolio.py "$SCORED" --top 10 --per-sector 2 --per-parent 2 >> "$LOG" 2>&1; then
   echo "[$(date '+%H:%M:%S')] ✅ Portfolio generated" >> "$LOG"
   $PY gen_portfolio_report.py >> "$LOG" 2>&1 || echo "⚠️ Portfolio report failed" >> "$LOG"
 else

@@ -1,0 +1,50 @@
+{
+  "version": "v5.2-shadow",
+  "asof": "2026-11-27",
+  "note": "Top50 剔除封顶失效票的影子对照：v5.1→v5.2 因 g_q 硬上限+ep软降权跌出Top50的个股。仅研究，不回主页。跨版本total禁比。",
+  "dropped_from_top50": 6,
+  "items": [
+    {
+      "code": "sh603444",
+      "old_rank": 38,
+      "new_rank": 153,
+      "old_total": 76.88,
+      "new_total": 68.09
+    },
+    {
+      "code": "sh603067",
+      "old_rank": 40,
+      "new_rank": 97,
+      "old_total": 76.79,
+      "new_total": 71.47
+    },
+    {
+      "code": "sh600378",
+      "old_rank": 43,
+      "new_rank": 104,
+      "old_total": 75.42,
+      "new_total": 70.74
+    },
+    {
+      "code": "sz002353",
+      "old_rank": 46,
+      "new_rank": 52,
+      "old_total": 75.2,
+      "new_total": 75.2
+    },
+    {
+      "code": "sh600354",
+      "old_rank": 47,
+      "new_rank": 53,
+      "old_total": 75.06,
+      "new_total": 75.05
+    },
+    {
+      "code": "sh600531",
+      "old_rank": 50,
+      "new_rank": 63,
+      "old_total": 74.58,
+      "new_total": 73.6
+    }
+  ]
+}

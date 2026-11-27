@@ -328,6 +328,13 @@ def main():
                 ocfg=r.get("ocfg"), roe=r.get("roe"))
             if _lb_note and not _g1n:
                 _g1n = _lb_note
+            # v5.2（2026-11-27，老大裁决「全量进总分」）：g_q<0 最终成长分硬上限 4.0。
+            #   ⚠️ 此处覆盖 step2 的 score_growth —— 必须装与 step2 同一道门，否则等于没装
+            #   （round17 / 2026-11-05 教训）。单一实现 growth_factor_b.gq_neg_final_cap，
+            #   g_q 口径复用 _gfb（方式B唯一来源）。
+            _sg, _gq_note = _gfb_mod.gq_neg_final_cap(_sg, _gfb.get("g_q"))
+            if _gq_note and not _g1n:
+                _g1n = _gq_note
             r["score_growth"] = (round(float(_sg), 2) if isinstance(_sg, (int, float)) else None)
             if _g1n and not r.get("growth_anchor_note"):
                 r["growth_anchor_note"] = _g1n

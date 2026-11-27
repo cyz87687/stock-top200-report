@@ -118,3 +118,7 @@ ywd73zn8
 
 # 前50合理性审计台账（可复现证据）
 !data/top50_audit_2026-11-24.json
+
+# v5.2 三隐患研究层产物（监控清单 + 影子对照，可复现证据）
+!data/gq_neg_monitor_2026-11-27.json
+!data/top50_shadow_compare_2026-11-27.json

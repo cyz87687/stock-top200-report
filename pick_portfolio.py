@@ -21,7 +21,8 @@ v4.18（round122，金融工程师视角 P0/P1 落地）:
   · P1   行业暴露偏离由「只查超配」改为**双向**, 低配也披露
 
 用法:
-  python3 pick_portfolio.py [scored_json] [--top 10] [--per-sector 3] [--out sector/portfolio_<date>.html]
+  python3 pick_portfolio.py [scored_json] [--top 10] [--per-sector 2] [--out sector/portfolio_<date>.html]
+  v5.2（2026-11-27）：--per-sector 默认 3→2（老大裁决隐患三，收紧同链板块敞口；L1 偏离 8pp 不变）。
   对照开关: --no-reach-check(旧停止条件) --no-risk(强制满仓) --no-l1-cap(关行业偏离)
 """
 import os
@@ -549,7 +550,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('scored', nargs='?', default=None)
     ap.add_argument('--top', type=int, default=10)
-    ap.add_argument('--per-sector', type=int, default=3)
+    ap.add_argument('--per-sector', type=int, default=2,
+                    help='同一申万二级板块最多N只（v5.2 从3收紧到2，防同链β集中）')
     ap.add_argument('--per-parent', type=int, default=2, help='同一申万一级行业最多N只(防行业集中)')
     ap.add_argument('--min-total', type=float, default=12.0, help='最低综合评分(默认12, 只推B级及以上)')
     ap.add_argument('--no-route-pool', action='store_true',

@@ -863,10 +863,10 @@ _conc_color = "#dc2626" if _conc_max_pct > 25 else ("#f59e0b" if _conc_warn else
 
 # ===== 2026-11-24 P1-5：头部行业集中度 + 按行业上限约束的 TopN 视图 =====
 # 实证：Top50 半导体10+元件9+通信设备4=23只(46%)，逐股独立打分无行业相关性约束。
-# 处置：在报告层额外给出「申万二级每行业≤3 只」约束后的 TopN（与 pick_portfolio
-#   的 --per-sector 3 同口径），让读者看到「分散化后的头部」而非仅集中版 Top50。
+# 处置：在报告层额外给出「申万二级每行业≤2 只」约束后的 TopN（与 pick_portfolio
+#   的 --per-sector 2 同口径，v5.2 从 3 收紧），让读者看到「分散化后的头部」而非仅集中版 Top50。
 # ⚠️ 只做展示层视图，不改评分/名次（因子层行业中性化属模型口径变更，待裁决）。
-TOP_SECTOR_CAP = 3
+TOP_SECTOR_CAP = 2
 
 
 def _sector_capped_top(items, n=50, cap=TOP_SECTOR_CAP):
@@ -9303,6 +9303,26 @@ for idx, r in enumerate(top20):
     _q3_badge = ""
     _es_badge = ""
 
+    # ===== v5.2（2026-11-27）三隐患封顶徽标：让「为何高成长/高估值被压」可解释 =====
+    # 字段均来自 scored（step2 落盘），徽标只做展示，不二次计分。
+    _ep_cap_badge = ""
+    if r.get("ep_capped"):
+        _ep_cap_badge = ('<span title="增速恶化（单季同比为负/环比≤−20%）触发估值维降权：'
+                         'v5.2 起 ep=max(6.0, ep_raw−2.0) 保留区分度；本季亏损仍硬封顶6.0" '
+                         'style="font-size:11px;font-weight:700;padding:1px 6px;'
+                         'border-radius:3px;background:#ede9fe;color:#6d28d9;margin-left:6px;cursor:help;">'
+                         '📉估值降权</span>')
+    _gq_cap_badge = ""
+    _fb_detail = r.get("fund_detail") if isinstance(r.get("fund_detail"), dict) else {}
+    _mb_badge = _fb_detail.get("modeB") if isinstance(_fb_detail.get("modeB"), dict) else {}
+    _gq_badge_val = _mb_badge.get("g_q")
+    if isinstance(_gq_badge_val, (int, float)) and _gq_badge_val < 0:
+        _gq_cap_badge = ('<span title="单季扣非同比为负（g_q&lt;0）→ 成长分最终硬上限4.0 '
+                         '（v5.2 gq_neg_final_cap，百分位之后再钉一次）" '
+                         'style="font-size:11px;font-weight:700;padding:1px 6px;'
+                         'border-radius:3px;background:#fee2e2;color:#b91c1c;margin-left:6px;cursor:help;">'
+                         f'⚠️单季下滑 g_q={_gq_badge_val:+.1%}</span>')
+
     # ===== v4.17 趋势状态徽标（空头排列/弱势/企稳中/多头排列，round90 趋势诊断）=====
     # 判定纯数据驱动（tech.ma5/10/20/60 + 现价），缺数据不渲染；不进评分、只作入场提示。
     _trend_badge = ""
@@ -9532,7 +9552,7 @@ for idx, r in enumerate(top20):
             <div class="header-row">
                 <div class="rank" style="background:{rank_color}">#{i}</div>
                 <div>
-                    <div class="name">{r['name']}{change_tag}{ai_badge}{_risk_badge}{_lowbase_badge}{_q3_badge}{_es_badge}{_trend_badge}</div>
+                    <div class="name">{r['name']}{change_tag}{ai_badge}{_risk_badge}{_lowbase_badge}{_ep_cap_badge}{_gq_cap_badge}{_q3_badge}{_es_badge}{_trend_badge}</div>
                     <div class="code">{r['code']} · {sector_disp(r)}</div>
                 </div>
                 {_toggle}
@@ -10888,7 +10908,11 @@ try:
         + f' 合计 {_top3_pct:.0f}%'
         + f'，存在同链集中风险。按<b>申万二级每行业≤{TOP_SECTOR_CAP}只</b>约束后的分散版前10：'
         + html_mod.escape(_capped_names)
-        + '（仅展示视图，不改评分名次；因子层行业中性化待裁决）</div>')
+        + '（仅展示视图，不改评分名次；因子层行业中性化待裁决）。'
+        + '<b>⚠️ 口径提示（v5.2）</b>：同链富集是「评分榜单」的 <b>β 敞口</b>，'
+        + '并非行业被低估的证据 —— ES 权重已归零、IC 与头部超额方向相反，'
+        + '禁止据此推断「元件被低估」或直接等权买入榜单；实际组合另受 '
+        + '<code>per_sector≤2</code> 与 L1 偏离 8pp 约束。</div>')
 except Exception as _ce:
     _conc_disclose = ""
 

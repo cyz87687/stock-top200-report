@@ -5362,18 +5362,29 @@ def main():
         #   禁在此重算 G_q/QoQ）。封顶只在本处生效一次（enhance 层不再动 ep）。
         #   round106：负基数票 G_q/QoQ 均无定义（None）→ 仅靠前两条会漏掉双亏票，
         #   补「q_profit<0 本季亏损」触发堵洞。
+        #   v5.2（2026-11-27，老大裁决「全量进总分」）：硬钉 6.0 改为软降权，
+        #   唯一实现 growth_factor_b.ep_quality_gate（本处单点消费，enhance 不动 ep）。
+        #   命中增速恶化 → ep = max(6.0, ep_raw−2.0) 保留区分度；本季亏损仍硬封顶不豁免。
         _cap5 = False
         if isinstance(s_ep, (int, float)):
             _mb5 = _GFB_MAP.get(code) or {}
             _gq5, _qq5 = _mb5.get("g_q"), _mb5.get("qoq")
             _qp5 = _mb5.get("q_profit")
-            if ((isinstance(_gq5, (int, float)) and _gq5 < 0)
-                    or (isinstance(_qq5, (int, float)) and _qq5 < -0.20)
-                    or (isinstance(_qp5, (int, float)) and _qp5 < 0)):
-                if s_ep > 6.0:
-                    s_ep = 6.0
-                    _cap5 = True
-                    _EP_CAP_LOG.append(f"{name}({code})")
+            _ep_hit5 = ((isinstance(_gq5, (int, float)) and _gq5 < 0)
+                        or (isinstance(_qq5, (int, float)) and _qq5 < -0.20)
+                        or (isinstance(_qp5, (int, float)) and _qp5 < 0))
+            _qp5_loss = isinstance(_qp5, (int, float)) and _qp5 < 0
+            _sus5 = sustain_info if isinstance(sustain_info, dict) else {}
+            _ocfni5, _accr5 = _quality_cash.get(code) or (None, None)
+            _cash_ok5 = not ((isinstance(_ocfni5, (int, float)) and _ocfni5 < 0)
+                             or (isinstance(_accr5, (int, float)) and _accr5 < -10))
+            s_ep, _ep_note5 = _gfb_mod.ep_quality_gate(
+                s_ep, _ep_hit5, quality=s_quality,
+                is_cyclic=bool(_sus5.get("is_cyclic")), cash_ok=_cash_ok5,
+                q_loss=_qp5_loss)
+            if _ep_note5:
+                _cap5 = True
+                _EP_CAP_LOG.append(f"{name}({code})")
         s_size_growth = _sg_rank.get(_c6)
         s_dominant = _dom_rank.get(_c6)
         # ══ v5.0（2026-11-23）：市值双维**合并取高** ══
@@ -5403,6 +5414,14 @@ def main():
             ocfg=_ths_ex.get("ocfg"), roe=roe_input)
         if _lb_note and not _g1n_a:
             _g1n_a = _lb_note
+        # v5.2（2026-11-27，老大裁决「全量进总分」）：g_q<0 最终成长分硬上限 4.0。
+        #   单一实现 growth_factor_b.gq_neg_final_cap；g_q 口径复用 _GFB_MAP（方式B唯一来源）。
+        #   ⚠️ enhance 会覆盖 score_growth —— 那里必须装同一道门（见 enhance:anchor_gate 处）。
+        _mb_gq5 = _GFB_MAP.get(code) or {}
+        s_growth, _gq_note5 = _gfb_mod.gq_neg_final_cap(
+            s_growth, _mb_gq5.get("g_q"))
+        if _gq_note5 and not _g1n_a:
+            _g1n_a = _gq_note5
         s_size_growth, _g1n_b = _gfb_mod.anchor_gate(s_size_growth, cagr3_input)
         # v5.0：合并维也过同一道成长存量门槛（它含 size_growth 成分）
         s_size_comb, _g1n_c = _gfb_mod.anchor_gate(s_size_comb, cagr3_input)
@@ -5760,9 +5779,10 @@ def main():
         "market_review": build_market_review(money_effect, None, results),
     }
     
-    # round105 P1-5 收尾汇总（禁静默：ep 封顶必须可见）
+    # round105 P1-5 / v5.2 收尾汇总（禁静默：ep 降权必须可见）
     if _EP_CAP_LOG:
-        print(f"\n📉 P1-5 增速恶化 ep 封顶（≤6.0）: {len(_EP_CAP_LOG)} 只 | "
+        print(f"\n📉 增速恶化 ep 软降权（v5.2：max(6.0,ep_raw−2.0)；本季亏损硬封顶6.0）: "
+              f"{len(_EP_CAP_LOG)} 只 | "
               + " / ".join(_EP_CAP_LOG[:15]) + (" ..." if len(_EP_CAP_LOG) > 15 else ""))
 
     with open(out, "w") as f:

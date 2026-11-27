@@ -501,6 +501,77 @@ def cyclic_caps(score_growth, score_ep, is_cyclic, fwd_pe=None):
     return g, ep, ("；".join(notes) if notes else None)
 
 
+# ---- 2026-11-27 Top50 隐患一：g_q<0 最终成长分硬上限（老大裁决「全量进总分」）----
+GQ_NEG_FINAL_CAP = 4.0
+
+
+def gq_neg_final_cap(score, g_q, cap=GQ_NEG_FINAL_CAP):
+    """单季扣非同比为负（g_q<0）→ **最终** score_growth 硬上限 cap（默认 4.0）。
+
+    背景：`compute_growth` 内的 `gq_neg_cap_0.4` 只作用于全池百分位**之前**的
+    中间 composite，最终 `score_growth = 全池百分位/10`，故「封顶治显示不治排序」——
+    源码 anchor_gate 注释（第 406 行）已自认。实证：全池 77 只、Top50 4 只
+    g_q<0 但成长分≥6（振华股份 g_q=−0.316→8.0、涛涛车业→9.41、吉比特→8.87）。
+    本函数在**百分位之后**再施加一次最终分硬上限，使「单季下滑」门槛落到输出。
+
+    ⚠️ 单一实现来源：step2（s_growth 消费点，anchor_gate 同处）与 enhance_scores
+       （方式B回写覆盖 score_growth 处）都必须调本函数，两处各写一份必然漂移且不报错
+       （round17 / 2026-11-05 教训）。
+    ⚠️ 不误伤：g_q 缺失 / 负基数(None) / 非数值 不触发（neg_base_neutral 哲学）；
+       已 ≤cap 不动；cagr3 弱锚票由既有 anchor_gate 处理，本函数不重复。
+    ⚠️ 先验产品裁决，非 IC 背书（G5 未过、长面板因缺 score_size_comb 重建失败）：
+       禁称「经验证的 alpha」，total 跨版本禁比。
+    返回 (score_after, note_or_None)；score 非数值时原样返回（缺维不补）。
+    """
+    def _is_num(v):
+        return isinstance(v, (int, float)) and not isinstance(v, bool) and v == v
+    if not _is_num(g_q) or g_q >= 0:
+        return score, None
+    if not _is_num(score) or score <= cap:
+        return score, None
+    return cap, f"g_q={g_q:.4f}<0→成长分硬上限{cap:.1f}(单季下滑)"
+
+
+# ---- 2026-11-27 Top50 隐患二：增速恶化 ep 软降权（老大裁决「全量进总分」）----
+EP_HARD_CAP = 6.0         # 本季亏损（真变脸票）硬封顶，不豁免
+EP_SOFT_FLOOR = 6.0       # 软降权下限（与旧硬顶一致，避免恶化票估值维崩塌）
+EP_SOFT_DEDUCTION = 2.0   # 软降权幅度：ep=max(6.0, ep_raw−2.0)
+
+
+def ep_quality_gate(ep, ep_cap_hit, quality=None, is_cyclic=False,
+                    cash_ok=True, mode="soft", q_loss=False):
+    """增速恶化票 ep 降权（v5.2，替代 round105 P1-5 的硬钉 6.0）。
+
+    round105 旧口径：G_q<0 或 QoQ<−20% 或 本季亏损 → ep 硬钉 6.0，
+    所有恶化票估值维同分、失去区分度，导致优质龙头（新易盛 ep 9.85→6.0）
+    被高 β 票倒挂。本函数改为：
+      · 未命中 ep_cap_hit → 原样返回（单一触发判定仍在 step2，口径复用 _GFB_MAP）。
+      · 本季亏损（q_loss=True）→ 保持硬封顶 6.0（真变脸票不豁免）。
+      · 仅增速恶化的盈利票 → 软降权 ep = max(6.0, ep_raw − 2.0)，保留区分度。
+      · 龙头豁免（quality≥8 且非周期且 cash_ok）暂不启用：质量分是模型产物，
+        用它做 gate 有内生性/循环论证风险；参数保留供 walkforward 验证后开启
+        （传 mode="exempt"）。先测软降权（老大裁决的推荐档）。
+    ⚠️ 单一实现：仅在 step2 的 ep 封顶点消费一次（enhance 层不再动 ep，沿用旧纪律）。
+    ⚠️ 先验产品裁决，非 IC 背书，禁称「经验证的 alpha」，total 跨版本禁比。
+    返回 (ep_after, note_or_None)。
+    """
+    def _is_num(v):
+        return isinstance(v, (int, float)) and not isinstance(v, bool) and v == v
+    if not ep_cap_hit or not _is_num(ep):
+        return ep, None
+    if q_loss:
+        if ep > EP_HARD_CAP:
+            return EP_HARD_CAP, f"本季亏损→ep硬封顶{EP_HARD_CAP:.1f}(真变脸不豁免)"
+        return ep, None
+    if mode == "exempt" and _is_num(quality) and quality >= 8.0 \
+            and not is_cyclic and cash_ok:
+        return ep, "优质龙头豁免ep降权(质量≥8/非周期/现金流正)—未启用待验证"
+    if ep > EP_SOFT_FLOOR:
+        after = max(EP_SOFT_FLOOR, ep - EP_SOFT_DEDUCTION)
+        return round(after, 4), f"增速恶化→ep软降{ep:.2f}→{after:.2f}(下限{EP_SOFT_FLOOR:.1f})"
+    return ep, None
+
+
 def compute_growth(rows, style="steady", em_all=None, as_of=None, pit_grace=0):
     """方式B 成长因子截面计算（round106 口径）。
 

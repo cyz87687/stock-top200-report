@@ -185,8 +185,9 @@ jobs:
             fi
 
             # Step 3.9: 每日组合 — 板块60日动量规则(A: 动量 / B: 反转) + 评分选股
-            echo "[$(date -u '+%H:%M:%S')] Running pick_portfolio.py ..." >> $LOG
-            if python3 pick_portfolio.py "$SCORED_JSON" --top 10 --per-sector 3 --per-parent 2 >> $LOG 2>&1; then
+            # v5.2（2026-11-27 老大裁决隐患三）：per_sector 3→2，收紧同链 β 敞口。
+            echo "[$(date -u '+%H:%M:%S')] Running pick_portfolio.py (per_sector=2) ..." >> $LOG
+            if python3 pick_portfolio.py "$SCORED_JSON" --top 10 --per-sector 2 --per-parent 2 >> $LOG 2>&1; then
               echo "[$(date -u '+%H:%M:%S')] ✅ Portfolio generated" >> $LOG
               # 2026-11-24 P0-5：组合报告单独留痕（原 `|| echo` 把失败吞成一行告警，
               # 页面上组合区块究竟是「没选出来」还是「报告没出」无法区分）。

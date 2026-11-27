@@ -302,7 +302,7 @@ def main():
     <li><span class="mono">python3 enhance_scores.py &lt;scored&gt; ai_assessment.json</span> — 叠加 AI 层与基本面导数</li>
     <li><span class="mono">python3 sector_momentum_daily.py</span> — 抓全市场近 90 日 K 线，自建申万二级板块指数，输出 60/10 日动量与排名（约 70 秒）</li>
     <li><span class="mono">python3 apply_sector_momentum.py &lt;scored&gt; --mode evidence</span> — 并入第五维，重算总分与评级</li>
-    <li><span class="mono">python3 pick_portfolio.py &lt;scored&gt; --top 10 --per-sector 3</span> — 按板块规则生成 A/B 两套组合</li>
+    <li><span class="mono">python3 pick_portfolio.py &lt;scored&gt; --top 10 --per-sector 2</span> — 按板块规则生成 A/B 两套组合（v5.2 起二级行业上限 3→2，收紧同链 β 敞口）</li>
     <li><span class="mono">python3 gen_portfolio_report.py</span> — 生成本报告</li>
   </ol>
   <p style="font-size:13px">行业映射 <span class="mono">sector/sw_map.json</span> 建议每周更新一次：<span class="mono">python3 fetch_sw_map.py</span>。</p>
